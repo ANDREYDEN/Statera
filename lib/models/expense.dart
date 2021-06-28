@@ -11,10 +11,6 @@ class Expense {
 
   List<Assignee> get assignees => items[0].assignees;
 
-  addItem(Item item) {
-    items.add(item);
-  }
-
   addAssignees(List<Assignee> assignees) {
     items.forEach((item) {
       item.assignees.setAll(0, assignees);
