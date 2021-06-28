@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
+import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/expense_list_item.dart';
 
 class ExpenseList extends StatefulWidget {
@@ -18,11 +20,15 @@ class _ExpenseListState extends State<ExpenseList> {
   List<Expense> expenses = [];
   var newExpenseNameController = TextEditingController();
 
+  AuthenticationViewModel get authVm =>
+      Provider.of<AuthenticationViewModel>(context, listen: false);
+
   @override
   void initState() {
-    var testExpense = Expense(author: "asd", name: "First Expense");
+    var testExpense =
+        Expense(author: this.authVm.user.uid, name: "First Expense");
     testExpense.addItem(Item(name: "Apple", value: 4));
-    testExpense.addAssignees([Assignee(uid: "asd")]);
+    testExpense.addAssignees([Assignee(uid: this.authVm.user.uid)]);
     expenses.add(testExpense);
     super.initState();
   }
@@ -45,7 +51,7 @@ class _ExpenseListState extends State<ExpenseList> {
                 onPressed: () {
                   setState(() {
                     this.expenses.add(Expense(
-                          author: "asd",
+                          author: this.authVm.user.uid,
                           name: newExpenseNameController.text,
                         ));
                   });

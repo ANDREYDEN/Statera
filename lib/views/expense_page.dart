@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
+import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/item_list_item.dart';
 
 class ExpensePage extends StatefulWidget {
@@ -19,6 +21,8 @@ class _ExpensePageState extends State<ExpensePage> {
   var newItemNameController = new TextEditingController();
   var newItemValueController = new TextEditingController();
 
+  AuthenticationViewModel get authVm =>
+      Provider.of<AuthenticationViewModel>(context, listen: false);
   List<Item> get items => widget.expense.items;
 
   @override
@@ -49,9 +53,9 @@ class _ExpensePageState extends State<ExpensePage> {
                 onPressed: () {
                   setState(() {
                     widget.expense.addItem(Item(
-                          name: newItemNameController.text,
-                          value: double.parse(newItemValueController.text),
-                        ));
+                      name: newItemNameController.text,
+                      value: double.parse(newItemValueController.text),
+                    ));
                   });
                   Navigator.of(context).pop();
                 },
@@ -70,12 +74,14 @@ class _ExpensePageState extends State<ExpensePage> {
             item: item,
             onConfirm: () {
               setState(() {
-                item.setAssigneeDecision("asd", ExpenseDecision.Confirmed);
+                item.setAssigneeDecision(
+                    this.authVm.user.uid, ExpenseDecision.Confirmed);
               });
             },
             onDeny: () {
               setState(() {
-                item.setAssigneeDecision("asd", ExpenseDecision.Denied);
+                item.setAssigneeDecision(
+                    this.authVm.user.uid, ExpenseDecision.Denied);
               });
             },
           );

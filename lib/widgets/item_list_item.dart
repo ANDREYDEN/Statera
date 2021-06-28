@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/models/item.dart';
+import 'package:statera/viewModels/authentication_vm.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
@@ -10,11 +11,14 @@ class ItemListItem extends StatelessWidget {
 
   const ItemListItem({
     Key? key,
-    required this.item, required this.onConfirm, required this.onDeny,
+    required this.item,
+    required this.onConfirm,
+    required this.onDeny,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
     return Padding(
       padding: EdgeInsets.all(10),
       child: Row(
@@ -28,19 +32,14 @@ class ItemListItem extends StatelessWidget {
                 onPressed: this.onConfirm,
                 icon: Icon(
                   Icons.check,
-                  color:
-                      item.assigneeDecision("asd") == ExpenseDecision.Confirmed
-                          ? Colors.green
-                          : Colors.grey,
+                  color: authVm.isConfirmed(item) ? Colors.green : Colors.grey,
                 ),
               ),
               IconButton(
                 onPressed: this.onDeny,
                 icon: Icon(
                   Icons.close,
-                  color: item.assigneeDecision("asd") == ExpenseDecision.Denied
-                      ? Colors.red
-                      : Colors.grey,
+                  color: authVm.isDenied(item) ? Colors.red : Colors.grey,
                 ),
               ),
             ],
