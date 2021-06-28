@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/mainNavigation.dart';
+import 'package:statera/main_navigation.dart';
 
 void main() {
   runApp(Statera());

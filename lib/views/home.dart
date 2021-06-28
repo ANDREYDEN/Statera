@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:statera/page_scaffold.dart';
+import 'package:statera/views/expense_list.dart';
 
 class Home extends StatefulWidget {
   static const String route = '/';
@@ -12,8 +14,19 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text("Home"),
+    return PageScaffold(
+      title: "Statera",
+      child: Column(
+        children: [
+          Text("Home"),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(ExpenseList.route);
+            },
+            child: Text("My Expeses"),
+          )
+        ],
+      ),
     );
   }
 }
