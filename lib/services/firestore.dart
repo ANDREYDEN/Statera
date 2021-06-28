@@ -4,6 +4,9 @@ import 'package:statera/models/expense.dart';
 class Firestore {
   late FirebaseFirestore _firestore;
 
+  CollectionReference get expensesCollection =>
+      _firestore.collection("expenses");
+
   Firestore._privateConstructor() {
     _firestore = FirebaseFirestore.instance;
   }
@@ -11,6 +14,26 @@ class Firestore {
   static Firestore get instance => Firestore._privateConstructor();
 
   addExpense(Expense expense) {
-    _firestore.collection("expenses").add(expense.toFirestore());
+    expensesCollection.add(expense.toFirestore());
+  }
+
+  Stream<List<Expense>> listenForAssignedExpensesForUser(String uid) {
+    return expensesCollection
+        .where("assignees", arrayContains: uid)
+        .snapshots()
+        .map<List<Expense>>((snap) => snap.docs
+            .map((doc) =>
+                Expense.fromFirestore(doc.data() as Map<String, dynamic>))
+            .toList());
+  }
+
+  Stream<List<Expense>> listenForAuthoredExpensesForUser(String uid) {
+    return expensesCollection
+        .where("author", isEqualTo: uid)
+        .snapshots()
+        .map<List<Expense>>((snap) => snap.docs
+            .map((doc) =>
+                Expense.fromFirestore(doc.data() as Map<String, dynamic>))
+            .toList());
   }
 }

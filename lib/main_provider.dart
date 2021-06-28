@@ -18,7 +18,7 @@ class MainProvider extends StatelessWidget {
           builder: (context, snapshot) {
             if (!snapshot.hasData ||
                 snapshot.connectionState != ConnectionState.done) {
-              return Text("Loading");
+              return Scaffold(body: Text("Loading"));
             }
 
             return this.child;

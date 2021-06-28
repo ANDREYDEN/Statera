@@ -11,7 +11,8 @@ class Expense {
 
   List<Assignee> get assignees => items.isEmpty ? [] : items[0].assignees;
 
-  double get total => items.fold<double>(0, (previousValue, item) => previousValue + item.value);
+  double get total => items.fold<double>(
+      0, (previousValue, item) => previousValue + item.value);
 
   addItem(Item item) {
     item.assignees = [Assignee(uid: author), ...this.assignees];
@@ -57,6 +58,18 @@ class Expense {
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author,
+      "assignees": assignees
     };
+  }
+
+  static Expense fromFirestore(Map<String, dynamic> data) {
+    var expense =  new Expense(
+      author: data["author"],
+      name: data["name"],
+    );
+    data["items"].forEach((itemData) => {
+      expense.addItem(Item.fromFirestore(itemData))
+    });
+    return expense;
   }
 }

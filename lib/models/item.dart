@@ -44,4 +44,11 @@ class Item {
       "value": value,
     };
   }
+
+  static Item fromFirestore(Map<String, dynamic> data) {
+    return Item(
+      name: data["name"],
+      value: double.parse(data["value"].toString()),
+    );
+  }
 }

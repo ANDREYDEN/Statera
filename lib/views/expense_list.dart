@@ -66,14 +66,35 @@ class _ExpenseListState extends State<ExpenseList> {
           ),
         );
       },
-      child: ListView.builder(
-        itemCount: this.expenses.length,
-        itemBuilder: (context, index) {
-          var expense = this.expenses[index];
-
-          return ExpenseListItem(expense: expense);
-        },
-      ),
+      child: Column(children: [
+        Text("Assigned to me"),
+        Expanded(child: buildExpensesList(Firestore.instance.listenForAssignedExpensesForUser(authVm.user.uid))),
+        Text("Authored by me"),
+        Expanded(child: buildExpensesList(Firestore.instance.listenForAuthoredExpensesForUser(authVm.user.uid))),
+      ]),
     );
+  }
+
+  Widget buildExpensesList(Stream<List<Expense>> stream) {
+    return StreamBuilder<List<Expense>>(
+        stream: stream,
+        builder: (context, snapshot) {
+          print(snapshot);
+          if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
+            return Text("Loading...");
+          }
+
+          var expenses = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: expenses.length,
+            itemBuilder: (context, index) {
+              var expense = expenses[index];
+
+              return ExpenseListItem(expense: expense);
+            },
+          );
+        }
+      );
   }
 }
