@@ -9,11 +9,18 @@ class Expense {
 
   Expense({required this.name, required this.author});
 
-  List<Assignee> get assignees => items[0].assignees;
+  List<Assignee> get assignees => items.isEmpty ? [] : items[0].assignees;
+
+  double get total => items.fold<double>(0, (previousValue, item) => previousValue + item.value);
+
+  addItem(Item item) {
+    item.assignees = [...this.assignees];
+    items.add(item);
+  }
 
   addAssignees(List<Assignee> assignees) {
     items.forEach((item) {
-      item.assignees.setAll(0, assignees);
+      item.assignees = [...assignees];
     });
   }
 
