@@ -51,4 +51,12 @@ class Expense {
       },
     );
   }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      "name": name,
+      "items": items.map((item) => item.toFirestore()).toList(),
+      "author": author,
+    };
+  }
 }

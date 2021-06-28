@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
+import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/expense_list_item.dart';
 
@@ -50,10 +51,12 @@ class _ExpenseListState extends State<ExpenseList> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    this.expenses.add(Expense(
-                          author: this.authVm.user.uid,
-                          name: newExpenseNameController.text,
-                        ));
+                    var newExpense = Expense(
+                      author: this.authVm.user.uid,
+                      name: newExpenseNameController.text,
+                    );
+                    this.expenses.add(newExpense);
+                    Firestore.instance.addExpense(newExpense);
                   });
                   Navigator.of(context).pop();
                 },

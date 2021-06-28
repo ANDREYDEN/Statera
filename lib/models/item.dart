@@ -37,4 +37,11 @@ class Item {
     var assignee = getAssigneeById(uid);
     assignee.decision = decision;
   }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      "name": name,
+      "value": value,
+    };
+  }
 }
