@@ -19,12 +19,22 @@ class Item {
 
   get sharedValue => value / confirmedCount;
 
-  ExpenseDecision assigneeDeicision(String uid) {
-    var assignee = assignees.firstWhere(
+  get valueString => "\$${value.toStringAsFixed(2)}";
+
+  Assignee getAssigneeById(uid) {
+    return assignees.firstWhere(
       (element) => element.uid == uid,
       orElse: () => throw new Exception(
           "Can not find assignee with uid $uid for item $name"),
     );
-    return assignee.decision;
+  }
+
+  ExpenseDecision assigneeDecision(String uid) {
+    return getAssigneeById(uid).decision;
+  }
+
+  void setAssigneeDecision(String uid, ExpenseDecision decision) {
+    var assignee = getAssigneeById(uid);
+    assignee.decision = decision;
   }
 }

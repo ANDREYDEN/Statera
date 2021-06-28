@@ -44,7 +44,7 @@ class Expense {
     return items.fold<double>(
       0,
       (previousValue, item) {
-        if (item.assigneeDeicision(uid) == ExpenseDecision.Confirmed) {
+        if (item.assigneeDecision(uid) == ExpenseDecision.Confirmed) {
           return previousValue + item.sharedValue;
         }
         return previousValue;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/views/expense_list.dart';
+import 'package:statera/views/expense_page.dart';
 import 'package:statera/views/home.dart';
 
 class MainNavigation extends StatefulWidget {

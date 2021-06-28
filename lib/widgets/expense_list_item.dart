@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/views/expense_page.dart';
 
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
@@ -9,9 +10,13 @@ class ExpenseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ExpensePage(expense: expense),
+          ),
+        );
       },
-          child: Padding(
+      child: Padding(
         padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
