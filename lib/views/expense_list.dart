@@ -16,6 +16,7 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   List<Expense> expenses = [];
+  var newExpenseNameController = TextEditingController();
 
   @override
   void initState() {
@@ -30,6 +31,32 @@ class _ExpenseListState extends State<ExpenseList> {
   Widget build(BuildContext context) {
     return PageScaffold(
       title: "My Expenses",
+      onFabPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("New Expense"),
+            content: TextField(
+              controller: newExpenseNameController,
+              decoration: InputDecoration(labelText: "Expense name"),
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    this.expenses.add(Expense(
+                          author: "asd",
+                          name: newExpenseNameController.text,
+                        ));
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text("Save"),
+              )
+            ],
+          ),
+        );
+      },
       child: ListView.builder(
         itemCount: this.expenses.length,
         itemBuilder: (context, index) {

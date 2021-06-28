@@ -21,7 +21,13 @@ class ExpenseListItem extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(this.expense.name),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(this.expense.name),
+                Text("${this.expense.items.length} item(s)")
+              ],
+            ),
             Text("\$${this.expense.total.toStringAsFixed(2)}"),
           ],
         ),

@@ -14,7 +14,7 @@ class Expense {
   double get total => items.fold<double>(0, (previousValue, item) => previousValue + item.value);
 
   addItem(Item item) {
-    item.assignees = [...this.assignees];
+    item.assignees = [Assignee(uid: "asd"), ...this.assignees];
     items.add(item);
   }
 

@@ -4,8 +4,14 @@ class PageScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
 
-  const PageScaffold({Key? key, required this.child, this.title})
-      : super(key: key);
+  final void Function()? onFabPressed;
+
+  const PageScaffold({
+    Key? key,
+    required this.child,
+    this.title,
+    this.onFabPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +20,13 @@ class PageScaffold extends StatelessWidget {
         title: Text(this.title ?? ""),
       ),
       body: child,
+      floatingActionButton: this.onFabPressed == null
+          ? null
+          : FloatingActionButton(
+              onPressed: this.onFabPressed,
+              child: Icon(Icons.add),
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
