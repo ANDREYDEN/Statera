@@ -23,7 +23,7 @@ class Firestore {
         .snapshots()
         .map<List<Expense>>((snap) => snap.docs
             .map((doc) =>
-                Expense.fromFirestore(doc.data() as Map<String, dynamic>))
+                Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
             .toList());
   }
 
@@ -33,7 +33,11 @@ class Firestore {
         .snapshots()
         .map<List<Expense>>((snap) => snap.docs
             .map((doc) =>
-                Expense.fromFirestore(doc.data() as Map<String, dynamic>))
+                Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
             .toList());
+  }
+
+  Future<void> saveExpense(Expense expense) async {
+    return expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 }

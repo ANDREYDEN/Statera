@@ -42,13 +42,18 @@ class Item {
     return {
       "name": name,
       "value": value,
+      "assignees": assignees.map((assignee) => assignee.toFirestore()).toList()
     };
   }
 
   static Item fromFirestore(Map<String, dynamic> data) {
-    return Item(
+    var item = Item(
       name: data["name"],
       value: double.parse(data["value"].toString()),
     );
+    item.assignees = data["assignees"]
+        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
+        .toList();
+    return item;
   }
 }

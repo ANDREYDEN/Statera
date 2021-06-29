@@ -68,9 +68,13 @@ class _ExpenseListState extends State<ExpenseList> {
       },
       child: Column(children: [
         Text("Assigned to me"),
-        Expanded(child: buildExpensesList(Firestore.instance.listenForAssignedExpensesForUser(authVm.user.uid))),
+        Expanded(
+            child: buildExpensesList(Firestore.instance
+                .listenForAssignedExpensesForUser(authVm.user.uid))),
         Text("Authored by me"),
-        Expanded(child: buildExpensesList(Firestore.instance.listenForAuthoredExpensesForUser(authVm.user.uid))),
+        Expanded(
+            child: buildExpensesList(Firestore.instance
+                .listenForAuthoredExpensesForUser(authVm.user.uid))),
       ]),
     );
   }
@@ -80,7 +84,11 @@ class _ExpenseListState extends State<ExpenseList> {
         stream: stream,
         builder: (context, snapshot) {
           print(snapshot);
-          if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
+          if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              snapshot.data == null) {
             return Text("Loading...");
           }
 
@@ -94,7 +102,6 @@ class _ExpenseListState extends State<ExpenseList> {
               return ExpenseListItem(expense: expense);
             },
           );
-        }
-      );
+        });
   }
 }

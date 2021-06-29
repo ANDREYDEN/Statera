@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
+import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/item_list_item.dart';
 
@@ -65,6 +66,15 @@ class _ExpensePageState extends State<ExpensePage> {
           ),
         );
       },
+      actions: [
+        ElevatedButton(
+          onPressed: () async {
+            await Firestore.instance.saveExpense(widget.expense);
+            Navigator.of(context).pop();
+          },
+          child: Text("Save"),
+        ),
+      ],
       child: ListView.builder(
         itemCount: this.items.length,
         itemBuilder: (context, index) {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:statera/services/firestore.dart';
 
 class PageScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
-
+  final List<Widget>? actions;
   final void Function()? onFabPressed;
 
   const PageScaffold({
@@ -11,6 +12,7 @@ class PageScaffold extends StatelessWidget {
     required this.child,
     this.title,
     this.onFabPressed,
+    this.actions,
   }) : super(key: key);
 
   @override
@@ -18,8 +20,8 @@ class PageScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title ?? ""),
+        actions: this.actions,
       ),
-      body: child,
       floatingActionButton: this.onFabPressed == null
           ? null
           : FloatingActionButton(
@@ -27,6 +29,7 @@ class PageScaffold extends StatelessWidget {
               child: Icon(Icons.add),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      body: child,
     );
   }
 }

@@ -6,6 +6,7 @@ class Expense {
   String name;
   String author; // UID
   bool completed = false;
+  String? id = "";
 
   Expense({required this.name, required this.author});
 
@@ -14,8 +15,16 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
+  bool isCompletedForUser(String uid) {
+    return items.fold(
+        true,
+        (previousValue, item) =>
+            previousValue &&
+            item.assigneeDecision(uid) != ExpenseDecision.Undefined);
+  }
+
   addItem(Item item) {
-    item.assignees = [Assignee(uid: author), ...this.assignees];
+    item.assignees = [...this.assignees];
     items.add(item);
   }
 
@@ -58,18 +67,18 @@ class Expense {
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author,
-      "assignees": assignees
+      "assignees": assignees.map((assignee) => assignee.uid).toList()
     };
   }
 
-  static Expense fromFirestore(Map<String, dynamic> data) {
-    var expense =  new Expense(
+  static Expense fromFirestore(Map<String, dynamic> data, String? id) {
+    var expense = new Expense(
       author: data["author"],
       name: data["name"],
     );
-    data["items"].forEach((itemData) => {
-      expense.addItem(Item.fromFirestore(itemData))
-    });
+    expense.id = id;
+    data["items"]
+        .forEach((itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
   }
 }
