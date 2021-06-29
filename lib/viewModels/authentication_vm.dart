@@ -23,4 +23,8 @@ class AuthenticationViewModel {
   bool isDenied(Item item) {
     return item.assigneeDecision(user.uid) == ExpenseDecision.Denied;
   }
+
+  String getNameByUID(String uid) {
+    return "Andrew";
+  }
 }

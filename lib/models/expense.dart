@@ -5,7 +5,6 @@ class Expense {
   List<Item> items = [];
   String name;
   String author; // UID
-  bool completed = false;
   String? id = "";
 
   Expense({required this.name, required this.author});
@@ -15,13 +14,15 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
-  bool isCompletedForUser(String uid) {
+  bool isCompletedByUser(String uid) {
     return items.fold(
         true,
         (previousValue, item) =>
             previousValue &&
             item.assigneeDecision(uid) != ExpenseDecision.Undefined);
   }
+
+  bool get completed => items.fold(true, (previousValue, item) => previousValue && item.completed);
 
   addItem(Item item) {
     item.assignees = [...this.assignees];

@@ -75,27 +75,35 @@ class _ExpensePageState extends State<ExpensePage> {
           child: Text("Save"),
         ),
       ],
-      child: ListView.builder(
-        itemCount: this.items.length,
-        itemBuilder: (context, index) {
-          var item = this.items[index];
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Author: ${authVm.getNameByUID(widget.expense.author)}"),
+          Flexible(
+                      child: ListView.builder(
+              itemCount: this.items.length,
+              itemBuilder: (context, index) {
+                var item = this.items[index];
 
-          return ItemListItem(
-            item: item,
-            onConfirm: () {
-              setState(() {
-                item.setAssigneeDecision(
-                    this.authVm.user.uid, ExpenseDecision.Confirmed);
-              });
-            },
-            onDeny: () {
-              setState(() {
-                item.setAssigneeDecision(
-                    this.authVm.user.uid, ExpenseDecision.Denied);
-              });
-            },
-          );
-        },
+                return ItemListItem(
+                  item: item,
+                  onConfirm: () {
+                    setState(() {
+                      item.setAssigneeDecision(
+                          this.authVm.user.uid, ExpenseDecision.Confirmed);
+                    });
+                  },
+                  onDeny: () {
+                    setState(() {
+                      item.setAssigneeDecision(
+                          this.authVm.user.uid, ExpenseDecision.Denied);
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -69,17 +69,34 @@ class _ExpenseListState extends State<ExpenseList> {
       child: Column(children: [
         Text("Assigned to me"),
         Expanded(
-            child: buildExpensesList(Firestore.instance
-                .listenForAssignedExpensesForUser(authVm.user.uid))),
+          child: buildExpensesList(
+            stream: Firestore.instance
+                .listenForAssignedExpensesForUser(authVm.user.uid),
+            builder: (expense) => ExpenseListItem(
+              expense: expense,
+              type: ExpenseListItemType.ForEveryone,
+            ),
+          ),
+        ),
         Text("Authored by me"),
         Expanded(
-            child: buildExpensesList(Firestore.instance
-                .listenForAuthoredExpensesForUser(authVm.user.uid))),
+          child: buildExpensesList(
+            stream: Firestore.instance
+                .listenForAuthoredExpensesForUser(authVm.user.uid),
+            builder: (expense) => ExpenseListItem(
+              expense: expense,
+              type: ExpenseListItemType.ForAuthor,
+            ),
+          ),
+        ),
       ]),
     );
   }
 
-  Widget buildExpensesList(Stream<List<Expense>> stream) {
+  Widget buildExpensesList({
+    required Stream<List<Expense>> stream,
+    required Widget Function(Expense) builder,
+  }) {
     return StreamBuilder<List<Expense>>(
         stream: stream,
         builder: (context, snapshot) {
@@ -99,7 +116,7 @@ class _ExpenseListState extends State<ExpenseList> {
             itemBuilder: (context, index) {
               var expense = expenses[index];
 
-              return ExpenseListItem(expense: expense);
+              return builder(expense);
             },
           );
         });

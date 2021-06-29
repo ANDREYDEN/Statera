@@ -21,6 +21,8 @@ class Item {
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
+  bool get completed => assignees.fold(true, (previousValue, assignee) => previousValue && assignee.madeDecision);
+
   Assignee getAssigneeById(uid) {
     return assignees.firstWhere(
       (element) => element.uid == uid,

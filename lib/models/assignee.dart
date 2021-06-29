@@ -26,6 +26,8 @@ class Assignee {
     }
   }
 
+  bool get madeDecision => decision != ExpenseDecision.Undefined;
+
   Map<String, dynamic> toFirestore() {
     return {
       "uid": uid,
