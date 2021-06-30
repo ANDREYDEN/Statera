@@ -22,24 +22,31 @@ class ItemListItem extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(item.name),
           Text(item.valueString),
           Row(
             children: [
-              IconButton(
-                onPressed: this.onConfirm,
-                icon: Icon(
-                  Icons.check,
-                  color: authVm.isConfirmed(item) ? Colors.green : Colors.grey,
+              Container(
+                color: authVm.isConfirmed(item) ? Colors.green : Colors.white,
+                child: IconButton(
+                  onPressed: this.onConfirm,
+                  icon: Icon(
+                    Icons.check,
+                    color:
+                        authVm.isConfirmed(item) ? Colors.white : Colors.black,
+                  ),
                 ),
               ),
-              IconButton(
-                onPressed: this.onDeny,
-                icon: Icon(
-                  Icons.close,
-                  color: authVm.isDenied(item) ? Colors.red : Colors.grey,
+              Container(
+                color: authVm.isDenied(item) ? Colors.red : Colors.white,
+                child: IconButton(
+                  onPressed: this.onDeny,
+                  icon: Icon(
+                    Icons.close,
+                    color: authVm.isDenied(item) ? Colors.white : Colors.black,
+                  ),
                 ),
               ),
             ],

@@ -7,10 +7,11 @@ class Expense {
   String name;
   Author author; // UID
   String? id = "";
+  late List<Assignee> assignees;
 
-  Expense({required this.name, required this.author});
-
-  List<Assignee> get assignees => items.isEmpty ? [] : items[0].assignees;
+  Expense({required this.name, required this.author}) {
+    this.assignees = [Assignee(uid: author.uid)];
+  }
 
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
@@ -23,10 +24,12 @@ class Expense {
             item.assigneeDecision(uid) != ExpenseDecision.Undefined);
   }
 
-  bool get completed => items.fold(true, (previousValue, item) => previousValue && item.completed);
+  bool get completed => items.fold(
+      true, (previousValue, item) => previousValue && item.completed);
 
   addItem(Item item) {
-    item.assignees = [...this.assignees];
+    item.assignees =
+        this.assignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
     items.add(item);
   }
 
@@ -79,8 +82,8 @@ class Expense {
       name: data["name"],
     );
     expense.id = id;
-    data["items"]
-        .forEach((itemData) => {expense.items.add(Item.fromFirestore(itemData))});
+    data["items"].forEach(
+        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
   }
 }
