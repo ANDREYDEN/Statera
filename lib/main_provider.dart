@@ -10,17 +10,17 @@ class MainProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<AuthenticationViewModel>(
-      create: (context) => AuthenticationViewModel(user: User(uid: "asd")),
-      builder: (context, _) {
-        return FutureBuilder(
-          future: Firebase.initializeApp(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData ||
-                snapshot.connectionState != ConnectionState.done) {
-              return Scaffold(body: Text("Loading"));
-            }
+    return FutureBuilder(
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData ||
+            snapshot.connectionState != ConnectionState.done) {
+          return Scaffold(body: Text("Loading"));
+        }
 
+        return Provider<AuthenticationViewModel>(
+          create: (context) => AuthenticationViewModel(),
+          builder: (context, _) {
             return this.child;
           },
         );

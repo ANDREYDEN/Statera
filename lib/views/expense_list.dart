@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/models/Author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
@@ -26,11 +27,6 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   void initState() {
-    var testExpense =
-        Expense(author: this.authVm.user.uid, name: "First Expense");
-    testExpense.addItem(Item(name: "Apple", value: 4));
-    testExpense.addAssignees([Assignee(uid: this.authVm.user.uid)]);
-    expenses.add(testExpense);
     super.initState();
   }
 
@@ -52,7 +48,7 @@ class _ExpenseListState extends State<ExpenseList> {
                 onPressed: () {
                   setState(() {
                     var newExpense = Expense(
-                      author: this.authVm.user.uid,
+                      author: Author.fromUser(this.authVm.user),
                       name: newExpenseNameController.text,
                     );
                     this.expenses.add(newExpense);
@@ -100,7 +96,6 @@ class _ExpenseListState extends State<ExpenseList> {
     return StreamBuilder<List<Expense>>(
         stream: stream,
         builder: (context, snapshot) {
-          print(snapshot);
           if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           }

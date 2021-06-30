@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:statera/services/firestore.dart';
 
 class PageScaffold extends StatelessWidget {
   final Widget child;

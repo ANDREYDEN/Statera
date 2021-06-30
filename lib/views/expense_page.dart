@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
+import 'package:statera/services/auth.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/item_list_item.dart';
@@ -78,7 +79,7 @@ class _ExpensePageState extends State<ExpensePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("Author: ${authVm.getNameByUID(widget.expense.author)}"),
+          Text("Author: ${widget.expense.author.name}"),
           Flexible(
                       child: ListView.builder(
               itemCount: this.items.length,

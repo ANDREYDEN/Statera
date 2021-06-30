@@ -1,10 +1,11 @@
+import 'package:statera/models/Author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/item.dart';
 
 class Expense {
   List<Item> items = [];
   String name;
-  String author; // UID
+  Author author; // UID
   String? id = "";
 
   Expense({required this.name, required this.author});
@@ -67,14 +68,14 @@ class Expense {
     return {
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
-      "author": author,
+      "author": author.toFirestore(),
       "assignees": assignees.map((assignee) => assignee.uid).toList()
     };
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
     var expense = new Expense(
-      author: data["author"],
+      author: Author.fromFirestore(data["author"]),
       name: data["name"],
     );
     expense.id = id;

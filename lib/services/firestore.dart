@@ -29,7 +29,7 @@ class Firestore {
 
   Stream<List<Expense>> listenForAuthoredExpensesForUser(String uid) {
     return expensesCollection
-        .where("author", isEqualTo: uid)
+        .where("author.uid", isEqualTo: uid)
         .snapshots()
         .map<List<Expense>>((snap) => snap.docs
             .map((doc) =>

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/services/auth.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/views/expense_page.dart';
 
@@ -50,7 +51,7 @@ class ExpenseListItem extends StatelessWidget {
                 children: [
                   Text(this.expense.name),
                   Text("${this.expense.items.length} item(s)"),
-                  Text("Author: ${authVm.getNameByUID(this.expense.author)}"),
+                  Text("Author: ${this.expense.author.name}"),
                 ],
               ),
               Column(
