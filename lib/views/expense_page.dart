@@ -26,79 +26,104 @@ class _ExpensePageState extends State<ExpensePage> {
       Provider.of<AuthenticationViewModel>(context, listen: false);
   List<Item> get items => widget.expense.items;
 
+  get isAuthoredByCurrentUser => widget.expense.author.uid == authVm.user.uid;
+
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
       title: widget.expense.name,
-      onFabPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("New Expense"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: newItemNameController,
-                  decoration: InputDecoration(labelText: "Item name"),
+      onFabPressed: this.isAuthoredByCurrentUser
+          ? () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("New Item"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: newItemNameController,
+                        decoration: InputDecoration(labelText: "Item name"),
+                      ),
+                      TextField(
+                        controller: newItemValueController,
+                        decoration: InputDecoration(labelText: "Item value"),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.expense.addItem(Item(
+                            name: newItemNameController.text,
+                            value: double.parse(newItemValueController.text),
+                          ));
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Save"),
+                    )
+                  ],
                 ),
-                TextField(
-                  controller: newItemValueController,
-                  decoration: InputDecoration(labelText: "Item value"),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-            actions: [
+              );
+            }
+          : null,
+      actions: this.isAuthoredByCurrentUser
+          ? [
               ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    widget.expense.addItem(Item(
-                      name: newItemNameController.text,
-                      value: double.parse(newItemValueController.text),
-                    ));
-                  });
+                onPressed: () async {
+                  await Firestore.instance.saveExpense(widget.expense);
                   Navigator.of(context).pop();
                 },
                 child: Text("Save"),
-              )
-            ],
-          ),
-        );
-      },
-      actions: [
-        ElevatedButton(
-          onPressed: () async {
-            await Firestore.instance.saveExpense(widget.expense);
-            Navigator.of(context).pop();
-          },
-          child: Text("Save"),
-        ),
-      ],
+              ),
+            ]
+          : null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text("Author: ${widget.expense.author.name}"),
           Flexible(
-                      child: ListView.builder(
+            child: ListView.builder(
               itemCount: this.items.length,
               itemBuilder: (context, index) {
                 var item = this.items[index];
 
-                return ItemListItem(
-                  item: item,
-                  onConfirm: () {
+                return Dismissible(
+                  key: Key(item.hashCode.toString()),
+                  onDismissed: (_) {
                     setState(() {
-                      item.setAssigneeDecision(
-                          this.authVm.user.uid, ExpenseDecision.Confirmed);
+                      this.items.removeAt(index);
                     });
                   },
-                  onDeny: () {
-                    setState(() {
-                      item.setAssigneeDecision(
-                          this.authVm.user.uid, ExpenseDecision.Denied);
-                    });
-                  },
+                  direction: DismissDirection.startToEnd,
+                  background: Container(
+                    color: Colors.red,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [Icon(Icons.delete)],
+                      ),
+                    ),
+                  ),
+                  child: ItemListItem(
+                    item: item,
+                    onConfirm: () {
+                      setState(() {
+                        item.setAssigneeDecision(
+                            this.authVm.user.uid, ExpenseDecision.Confirmed);
+                      });
+                    },
+                    onDeny: () {
+                      setState(() {
+                        item.setAssigneeDecision(
+                            this.authVm.user.uid, ExpenseDecision.Denied);
+                      });
+                    },
+                  ),
                 );
               },
             ),

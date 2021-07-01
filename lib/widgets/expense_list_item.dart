@@ -51,15 +51,21 @@ class ExpenseListItem extends StatelessWidget {
                 children: [
                   Text(this.expense.name),
                   Text("${this.expense.items.length} item(s)"),
-                  Text("Author: ${this.expense.author.name}"),
+                  Visibility(
+                    visible: this.type == ExpenseListItemType.ForEveryone,
+                    child: Text("Payer: ${this.expense.author.name}"),
+                  ),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text("Total: \$${this.expense.total.toStringAsFixed(2)}"),
-                  Text(
-                      "My part: \$${this.expense.getTotalForUser(authVm.user.uid).toStringAsFixed(2)}"),
+                  Visibility(
+                    visible: this.type == ExpenseListItemType.ForEveryone,
+                    child: Text(
+                        "My part: \$${this.expense.getTotalForUser(authVm.user.uid).toStringAsFixed(2)}"),
+                  ),
                 ],
               ),
             ],
