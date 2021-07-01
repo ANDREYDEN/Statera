@@ -50,39 +50,52 @@ class Firestore {
   }
 
   Future<void> addUserToGroup(User user) async {
-    await groupsCollection.doc('group145').update({
-      'members': [Author.fromUser(user).toFirestore()]
+    var members = await getUsersGroupMembers();
+    if (members.any((member) => member.uid == user.uid)) return;
+
+    await theGroup.set({
+      'members': [
+        ...members.map((author) => author.toFirestore()).toList(),
+        Author.fromUser(user).toFirestore()
+      ]
     });
   }
 
-  Future<List<Author>> getUsersGroupMembers(String uid) async {
+  Future<List<Author>> getUsersGroupMembers() async {
     var groupSnap = await theGroup.get();
-    List<dynamic> members =
+    List<dynamic> membersData =
         (groupSnap.data() as Map<String, dynamic>)['members'];
-    return members
+    return membersData
         .map((memberData) => Author.fromFirestore(memberData))
         .toList();
   }
 
-  Future<Map<Author, double>> getOwingsForUser(String consumerUid) async {
-    List<Author> members = await getUsersGroupMembers(consumerUid);
-
-    Map<Author, double> owings = {};
-
-    // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
-    await Future.forEach(members, (Author member) async {
-      var payerExpensesSnap =
-          await _authoredExpensesForUserQuery(member.uid).get();
-      List<Expense> payerExpenses = payerExpensesSnap.docs
-          .map((doc) =>
-              Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+  Stream<Map<Author, double>> getOwingsForUser(String consumerUid) {
+    return theGroup.snapshots().asyncMap((snap) async {
+      List<dynamic> membersData =
+          (snap.data() as Map<String, dynamic>)['members'];
+      List<Author> members = membersData
+          .map((memberData) => Author.fromFirestore(memberData))
           .toList();
-      owings[member] = payerExpenses.fold(
-          0,
-          (previousValue, expense) =>
-              previousValue + expense.getTotalForUser(consumerUid));
-    });
+          
+      Map<Author, double> owings = {};
 
-    return owings;
+      // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
+      await Future.forEach(members, (Author member) async {
+        var payerExpensesSnap =
+            await _authoredExpensesForUserQuery(member.uid).get();
+        List<Expense> payerExpenses = payerExpensesSnap.docs
+            .map((doc) => Expense.fromFirestore(
+                doc.data() as Map<String, dynamic>, doc.id))
+            .where((expense) => expense.hasAssignee(member.uid))
+            .toList();
+        owings[member] = payerExpenses.fold(
+            0,
+            (previousValue, expense) =>
+                previousValue + expense.getTotalForUser(consumerUid));
+      });
+
+      return owings;
+    });
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/Author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
-import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
@@ -21,6 +21,7 @@ class ExpenseList extends StatefulWidget {
 class _ExpenseListState extends State<ExpenseList> {
   List<Expense> expenses = [];
   var newExpenseNameController = TextEditingController();
+  List<Assignee> newExpenseAssignees = [];
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -39,9 +40,38 @@ class _ExpenseListState extends State<ExpenseList> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text("New Expense"),
-            content: TextField(
-              controller: newExpenseNameController,
-              decoration: InputDecoration(labelText: "Expense name"),
+            content: Column(
+              children: [
+                TextField(
+                  controller: newExpenseNameController,
+                  decoration: InputDecoration(labelText: "Expense name"),
+                ),
+                FutureBuilder<List<Author>>(
+                  future:
+                      Firestore.instance.getUsersGroupMembers(),
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting ||
+                        !snap.hasData) {
+                      return Text("Loading...");
+                    }
+                    var members = snap.data!;
+
+                    return MultiSelectDialogField(
+                      title: Text('Expense consumers'),
+                      items: members
+                          .map((member) => MultiSelectItem(member, member.name))
+                          .toList(),
+                      onConfirm: (List<Author?> selectedMembers) {
+                        setState(() {
+                          newExpenseAssignees = selectedMembers
+                              .map((member) => Assignee(uid: member!.uid))
+                              .toList();
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
             actions: [
               ElevatedButton(
@@ -51,6 +81,7 @@ class _ExpenseListState extends State<ExpenseList> {
                       author: Author.fromUser(this.authVm.user),
                       name: newExpenseNameController.text,
                     );
+                    newExpense.addAssignees(newExpenseAssignees);
                     this.expenses.add(newExpense);
                     Firestore.instance.addExpense(newExpense);
                   });

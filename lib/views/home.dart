@@ -58,8 +58,8 @@ class _HomeState extends State<Home> {
                         child: Text("My Expeses"),),
                         Text('Owings:'),
                     Flexible(
-                      child: FutureBuilder<Map<Author, double>>(
-                          future:
+                      child: StreamBuilder<Map<Author, double>>(
+                          stream:
                               Firestore.instance.getOwingsForUser(user.uid),
                           builder: (context, membersSnapshot) {
                             if (userSnapshot.hasError) {

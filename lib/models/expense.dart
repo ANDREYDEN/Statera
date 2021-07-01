@@ -56,6 +56,8 @@ class Expense {
   }
 
   double getTotalForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+    
     return items.fold<double>(
       0,
       (previousValue, item) {
@@ -85,5 +87,9 @@ class Expense {
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
+  }
+
+  hasAssignee(String uid) {
+    return this.assignees.any((assignee) => assignee.uid == uid);
   }
 }
