@@ -4,7 +4,6 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
-import 'package:statera/services/auth.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/item_list_item.dart';

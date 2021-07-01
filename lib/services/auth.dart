@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:statera/services/firestore.dart';
 
 class Auth {
   late FirebaseAuth _auth;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Auth._privateConstructor() {
     _auth = FirebaseAuth.instance;
@@ -24,7 +26,7 @@ class Auth {
 
   
 Future<UserCredential> signInWithGoogle() async {
-  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
   if (googleUser == null) throw new Exception("Failed to log in with Google");
 
@@ -35,6 +37,17 @@ Future<UserCredential> signInWithGoogle() async {
     idToken: googleAuth.idToken,
   );
 
-  return await _auth.signInWithCredential(credential);
+
+  final userCredential = await _auth.signInWithCredential(credential);
+
+
+  await Firestore.instance.addUserToGroup(userCredential.user!);
+
+  return userCredential;
 }
+
+  Future<void> signOut() async {
+    await _googleSignIn.disconnect();
+    await _auth.signOut();
+  }
 }

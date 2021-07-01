@@ -15,7 +15,7 @@ class MainProvider extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData ||
             snapshot.connectionState != ConnectionState.done) {
-          return Scaffold(body: Text("Loading"));
+          return Container(child: Text("Loading"));
         }
 
         return Provider<AuthenticationViewModel>(
