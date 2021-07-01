@@ -71,8 +71,9 @@ class _ExpensePageState extends State<ExpensePage> {
               );
             }
           : null,
-      actions: this.isAuthoredByCurrentUser
-          ? [
+      actions: widget.expense.finalized
+          ? null
+          : [
               ElevatedButton(
                 onPressed: () async {
                   await Firestore.instance.saveExpense(widget.expense);
@@ -80,8 +81,7 @@ class _ExpensePageState extends State<ExpensePage> {
                 },
                 child: Text("Save"),
               ),
-            ]
-          : null,
+            ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -92,6 +92,7 @@ class _ExpensePageState extends State<ExpensePage> {
               itemBuilder: (context, index) {
                 var item = this.items[index];
 
+                // TODO: make this conditionally dismissable if finalized
                 return Dismissible(
                   key: Key(item.hashCode.toString()),
                   onDismissed: (_) {
@@ -104,6 +105,8 @@ class _ExpensePageState extends State<ExpensePage> {
                   child: ItemListItem(
                     item: item,
                     onConfirm: () {
+                      if (widget.expense.finalized) return;
+
                       setState(() {
                         item.setAssigneeDecision(
                             this.authVm.user.uid, ExpenseDecision.Confirmed);
@@ -111,6 +114,8 @@ class _ExpensePageState extends State<ExpensePage> {
                     },
                     onDeny: () {
                       setState(() {
+                        if (widget.expense.finalized) return;
+
                         item.setAssigneeDecision(
                             this.authVm.user.uid, ExpenseDecision.Denied);
                       });

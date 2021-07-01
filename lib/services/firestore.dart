@@ -97,11 +97,13 @@ class Firestore {
       await Future.forEach(members, (Author member) async {
         var payerExpensesSnap =
             await _authoredExpensesForUserQuery(member.uid).get();
+
         List<Expense> payerExpenses = payerExpensesSnap.docs
             .map((doc) => Expense.fromFirestore(
                 doc.data() as Map<String, dynamic>, doc.id))
             .where((expense) => expense.hasAssignee(member.uid))
             .toList();
+            
         owings[member] = payerExpenses.fold(
             0,
             (previousValue, expense) =>

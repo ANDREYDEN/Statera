@@ -29,6 +29,12 @@ class Expense {
   bool get completed => items.fold(
       true, (previousValue, item) => previousValue && item.completed);
 
+  int get definedAssignees => assignees.fold(
+        0,
+        (previousValue, assignee) =>
+            previousValue + (isCompletedByUser(assignee.uid) ? 1 : 0),
+      );
+
   addItem(Item item) {
     item.assignees =
         this.assignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
@@ -38,7 +44,8 @@ class Expense {
   addAssignees(List<Assignee> newAssignees) {
     this.assignees = [...newAssignees];
     items.forEach((item) {
-      item.assignees = newAssignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
+      item.assignees =
+          newAssignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
     });
   }
 
@@ -60,7 +67,7 @@ class Expense {
 
   double getTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
-    
+
     return items.fold<double>(
       0,
       (previousValue, item) {
@@ -84,10 +91,11 @@ class Expense {
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
     var expense = new Expense(
-      author: Author.fromFirestore(data["author"]),
-      name: data["name"],
-      finalized: data["finalized"]
-    );
+        author: Author.fromFirestore(data["author"]),
+        name: data["name"],
+        finalized: data["finalized"]);
+    expense.assignees =
+        data["assignees"].map<Assignee>((uid) => Assignee(uid: uid)).toList();
     expense.id = id;
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});

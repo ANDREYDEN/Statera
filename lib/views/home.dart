@@ -52,15 +52,15 @@ class _HomeState extends State<Home> {
               : Column(
                   children: [
                     ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(ExpenseList.route);
-                        },
-                        child: Text("My Expeses"),),
-                        Text('Owings:'),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(ExpenseList.route);
+                      },
+                      child: Text("My Expeses"),
+                    ),
+                    Text('Owings'),
                     Flexible(
                       child: StreamBuilder<Map<Author, double>>(
-                          stream:
-                              Firestore.instance.getOwingsForUser(user.uid),
+                          stream: Firestore.instance.getOwingsForUser(user.uid),
                           builder: (context, membersSnapshot) {
                             if (userSnapshot.hasError) {
                               return Text(userSnapshot.error.toString());
@@ -77,7 +77,8 @@ class _HomeState extends State<Home> {
                               itemBuilder: (context, index) {
                                 var payer = owings.keys.elementAt(index);
                                 return Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(payer.name),
                                     Text(owings[payer].toString())

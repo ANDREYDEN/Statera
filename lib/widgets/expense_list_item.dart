@@ -59,6 +59,10 @@ class ExpenseListItem extends StatelessWidget {
                         visible: this.type == ExpenseListItemType.ForEveryone,
                         child: Text("Payer: ${this.expense.author.name}"),
                       ),
+                      Row(children: [
+                        Icon(Icons.person),
+                        Text("${this.expense.definedAssignees}/${this.expense.assignees.length}")
+                      ],)
                     ],
                   ),
                   Column(
