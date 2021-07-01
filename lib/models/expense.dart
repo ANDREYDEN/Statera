@@ -8,9 +8,11 @@ class Expense {
   Author author; // UID
   String? id = "";
   late List<Assignee> assignees;
+  bool finalized = false;
 
-  Expense({required this.name, required this.author}) {
+  Expense({required this.name, required this.author, finalized}) {
     this.assignees = [Assignee(uid: author.uid)];
+    this.finalized = finalized ?? false;
   }
 
   double get total => items.fold<double>(
@@ -33,9 +35,10 @@ class Expense {
     items.add(item);
   }
 
-  addAssignees(List<Assignee> assignees) {
+  addAssignees(List<Assignee> newAssignees) {
+    this.assignees = [...newAssignees];
     items.forEach((item) {
-      item.assignees = [...assignees];
+      item.assignees = newAssignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
     });
   }
 
@@ -74,7 +77,8 @@ class Expense {
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author.toFirestore(),
-      "assignees": assignees.map((assignee) => assignee.uid).toList()
+      "assignees": assignees.map((assignee) => assignee.uid).toList(),
+      "finalized": finalized
     };
   }
 
@@ -82,6 +86,7 @@ class Expense {
     var expense = new Expense(
       author: Author.fromFirestore(data["author"]),
       name: data["name"],
+      finalized: data["finalized"]
     );
     expense.id = id;
     data["items"].forEach(

@@ -26,6 +26,7 @@ class Firestore {
   Stream<List<Expense>> listenForAssignedExpensesForUser(String uid) {
     return expensesCollection
         .where("assignees", arrayContains: uid)
+        .where("finalized", isEqualTo: false)
         .snapshots()
         .map<List<Expense>>((snap) => snap.docs
             .map((doc) => Expense.fromFirestore(
@@ -34,12 +35,24 @@ class Firestore {
   }
 
   Query _authoredExpensesForUserQuery(String uid) {
-    return expensesCollection.where("author.uid", isEqualTo: uid);
+    return expensesCollection
+        .where("author.uid", isEqualTo: uid)
+        .where("finalized", isEqualTo: false);
   }
 
   Stream<List<Expense>> listenForAuthoredExpensesForUser(String uid) {
     return _authoredExpensesForUserQuery(uid).snapshots().map<List<Expense>>(
         (snap) => snap.docs
+            .map((doc) => Expense.fromFirestore(
+                doc.data() as Map<String, dynamic>, doc.id))
+            .toList());
+  }
+
+  listenForFinalizedExpensesForUser(String uid) {
+    return expensesCollection
+        .where("finalized", isEqualTo: true)
+        .snapshots()
+        .map<List<Expense>>((snap) => snap.docs
             .map((doc) => Expense.fromFirestore(
                 doc.data() as Map<String, dynamic>, doc.id))
             .toList());
@@ -77,7 +90,7 @@ class Firestore {
       List<Author> members = membersData
           .map((memberData) => Author.fromFirestore(memberData))
           .toList();
-          
+
       Map<Author, double> owings = {};
 
       // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
@@ -97,5 +110,9 @@ class Firestore {
 
       return owings;
     });
+  }
+
+  Future<void> deleteExpense(Expense expense) {
+    return expensesCollection.doc(expense.id).delete();
   }
 }

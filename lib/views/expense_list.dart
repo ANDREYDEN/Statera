@@ -7,6 +7,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/widgets/dismissBackground.dart';
 import 'package:statera/widgets/expense_list_item.dart';
 
 class ExpenseList extends StatefulWidget {
@@ -47,8 +48,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   decoration: InputDecoration(labelText: "Expense name"),
                 ),
                 FutureBuilder<List<Author>>(
-                  future:
-                      Firestore.instance.getUsersGroupMembers(),
+                  future: Firestore.instance.getUsersGroupMembers(),
                   builder: (context, snap) {
                     if (snap.connectionState == ConnectionState.waiting ||
                         !snap.hasData) {
@@ -58,8 +58,10 @@ class _ExpenseListState extends State<ExpenseList> {
 
                     return MultiSelectDialogField(
                       title: Text('Expense consumers'),
+                      buttonText: Text('Expense consumers'),
                       items: members
-                          .map((member) => MultiSelectItem(member, member.name))
+                          .map((member) =>
+                              MultiSelectItem<Author?>(member, member.name))
                           .toList(),
                       onConfirm: (List<Author?> selectedMembers) {
                         setState(() {
@@ -110,9 +112,28 @@ class _ExpenseListState extends State<ExpenseList> {
           child: buildExpensesList(
             stream: Firestore.instance
                 .listenForAuthoredExpensesForUser(authVm.user.uid),
+            builder: (expense) => Dismissible(
+              key: Key(expense.id!),
+              onDismissed: (_) {
+                Firestore.instance.deleteExpense(expense);
+              },
+              direction: DismissDirection.startToEnd,
+              background: DismissBackground(),
+              child: ExpenseListItem(
+                expense: expense,
+                type: ExpenseListItemType.ForAuthor,
+              ),
+            ),
+          ),
+        ),
+        Text("Finalized"),
+        Expanded(
+          child: buildExpensesList(
+            stream: Firestore.instance
+                .listenForFinalizedExpensesForUser(authVm.user.uid),
             builder: (expense) => ExpenseListItem(
               expense: expense,
-              type: ExpenseListItemType.ForAuthor,
+              type: ExpenseListItemType.ForEveryone,
             ),
           ),
         ),
@@ -147,4 +168,6 @@ class _ExpenseListState extends State<ExpenseList> {
           );
         });
   }
+
+
 }

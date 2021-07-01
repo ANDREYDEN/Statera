@@ -27,7 +27,7 @@ class PageScaffold extends StatelessWidget {
               onPressed: this.onFabPressed,
               child: Icon(Icons.add),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: child,
     );
   }

@@ -6,6 +6,7 @@ import 'package:statera/models/item.dart';
 import 'package:statera/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/widgets/dismissBackground.dart';
 import 'package:statera/widgets/item_list_item.dart';
 
 class ExpensePage extends StatefulWidget {
@@ -99,16 +100,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     });
                   },
                   direction: DismissDirection.startToEnd,
-                  background: Container(
-                    color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [Icon(Icons.delete)],
-                      ),
-                    ),
-                  ),
+                  background: DismissBackground(),
                   child: ItemListItem(
                     item: item,
                     onConfirm: () {
