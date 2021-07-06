@@ -4,15 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/Author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/models/group.dart';
+import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/dismiss_background.dart';
-import 'package:statera/widgets/expense_list_item.dart';
+import 'package:statera/widgets/listItems/expense_list_item.dart';
 
 class ExpenseList extends StatefulWidget {
-  static const String route = "/expense-list";
-
   const ExpenseList({Key? key}) : super(key: key);
 
   @override
@@ -26,6 +26,8 @@ class _ExpenseListState extends State<ExpenseList> {
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
+
+  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
 
   @override
   void initState() {
@@ -97,19 +99,19 @@ class _ExpenseListState extends State<ExpenseList> {
               controller: newExpenseNameController,
               decoration: InputDecoration(labelText: "Expense name"),
             ),
-            FutureBuilder<List<Author>>(
-              future: Firestore.instance.getUsersGroupMembers(),
+            FutureBuilder<Group>(
+              future: Firestore.instance.getGroup(this.groupVm.group.code),
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting ||
                     !snap.hasData) {
                   return Text("Loading...");
                 }
-                var members = snap.data!;
+                var group = snap.data!;
 
                 return MultiSelectDialogField(
                   title: Text('Expense consumers'),
                   buttonText: Text('Expense consumers'),
-                  items: members
+                  items: group.members
                       .map((member) =>
                           MultiSelectItem<Author?>(member, member.name))
                       .toList(),

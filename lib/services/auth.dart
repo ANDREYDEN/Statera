@@ -56,8 +56,6 @@ class Auth {
 
     final userCredential = await _auth.signInWithCredential(credential);
 
-    await Firestore.instance.addUserToGroup(userCredential.user!);
-
     return userCredential;
   }
 }

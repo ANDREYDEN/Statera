@@ -7,7 +7,7 @@ import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/widgets/dismiss_background.dart';
-import 'package:statera/widgets/item_list_item.dart';
+import 'package:statera/widgets/listItems/item_list_item.dart';
 
 class ExpensePage extends StatefulWidget {
   static const String route = "/expense";

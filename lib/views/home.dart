@@ -3,20 +3,23 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/Author.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/views/expense_list.dart';
+import 'package:statera/viewModels/group_vm.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationViewModel _authVm = Provider.of<AuthenticationViewModel>(context);
+    var authVm = Provider.of<AuthenticationViewModel>(context);
+    var groupVm = Provider.of<GroupViewModel>(context);
+
     return Column(
       children: [
         Text('Owings'),
         Flexible(
           child: StreamBuilder<Map<Author, double>>(
-              stream: Firestore.instance.getOwingsForUser(_authVm.user.uid),
+              stream: Firestore.instance
+                  .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.code),
               builder: (context, membersSnapshot) {
                 if (membersSnapshot.hasError) {
                   return Text(membersSnapshot.error.toString());
