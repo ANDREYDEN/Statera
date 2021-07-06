@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/Author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
-import 'package:statera/page_scaffold.dart';
+import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/widgets/dismissBackground.dart';
+import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/expense_list_item.dart';
 
 class ExpenseList extends StatefulWidget {
@@ -34,110 +34,115 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
-    return PageScaffold(
-      title: "My Expenses",
-      onFabPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("New Expense"),
-            content: Column(
-              children: [
-                TextField(
-                  controller: newExpenseNameController,
-                  decoration: InputDecoration(labelText: "Expense name"),
-                ),
-                FutureBuilder<List<Author>>(
-                  future: Firestore.instance.getUsersGroupMembers(),
-                  builder: (context, snap) {
-                    if (snap.connectionState == ConnectionState.waiting ||
-                        !snap.hasData) {
-                      return Text("Loading...");
-                    }
-                    var members = snap.data!;
+    return Column(children: [
+      Text("Assigned to me"),
+      Expanded(
+        child: buildExpensesList(
+          stream: Firestore.instance
+              .listenForAssignedExpensesForUser(authVm.user.uid),
+          builder: (expense) => ExpenseListItem(
+            expense: expense,
+            type: ExpenseListItemType.ForEveryone,
+          ),
+        ),
+      ),
+      Text("Authored by me"),
+      Expanded(
+        child: buildExpensesList(
+          stream: Firestore.instance
+              .listenForAuthoredExpensesForUser(authVm.user.uid),
+          builder: (expense) => Dismissible(
+            key: Key(expense.id!),
+            onDismissed: (_) {
+              Firestore.instance.deleteExpense(expense);
+            },
+            direction: DismissDirection.startToEnd,
+            background: DismissBackground(),
+            child: ExpenseListItem(
+              expense: expense,
+              type: ExpenseListItemType.ForAuthor,
+            ),
+          ),
+        ),
+      ),
+      Text("Finalized"),
+      Expanded(
+        child: buildExpensesList(
+          stream: Firestore.instance
+              .listenForFinalizedExpensesForUser(authVm.user.uid),
+          builder: (expense) => ExpenseListItem(
+            expense: expense,
+            type: ExpenseListItemType.ForEveryone,
+          ),
+        ),
+      ),
+      Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: IconButton(onPressed: handleNewExpense, icon: Icon(Icons.add)),
+      ),
+    ]);
+  }
 
-                    return MultiSelectDialogField(
-                      title: Text('Expense consumers'),
-                      buttonText: Text('Expense consumers'),
-                      items: members
-                          .map((member) =>
-                              MultiSelectItem<Author?>(member, member.name))
-                          .toList(),
-                      onConfirm: (List<Author?> selectedMembers) {
-                        setState(() {
-                          newExpenseAssignees = selectedMembers
-                              .map((member) => Assignee(uid: member!.uid))
-                              .toList();
-                        });
-                      },
-                    );
+  void handleNewExpense() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("New Expense"),
+        content: Column(
+          children: [
+            TextField(
+              controller: newExpenseNameController,
+              decoration: InputDecoration(labelText: "Expense name"),
+            ),
+            FutureBuilder<List<Author>>(
+              future: Firestore.instance.getUsersGroupMembers(),
+              builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.waiting ||
+                    !snap.hasData) {
+                  return Text("Loading...");
+                }
+                var members = snap.data!;
+
+                return MultiSelectDialogField(
+                  title: Text('Expense consumers'),
+                  buttonText: Text('Expense consumers'),
+                  items: members
+                      .map((member) =>
+                          MultiSelectItem<Author?>(member, member.name))
+                      .toList(),
+                  onConfirm: (List<Author?> selectedMembers) {
+                    setState(() {
+                      newExpenseAssignees = selectedMembers
+                          .map((member) => Assignee(uid: member!.uid))
+                          .toList();
+                    });
                   },
-                ),
-              ],
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    var newExpense = Expense(
-                      author: Author.fromUser(this.authVm.user),
-                      name: newExpenseNameController.text,
-                    );
-                    newExpense.addAssignees(newExpenseAssignees);
-                    this.expenses.add(newExpense);
-                    Firestore.instance.addExpense(newExpense);
-                  });
-                  Navigator.of(context).pop();
-                },
-                child: Text("Save"),
-              )
-            ],
-          ),
-        );
-      },
-      child: Column(children: [
-        Text("Assigned to me"),
-        Expanded(
-          child: buildExpensesList(
-            stream: Firestore.instance
-                .listenForAssignedExpensesForUser(authVm.user.uid),
-            builder: (expense) => ExpenseListItem(
-              expense: expense,
-              type: ExpenseListItemType.ForEveryone,
-            ),
-          ),
-        ),
-        Text("Authored by me"),
-        Expanded(
-          child: buildExpensesList(
-            stream: Firestore.instance
-                .listenForAuthoredExpensesForUser(authVm.user.uid),
-            builder: (expense) => Dismissible(
-              key: Key(expense.id!),
-              onDismissed: (_) {
-                Firestore.instance.deleteExpense(expense);
+                );
               },
-              direction: DismissDirection.startToEnd,
-              background: DismissBackground(),
-              child: ExpenseListItem(
-                expense: expense,
-                type: ExpenseListItemType.ForAuthor,
-              ),
             ),
-          ),
+          ],
         ),
-        Text("Finalized"),
-        Expanded(
-          child: buildExpensesList(
-            stream: Firestore.instance
-                .listenForFinalizedExpensesForUser(authVm.user.uid),
-            builder: (expense) => ExpenseListItem(
-              expense: expense,
-              type: ExpenseListItemType.ForEveryone,
-            ),
-          ),
-        ),
-      ]),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                var newExpense = Expense(
+                  author: Author.fromUser(this.authVm.user),
+                  name: newExpenseNameController.text,
+                );
+                newExpense.addAssignees(newExpenseAssignees);
+                this.expenses.add(newExpense);
+                Firestore.instance.addExpense(newExpense);
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text("Save"),
+          )
+        ],
+      ),
     );
   }
 
@@ -168,6 +173,4 @@ class _ExpenseListState extends State<ExpenseList> {
           );
         });
   }
-
-
 }

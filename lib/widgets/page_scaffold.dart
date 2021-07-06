@@ -6,17 +6,21 @@ class PageScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final void Function()? onFabPressed;
 
+  final BottomNavigationBar? bottomNavBar;
+
   const PageScaffold({
     Key? key,
     required this.child,
     this.title,
     this.onFabPressed,
-    this.actions,
+    this.actions, 
+    this.bottomNavBar,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: this.bottomNavBar,
       appBar: AppBar(
         title: Text(this.title ?? ""),
         actions: this.actions,
