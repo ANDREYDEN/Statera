@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:statera/models/Author.dart';
@@ -19,6 +20,10 @@ class Group {
     members
   }) {
     this.members = members ?? [];
+  }
+
+  void addUser(User user) {
+    this.members.add(Author.fromUser(user));
   }
 
   void generateCode() {

@@ -9,7 +9,7 @@ class Statera extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Statera',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

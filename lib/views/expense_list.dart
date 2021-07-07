@@ -134,6 +134,7 @@ class _ExpenseListState extends State<ExpenseList> {
                 var newExpense = Expense(
                   author: Author.fromUser(this.authVm.user),
                   name: newExpenseNameController.text,
+                  groupId: groupVm.group.id
                 );
                 newExpense.addAssignees(newExpenseAssignees);
                 this.expenses.add(newExpense);

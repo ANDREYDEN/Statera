@@ -63,13 +63,13 @@ class _GroupListState extends State<GroupList> {
                             Expanded(
                               child: TextField(
                                 controller: joinGroupCodeController,
-                                decoration: InputDecoration(labelText: "Group code"),
+                                decoration:
+                                    InputDecoration(labelText: "Group code"),
                               ),
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                Firestore.instance.joinGroup(
-                                  authVm.user,
+                                authVm.joinGroup(
                                   joinGroupCodeController.text,
                                 );
                               },
@@ -136,7 +136,7 @@ class _GroupListState extends State<GroupList> {
                 name: newGroupNameController.text,
               );
               newGroup.generateCode();
-              await Firestore.instance.addGroupForUser(authVm.user, newGroup);
+              await authVm.createGroup(newGroup);
               Navigator.of(context).pop();
             },
             child: Text("Save"),

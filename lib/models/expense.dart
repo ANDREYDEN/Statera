@@ -3,14 +3,20 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/item.dart';
 
 class Expense {
+  String? id = "";
+  String? groupId;
   List<Item> items = [];
   String name;
   Author author; // UID
-  String? id = "";
   late List<Assignee> assignees;
   bool finalized = false;
 
-  Expense({required this.name, required this.author, finalized}) {
+  Expense({
+    required this.name,
+    required this.author,
+    required this.groupId,
+    finalized,
+  }) {
     this.assignees = [Assignee(uid: author.uid)];
     this.finalized = finalized ?? false;
   }
@@ -81,19 +87,22 @@ class Expense {
 
   Map<String, dynamic> toFirestore() {
     return {
+      "groupId": groupId,
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author.toFirestore(),
       "assignees": assignees.map((assignee) => assignee.uid).toList(),
-      "finalized": finalized
+      "finalized": finalized,
     };
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
     var expense = new Expense(
-        author: Author.fromFirestore(data["author"]),
-        name: data["name"],
-        finalized: data["finalized"]);
+      author: Author.fromFirestore(data["author"]),
+      name: data["name"],
+      groupId: data["groupId"],
+      finalized: data["finalized"],
+    );
     expense.assignees =
         data["assignees"].map<Assignee>((uid) => Assignee(uid: uid)).toList();
     expense.id = id;
