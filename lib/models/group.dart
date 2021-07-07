@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import 'package:statera/models/Author.dart';
+import 'package:statera/utils/helpers.dart';
 
 class Group {
   String? id;
@@ -21,7 +22,10 @@ class Group {
   }
 
   void generateCode() {
-    code = "foo";
+    code = "";
+    for (var i = 0; i < 5; i++) {
+      code = code! + getRandomLetter();
+    }
   }
 
   Map<String, dynamic> toFirestore() {

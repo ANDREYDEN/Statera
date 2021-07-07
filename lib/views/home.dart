@@ -16,7 +16,7 @@ class Home extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "Invite members to this group: ${groupVm.group.name}",
+          "Invite members to this group: ${groupVm.group.code}",
           style: Theme.of(context).textTheme.subtitle1,
         ),
         SizedBox(height: 20),
