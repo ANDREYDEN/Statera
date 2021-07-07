@@ -4,6 +4,7 @@ import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/widgets/expenses_picker_dialog.dart';
 
 class OwingListItem extends StatelessWidget {
   final Author payer;
@@ -21,13 +22,11 @@ class OwingListItem extends StatelessWidget {
             previousValue + expense.getPotentialTotalForUser(consumerUid),
       );
 
-  double getConfirmedOwing(consumerUid) => this.expenses.fold(
-        0,
-        (previousValue, expense) {
-          if (!expense.isReadyToPay) return previousValue;
-          return previousValue + expense.getConfirmedTotalForUser(consumerUid);
-        }
-      );
+  double getConfirmedOwing(consumerUid) =>
+      this.expenses.fold(0, (previousValue, expense) {
+        if (!expense.isReadyToPay || expense.paidBy(consumerUid)) return previousValue;
+        return previousValue + expense.getConfirmedTotalForUser(consumerUid);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +38,27 @@ class OwingListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(payer.name),
-          Text("Not marked: ${toStringPrice(this.getPotentialOwing(authVm.user.uid))}"),
+          Text(
+              "Not marked: ${toStringPrice(this.getPotentialOwing(authVm.user.uid))}"),
           ElevatedButton(
             onPressed: () {
-              // TODO: show selection screen
+              handlePayment(context, authVm.user.uid);
             },
-            child: Text("Pay ${toStringPrice(this.getConfirmedOwing(authVm.user.uid))}"),
+            child: Text(
+                "Pay ${toStringPrice(this.getConfirmedOwing(authVm.user.uid))}"),
           ),
         ],
+      ),
+    );
+  }
+
+  void handlePayment(BuildContext context, String consumerUid) {
+    showDialog(
+      context: context,
+      builder: (context) => ExpensesPickerDialog(
+        expenses:
+            this.expenses.where((expense) => expense.isReadyToPay).toList(),
+        consumerUid: consumerUid,
       ),
     );
   }

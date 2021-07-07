@@ -156,4 +156,8 @@ class Firestore {
               .toList(),
         );
   }
+
+  Future<void> setExpense(Expense expense) async {
+    await expensesCollection.doc(expense.id).set(expense.toFirestore());
+  }
 }

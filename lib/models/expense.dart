@@ -106,6 +106,10 @@ class Expense {
     return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
   }
 
+  void pay(String uid) {
+    assignees.firstWhere((assignee) => assignee.uid == uid).paid = true;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       "groupId": groupId,
