@@ -1,42 +1,42 @@
-enum ExpenseDecision {
+enum ProductDecision {
   Undefined,
   Confirmed,
   Denied
 }
 
-const edToString = {
-  ExpenseDecision.Undefined: "Undefined",
-  ExpenseDecision.Confirmed: "Confirmed",
-  ExpenseDecision.Denied: "Denied",
+const pdToString = {
+  ProductDecision.Undefined: "Undefined",
+  ProductDecision.Confirmed: "Confirmed",
+  ProductDecision.Denied: "Denied",
 };
 
-const edFromString = {
-  "Undefined": ExpenseDecision.Undefined,
-  "Confirmed": ExpenseDecision.Confirmed,
-  "Denied": ExpenseDecision.Denied,
+const pdFromString = {
+  "Undefined": ProductDecision.Undefined,
+  "Confirmed": ProductDecision.Confirmed,
+  "Denied": ProductDecision.Denied,
 };
 
 class Assignee {
   String uid;
-  ExpenseDecision decision = ExpenseDecision.Undefined;
+  ProductDecision decision = ProductDecision.Undefined;
 
-  Assignee({required this.uid, ExpenseDecision? decision}) {
+  Assignee({required this.uid, ProductDecision? decision}) {
     if (decision != null) {
       this.decision = decision;
     }
   }
 
-  bool get madeDecision => decision != ExpenseDecision.Undefined;
+  bool get madeDecision => decision != ProductDecision.Undefined;
 
   Map<String, dynamic> toFirestore() {
     return {
       "uid": uid,
-      "decision": edToString[decision]
+      "decision": pdToString[decision]
     };
   }
 
   static Assignee fromFirestore(Map<String, dynamic> data) {
     var dataDecision = data["decision"];
-    return Assignee(uid: data["uid"], decision: edFromString[dataDecision]);
+    return Assignee(uid: data["uid"], decision: pdFromString[dataDecision]);
   }
 }

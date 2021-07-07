@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/Author.dart';
+import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';

@@ -34,6 +34,7 @@ class _ExpensePageState extends State<ExpensePage> {
     return PageScaffold(
       title: widget.expense.name,
       onFabPressed: this.isAuthoredByCurrentUser
+      // onFabPressed: true
           ? () {
               showDialog(
                 context: context,
@@ -109,7 +110,7 @@ class _ExpensePageState extends State<ExpensePage> {
 
                       setState(() {
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ExpenseDecision.Confirmed);
+                            this.authVm.user.uid, ProductDecision.Confirmed);
                       });
                     },
                     onDeny: () {
@@ -117,7 +118,7 @@ class _ExpensePageState extends State<ExpensePage> {
                         if (widget.expense.finalized) return;
 
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ExpenseDecision.Denied);
+                            this.authVm.user.uid, ProductDecision.Denied);
                       });
                     },
                   ),

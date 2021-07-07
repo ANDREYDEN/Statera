@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:statera/models/Author.dart';
+import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 
@@ -101,7 +101,7 @@ class Firestore {
     );
   }
 
-  Stream<Map<Author, double>> getOwingsForUserInGroup(
+  Stream<Map<Author, List<Expense>>> getOwingsForUserInGroup(
     String consumerUid,
     String? groupId,
   ) {
@@ -111,7 +111,7 @@ class Firestore {
         id: snap.id,
       );
 
-      Map<Author, double> owings = {};
+      Map<Author, List<Expense>> owings = {};
 
       // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
       await Future.forEach(
@@ -132,10 +132,7 @@ class Firestore {
               .where((expense) => expense.hasAssignee(member.uid))
               .toList();
 
-          owings[member] = payerExpenses.fold(
-              0,
-              (previousValue, expense) =>
-                  previousValue + expense.getTotalForUser(consumerUid));
+          owings[member] = payerExpenses;
         },
       );
 

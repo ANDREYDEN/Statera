@@ -22,11 +22,11 @@ class AuthenticationViewModel {
   }
 
   bool hasConfirmed(Item item) {
-    return item.assigneeDecision(user.uid) == ExpenseDecision.Confirmed;
+    return item.assigneeDecision(user.uid) == ProductDecision.Confirmed;
   }
 
   bool hasDenied(Item item) {
-    return item.assigneeDecision(user.uid) == ExpenseDecision.Denied;
+    return item.assigneeDecision(user.uid) == ProductDecision.Denied;
   }
 
   Future<void> createGroup(Group newGroup) async {

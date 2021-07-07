@@ -14,14 +14,14 @@ class Item {
         0,
         (previousValue, assignee) =>
             previousValue +
-            (assignee.decision == ExpenseDecision.Confirmed ? 1 : 0),
+            (assignee.decision == ProductDecision.Confirmed ? 1 : 0),
       );
 
   get sharedValue => value / confirmedCount;
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
-  bool get completed => assignees.fold(true, (previousValue, assignee) => previousValue && assignee.madeDecision);
+  bool get completed => assignees.every((assignee) => assignee.madeDecision);
 
   Assignee getAssigneeById(uid) {
     return assignees.firstWhere(
@@ -31,11 +31,11 @@ class Item {
     );
   }
 
-  ExpenseDecision assigneeDecision(String uid) {
+  ProductDecision assigneeDecision(String uid) {
     return getAssigneeById(uid).decision;
   }
 
-  void setAssigneeDecision(String uid, ExpenseDecision decision) {
+  void setAssigneeDecision(String uid, ProductDecision decision) {
     var assignee = getAssigneeById(uid);
     assignee.decision = decision;
   }

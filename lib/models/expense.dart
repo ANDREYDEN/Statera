@@ -1,4 +1,4 @@
-import 'package:statera/models/Author.dart';
+import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/item.dart';
 
@@ -24,12 +24,14 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
+  bool get isReadyToPay => items.every((item) => item.completed);
+
   bool isCompletedByUser(String uid) {
     return items.fold(
         true,
         (previousValue, item) =>
             previousValue &&
-            item.assigneeDecision(uid) != ExpenseDecision.Undefined);
+            item.assigneeDecision(uid) != ProductDecision.Undefined);
   }
 
   bool get completed => items.fold(
@@ -66,7 +68,7 @@ class Expense {
       orElse: () => throw Exception(
           "Can not find assignee in expense $name with UID $uid"),
     );
-    if (assignee.decision == ExpenseDecision.Undefined) return null;
+    if (assignee.decision == ProductDecision.Undefined) return null;
 
     return item.sharedValue;
   }
@@ -77,7 +79,7 @@ class Expense {
     return items.fold<double>(
       0,
       (previousValue, item) {
-        if (item.assigneeDecision(uid) == ExpenseDecision.Confirmed) {
+        if (item.assigneeDecision(uid) == ProductDecision.Confirmed) {
           return previousValue + item.sharedValue;
         }
         return previousValue;
