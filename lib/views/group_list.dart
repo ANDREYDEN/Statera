@@ -58,24 +58,28 @@ class _GroupListState extends State<GroupList> {
                   ? this.noUserView
                   : Column(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: joinGroupCodeController,
-                                decoration:
-                                    InputDecoration(labelText: "Group code"),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: joinGroupCodeController,
+                                  decoration:
+                                      InputDecoration(labelText: "Group code"),
+                                ),
                               ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                authVm.joinGroup(
-                                  joinGroupCodeController.text,
-                                );
-                              },
-                              child: Text("Join"),
-                            ),
-                          ],
+                              SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () {
+                                  authVm.joinGroup(
+                                    joinGroupCodeController.text,
+                                  );
+                                },
+                                child: Text("Join"),
+                              ),
+                            ],
+                          ),
                         ),
                         Expanded(
                           child: StreamBuilder<List<Group>>(

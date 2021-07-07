@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/models/author.dart';
@@ -35,7 +33,7 @@ class Firestore {
         .where("finalized", isEqualTo: finalized);
 
     if (assigneeId != null) {
-      query = query.where("assignees", arrayContains: assigneeId);
+      query = query.where("assigneeIds", arrayContains: assigneeId);
     }
 
     if (authorId != null) {
@@ -110,7 +108,6 @@ class Firestore {
         snap.data() as Map<String, dynamic>,
         id: snap.id,
       );
-
       Map<Author, List<Expense>> owings = {};
 
       // TODO: this might take longer as Future.forEach is consecutively waiting for each Future

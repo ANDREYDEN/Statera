@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/services/auth.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 

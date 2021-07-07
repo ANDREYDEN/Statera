@@ -72,7 +72,7 @@ class ExpenseListItem extends StatelessWidget {
                       Visibility(
                         visible: this.type == ExpenseListItemType.ForEveryone,
                         child: Text(
-                            "My part: \$${this.expense.getTotalForUser(authVm.user.uid).toStringAsFixed(2)}"),
+                            "My part: \$${this.expense.getConfirmedTotalForUser(authVm.user.uid).toStringAsFixed(2)}"),
                       ),
                     ],
                   ),

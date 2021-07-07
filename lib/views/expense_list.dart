@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee.dart';
+import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
-import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
 

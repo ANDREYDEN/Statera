@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/widgets/page_scaffold.dart';

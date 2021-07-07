@@ -1,5 +1,6 @@
-import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee.dart';
+import 'package:statera/models/author.dart';
+import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/item.dart';
 
 class Expense {
@@ -45,7 +46,7 @@ class Expense {
 
   addItem(Item item) {
     item.assignees =
-        this.assignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
+        this.assignees.map((assignee) => AssigneeDecision(uid: assignee.uid)).toList();
     items.add(item);
   }
 
@@ -53,7 +54,7 @@ class Expense {
     this.assignees = [...newAssignees];
     items.forEach((item) {
       item.assignees =
-          newAssignees.map((assignee) => Assignee(uid: assignee.uid)).toList();
+          newAssignees.map((assignee) => AssigneeDecision(uid: assignee.uid)).toList();
     });
   }
 
@@ -63,7 +64,7 @@ class Expense {
       orElse: () =>
           throw Exception("No expense item found with name $itemName"),
     );
-    Assignee assignee = item.assignees.firstWhere(
+    AssigneeDecision assignee = item.assignees.firstWhere(
       (element) => element.uid == uid,
       orElse: () => throw Exception(
           "Can not find assignee in expense $name with UID $uid"),
@@ -73,7 +74,7 @@ class Expense {
     return item.sharedValue;
   }
 
-  double getTotalForUser(String uid) {
+  double getConfirmedTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
@@ -87,13 +88,32 @@ class Expense {
     );
   }
 
+  double getPotentialTotalForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+
+    return items.fold<double>(
+      0,
+      (previousValue, item) {
+        if (item.assigneeDecision(uid) != ProductDecision.Denied) {
+          return previousValue + item.sharedValue;
+        }
+        return previousValue;
+      },
+    );
+  }
+
+  bool paidBy(String uid) {
+    return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       "groupId": groupId,
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author.toFirestore(),
-      "assignees": assignees.map((assignee) => assignee.uid).toList(),
+      "assigneeIds": assignees.map((assignee) => assignee.uid).toList().toList(),
+      "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
       "finalized": finalized,
     };
   }
@@ -106,7 +126,7 @@ class Expense {
       finalized: data["finalized"],
     );
     expense.assignees =
-        data["assignees"].map<Assignee>((uid) => Assignee(uid: uid)).toList();
+        data["assignees"].map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData)).toList();
     expense.id = id;
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});

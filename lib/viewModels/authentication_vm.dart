@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/services/auth.dart';
