@@ -27,7 +27,8 @@ class _ExpenseListState extends State<ExpenseList> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
-  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
+  GroupViewModel get groupVm =>
+      Provider.of<GroupViewModel>(context, listen: false);
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class _ExpenseListState extends State<ExpenseList> {
       Expanded(
         child: buildExpensesList(
           stream: Firestore.instance
-              .listenForAssignedExpensesForUser(authVm.user.uid),
+              .listenForAssignedExpenses(authVm.user.uid, groupVm.group.id),
           builder: (expense) => ExpenseListItem(
             expense: expense,
             type: ExpenseListItemType.ForEveryone,
@@ -52,7 +53,7 @@ class _ExpenseListState extends State<ExpenseList> {
       Expanded(
         child: buildExpensesList(
           stream: Firestore.instance
-              .listenForAuthoredExpensesForUser(authVm.user.uid),
+              .listenForAuthoredExpenses(authVm.user.uid, groupVm.group.id),
           builder: (expense) => Dismissible(
             key: Key(expense.id!),
             onDismissed: (_) {
@@ -70,8 +71,8 @@ class _ExpenseListState extends State<ExpenseList> {
       Text("Finalized"),
       Expanded(
         child: buildExpensesList(
-          stream: Firestore.instance
-              .listenForFinalizedExpensesForUser(authVm.user.uid),
+          stream:
+              Firestore.instance.listenForFinalizedExpenses(groupVm.group.id),
           builder: (expense) => ExpenseListItem(
             expense: expense,
             type: ExpenseListItemType.ForEveryone,
@@ -134,7 +135,7 @@ class _ExpenseListState extends State<ExpenseList> {
                 var newExpense = Expense(
                   author: Author.fromUser(this.authVm.user),
                   name: newExpenseNameController.text,
-                  groupId: groupVm.group.id
+                  groupId: groupVm.group.id,
                 );
                 newExpense.addAssignees(newExpenseAssignees);
                 this.expenses.add(newExpense);

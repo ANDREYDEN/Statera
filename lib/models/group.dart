@@ -42,7 +42,7 @@ class Group {
     };
   }
 
-  factory Group.fromFirestore(Map<String, dynamic> map, { String? id }) {
+  factory Group.fromFirestore(Map<String, dynamic> map, { required String? id }) {
     return Group(
       name: map['name'],
       members: List<Author>.from(map['members']?.map((x) => Author.fromFirestore(x))),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/models/Author.dart';
@@ -22,39 +24,56 @@ class Firestore {
     expensesCollection.add(expense.toFirestore());
   }
 
-  Stream<List<Expense>> listenForAssignedExpensesForUser(String uid) {
-    return expensesCollection
-        .where("assignees", arrayContains: uid)
-        .where("finalized", isEqualTo: false)
-        .snapshots()
-        .map<List<Expense>>((snap) => snap.docs
-            .map((doc) => Expense.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id))
-            .toList());
+  Query _expensesQuery({
+    String? groupId,
+    String? assigneeId,
+    bool finalized = false,
+    String? authorId,
+  }) {
+    var query = expensesCollection
+        .where("groupId", isEqualTo: groupId)
+        .where("finalized", isEqualTo: finalized);
+
+    if (assigneeId != null) {
+      query = query.where("assignees", arrayContains: assigneeId);
+    }
+
+    if (authorId != null) {
+      query = query.where("author.uid", isEqualTo: authorId);
+    }
+
+    return query;
   }
 
-  Query _authoredExpensesForUserQuery(String uid) {
-    return expensesCollection
-        .where("author.uid", isEqualTo: uid)
-        .where("finalized", isEqualTo: false);
+  Stream<List<Expense>> _queryToExpensesStream(Query query) {
+    return query.snapshots().map<List<Expense>>((snap) => snap.docs
+        .map((doc) =>
+            Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+        .toList());
   }
 
-  Stream<List<Expense>> listenForAuthoredExpensesForUser(String uid) {
-    return _authoredExpensesForUserQuery(uid).snapshots().map<List<Expense>>(
-        (snap) => snap.docs
-            .map((doc) => Expense.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id))
-            .toList());
+  Stream<List<Expense>> listenForAssignedExpenses(
+    String uid,
+    String? groupId,
+  ) {
+    return _queryToExpensesStream(_expensesQuery(
+      groupId: groupId,
+      assigneeId: uid,
+    ));
   }
 
-  listenForFinalizedExpensesForUser(String uid) {
-    return expensesCollection
-        .where("finalized", isEqualTo: true)
-        .snapshots()
-        .map<List<Expense>>((snap) => snap.docs
-            .map((doc) => Expense.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id))
-            .toList());
+  Stream<List<Expense>> listenForAuthoredExpenses(String uid, String? groupId) {
+    return _queryToExpensesStream(_expensesQuery(
+      groupId: groupId,
+      authorId: uid,
+    ));
+  }
+
+  listenForFinalizedExpenses(String? groupId) {
+    return _queryToExpensesStream(_expensesQuery(
+      groupId: groupId,
+      finalized: true,
+    ));
   }
 
   Future<void> saveExpense(Expense expense) async {
@@ -83,32 +102,42 @@ class Firestore {
   }
 
   Stream<Map<Author, double>> getOwingsForUserInGroup(
-      String consumerUid, String? groupCode) {
-    return groupsCollection
-        .where('code', isEqualTo: groupCode)
-        .snapshots()
-        .asyncMap((snap) async {
-      var group =
-          Group.fromFirestore(snap.docs.first.data() as Map<String, dynamic>);
+    String consumerUid,
+    String? groupId,
+  ) {
+    return groupsCollection.doc(groupId).snapshots().asyncMap((snap) async {
+      var group = Group.fromFirestore(
+        snap.data() as Map<String, dynamic>,
+        id: snap.id,
+      );
 
       Map<Author, double> owings = {};
 
       // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
-      await Future.forEach(group.members, (Author member) async {
-        var payerExpensesSnap =
-            await _authoredExpensesForUserQuery(member.uid).get();
+      await Future.forEach(
+        group.members,
+        (Author member) async {
+          // skip yourself
+          if (member.uid == consumerUid) return;
 
-        List<Expense> payerExpenses = payerExpensesSnap.docs
-            .map((doc) => Expense.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id))
-            .where((expense) => expense.hasAssignee(member.uid))
-            .toList();
+          var payerExpensesSnap =
+              await _expensesQuery(groupId: groupId, authorId: member.uid)
+                  .get();
 
-        owings[member] = payerExpenses.fold(
-            0,
-            (previousValue, expense) =>
-                previousValue + expense.getTotalForUser(consumerUid));
-      });
+          List<Expense> payerExpenses = payerExpensesSnap.docs
+              .map((doc) => Expense.fromFirestore(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                  ))
+              .where((expense) => expense.hasAssignee(member.uid))
+              .toList();
+
+          owings[member] = payerExpenses.fold(
+              0,
+              (previousValue, expense) =>
+                  previousValue + expense.getTotalForUser(consumerUid));
+        },
+      );
 
       return owings;
     });
@@ -125,8 +154,10 @@ class Firestore {
         .map(
           (event) => event.docs
               .map(
-                (doc) =>
-                    Group.fromFirestore(doc.data() as Map<String, dynamic>),
+                (doc) => Group.fromFirestore(
+                  doc.data() as Map<String, dynamic>,
+                  id: doc.id,
+                ),
               )
               .toList(),
         );

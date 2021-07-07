@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
         Flexible(
           child: StreamBuilder<Map<Author, double>>(
               stream: Firestore.instance
-                  .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.code),
+                  .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.id),
               builder: (context, membersSnapshot) {
                 if (membersSnapshot.hasError) {
                   return Text(membersSnapshot.error.toString());
