@@ -136,4 +136,10 @@ class Firestore {
     group.members.add(Author.fromUser(user));
     await groupsCollection.add(group.toFirestore());
   }
+
+  Future<void> joinGroup(User user, String groupCode) async {
+    var group = await getGroup(groupCode);
+    group.members.add(Author.fromUser(user));
+    await groupsCollection.doc(group.id).update(group.toFirestore());
+  }
 }

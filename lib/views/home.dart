@@ -15,6 +15,11 @@ class Home extends StatelessWidget {
 
     return Column(
       children: [
+        Text(
+          "Invite members to this group: ${groupVm.group.name}",
+          style: Theme.of(context).textTheme.subtitle1,
+        ),
+        SizedBox(height: 20),
         Text('Owings'),
         Flexible(
           child: StreamBuilder<Map<Author, double>>(

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/services/auth.dart';
+import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
 class GroupScaffoldItem {
@@ -30,10 +32,12 @@ class GroupScaffold extends StatefulWidget {
 class _GroupScaffoldState extends State<GroupScaffold> {
   int selectedNavBarItemIndex = 0;
 
+  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
+
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: "Statera",
+      title: groupVm.group.name,
       bottomNavBar: BottomNavigationBar(
         iconSize: 36,
         items: widget.items

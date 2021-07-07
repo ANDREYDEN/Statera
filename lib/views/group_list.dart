@@ -6,7 +6,6 @@ import 'package:statera/services/auth.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/views/group_page.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
@@ -21,10 +20,12 @@ class GroupList extends StatefulWidget {
 
 class _GroupListState extends State<GroupList> {
   TextEditingController newGroupNameController = TextEditingController();
+  TextEditingController joinGroupCodeController = TextEditingController();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
-  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
+  GroupViewModel get groupVm =>
+      Provider.of<GroupViewModel>(context, listen: false);
 
   @override
   Widget build(BuildContext context) {
@@ -55,24 +56,53 @@ class _GroupListState extends State<GroupList> {
               ? Text("Loading...")
               : user == null
                   ? this.noUserView
-                  : StreamBuilder<List<Group>>(
-                      stream:
-                          Firestore.instance.userGroupsStream(authVm.user.uid),
-                      builder: (context, snap) {
-                        if (!snap.hasData ||
-                            snap.connectionState == ConnectionState.waiting) {
-                          return Text("Loading...");
-                        }
+                  : Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: joinGroupCodeController,
+                                decoration: InputDecoration(labelText: "Group code"),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Firestore.instance.joinGroup(
+                                  authVm.user,
+                                  joinGroupCodeController.text,
+                                );
+                              },
+                              child: Text("Join"),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: StreamBuilder<List<Group>>(
+                            stream: Firestore.instance
+                                .userGroupsStream(authVm.user.uid),
+                            builder: (context, snap) {
+                              if (!snap.hasData ||
+                                  snap.connectionState ==
+                                      ConnectionState.waiting) {
+                                return Text("Loading...");
+                              }
 
-                        var groups = snap.data!;
+                              var groups = snap.data!;
 
-                        return ListView.builder(
-                          itemCount: groups.length,
-                          itemBuilder: (context, index) {
-                            return GroupListItem(group: groups[index]);
-                          },
-                        );
-                      },
+                              return groups.isEmpty
+                                  ? Text("You don't have any groups yet...")
+                                  : ListView.builder(
+                                      itemCount: groups.length,
+                                      itemBuilder: (context, index) {
+                                        return GroupListItem(
+                                            group: groups[index]);
+                                      },
+                                    );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
         );
       },
