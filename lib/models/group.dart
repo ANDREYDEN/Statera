@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
@@ -7,21 +8,28 @@ import 'package:statera/models/Author.dart';
 class Group {
   String? id;
   String name;
-  List<Author> members;
-  String code;
+  late List<Author> members;
+  String? code;
 
   Group({
     required this.name,
-    required this.members,
-    required this.code,
-    this.id
-  });
+    this.code,
+    this.id,
+    members
+  }) {
+    this.members = members ?? [];
+  }
+
+  void generateCode() {
+    code = "foo";
+  }
 
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
+      'memberIds': members.map((x) => x.uid).toList()
     };
   }
 

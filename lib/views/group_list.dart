@@ -5,17 +5,29 @@ import 'package:statera/models/group.dart';
 import 'package:statera/services/auth.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/views/group_page.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
-class GroupList extends StatelessWidget {
+class GroupList extends StatefulWidget {
   static const String route = '/';
 
   const GroupList({Key? key}) : super(key: key);
 
   @override
+  _GroupListState createState() => _GroupListState();
+}
+
+class _GroupListState extends State<GroupList> {
+  TextEditingController newGroupNameController = TextEditingController();
+
+  AuthenticationViewModel get authVm =>
+      Provider.of<AuthenticationViewModel>(context, listen: false);
+  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
+
+  @override
   Widget build(BuildContext context) {
-    var authVm = Provider.of<AuthenticationViewModel>(context);
     return StreamBuilder<User?>(
       stream: Auth.instance.currentUserStream(),
       builder: (context, userSnapshot) {
@@ -38,6 +50,7 @@ class GroupList extends StatelessWidget {
                     child: Text("Sign Out"),
                   ),
                 ],
+          onFabPressed: handleNewGroup,
           child: loading
               ? Text("Loading...")
               : user == null
@@ -72,4 +85,34 @@ class GroupList extends StatelessWidget {
         },
         child: Text("Log In with Google"),
       );
+
+  void handleNewGroup() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("New Group"),
+        content: Column(
+          children: [
+            TextField(
+              controller: newGroupNameController,
+              decoration: InputDecoration(labelText: "Group name"),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              var newGroup = Group(
+                name: newGroupNameController.text,
+              );
+              newGroup.generateCode();
+              await Firestore.instance.addGroupForUser(authVm.user, newGroup);
+              Navigator.of(context).pop();
+            },
+            child: Text("Save"),
+          )
+        ],
+      ),
+    );
+  }
 }

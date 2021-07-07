@@ -70,7 +70,7 @@ class Firestore {
     await groupsCollection.doc(group.id).set(group.toFirestore());
   }
 
-  Future<Group> getGroup(String groupCode) async {
+  Future<Group> getGroup(String? groupCode) async {
     var groupSnap =
         await groupsCollection.where('code', isEqualTo: groupCode).get();
     if (groupSnap.docs.isEmpty)
@@ -83,7 +83,7 @@ class Firestore {
   }
 
   Stream<Map<Author, double>> getOwingsForUserInGroup(
-      String consumerUid, String groupCode) {
+      String consumerUid, String? groupCode) {
     return groupsCollection
         .where('code', isEqualTo: groupCode)
         .snapshots()
@@ -122,10 +122,18 @@ class Firestore {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
         .snapshots()
-        .map((event) => event.docs
-            .map(
-              (doc) => Group.fromFirestore(doc.data() as Map<String, dynamic>),
-            )
-            .toList());
+        .map(
+          (event) => event.docs
+              .map(
+                (doc) =>
+                    Group.fromFirestore(doc.data() as Map<String, dynamic>),
+              )
+              .toList(),
+        );
+  }
+
+  Future<void> addGroupForUser(User user, Group group) async {
+    group.members.add(Author.fromUser(user));
+    await groupsCollection.add(group.toFirestore());
   }
 }
