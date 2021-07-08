@@ -88,6 +88,65 @@ class _ExpensePageState extends State<ExpensePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          SizedBox(
+            height: 50,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isMarkedBy(authVm.user.uid)
+                        ? null
+                        : Colors.red[200],
+                    child: Text(
+                      'Requires marking',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isMarkedBy(authVm.user.uid) &&
+                            !widget.expense.isReadyToBePaidFor
+                        ? Colors.yellow[300]
+                        : null,
+                    child: Text(
+                      'Marked',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isReadyToBePaidFor &&
+                            !widget.expense.paidBy(authVm.user.uid)
+                        ? Colors.green[200]
+                        : null,
+                    child: Text(
+                      'Ready to be paid',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.paidBy(authVm.user.uid)
+                        ? Colors.grey[400]
+                        : null,
+                    child: Text(
+                      'Paid',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
           Text("Author: ${widget.expense.author.name}"),
           Flexible(
             child: ListView.builder(
