@@ -34,19 +34,19 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Expanded(child: buildExpensesList()),
-      Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(100),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: buildExpensesList()),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: handleNewExpense,
+            child: Icon(Icons.add, color: Colors.white),
+          ),
         ),
-        child: IconButton(
-          onPressed: handleNewExpense,
-          icon: Icon(Icons.add, color: Colors.white),
-        ),
-      ),
-    ]);
+      ],
+    );
   }
 
   void handleNewExpense() {
@@ -112,24 +112,26 @@ class _ExpenseListState extends State<ExpenseList> {
             return 0;
           });
 
-          return ListView.builder(
-            itemCount: expenses.length,
-            itemBuilder: (context, index) {
-              var expense = expenses[index];
+          return expenses.isEmpty
+              ? Text("No expenses yet...")
+              : ListView.builder(
+                  itemCount: expenses.length,
+                  itemBuilder: (context, index) {
+                    var expense = expenses[index];
 
-              return expense.author.uid == authVm.user.uid
-                  ? Dismissible(
-                      key: Key(expense.id!),
-                      onDismissed: (_) {
-                        Firestore.instance.deleteExpense(expense);
-                      },
-                      direction: DismissDirection.startToEnd,
-                      background: DismissBackground(),
-                      child: ExpenseListItem(expense: expense),
-                    )
-                  : ExpenseListItem(expense: expense);
-            },
-          );
+                    return expense.author.uid == authVm.user.uid
+                        ? Dismissible(
+                            key: Key(expense.id!),
+                            onDismissed: (_) {
+                              Firestore.instance.deleteExpense(expense);
+                            },
+                            direction: DismissDirection.startToEnd,
+                            background: DismissBackground(),
+                            child: ExpenseListItem(expense: expense),
+                          )
+                        : ExpenseListItem(expense: expense);
+                  },
+                );
         });
   }
 }
