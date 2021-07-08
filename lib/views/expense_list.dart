@@ -64,18 +64,17 @@ class _ExpenseListState extends State<ExpenseList> {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                var newExpense = Expense(
-                  author: Author.fromUser(this.authVm.user),
-                  name: newExpenseNameController.text,
-                  groupId: groupVm.group.id,
-                );
-                Firestore.instance.addExpenseToGroup(
-                  newExpense,
-                  groupVm.group.code,
-                );
-              });
+            onPressed: () async {
+              var newExpense = Expense(
+                author: Author.fromUser(this.authVm.user),
+                name: newExpenseNameController.text,
+                groupId: groupVm.group.id,
+              );
+              await Firestore.instance.addExpenseToGroup(
+                newExpense,
+                groupVm.group.code,
+              );
+              newExpenseNameController.clear();
               Navigator.of(context).pop();
             },
             child: Text("Save"),
