@@ -10,10 +10,10 @@ class ExpenseListItem extends StatelessWidget {
   const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
 
   Color? getCardColor(String uid) {
-    if (this.expense.author.uid == uid) {
+    if (this.expense.isAuthoredBy(uid)) {
       if (this.expense.isPaidFor) return Colors.grey[400];
     }
-    if (this.expense.paidBy(uid)) return Colors.grey[400];
+    if (this.expense.isPaidBy(uid)) return Colors.grey[400];
     if (this.expense.isReadyToBePaidFor) return Colors.green[200];
     if (!this.expense.isMarkedBy(uid)) return Colors.red[200];
     return Colors.yellow[300];

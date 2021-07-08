@@ -29,8 +29,10 @@ class Expense {
   int get paidAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>
-            previousValue + (paidBy(assignee.uid) ? 1 : 0),
+            previousValue + (isPaidBy(assignee.uid) ? 1 : 0),
       );
+
+  bool get canReceiveAssignees => assignees.length == 1 || (!isPaidFor && paidAssignees == 0);
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -40,6 +42,10 @@ class Expense {
             item.assigneeDecision(uid) != ProductDecision.Undefined);
   }
 
+  bool isAuthoredBy(String uid) {
+    return this.author.uid == uid;
+  }
+
   int get definedAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>
@@ -47,20 +53,26 @@ class Expense {
       );
 
   addItem(Item item) {
-    item.assignees = this
-        .assignees
-        .map((assignee) => AssigneeDecision(uid: assignee.uid))
-        .toList();
     items.add(item);
+    _resetItemAssignees();
+  }
+
+  _resetItemAssignees() {
+    items.forEach((item) {
+      item.assignees = this.assignees
+          .map((assignee) => AssigneeDecision(uid: assignee.uid))
+          .toList();
+    });
   }
 
   setAssignees(List<Assignee> newAssignees) {
     this.assignees = [...newAssignees];
-    items.forEach((item) {
-      item.assignees = newAssignees
-          .map((assignee) => AssigneeDecision(uid: assignee.uid))
-          .toList();
-    });
+    _resetItemAssignees();
+  }
+
+  addAssignee(Assignee newAssignee) {
+    this.assignees.add(newAssignee);
+    _resetItemAssignees();
   }
 
   double? getItemValueForUser(String itemName, String uid) {
@@ -109,7 +121,7 @@ class Expense {
     );
   }
 
-  bool paidBy(String uid) {
+  bool isPaidBy(String uid) {
     return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
   }
 

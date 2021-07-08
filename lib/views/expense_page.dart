@@ -27,7 +27,7 @@ class _ExpensePageState extends State<ExpensePage> {
       Provider.of<AuthenticationViewModel>(context, listen: false);
   List<Item> get items => widget.expense.items;
 
-  get isAuthoredByCurrentUser => widget.expense.author.uid == authVm.user.uid;
+  get isAuthoredByCurrentUser => widget.expense.isAuthoredBy(authVm.user.uid);
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +96,9 @@ class _ExpensePageState extends State<ExpensePage> {
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.all(8),
-                    color: widget.expense.isMarkedBy(authVm.user.uid)
-                        ? null
-                        : Colors.red[200],
+                    color: !widget.expense.isMarkedBy(authVm.user.uid)
+                        ? Colors.red[200]
+                        : null,
                     child: Text(
                       'Requires marking',
                       textAlign: TextAlign.center,
@@ -109,7 +109,8 @@ class _ExpensePageState extends State<ExpensePage> {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     color: widget.expense.isMarkedBy(authVm.user.uid) &&
-                            !widget.expense.isReadyToBePaidFor
+                            !widget.expense.isReadyToBePaidFor &&
+                            !widget.expense.isPaidFor
                         ? Colors.yellow[300]
                         : null,
                     child: Text(
@@ -122,7 +123,7 @@ class _ExpensePageState extends State<ExpensePage> {
                   child: Container(
                     padding: EdgeInsets.all(8),
                     color: widget.expense.isReadyToBePaidFor &&
-                            !widget.expense.paidBy(authVm.user.uid)
+                            !widget.expense.isPaidBy(authVm.user.uid)
                         ? Colors.green[200]
                         : null,
                     child: Text(
@@ -134,7 +135,7 @@ class _ExpensePageState extends State<ExpensePage> {
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.all(8),
-                    color: widget.expense.paidBy(authVm.user.uid)
+                    color: widget.expense.isPaidBy(authVm.user.uid)
                         ? Colors.grey[400]
                         : null,
                     child: Text(

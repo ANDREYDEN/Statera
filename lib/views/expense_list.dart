@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
-import 'package:statera/models/group.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
@@ -103,8 +100,8 @@ class _ExpenseListState extends State<ExpenseList> {
             if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
             if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
 
-            if (!firstExpense.paidBy(authVm.user.uid)) return -1;
-            if (!secondExpense.paidBy(authVm.user.uid)) return 1;
+            if (!firstExpense.isPaidBy(authVm.user.uid)) return -1;
+            if (!secondExpense.isPaidBy(authVm.user.uid)) return 1;
 
             if (firstExpense.isReadyToBePaidFor) return -1;
             if (secondExpense.isReadyToBePaidFor) return 1;
@@ -119,7 +116,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   itemBuilder: (context, index) {
                     var expense = expenses[index];
 
-                    return expense.author.uid == authVm.user.uid
+                    return expense.isAuthoredBy(authVm.user.uid)
                         ? Dismissible(
                             key: Key(expense.id!),
                             onDismissed: (_) {

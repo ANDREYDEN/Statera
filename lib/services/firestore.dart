@@ -114,7 +114,7 @@ class Firestore {
               .toList();
 
           owings[member] = payerExpenses
-              .where((expense) => !expense.paidBy(consumerUid))
+              .where((expense) => !expense.isPaidBy(consumerUid))
               .toList();
         },
       );
@@ -141,5 +141,22 @@ class Firestore {
               )
               .toList(),
         );
+  }
+
+  Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
+    var expensesSnap = await _expensesQuery(groupId: groupId).get();
+    List<Expense> expenses = expensesSnap.docs
+        .map((doc) =>
+            Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+    var outstandingExpenses =
+        expenses.where((expense) => expense.canReceiveAssignees);
+    outstandingExpenses.forEach((expense) {
+      expense.addAssignee(Assignee(uid: user.uid));
+    });
+
+    await Future.wait(
+      outstandingExpenses.map((expense) => saveExpense(expense)),
+    );
   }
 }

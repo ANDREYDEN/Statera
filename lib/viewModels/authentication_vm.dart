@@ -30,15 +30,20 @@ class AuthenticationViewModel {
   }
 
   Future<void> createGroup(Group newGroup) async {
+    newGroup.generateCode();
     newGroup.addUser(user);
     await Firestore.instance.groupsCollection.add(newGroup.toFirestore());
   }
 
   Future<void> joinGroup(String groupCode) async {
     var group = await Firestore.instance.getGroup(groupCode);
+    if (group.members.any((member) => member.uid == user.uid)) return;
+
     group.addUser(user);
     await Firestore.instance.groupsCollection
         .doc(group.id)
         .update(group.toFirestore());
+
+    await Firestore.instance.addUserToOutstandingExpenses(user, group.id);
   }
 }

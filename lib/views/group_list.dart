@@ -75,6 +75,7 @@ class _GroupListState extends State<GroupList> {
                                   authVm.joinGroup(
                                     joinGroupCodeController.text,
                                   );
+                                  joinGroupCodeController.clear();
                                 },
                                 child: Text("Join"),
                               ),
@@ -100,7 +101,8 @@ class _GroupListState extends State<GroupList> {
                                       itemCount: groups.length,
                                       itemBuilder: (context, index) {
                                         return GroupListItem(
-                                            group: groups[index]);
+                                          group: groups[index],
+                                        );
                                       },
                                     );
                             },
@@ -139,7 +141,6 @@ class _GroupListState extends State<GroupList> {
               var newGroup = Group(
                 name: newGroupNameController.text,
               );
-              newGroup.generateCode();
               await authVm.createGroup(newGroup);
               Navigator.of(context).pop();
             },
