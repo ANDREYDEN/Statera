@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
+import 'package:async/async.dart' show StreamGroup;
 
 class Firestore {
   late FirebaseFirestore _firestore;
@@ -47,21 +48,9 @@ class Firestore {
         .toList());
   }
 
-  Stream<List<Expense>> listenForAssignedExpenses(
-    String uid,
-    String? groupId,
-  ) {
-    return _queryToExpensesStream(_expensesQuery(
-      groupId: groupId,
-      assigneeId: uid,
-    ));
-  }
-
-  Stream<List<Expense>> listenForAuthoredExpenses(String uid, String? groupId) {
-    return _queryToExpensesStream(_expensesQuery(
-      groupId: groupId,
-      authorId: uid,
-    ));
+  Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
+    return _queryToExpensesStream(
+        expensesCollection.where("groupId", isEqualTo: groupId));
   }
 
   Future<void> saveExpense(Expense expense) async {

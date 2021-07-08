@@ -54,25 +54,34 @@ class ExpenseListItem extends StatelessWidget {
                     children: [
                       Text(this.expense.name),
                       Text("${this.expense.items.length} item(s)"),
-                      Visibility(
-                        visible: this.type == ExpenseListItemType.ForEveryone,
-                        child: Text("Payer: ${this.expense.author.name}"),
-                      ),
-                      Row(children: [
-                        Icon(Icons.person),
-                        Text("${this.expense.definedAssignees}/${this.expense.assignees.length}")
-                      ],)
+                      Text("Payer: ${this.expense.author.name}"),
+                      Row(
+                        children: [
+                          Text("Marked: "),
+                          Icon(Icons.person),
+                          Text(
+                            "${this.expense.definedAssignees}/${this.expense.assignees.length}",
+                          )
+                        ],
+                      )
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text("Total: \$${this.expense.total.toStringAsFixed(2)}"),
-                      Visibility(
-                        visible: this.type == ExpenseListItemType.ForEveryone,
-                        child: Text(
-                            "My part: \$${this.expense.getConfirmedTotalForUser(authVm.user.uid).toStringAsFixed(2)}"),
+                      Text(
+                        "My part: \$${this.expense.getConfirmedTotalForUser(authVm.user.uid).toStringAsFixed(2)}",
                       ),
+                      Row(
+                        children: [
+                          Text("Paid: "),
+                          Icon(Icons.person),
+                          Text(
+                            "${this.expense.paidAssignees}/${this.expense.assignees.length}",
+                          )
+                        ],
+                      )
                     ],
                   ),
                 ],

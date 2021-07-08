@@ -26,6 +26,12 @@ class Expense {
 
   bool get isPaidFor => assignees.every((assignee) => assignee.paid);
 
+  int get paidAssignees => assignees.fold(
+        0,
+        (previousValue, assignee) =>
+            previousValue + (paidBy(assignee.uid) ? 1 : 0),
+      );
+
   bool isMarkedByUser(String uid) {
     return items.fold(
         true,
@@ -41,16 +47,19 @@ class Expense {
       );
 
   addItem(Item item) {
-    item.assignees =
-        this.assignees.map((assignee) => AssigneeDecision(uid: assignee.uid)).toList();
+    item.assignees = this
+        .assignees
+        .map((assignee) => AssigneeDecision(uid: assignee.uid))
+        .toList();
     items.add(item);
   }
 
   addAssignees(List<Assignee> newAssignees) {
     this.assignees = [...newAssignees];
     items.forEach((item) {
-      item.assignees =
-          newAssignees.map((assignee) => AssigneeDecision(uid: assignee.uid)).toList();
+      item.assignees = newAssignees
+          .map((assignee) => AssigneeDecision(uid: assignee.uid))
+          .toList();
     });
   }
 
@@ -114,7 +123,8 @@ class Expense {
       "name": name,
       "items": items.map((item) => item.toFirestore()).toList(),
       "author": author.toFirestore(),
-      "assigneeIds": assignees.map((assignee) => assignee.uid).toList().toList(),
+      "assigneeIds":
+          assignees.map((assignee) => assignee.uid).toList().toList(),
       "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
     };
   }
@@ -125,8 +135,9 @@ class Expense {
       name: data["name"],
       groupId: data["groupId"],
     );
-    expense.assignees =
-        data["assignees"].map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData)).toList();
+    expense.assignees = data["assignees"]
+        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
+        .toList();
     expense.id = id;
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});

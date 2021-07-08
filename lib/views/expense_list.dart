@@ -37,42 +37,16 @@ class _ExpenseListState extends State<ExpenseList> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Text("Assigned to me"),
-      Expanded(
-        child: buildExpensesList(
-          stream: Firestore.instance
-              .listenForAssignedExpenses(authVm.user.uid, groupVm.group.id),
-          builder: (expense) => ExpenseListItem(
-            expense: expense,
-            type: ExpenseListItemType.ForEveryone,
-          ),
-        ),
-      ),
-      Text("Authored by me"),
-      Expanded(
-        child: buildExpensesList(
-          stream: Firestore.instance
-              .listenForAuthoredExpenses(authVm.user.uid, groupVm.group.id),
-          builder: (expense) => Dismissible(
-            key: Key(expense.id!),
-            onDismissed: (_) {
-              Firestore.instance.deleteExpense(expense);
-            },
-            direction: DismissDirection.startToEnd,
-            background: DismissBackground(),
-            child: ExpenseListItem(
-              expense: expense,
-              type: ExpenseListItemType.ForAuthor,
-            ),
-          ),
-        ),
-      ),
+      Expanded(child: buildExpensesList()),
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(100),
         ),
-        child: IconButton(onPressed: handleNewExpense, icon: Icon(Icons.add)),
+        child: IconButton(
+          onPressed: handleNewExpense,
+          icon: Icon(Icons.add, color: Colors.white),
+        ),
       ),
     ]);
   }
@@ -138,12 +112,10 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  Widget buildExpensesList({
-    required Stream<List<Expense>> stream,
-    required Widget Function(Expense) builder,
-  }) {
+  Widget buildExpensesList() {
     return StreamBuilder<List<Expense>>(
-        stream: stream,
+        stream: Firestore.instance
+            .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text(snapshot.error.toString());
@@ -160,7 +132,23 @@ class _ExpenseListState extends State<ExpenseList> {
             itemBuilder: (context, index) {
               var expense = expenses[index];
 
-              return builder(expense);
+              return expense.author.uid == authVm.user.uid
+                  ? Dismissible(
+                      key: Key(expense.id!),
+                      onDismissed: (_) {
+                        Firestore.instance.deleteExpense(expense);
+                      },
+                      direction: DismissDirection.startToEnd,
+                      background: DismissBackground(),
+                      child: ExpenseListItem(
+                        expense: expense,
+                        type: ExpenseListItemType.ForAuthor,
+                      ),
+                    )
+                  : ExpenseListItem(
+                      expense: expense,
+                      type: ExpenseListItemType.ForEveryone,
+                    );
             },
           );
         });
