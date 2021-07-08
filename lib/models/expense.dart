@@ -22,7 +22,7 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
-  bool get isPaidFor => assignees.every((assignee) => assignee.paid);
+  bool get isPaidFor => assignees.every((assignee) => assignee.uid == author.uid || assignee.paid);
 
   bool get isReadyToBePaidFor => !isPaidFor && items.every((item) => item.completed);
 

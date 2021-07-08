@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/views/expense_page.dart';
 
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
-  const ExpenseListItem({Key? key, required this.expense})
-      : super(key: key);
+  const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
 
   Color? getCardColor(String uid) {
+    if (this.expense.author.uid == uid) {
+      if (this.expense.isPaidFor) return Colors.grey[400];
+    }
     if (this.expense.paidBy(uid)) return Colors.grey[400];
     if (this.expense.isReadyToBePaidFor) return Colors.green[200];
     if (!this.expense.isMarkedBy(uid)) return Colors.red[200];
@@ -42,7 +45,10 @@ class ExpenseListItem extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(this.expense.name),
+                      Text(
+                        this.expense.name,
+                        style: TextStyle(fontSize: 20),
+                      ),
                       Text("${this.expense.items.length} item(s)"),
                       Text("Payer: ${this.expense.author.name}"),
                       Row(
@@ -59,16 +65,22 @@ class ExpenseListItem extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("Total: \$${this.expense.total.toStringAsFixed(2)}"),
                       Text(
-                        "My part: \$${this.expense.getConfirmedTotalForUser(authVm.user.uid).toStringAsFixed(2)}",
+                        toStringPrice(this
+                            .expense
+                            .getConfirmedTotalForUser(authVm.user.uid)),
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      Text(
+                        toStringPrice(this.expense.total),
+                        style: TextStyle(fontSize: 12),
                       ),
                       Row(
                         children: [
                           Text("Paid: "),
                           Icon(Icons.person),
                           Text(
-                            "${this.expense.paidAssignees}/${this.expense.assignees.length}",
+                            "${this.expense.paidAssignees}/${this.expense.assignees.length - 1}",
                           )
                         ],
                       )
