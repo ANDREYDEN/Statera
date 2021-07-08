@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
@@ -17,9 +18,33 @@ class Home extends StatelessWidget {
 
     return Column(
       children: [
-        Text(
-          "Invite members to this group: ${groupVm.group.code}",
-          style: Theme.of(context).textTheme.subtitle1,
+        Row(
+          children: [
+            Text(
+              "Code:",
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+            TextButton(
+              onPressed: () async {
+                ClipboardData data = ClipboardData(
+                  text: groupVm.group.code.toString(),
+                );
+                await Clipboard.setData(data);
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.copy),
+                  Text(
+                    groupVm.group.code.toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
         SizedBox(height: 20),
         Text('Owings'),
