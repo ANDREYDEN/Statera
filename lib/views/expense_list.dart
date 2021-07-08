@@ -19,9 +19,7 @@ class ExpenseList extends StatefulWidget {
 }
 
 class _ExpenseListState extends State<ExpenseList> {
-  List<Expense> expenses = [];
   var newExpenseNameController = TextEditingController();
-  List<Assignee> newExpenseAssignees = [];
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -62,32 +60,6 @@ class _ExpenseListState extends State<ExpenseList> {
               controller: newExpenseNameController,
               decoration: InputDecoration(labelText: "Expense name"),
             ),
-            FutureBuilder<Group>(
-              future: Firestore.instance.getGroup(this.groupVm.group.code),
-              builder: (context, snap) {
-                if (snap.connectionState == ConnectionState.waiting ||
-                    !snap.hasData) {
-                  return Text("Loading...");
-                }
-                var group = snap.data!;
-
-                return MultiSelectDialogField(
-                  title: Text('Expense consumers'),
-                  buttonText: Text('Expense consumers'),
-                  items: group.members
-                      .map((member) =>
-                          MultiSelectItem<Author?>(member, member.name))
-                      .toList(),
-                  onConfirm: (List<Author?> selectedMembers) {
-                    setState(() {
-                      newExpenseAssignees = selectedMembers
-                          .map((member) => Assignee(uid: member!.uid))
-                          .toList();
-                    });
-                  },
-                );
-              },
-            ),
           ],
         ),
         actions: [
@@ -99,9 +71,10 @@ class _ExpenseListState extends State<ExpenseList> {
                   name: newExpenseNameController.text,
                   groupId: groupVm.group.id,
                 );
-                newExpense.addAssignees(newExpenseAssignees);
-                this.expenses.add(newExpense);
-                Firestore.instance.addExpense(newExpense);
+                Firestore.instance.addExpenseToGroup(
+                  newExpense,
+                  groupVm.group.code,
+                );
               });
               Navigator.of(context).pop();
             },

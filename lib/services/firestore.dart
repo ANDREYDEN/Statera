@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
@@ -18,10 +19,6 @@ class Firestore {
   }
 
   static Firestore get instance => Firestore._privateConstructor();
-
-  addExpense(Expense expense) {
-    expensesCollection.add(expense.toFirestore());
-  }
 
   Query _expensesQuery({
     String? groupId,
@@ -51,6 +48,14 @@ class Firestore {
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return _queryToExpensesStream(
         expensesCollection.where("groupId", isEqualTo: groupId));
+  }
+
+  Future<void> addExpenseToGroup(Expense expense, String? groupCode) async {
+    var group = await getGroup(groupCode);
+    expense.addAssignees(
+      group.members.map((member) => Assignee(uid: member.uid)).toList(),
+    );
+    await expensesCollection.add(expense.toFirestore());
   }
 
   Future<void> saveExpense(Expense expense) async {

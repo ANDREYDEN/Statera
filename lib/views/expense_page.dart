@@ -34,7 +34,7 @@ class _ExpensePageState extends State<ExpensePage> {
     return PageScaffold(
       title: widget.expense.name,
       onFabPressed: this.isAuthoredByCurrentUser
-      // onFabPressed: true
+          // onFabPressed: true
           ? () {
               showDialog(
                 context: context,
@@ -63,6 +63,8 @@ class _ExpensePageState extends State<ExpensePage> {
                             value: double.parse(newItemValueController.text),
                           ));
                         });
+                        newItemNameController.clear();
+                        newItemValueController.clear();
                         Navigator.of(context).pop();
                       },
                       child: Text("Save"),
@@ -110,7 +112,9 @@ class _ExpensePageState extends State<ExpensePage> {
 
                       setState(() {
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ProductDecision.Confirmed);
+                          this.authVm.user.uid,
+                          ProductDecision.Confirmed,
+                        );
                       });
                     },
                     onDeny: () {
@@ -118,7 +122,9 @@ class _ExpensePageState extends State<ExpensePage> {
                         if (widget.expense.isReadyToPay) return;
 
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ProductDecision.Denied);
+                          this.authVm.user.uid,
+                          ProductDecision.Denied,
+                        );
                       });
                     },
                   ),
