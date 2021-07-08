@@ -54,7 +54,7 @@ class Expense {
     items.add(item);
   }
 
-  addAssignees(List<Assignee> newAssignees) {
+  setAssignees(List<Assignee> newAssignees) {
     this.assignees = [...newAssignees];
     items.forEach((item) {
       item.assignees = newAssignees

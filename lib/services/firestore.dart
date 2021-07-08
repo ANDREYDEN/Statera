@@ -52,7 +52,7 @@ class Firestore {
 
   Future<void> addExpenseToGroup(Expense expense, String? groupCode) async {
     var group = await getGroup(groupCode);
-    expense.addAssignees(
+    expense.setAssignees(
       group.members.map((member) => Assignee(uid: member.uid)).toList(),
     );
     await expensesCollection.add(expense.toFirestore());
