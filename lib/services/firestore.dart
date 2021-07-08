@@ -25,12 +25,9 @@ class Firestore {
   Query _expensesQuery({
     String? groupId,
     String? assigneeId,
-    bool finalized = false,
     String? authorId,
   }) {
-    var query = expensesCollection
-        .where("groupId", isEqualTo: groupId)
-        .where("finalized", isEqualTo: finalized);
+    var query = expensesCollection.where("groupId", isEqualTo: groupId);
 
     if (assigneeId != null) {
       query = query.where("assigneeIds", arrayContains: assigneeId);
@@ -64,13 +61,6 @@ class Firestore {
     return _queryToExpensesStream(_expensesQuery(
       groupId: groupId,
       authorId: uid,
-    ));
-  }
-
-  listenForFinalizedExpenses(String? groupId) {
-    return _queryToExpensesStream(_expensesQuery(
-      groupId: groupId,
-      finalized: true,
     ));
   }
 
@@ -129,7 +119,9 @@ class Firestore {
               .where((expense) => expense.hasAssignee(member.uid))
               .toList();
 
-          owings[member] = payerExpenses;
+          owings[member] = payerExpenses
+              .where((expense) => !expense.paidBy(consumerUid))
+              .toList();
         },
       );
 
@@ -155,9 +147,5 @@ class Firestore {
               )
               .toList(),
         );
-  }
-
-  Future<void> setExpense(Expense expense) async {
-    await expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 }

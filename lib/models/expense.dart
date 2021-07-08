@@ -10,16 +10,13 @@ class Expense {
   String name;
   Author author; // UID
   late List<Assignee> assignees;
-  bool finalized = false;
 
   Expense({
     required this.name,
     required this.author,
     required this.groupId,
-    finalized,
   }) {
     this.assignees = [Assignee(uid: author.uid)];
-    this.finalized = finalized ?? false;
   }
 
   double get total => items.fold<double>(
@@ -27,7 +24,9 @@ class Expense {
 
   bool get isReadyToPay => items.every((item) => item.completed);
 
-  bool isCompletedByUser(String uid) {
+  bool get isPaidFor => assignees.every((assignee) => assignee.paid);
+
+  bool isMarkedByUser(String uid) {
     return items.fold(
         true,
         (previousValue, item) =>
@@ -35,13 +34,10 @@ class Expense {
             item.assigneeDecision(uid) != ProductDecision.Undefined);
   }
 
-  bool get completed => items.fold(
-      true, (previousValue, item) => previousValue && item.completed);
-
   int get definedAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>
-            previousValue + (isCompletedByUser(assignee.uid) ? 1 : 0),
+            previousValue + (isMarkedByUser(assignee.uid) ? 1 : 0),
       );
 
   addItem(Item item) {
@@ -88,8 +84,10 @@ class Expense {
     );
   }
 
+  /// Total for user for an unmarked expence.
+  /// All but the [Denied] expenses count.
   double getPotentialTotalForUser(String uid) {
-    if (!this.hasAssignee(uid)) return 0;
+    if (!this.hasAssignee(uid) || this.isReadyToPay) return 0;
 
     return items.fold<double>(
       0,
@@ -118,7 +116,6 @@ class Expense {
       "author": author.toFirestore(),
       "assigneeIds": assignees.map((assignee) => assignee.uid).toList().toList(),
       "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
-      "finalized": finalized,
     };
   }
 
@@ -127,7 +124,6 @@ class Expense {
       author: Author.fromFirestore(data["author"]),
       name: data["name"],
       groupId: data["groupId"],
-      finalized: data["finalized"],
     );
     expense.assignees =
         data["assignees"].map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData)).toList();

@@ -67,17 +67,6 @@ class _ExpenseListState extends State<ExpenseList> {
           ),
         ),
       ),
-      Text("Finalized"),
-      Expanded(
-        child: buildExpensesList(
-          stream:
-              Firestore.instance.listenForFinalizedExpenses(groupVm.group.id),
-          builder: (expense) => ExpenseListItem(
-            expense: expense,
-            type: ExpenseListItemType.ForEveryone,
-          ),
-        ),
-      ),
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,

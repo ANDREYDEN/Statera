@@ -67,7 +67,7 @@ class _ExpensesPickerDialogState extends State<ExpensesPickerDialog> {
                 .where((expense) => expense != null)
                 .map((expense) {
               expense!.pay(widget.consumerUid);
-              return Firestore.instance.setExpense(expense);
+              return Firestore.instance.saveExpense(expense);
             }));
             Navigator.of(context).pop();
           },

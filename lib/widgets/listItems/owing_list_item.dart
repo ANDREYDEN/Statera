@@ -8,23 +8,23 @@ import 'package:statera/widgets/expenses_picker_dialog.dart';
 
 class OwingListItem extends StatelessWidget {
   final Author payer;
-  final List<Expense> expenses;
+  final List<Expense> outstandingExpenses;
 
   const OwingListItem({
     Key? key,
     required this.payer,
-    required this.expenses,
+    required this.outstandingExpenses,
   }) : super(key: key);
 
-  double getPotentialOwing(consumerUid) => this.expenses.fold(
+  double getPotentialOwing(consumerUid) => this.outstandingExpenses.fold(
         0,
         (previousValue, expense) =>
             previousValue + expense.getPotentialTotalForUser(consumerUid),
       );
 
   double getConfirmedOwing(consumerUid) =>
-      this.expenses.fold(0, (previousValue, expense) {
-        if (!expense.isReadyToPay || expense.paidBy(consumerUid)) return previousValue;
+      this.outstandingExpenses.fold(0, (previousValue, expense) {
+        if (!expense.isReadyToPay) return previousValue;
         return previousValue + expense.getConfirmedTotalForUser(consumerUid);
       });
 
@@ -38,14 +38,20 @@ class OwingListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(payer.name),
-          Text(
-              "Not marked: ${toStringPrice(this.getPotentialOwing(authVm.user.uid))}"),
-          ElevatedButton(
-            onPressed: () {
-              handlePayment(context, authVm.user.uid);
-            },
-            child: Text(
-                "Pay ${toStringPrice(this.getConfirmedOwing(authVm.user.uid))}"),
+          Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  handlePayment(context, authVm.user.uid);
+                },
+                child: Text(
+                  "Pay ${toStringPrice(this.getConfirmedOwing(authVm.user.uid))}",
+                ),
+              ),
+              Text(
+                "Future estimation: ${toStringPrice(this.getPotentialOwing(authVm.user.uid))}",
+              ),
+            ],
           ),
         ],
       ),
@@ -56,8 +62,10 @@ class OwingListItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => ExpensesPickerDialog(
-        expenses:
-            this.expenses.where((expense) => expense.isReadyToPay).toList(),
+        expenses: this
+            .outstandingExpenses
+            .where((expense) => expense.isReadyToPay)
+            .toList(),
         consumerUid: consumerUid,
       ),
     );

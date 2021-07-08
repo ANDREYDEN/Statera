@@ -15,14 +15,13 @@ class ExpenseListItem extends StatelessWidget {
 
   Color? getCardColor(String uid) {
     if (type == ExpenseListItemType.ForEveryone) {
-      if (this.expense.finalized) return Colors.grey[400];
-
-      return this.expense.isCompletedByUser(uid)
-          ? Colors.green[200]
-          : Colors.red[200];
+      if (this.expense.paidBy(uid)) return Colors.grey[400];
+      if (this.expense.isReadyToPay) return Colors.green[200];
+      if (!this.expense.isMarkedByUser(uid)) return Colors.red[200];
+      return Colors.yellow[300];
     }
     if (type == ExpenseListItemType.ForAuthor) {
-      return this.expense.completed ? Colors.green[200] : Colors.red[200];
+      return this.expense.isReadyToPay ? Colors.green[200] : Colors.red[200];
     }
     return Colors.grey;
   }
@@ -78,22 +77,6 @@ class ExpenseListItem extends StatelessWidget {
                   ),
                 ],
               ),
-              Visibility(
-                visible: this.type == ExpenseListItemType.ForAuthor &&
-                    this.expense.completed,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                          onPressed: () {
-                            this.expense.finalized = true;
-                            Firestore.instance.saveExpense(this.expense);
-                          },
-                          child: Text("Finalize")),
-                    ),
-                  ],
-                ),
-              )
             ],
           ),
         ),

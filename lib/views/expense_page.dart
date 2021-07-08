@@ -72,7 +72,7 @@ class _ExpensePageState extends State<ExpensePage> {
               );
             }
           : null,
-      actions: widget.expense.finalized
+      actions: widget.expense.isPaidFor
           ? null
           : [
               ElevatedButton(
@@ -106,7 +106,7 @@ class _ExpensePageState extends State<ExpensePage> {
                   child: ItemListItem(
                     item: item,
                     onConfirm: () {
-                      if (widget.expense.finalized) return;
+                      if (widget.expense.isReadyToPay) return;
 
                       setState(() {
                         item.setAssigneeDecision(
@@ -115,7 +115,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     },
                     onDeny: () {
                       setState(() {
-                        if (widget.expense.finalized) return;
+                        if (widget.expense.isReadyToPay) return;
 
                         item.setAssigneeDecision(
                             this.authVm.user.uid, ProductDecision.Denied);

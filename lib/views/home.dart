@@ -43,7 +43,7 @@ class Home extends StatelessWidget {
                   var payer = owings.keys.elementAt(index);
                   return OwingListItem(
                     payer: payer,
-                    expenses: owings[payer]!,
+                    outstandingExpenses: owings[payer]!,
                   );
                 },
               );
