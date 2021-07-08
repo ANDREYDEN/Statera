@@ -1,29 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
-import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/views/expense_page.dart';
 
-enum ExpenseListItemType { ForAuthor, ForEveryone }
-
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
-  final ExpenseListItemType type;
-  const ExpenseListItem({Key? key, required this.expense, required this.type})
+  const ExpenseListItem({Key? key, required this.expense})
       : super(key: key);
 
   Color? getCardColor(String uid) {
-    if (type == ExpenseListItemType.ForEveryone) {
-      if (this.expense.paidBy(uid)) return Colors.grey[400];
-      if (this.expense.isReadyToPay) return Colors.green[200];
-      if (!this.expense.isMarkedByUser(uid)) return Colors.red[200];
-      return Colors.yellow[300];
-    }
-    if (type == ExpenseListItemType.ForAuthor) {
-      return this.expense.isReadyToPay ? Colors.green[200] : Colors.red[200];
-    }
-    return Colors.grey;
+    if (this.expense.paidBy(uid)) return Colors.grey[400];
+    if (this.expense.isReadyToBePaidFor) return Colors.green[200];
+    if (!this.expense.isMarkedBy(uid)) return Colors.red[200];
+    return Colors.yellow[300];
   }
 
   @override

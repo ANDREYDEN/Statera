@@ -22,9 +22,9 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
-  bool get isReadyToPay => items.every((item) => item.completed);
-
   bool get isPaidFor => assignees.every((assignee) => assignee.paid);
+
+  bool get isReadyToBePaidFor => !isPaidFor && items.every((item) => item.completed);
 
   int get paidAssignees => assignees.fold(
         0,
@@ -32,7 +32,7 @@ class Expense {
             previousValue + (paidBy(assignee.uid) ? 1 : 0),
       );
 
-  bool isMarkedByUser(String uid) {
+  bool isMarkedBy(String uid) {
     return items.fold(
         true,
         (previousValue, item) =>
@@ -43,7 +43,7 @@ class Expense {
   int get definedAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>
-            previousValue + (isMarkedByUser(assignee.uid) ? 1 : 0),
+            previousValue + (isMarkedBy(assignee.uid) ? 1 : 0),
       );
 
   addItem(Item item) {
@@ -96,7 +96,7 @@ class Expense {
   /// Total for user for an unmarked expence.
   /// All but the [Denied] expenses count.
   double getPotentialTotalForUser(String uid) {
-    if (!this.hasAssignee(uid) || this.isReadyToPay) return 0;
+    if (!this.hasAssignee(uid) || this.isReadyToBePaidFor) return 0;
 
     return items.fold<double>(
       0,

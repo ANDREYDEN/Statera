@@ -108,7 +108,7 @@ class _ExpensePageState extends State<ExpensePage> {
                   child: ItemListItem(
                     item: item,
                     onConfirm: () {
-                      if (widget.expense.isReadyToPay) return;
+                      if (widget.expense.isReadyToBePaidFor) return;
 
                       setState(() {
                         item.setAssigneeDecision(
@@ -119,7 +119,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     },
                     onDeny: () {
                       setState(() {
-                        if (widget.expense.isReadyToPay) return;
+                        if (widget.expense.isReadyToBePaidFor) return;
 
                         item.setAssigneeDecision(
                           this.authVm.user.uid,

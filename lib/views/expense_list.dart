@@ -100,6 +100,19 @@ class _ExpenseListState extends State<ExpenseList> {
 
           var expenses = snapshot.data!;
 
+          expenses.sort((firstExpense, secondExpense) {
+            if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
+            if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
+
+            if (!firstExpense.paidBy(authVm.user.uid)) return -1;
+            if (!secondExpense.paidBy(authVm.user.uid)) return 1;
+
+            if (firstExpense.isReadyToBePaidFor) return -1;
+            if (secondExpense.isReadyToBePaidFor) return 1;
+
+            return 0;
+          });
+
           return ListView.builder(
             itemCount: expenses.length,
             itemBuilder: (context, index) {
@@ -113,15 +126,9 @@ class _ExpenseListState extends State<ExpenseList> {
                       },
                       direction: DismissDirection.startToEnd,
                       background: DismissBackground(),
-                      child: ExpenseListItem(
-                        expense: expense,
-                        type: ExpenseListItemType.ForAuthor,
-                      ),
+                      child: ExpenseListItem(expense: expense),
                     )
-                  : ExpenseListItem(
-                      expense: expense,
-                      type: ExpenseListItemType.ForEveryone,
-                    );
+                  : ExpenseListItem(expense: expense);
             },
           );
         });

@@ -24,7 +24,7 @@ class OwingListItem extends StatelessWidget {
 
   double getConfirmedOwing(consumerUid) =>
       this.outstandingExpenses.fold(0, (previousValue, expense) {
-        if (!expense.isReadyToPay) return previousValue;
+        if (!expense.isReadyToBePaidFor) return previousValue;
         return previousValue + expense.getConfirmedTotalForUser(consumerUid);
       });
 
@@ -64,7 +64,7 @@ class OwingListItem extends StatelessWidget {
       builder: (context) => ExpensesPickerDialog(
         expenses: this
             .outstandingExpenses
-            .where((expense) => expense.isReadyToPay)
+            .where((expense) => expense.isReadyToBePaidFor)
             .toList(),
         consumerUid: consumerUid,
       ),
