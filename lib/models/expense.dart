@@ -102,7 +102,7 @@ class Expense {
       0,
       (previousValue, item) {
         if (item.assigneeDecision(uid) != ProductDecision.Denied) {
-          return previousValue + item.sharedValue;
+          return previousValue + item.getSharedValueFor(uid);
         }
         return previousValue;
       },

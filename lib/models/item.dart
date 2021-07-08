@@ -17,7 +17,14 @@ class Item {
             (assignee.decision == ProductDecision.Confirmed ? 1 : 0),
       );
 
-  get sharedValue => confirmedCount == 0 ? value : value / confirmedCount;
+  double get sharedValue => confirmedCount == 0 ? value : value / confirmedCount;
+
+  double getSharedValueFor(String uid) {
+    if (assigneeDecision(uid) == ProductDecision.Confirmed) {
+      return sharedValue;
+    }
+    return value / (confirmedCount + 1);
+  }
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
