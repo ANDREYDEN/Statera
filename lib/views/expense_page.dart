@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
-import 'package:statera/page_scaffold.dart';
+import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/widgets/item_list_item.dart';
+import 'package:statera/widgets/dismiss_background.dart';
+import 'package:statera/widgets/listItems/item_list_item.dart';
 
 class ExpensePage extends StatefulWidget {
   static const String route = "/expense";
@@ -33,6 +34,7 @@ class _ExpensePageState extends State<ExpensePage> {
     return PageScaffold(
       title: widget.expense.name,
       onFabPressed: this.isAuthoredByCurrentUser
+          // onFabPressed: true
           ? () {
               showDialog(
                 context: context,
@@ -61,6 +63,8 @@ class _ExpensePageState extends State<ExpensePage> {
                             value: double.parse(newItemValueController.text),
                           ));
                         });
+                        newItemNameController.clear();
+                        newItemValueController.clear();
                         Navigator.of(context).pop();
                       },
                       child: Text("Save"),
@@ -70,8 +74,9 @@ class _ExpensePageState extends State<ExpensePage> {
               );
             }
           : null,
-      actions: this.isAuthoredByCurrentUser
-          ? [
+      actions: widget.expense.isPaidFor
+          ? null
+          : [
               ElevatedButton(
                 onPressed: () async {
                   await Firestore.instance.saveExpense(widget.expense);
@@ -79,11 +84,69 @@ class _ExpensePageState extends State<ExpensePage> {
                 },
                 child: Text("Save"),
               ),
-            ]
-          : null,
+            ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          SizedBox(
+            height: 50,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isMarkedBy(authVm.user.uid)
+                        ? null
+                        : Colors.red[200],
+                    child: Text(
+                      'Requires marking',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isMarkedBy(authVm.user.uid) &&
+                            !widget.expense.isReadyToBePaidFor
+                        ? Colors.yellow[300]
+                        : null,
+                    child: Text(
+                      'Marked',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.isReadyToBePaidFor &&
+                            !widget.expense.paidBy(authVm.user.uid)
+                        ? Colors.green[200]
+                        : null,
+                    child: Text(
+                      'Ready to be paid',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: widget.expense.paidBy(authVm.user.uid)
+                        ? Colors.grey[400]
+                        : null,
+                    child: Text(
+                      'Paid',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
           Text("Author: ${widget.expense.author.name}"),
           Flexible(
             child: ListView.builder(
@@ -91,6 +154,7 @@ class _ExpensePageState extends State<ExpensePage> {
               itemBuilder: (context, index) {
                 var item = this.items[index];
 
+                // TODO: make this conditionally dismissable if finalized
                 return Dismissible(
                   key: Key(item.hashCode.toString()),
                   onDismissed: (_) {
@@ -99,28 +163,27 @@ class _ExpensePageState extends State<ExpensePage> {
                     });
                   },
                   direction: DismissDirection.startToEnd,
-                  background: Container(
-                    color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [Icon(Icons.delete)],
-                      ),
-                    ),
-                  ),
+                  background: DismissBackground(),
                   child: ItemListItem(
                     item: item,
                     onConfirm: () {
+                      if (widget.expense.isReadyToBePaidFor) return;
+
                       setState(() {
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ExpenseDecision.Confirmed);
+                          this.authVm.user.uid,
+                          ProductDecision.Confirmed,
+                        );
                       });
                     },
                     onDeny: () {
                       setState(() {
+                        if (widget.expense.isReadyToBePaidFor) return;
+
                         item.setAssigneeDecision(
-                            this.authVm.user.uid, ExpenseDecision.Denied);
+                          this.authVm.user.uid,
+                          ProductDecision.Denied,
+                        );
                       });
                     },
                   ),

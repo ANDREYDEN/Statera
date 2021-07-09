@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:statera/models/assignee_decision.dart';
+import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/services/auth.dart';
+import 'package:statera/services/firestore.dart';
 
 class AuthenticationViewModel {
   User? _user;
@@ -14,15 +16,29 @@ class AuthenticationViewModel {
   }
 
   User get user {
-    if (_user == null) throw new Exception('Trying to get user when not signed in.');
+    if (_user == null)
+      throw new Exception('Trying to get user when not signed in.');
     return _user!;
   }
 
-  bool isConfirmed(Item item) {
-    return item.assigneeDecision(user.uid) == ExpenseDecision.Confirmed;
+  bool hasConfirmed(Item item) {
+    return item.assigneeDecision(user.uid) == ProductDecision.Confirmed;
   }
 
-  bool isDenied(Item item) {
-    return item.assigneeDecision(user.uid) == ExpenseDecision.Denied;
+  bool hasDenied(Item item) {
+    return item.assigneeDecision(user.uid) == ProductDecision.Denied;
+  }
+
+  Future<void> createGroup(Group newGroup) async {
+    newGroup.addUser(user);
+    await Firestore.instance.groupsCollection.add(newGroup.toFirestore());
+  }
+
+  Future<void> joinGroup(String groupCode) async {
+    var group = await Firestore.instance.getGroup(groupCode);
+    group.addUser(user);
+    await Firestore.instance.groupsCollection
+        .doc(group.id)
+        .update(group.toFirestore());
   }
 }

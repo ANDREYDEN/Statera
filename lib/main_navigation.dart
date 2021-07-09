@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/main_provider.dart';
-import 'package:statera/views/expense_list.dart';
-import 'package:statera/views/home.dart';
+import 'package:statera/views/group_list.dart';
+import 'package:statera/views/group_page.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({Key? key}) : super(key: key);
@@ -12,8 +12,8 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   Map<String, Widget> get widgets => {
-        Home.route: Home(),
-        ExpenseList.route: ExpenseList(),
+        GroupList.route: GroupList(),
+        GroupPage.route: GroupPage(),
       };
 
   @override
@@ -21,7 +21,7 @@ class _MainNavigationState extends State<MainNavigation> {
     return SafeArea(
       child: MainProvider(
         child: Navigator(
-          initialRoute: Home.route,
+          initialRoute: GroupList.route,
           onGenerateRoute: (settings) {
             var route = settings.name;
             if (!widgets.containsKey(route))

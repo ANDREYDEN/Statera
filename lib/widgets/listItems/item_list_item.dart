@@ -37,23 +37,23 @@ class ItemListItem extends StatelessWidget {
           Row(
             children: [
               Container(
-                color: authVm.isConfirmed(item) ? Colors.green : Colors.white,
+                color: authVm.hasConfirmed(item) ? Colors.green : Colors.white,
                 child: IconButton(
                   onPressed: this.onConfirm,
                   icon: Icon(
                     Icons.check,
                     color:
-                        authVm.isConfirmed(item) ? Colors.white : Colors.black,
+                        authVm.hasConfirmed(item) ? Colors.white : Colors.black,
                   ),
                 ),
               ),
               Container(
-                color: authVm.isDenied(item) ? Colors.red : Colors.white,
+                color: authVm.hasDenied(item) ? Colors.red : Colors.white,
                 child: IconButton(
                   onPressed: this.onDeny,
                   icon: Icon(
                     Icons.close,
-                    color: authVm.isDenied(item) ? Colors.white : Colors.black,
+                    color: authVm.hasDenied(item) ? Colors.white : Colors.black,
                   ),
                 ),
               ),

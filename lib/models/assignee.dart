@@ -1,42 +1,35 @@
-enum ExpenseDecision {
-  Undefined,
-  Confirmed,
-  Denied
-}
-
-const edToString = {
-  ExpenseDecision.Undefined: "Undefined",
-  ExpenseDecision.Confirmed: "Confirmed",
-  ExpenseDecision.Denied: "Denied",
-};
-
-const edFromString = {
-  "Undefined": ExpenseDecision.Undefined,
-  "Confirmed": ExpenseDecision.Confirmed,
-  "Denied": ExpenseDecision.Denied,
-};
-
 class Assignee {
   String uid;
-  ExpenseDecision decision = ExpenseDecision.Undefined;
+  bool paid;
 
-  Assignee({required this.uid, ExpenseDecision? decision}) {
-    if (decision != null) {
-      this.decision = decision;
-    }
-  }
-
-  bool get madeDecision => decision != ExpenseDecision.Undefined;
+  Assignee({
+    required this.uid,
+    this.paid = false,
+  });
 
   Map<String, dynamic> toFirestore() {
     return {
-      "uid": uid,
-      "decision": edToString[decision]
+      'uid': uid,
+      'paid': paid,
     };
   }
 
-  static Assignee fromFirestore(Map<String, dynamic> data) {
-    var dataDecision = data["decision"];
-    return Assignee(uid: data["uid"], decision: edFromString[dataDecision]);
+  factory Assignee.fromFirestore(Map<String, dynamic> map) {
+    return Assignee(
+      uid: map['uid'],
+      paid: map['paid'],
+    );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is Assignee &&
+      other.uid == uid &&
+      other.paid == paid;
+  }
+
+  @override
+  int get hashCode => uid.hashCode ^ paid.hashCode;
 }

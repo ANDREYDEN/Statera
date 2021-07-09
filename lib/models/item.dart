@@ -1,9 +1,9 @@
-import 'package:statera/models/assignee.dart';
+import 'package:statera/models/assignee_decision.dart';
 
 class Item {
   String name;
   double value;
-  List<Assignee> assignees = [];
+  List<AssigneeDecision> assignees = [];
 
   Item({
     required this.name,
@@ -14,16 +14,16 @@ class Item {
         0,
         (previousValue, assignee) =>
             previousValue +
-            (assignee.decision == ExpenseDecision.Confirmed ? 1 : 0),
+            (assignee.decision == ProductDecision.Confirmed ? 1 : 0),
       );
 
-  get sharedValue => value / confirmedCount;
+  get sharedValue => confirmedCount == 0 ? value : value / confirmedCount;
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
-  bool get completed => assignees.fold(true, (previousValue, assignee) => previousValue && assignee.madeDecision);
+  bool get completed => assignees.every((assignee) => assignee.madeDecision);
 
-  Assignee getAssigneeById(uid) {
+  AssigneeDecision getAssigneeById(uid) {
     return assignees.firstWhere(
       (element) => element.uid == uid,
       orElse: () => throw new Exception(
@@ -31,11 +31,11 @@ class Item {
     );
   }
 
-  ExpenseDecision assigneeDecision(String uid) {
+  ProductDecision assigneeDecision(String uid) {
     return getAssigneeById(uid).decision;
   }
 
-  void setAssigneeDecision(String uid, ExpenseDecision decision) {
+  void setAssigneeDecision(String uid, ProductDecision decision) {
     var assignee = getAssigneeById(uid);
     assignee.decision = decision;
   }
@@ -54,7 +54,7 @@ class Item {
       value: double.parse(data["value"].toString()),
     );
     item.assignees = data["assignees"]
-        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
+        .map<AssigneeDecision>((assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
         .toList();
     return item;
   }

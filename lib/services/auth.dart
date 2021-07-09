@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:statera/services/firestore.dart';
 
 class Auth {
   late FirebaseAuth _auth;
@@ -20,34 +20,39 @@ class Auth {
 
   Future<User> currentUserOrThrow() async {
     var user = await _auth.authStateChanges().first;
-    if (user == null) throw Exception("Tried to get a user when not logged in.");
+    if (user == null)
+      throw Exception("Tried to get a user when not logged in.");
     return user;
   }
 
-  
-Future<UserCredential> signInWithGoogle() async {
-  final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-  if (googleUser == null) throw new Exception("Failed to log in with Google");
-
-  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-  final credential = GoogleAuthProvider.credential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-
-
-  final userCredential = await _auth.signInWithCredential(credential);
-
-
-  await Firestore.instance.addUserToGroup(userCredential.user!);
-
-  return userCredential;
-}
+  Future<UserCredential> signInWithGoogle() async {
+    return kIsWeb
+        ? _auth.signInWithPopup(GoogleAuthProvider())
+        : this.signInWithGoogleOnMobile();
+  }
 
   Future<void> signOut() async {
-    await _googleSignIn.disconnect();
+    if (!kIsWeb) {
+      await _googleSignIn.disconnect();
+    }
     await _auth.signOut();
+  }
+
+  Future<UserCredential> signInWithGoogleOnMobile() async {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+    if (googleUser == null) throw new Exception("Failed to log in with Google");
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential = await _auth.signInWithCredential(credential);
+
+    return userCredential;
   }
 }
