@@ -32,59 +32,57 @@ class ExpenseListItem extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        margin: EdgeInsets.all(10),
+      child: Container(
+        margin: EdgeInsets.all(5),
         color: this.getCardColor(authVm.user.uid),
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
+          padding: const EdgeInsets.all(15.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: this.expense.author.photoURL == null
+                          ? null
+                          : NetworkImage(this.expense.author.photoURL!),
+                      child: this.expense.author.photoURL != null
+                          ? null
+                          : Container(color: Colors.grey),
+                    ),
+                    SizedBox(width: 15),
+                    Flexible(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              this.expense.name,
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                          Text("${this.expense.items.length} item(s)"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        this.expense.name,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Text("${this.expense.items.length} item(s)"),
-                      Text("Payer: ${this.expense.author.name}"),
-                      Row(
-                        children: [
-                          Text("Marked: "),
-                          Icon(Icons.person),
-                          Text(
-                            "${this.expense.definedAssignees}/${this.expense.assignees.length}",
-                          )
-                        ],
-                      )
-                    ],
+                  Text(
+                    toStringPrice(
+                        this.expense.getConfirmedTotalForUser(authVm.user.uid)),
+                    style: TextStyle(fontSize: 24),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        toStringPrice(this
-                            .expense
-                            .getConfirmedTotalForUser(authVm.user.uid)),
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      Text(
-                        toStringPrice(this.expense.total),
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      Row(
-                        children: [
-                          Text("Paid: "),
-                          Icon(Icons.person),
-                          Text(
-                            "${this.expense.paidAssignees}/${this.expense.assignees.length - 1}",
-                          )
-                        ],
-                      )
-                    ],
+                  Text(
+                    toStringPrice(this.expense.total),
+                    style: TextStyle(fontSize: 12),
                   ),
                 ],
               ),

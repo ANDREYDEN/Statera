@@ -147,8 +147,34 @@ class _ExpensePageState extends State<ExpensePage> {
               ],
             ),
           ),
-          SizedBox(height: 10),
-          Text("Author: ${widget.expense.author.name}"),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Payer: ${widget.expense.author.name}"),
+                Row(
+                  children: [
+                    Text("Marked: "),
+                    Icon(Icons.person),
+                    Text(
+                      "${widget.expense.definedAssignees}/${widget.expense.assignees.length}",
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text("Paid: "),
+                    Icon(Icons.person),
+                    Text(
+                      "${widget.expense.paidAssignees}/${widget.expense.assignees.length - 1}",
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+          Divider(thickness: 1),
           Flexible(
             child: ListView.builder(
               itemCount: this.items.length,
