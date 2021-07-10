@@ -91,39 +91,28 @@ class Firestore {
 
   Stream<Map<Author, List<Expense>>> getOwingsForUserInGroup(
     String consumerUid,
-    String? groupId,
+    Group group,
   ) {
-    return groupsCollection.doc(groupId).snapshots().asyncMap((snap) async {
-      var group = Group.fromFirestore(
-        snap.data() as Map<String, dynamic>,
-        id: snap.id,
-      );
+    // TODO: oprtimize to only unpaid expenses
+    return _expensesQuery(groupId: group.id)
+        .snapshots()
+        .asyncMap((expensesSnap) async {
+      var expenses = expensesSnap.docs.map((doc) => Expense.fromFirestore(
+            doc.data() as Map<String, dynamic>,
+            doc.id,
+          ));
       Map<Author, List<Expense>> owings = {};
 
       // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
-      await Future.forEach(
-        group.members,
-        (Author member) async {
-          // skip yourself
-          if (member.uid == consumerUid) return;
-
-          var payerExpensesSnap =
-              await _expensesQuery(groupId: groupId, authorId: member.uid)
-                  .get();
-
-          List<Expense> payerExpenses = payerExpensesSnap.docs
-              .map((doc) => Expense.fromFirestore(
-                    doc.data() as Map<String, dynamic>,
-                    doc.id,
-                  ))
-              .where((expense) => expense.hasAssignee(member.uid))
-              .toList();
-
-          owings[member] = payerExpenses
-              .where((expense) => !expense.isPaidBy(consumerUid))
-              .toList();
-        },
-      );
+      group.members
+          .where((member) => member.uid != consumerUid)
+          .forEach((member) {
+        owings[member] = expenses
+            .where((expense) =>
+                expense.isAuthoredBy(member.uid) &&
+                !expense.isPaidBy(consumerUid))
+            .toList();
+      });
 
       return owings;
     });
