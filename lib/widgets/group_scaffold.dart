@@ -29,8 +29,10 @@ class GroupScaffold extends StatefulWidget {
 
 class _GroupScaffoldState extends State<GroupScaffold> {
   int selectedNavBarItemIndex = 0;
+  PageController pageController = PageController();
 
-  GroupViewModel get groupVm => Provider.of<GroupViewModel>(context, listen: false);
+  GroupViewModel get groupVm =>
+      Provider.of<GroupViewModel>(context, listen: false);
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +55,22 @@ class _GroupScaffoldState extends State<GroupScaffold> {
           setState(() {
             this.selectedNavBarItemIndex = index;
           });
+          pageController.animateToPage(
+            index,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.ease,
+          );
         },
       ),
-      child: widget.items[this.selectedNavBarItemIndex].view,
+      child: PageView(
+        controller: this.pageController,
+        onPageChanged: (index) {
+          setState(() {
+            this.selectedNavBarItemIndex = index;
+          });
+        },
+        children: widget.items.map((item) => item.view).toList(),
+      ),
     );
   }
 }

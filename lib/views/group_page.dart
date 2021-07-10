@@ -18,7 +18,7 @@ class GroupPage extends StatelessWidget {
           view: Home()
         ),
         GroupScaffoldItem(
-          icon: Icons.money,
+          icon: Icons.attach_money,
           label: "Expenses",
           view: ExpenseList(),
         ),
