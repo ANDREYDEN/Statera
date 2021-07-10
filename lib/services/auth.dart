@@ -5,12 +5,18 @@ import 'package:google_sign_in/google_sign_in.dart';
 class Auth {
   late FirebaseAuth _auth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
+  static Auth? _instance;
 
   Auth._privateConstructor() {
     _auth = FirebaseAuth.instance;
   }
 
-  static Auth get instance => Auth._privateConstructor();
+  static Auth get instance {
+    if (_instance == null) {
+      _instance = Auth._privateConstructor();
+    } 
+    return _instance!; 
+  }
 
   User? get currentUser => _auth.currentUser;
 
@@ -25,7 +31,7 @@ class Auth {
     return user;
   }
 
-  Future<UserCredential> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     return kIsWeb
         ? _auth.signInWithPopup(GoogleAuthProvider())
         : this.signInWithGoogleOnMobile();
@@ -38,7 +44,7 @@ class Auth {
     await _auth.signOut();
   }
 
-  Future<UserCredential> signInWithGoogleOnMobile() async {
+  Future<UserCredential?> signInWithGoogleOnMobile() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
     if (googleUser == null) throw new Exception("Failed to log in with Google");
