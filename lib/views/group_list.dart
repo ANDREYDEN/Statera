@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/services/auth.dart';
 import 'package:statera/services/firestore.dart';
+import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
@@ -46,12 +48,14 @@ class _GroupListState extends State<GroupList> {
               : [
                   ElevatedButton(
                     onPressed: () {
-                      Auth.instance.signOut();
+                      snackbarCatch(context, () {
+                        Auth.instance.signOut();
+                      });
                     },
                     child: Text("Sign Out"),
                   ),
                 ],
-          onFabPressed: handleNewGroup,
+          onFabPressed: user == null ? null : handleNewGroup,
           child: loading
               ? Text("Loading...")
               : user == null
@@ -72,10 +76,12 @@ class _GroupListState extends State<GroupList> {
                               SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: () {
-                                  authVm.joinGroup(
-                                    joinGroupCodeController.text,
-                                  );
-                                  joinGroupCodeController.clear();
+                                  snackbarCatch(context, () {
+                                    authVm.joinGroup(
+                                      joinGroupCodeController.text,
+                                    );
+                                    joinGroupCodeController.clear();
+                                  });
                                 },
                                 child: Text("Join"),
                               ),
@@ -83,18 +89,10 @@ class _GroupListState extends State<GroupList> {
                           ),
                         ),
                         Expanded(
-                          child: StreamBuilder<List<Group>>(
+                          child: CustomStreamBuilder<List<Group>>(
                             stream: Firestore.instance
                                 .userGroupsStream(authVm.user.uid),
-                            builder: (context, snap) {
-                              if (!snap.hasData ||
-                                  snap.connectionState ==
-                                      ConnectionState.waiting) {
-                                return Text("Loading...");
-                              }
-
-                              var groups = snap.data!;
-
+                            builder: (context, groups) {
                               return groups.isEmpty
                                   ? Text("You don't have any groups yet...")
                                   : ListView.builder(
@@ -116,8 +114,10 @@ class _GroupListState extends State<GroupList> {
   }
 
   Widget get noUserView => ElevatedButton(
-        onPressed: () {
-          Auth.instance.signInWithGoogle();
+        onPressed: () async {
+          snackbarCatch(context, () async {
+            await Auth.instance.signInWithGoogle();
+          });
         },
         child: Text("Log In with Google"),
       );

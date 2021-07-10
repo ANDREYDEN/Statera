@@ -5,6 +5,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
 
@@ -82,20 +83,10 @@ class _ExpenseListState extends State<ExpenseList> {
   }
 
   Widget buildExpensesList() {
-    return StreamBuilder<List<Expense>>(
+    return CustomStreamBuilder<List<Expense>>(
         stream: Firestore.instance
             .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          if (snapshot.connectionState == ConnectionState.waiting ||
-              snapshot.data == null) {
-            return Text("Loading...");
-          }
-
-          var expenses = snapshot.data!;
-
+        builder: (context, expenses) {
           expenses.sort((firstExpense, secondExpense) {
             if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
             if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;

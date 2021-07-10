@@ -6,6 +6,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/owing_list_item.dart';
 
 class Home extends StatelessWidget {
@@ -49,19 +50,10 @@ class Home extends StatelessWidget {
         SizedBox(height: 20),
         Text('Owings'),
         Flexible(
-          child: StreamBuilder<Map<Author, List<Expense>>>(
+          child: CustomStreamBuilder<Map<Author, List<Expense>>>(
             stream: Firestore.instance
-                .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.id),
-            builder: (context, membersSnapshot) {
-              if (membersSnapshot.hasError) {
-                return Text(membersSnapshot.error.toString());
-              }
-              if (membersSnapshot.connectionState == ConnectionState.waiting ||
-                  !membersSnapshot.hasData) {
-                return Text("Loading...");
-              }
-
-              var owings = membersSnapshot.data!;
+                .getOwingsForUserInGroup(authVm.user.uid, groupVm.group),
+            builder: (context, owings) {
               return ListView.builder(
                 itemCount: owings.length,
                 itemBuilder: (context, index) {
