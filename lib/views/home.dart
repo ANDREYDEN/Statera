@@ -19,36 +19,43 @@ class Home extends StatelessWidget {
 
     return Column(
       children: [
-        Row(
-          children: [
-            Text(
-              "Code:",
-              style: Theme.of(context).textTheme.subtitle1,
-            ),
-            TextButton(
-              onPressed: () async {
-                ClipboardData data = ClipboardData(
-                  text: groupVm.group.code.toString(),
-                );
-                await Clipboard.setData(data);
-              },
-              child: Row(
-                children: [
-                  Icon(Icons.copy),
-                  Text(
-                    groupVm.group.code.toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Text(
+                "Invite people to the group with the code:",
+                style: Theme.of(context).textTheme.subtitle1,
               ),
-            )
-          ],
+              TextButton(
+                onPressed: () async {
+                  ClipboardData data = ClipboardData(
+                    text: groupVm.group.code.toString(),
+                  );
+                  await Clipboard.setData(data);
+                },
+                child: Row(
+                  children: [
+                    Icon(Icons.copy),
+                    Text(
+                      groupVm.group.code.toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
+        Divider(thickness: 1,),
         SizedBox(height: 20),
-        Text('Owings'),
+        Text(
+          'Your Owings',
+          style: Theme.of(context).textTheme.headline6,
+        ),
         Flexible(
           child: CustomStreamBuilder<Map<Author, List<Expense>>>(
             stream: Firestore.instance
