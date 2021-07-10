@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
-import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/viewModels/group_vm.dart';
 
 class ExpensesPickerDialog extends StatefulWidget {
   final List<Expense> expenses;
@@ -37,22 +35,58 @@ class _ExpensesPickerDialogState extends State<ExpensesPickerDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Pay off expenses"),
-      content: MultiSelectDialogField(
-        title: Text('Expenses'),
-        buttonText: Text('Expenses'),
-        items: widget.expenses
-            .map(
-              (expense) => MultiSelectItem<Expense?>(
-                expense,
-                "${toStringPrice(expense.getConfirmedTotalForUser(widget.consumerUid))} - ${expense.name}",
-              ),
-            )
-            .toList(),
-        onConfirm: (List<Expense?> selectedExpenses) {
-          setState(() {
-            this.selectedExpenses = selectedExpenses;
-          });
-        },
+      content: Column(
+        children: [
+          MultiSelectDialogField(
+            title: Text('Expenses'),
+            buttonText: Text('Expenses'),
+            items: widget.expenses
+                .map(
+                  (expense) => MultiSelectItem<Expense?>(
+                    expense,
+                    "${toStringPrice(expense.getConfirmedTotalForUser(widget.consumerUid))} - ${expense.name}",
+                  ),
+                )
+                .toList(),
+            onConfirm: (List<Expense?> selectedExpenses) {
+              setState(() {
+                this.selectedExpenses = selectedExpenses;
+              });
+            },
+          ),
+          Visibility(
+            visible: selectedExpenses.isNotEmpty,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 20),
+                Text(
+                  "e-Transfer message:",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Flexible(child: Text(getEtransferMessage())),
+                    Flexible(
+                      child: IconButton(
+                        onPressed: () async {
+                          ClipboardData data = ClipboardData(
+                            text: getEtransferMessage(),
+                          );
+                          await Clipboard.setData(data);
+                        },
+                        icon: Icon(Icons.copy),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
       ),
       actions: [
         ElevatedButton(
@@ -63,12 +97,16 @@ class _ExpensesPickerDialogState extends State<ExpensesPickerDialog> {
         ),
         ElevatedButton(
           onPressed: () async {
-            await Future.wait(selectedExpenses
-                .where((expense) => expense != null)
-                .map((expense) {
-              expense!.pay(widget.consumerUid);
-              return Firestore.instance.saveExpense(expense);
-            }));
+            await snackbarCatch(context, () async {
+              await Future.wait(selectedExpenses
+                  .where((expense) => expense != null)
+                  .map((expense) {
+                expense!.pay(widget.consumerUid);
+                return Firestore.instance.saveExpense(expense);
+              }));
+            },
+                successMessage:
+                    "Successfully paid ${toStringPrice(selectedExpensesValue)} to ${selectedExpenses.first!.author.name}");
             Navigator.of(context).pop();
           },
           child: Text("Pay ${toStringPrice(selectedExpensesValue)}"),
@@ -76,4 +114,9 @@ class _ExpensesPickerDialogState extends State<ExpensesPickerDialog> {
       ],
     );
   }
+
+  String getEtransferMessage() => selectedExpenses
+      .where((expense) => expense != null)
+      .map((expense) => expense!.name)
+      .join('; ');
 }
