@@ -105,15 +105,6 @@ class Firestore {
     return expensesCollection.doc(expense.id).delete();
   }
 
-  Future<void> addUserToGroup(User user, String groupCode) async {
-    var group = await getGroup(groupCode);
-    if (group.members.any((member) => member.uid == user.uid)) return;
-
-    group.members.add(Author.fromUser(user));
-
-    await groupsCollection.doc(group.id).set(group.toFirestore());
-  }
-
   Future<Group> getGroup(String? groupCode) async {
     var groupSnap =
         await groupsCollection.where('code', isEqualTo: groupCode).get();
