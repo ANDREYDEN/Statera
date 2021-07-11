@@ -7,9 +7,9 @@ class Expense {
   String? id = "";
   String? groupId;
   List<Item> items = [];
-  String name;
-  Author author; // UID
-  late List<Assignee> assignees;
+  late String name;
+  late Author author; // UID
+  List<Assignee> assignees = [];
 
   Expense({
     required this.name,
@@ -19,12 +19,22 @@ class Expense {
     this.assignees = [Assignee(uid: author.uid)];
   }
 
+  Expense.fake() {
+    this.name = "foo";
+    this.author = Author(name: "foo", uid: "foo");
+  }
+
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
-  bool get isPaidFor => assignees.every((assignee) => assignee.uid == author.uid || assignee.paid);
+  bool get isPaidFor => assignees
+      .every((assignee) => assignee.uid == author.uid || assignee.paid);
 
-  bool get isReadyToBePaidFor => !isPaidFor && items.every((item) => item.completed);
+  bool get isReadyToBePaidFor =>
+      !isPaidFor && items.every((item) => item.completed);
+
+  bool get paymentInProgress =>
+      !isPaidFor && assignees.any((assignee) => assignee.paid);
 
   int get paidAssignees => assignees.fold(
         0,
@@ -32,7 +42,8 @@ class Expense {
             previousValue + (isPaidBy(assignee.uid) ? 1 : 0),
       );
 
-  bool get canReceiveAssignees => assignees.length == 1 || (!isPaidFor && paidAssignees == 0);
+  bool get canReceiveAssignees =>
+      assignees.length == 1 || (!isPaidFor && paidAssignees == 0);
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -59,7 +70,8 @@ class Expense {
 
   _resetItemAssignees() {
     items.forEach((item) {
-      item.assignees = this.assignees
+      item.assignees = this
+          .assignees
           .map((assignee) => AssigneeDecision(uid: assignee.uid))
           .toList();
     });

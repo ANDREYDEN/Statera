@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
+import 'package:statera/models/item.dart';
 
 class Firestore {
   late FirebaseFirestore _firestore;
@@ -64,8 +65,44 @@ class Firestore {
     await expensesCollection.add(expense.toFirestore());
   }
 
+  Future<Expense> getExpense(String? expenseId) async {
+    var expenseDoc = await expensesCollection.doc(expenseId).get();
+    if (!expenseDoc.exists)
+      throw new Exception("Expense with id $expenseId does not exist.");
+    return Expense.fromFirestore(
+        expenseDoc.data() as Map<String, dynamic>, expenseDoc.id);
+  }
+
+  Future<void> updateExpense(
+      String? expenseId, Function(Expense) update) async {
+    await _firestore.runTransaction((transaction) async {
+      var docRef = expensesCollection.doc(expenseId);
+      var expenseSnap = await transaction.get(docRef);
+      Expense expense = Expense.fromFirestore(
+        expenseSnap.data() as Map<String, dynamic>,
+        expenseSnap.id,
+      );
+      update(expense);
+      transaction.set(docRef, expense.toFirestore());
+    });
+  }
+
+  Stream<Expense> listenForExpense(String? expenseId) {
+    return expensesCollection
+        .doc(expenseId)
+        .snapshots()
+        .map((snap) => Expense.fromFirestore(
+              snap.data() as Map<String, dynamic>,
+              snap.id,
+            ));
+  }
+
   Future<void> saveExpense(Expense expense) async {
     return expensesCollection.doc(expense.id).set(expense.toFirestore());
+  }
+
+  Future<void> deleteExpense(Expense expense) {
+    return expensesCollection.doc(expense.id).delete();
   }
 
   Future<void> addUserToGroup(User user, String groupCode) async {
@@ -116,10 +153,6 @@ class Firestore {
 
       return owings;
     });
-  }
-
-  Future<void> deleteExpense(Expense expense) {
-    return expensesCollection.doc(expense.id).delete();
   }
 
   Stream<List<Group>> userGroupsStream(String uid) {

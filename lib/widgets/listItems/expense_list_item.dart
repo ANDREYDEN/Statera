@@ -28,7 +28,7 @@ class ExpenseListItem extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ExpensePage(expense: expense),
+            builder: (context) => ExpensePage(expenseId: expense.id),
           ),
         );
       },
