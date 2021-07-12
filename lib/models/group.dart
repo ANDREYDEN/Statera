@@ -16,7 +16,7 @@ class Group {
     this.id,
     members
   }) {
-    this.members = members;
+    this.members = members ?? [];
   }
 
 
