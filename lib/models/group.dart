@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:statera/models/author.dart';
+import 'package:statera/models/expense.dart';
 import 'package:statera/utils/helpers.dart';
 
 class Group {

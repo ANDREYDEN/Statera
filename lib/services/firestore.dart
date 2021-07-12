@@ -59,9 +59,7 @@ class Firestore {
 
   Future<void> addExpenseToGroup(Expense expense, String? groupCode) async {
     var group = await getGroup(groupCode);
-    expense.setAssignees(
-      group.members.map((member) => Assignee(uid: member.uid)).toList(),
-    );
+    expense.assignGroup(group);
     await expensesCollection.add(expense.toFirestore());
   }
 
@@ -70,7 +68,9 @@ class Firestore {
     if (!expenseDoc.exists)
       throw new Exception("Expense with id $expenseId does not exist.");
     return Expense.fromFirestore(
-        expenseDoc.data() as Map<String, dynamic>, expenseDoc.id);
+      expenseDoc.data() as Map<String, dynamic>,
+      expenseDoc.id,
+    );
   }
 
   Future<void> updateExpense(

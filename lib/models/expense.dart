@@ -1,6 +1,7 @@
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee_decision.dart';
+import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
 
 class Expense {
@@ -63,35 +64,33 @@ class Expense {
             previousValue + (isMarkedBy(assignee.uid) ? 1 : 0),
       );
 
-  addItem(Item item) {
-    items.add(item);
-    _resetItemAssignees();
-  }
-
-  _resetItemAssignees() {
-    items.forEach((item) {
-      item.assignees = this.assignees.map((expenseAssignee) {
-        bool assigneeExists = item.assignees
-            .where((itemAssignee) => itemAssignee.uid == expenseAssignee.uid)
-            .isNotEmpty;
-        return AssigneeDecision(
-          uid: expenseAssignee.uid,
-          decision: assigneeExists
-              ? item.assigneeDecision(expenseAssignee.uid)
-              : ProductDecision.Undefined,
-        );
-      }).toList();
-    });
-  }
-
-  setAssignees(List<Assignee> newAssignees) {
-    this.assignees = [...newAssignees];
-    _resetItemAssignees();
+  addItem(Item newItem) {
+    newItem.assignees = this
+        .assignees
+        .map((assignee) => AssigneeDecision(uid: assignee.uid))
+        .toList();
+    this.items.add(newItem);
   }
 
   addAssignee(Assignee newAssignee) {
+    this.items.forEach((item) {
+      item.assignees.add(AssigneeDecision(
+        uid: newAssignee.uid,
+      ));
+    });
     this.assignees.add(newAssignee);
-    _resetItemAssignees();
+  }
+
+  assignGroup(Group group) {
+    this.groupId = group.id;
+    var assignees =
+        group.members.map((member) => Assignee(uid: member.uid)).toList();
+    this.assignees = assignees;
+    this.items.forEach((item) {
+      item.assignees = group.members
+          .map((member) => AssigneeDecision(uid: member.uid))
+          .toList();
+    });
   }
 
   double? getItemValueForUser(String itemName, String uid) {

@@ -29,18 +29,11 @@ void main() {
     });
 
     group('adding assignees', () {
-      test('sets an assignee', () {
-        expense.setAssignees([assignee]);
-
-        expect(expense.assignees, hasLength(1));
-        expect(expense.assignees.first.uid, assignee.uid);
-      });
-
       test('adds an assignee', () {
+        expense.assignees = [assignee];
+
         var item = Item.fake();
         expense.addItem(item);
-        expense.setAssignees([assignee]);
-
         var firstAssigneeDecision = ProductDecision.Confirmed;
         item.setAssigneeDecision(assignee.uid, firstAssigneeDecision);
 
@@ -61,10 +54,10 @@ void main() {
       });
 
       test('adds assignee decisions to existing items', () {
+        expense.assignees = [assignee];
+        
         var item = Item.fake();
         expense.addItem(item);
-
-        expense.setAssignees([assignee]);
 
         var itemAssigneeIds = item.assignees
             .map((assigneeDecision) => assigneeDecision.uid)
@@ -76,12 +69,12 @@ void main() {
     });
 
     test('can indicate that it is ready to be paid for', () {
-      var item = Item(name: 'asd', value: 123);
-      expense.addItem(item);
-
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');
-      expense.setAssignees([firstAssignee, secondAssignee]);
+      expense.assignees = [firstAssignee, secondAssignee];
+
+      var item = Item(name: 'asd', value: 123);
+      expense.addItem(item);
 
       item.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
       item.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
@@ -90,7 +83,7 @@ void main() {
     });
 
     test('is marked by an assignee if all products are marked', () {
-      expense.setAssignees([assignee]);
+      expense.assignees = [assignee];
 
       var item1 = Item(name: 'asd', value: 123);
       var item2 = Item(name: 'asd', value: 123);
@@ -109,7 +102,7 @@ void main() {
     test('gets confirmed total for assignee', () {
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');
-      expense.setAssignees([firstAssignee, secondAssignee]);
+      expense.assignees = [firstAssignee, secondAssignee];
 
       var item1 = Item(name: 'big', value: 124);
       var item2 = Item(name: 'small', value: 42);
@@ -129,7 +122,7 @@ void main() {
     test('gets unconfirmed extra total for assignee', () {
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');
-      expense.setAssignees([firstAssignee, secondAssignee]);
+      expense.assignees = [firstAssignee, secondAssignee];
 
       var item1 = Item(name: 'big', value: 124);
       var item2 = Item(name: 'small', value: 42);
