@@ -1,14 +1,19 @@
 import 'package:statera/models/assignee_decision.dart';
 
 class Item {
-  String name;
-  double value;
+  late String name;
+  late double value;
   List<AssigneeDecision> assignees = [];
 
   Item({
     required this.name,
     required this.value,
   });
+
+  Item.fake() {
+    this.name = "foo";
+    this.value = 145;
+  }
 
   get confirmedCount => assignees.fold<double>(
         0,

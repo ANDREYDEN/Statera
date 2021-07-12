@@ -5,8 +5,8 @@ import 'package:statera/utils/helpers.dart';
 
 class Group {
   String? id;
-  String name;
-  late List<Author> members;
+  late String name;
+  late List<Author> members = [];
   String? code;
 
   Group({
@@ -15,7 +15,12 @@ class Group {
     this.id,
     members
   }) {
-    this.members = members ?? [];
+    this.members = members;
+  }
+
+
+  Group.fake() {
+    this.name = "foo";
   }
 
   void addUser(User user) {

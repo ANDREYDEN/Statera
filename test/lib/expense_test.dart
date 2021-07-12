@@ -29,15 +29,39 @@ void main() {
     });
 
     group('adding assignees', () {
-      test('adds an assignee', () {
+      test('sets an assignee', () {
         expense.setAssignees([assignee]);
 
         expect(expense.assignees, hasLength(1));
         expect(expense.assignees.first.uid, assignee.uid);
       });
 
+      test('adds an assignee', () {
+        var item = Item.fake();
+        expense.addItem(item);
+        expense.setAssignees([assignee]);
+
+        var firstAssigneeDecision = ProductDecision.Confirmed;
+        item.setAssigneeDecision(assignee.uid, firstAssigneeDecision);
+
+        var newAssignee = Assignee.fake();
+        expense.addAssignee(newAssignee);
+
+        expect(expense.assignees, hasLength(2));
+        expect(expense.assignees[1].uid, newAssignee.uid);
+        expect(
+          item.assigneeDecision(assignee.uid),
+          firstAssigneeDecision,
+          reason: "First assignee decision was removed",
+        );
+        expect(
+          item.assigneeDecision(newAssignee.uid),
+          ProductDecision.Undefined,
+        );
+      });
+
       test('adds assignee decisions to existing items', () {
-        var item = Item(name: 'asd', value: 123);
+        var item = Item.fake();
         expense.addItem(item);
 
         expense.setAssignees([assignee]);
@@ -82,7 +106,7 @@ void main() {
       expect(expense.isMarkedBy(assignee.uid), isTrue);
     });
 
-    test('calculates the correct confirmed total for assignee', () {
+    test('gets confirmed total for assignee', () {
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');
       expense.setAssignees([firstAssignee, secondAssignee]);
@@ -102,7 +126,7 @@ void main() {
       expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 104);
     });
 
-    test('it calculates the correct unconfirmed extra total for assignee', () {
+    test('gets unconfirmed extra total for assignee', () {
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');
       expense.setAssignees([firstAssignee, secondAssignee]);

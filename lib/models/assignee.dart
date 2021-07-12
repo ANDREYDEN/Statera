@@ -1,11 +1,15 @@
 class Assignee {
-  String uid;
-  bool paid;
+  late String uid;
+  bool paid = false;
 
   Assignee({
     required this.uid,
     this.paid = false,
   });
+
+  Assignee.fake() {
+    this.uid = "foo";
+  }
 
   Map<String, dynamic> toFirestore() {
     return {

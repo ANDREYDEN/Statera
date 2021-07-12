@@ -70,10 +70,17 @@ class Expense {
 
   _resetItemAssignees() {
     items.forEach((item) {
-      item.assignees = this
-          .assignees
-          .map((assignee) => AssigneeDecision(uid: assignee.uid))
-          .toList();
+      item.assignees = this.assignees.map((expenseAssignee) {
+        bool assigneeExists = item.assignees
+            .where((itemAssignee) => itemAssignee.uid == expenseAssignee.uid)
+            .isNotEmpty;
+        return AssigneeDecision(
+          uid: expenseAssignee.uid,
+          decision: assigneeExists
+              ? item.assigneeDecision(expenseAssignee.uid)
+              : ProductDecision.Undefined,
+        );
+      }).toList();
     });
   }
 
