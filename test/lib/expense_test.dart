@@ -3,6 +3,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
 
 void main() {
@@ -26,10 +27,33 @@ void main() {
     test('adds the author to the assignees by default', () {
       expect(expense.assignees, hasLength(1));
       expect(expense.assignees.first.uid, author.uid);
+      expect(expense.isAuthoredBy(author.uid), isTrue);
     });
 
     group('adding assignees', () {
-      test('adds an assignee', () {
+      test(
+        "can add new assignees if there's noone but the author assigned",
+        () {
+          expense.assignees = [assignee];
+
+          expect(expense.canReceiveAssignees, isTrue);
+        },
+      );
+
+      test(
+        "can not add new assignees if somebody already paid for an item",
+        () {
+          var firstAssignee = Assignee(uid: 'first');
+          var secondAssignee = Assignee(uid: 'second');
+          expense.assignees = [firstAssignee, secondAssignee];
+
+          expense.pay(firstAssignee.uid);
+
+          expect(expense.canReceiveAssignees, isFalse);
+        },
+      );
+
+      test('can add an assignee', () {
         expense.assignees = [assignee];
 
         var item = Item.fake();
@@ -53,9 +77,9 @@ void main() {
         );
       });
 
-      test('adds assignee decisions to existing items', () {
+      test('can add assignee decisions to existing items', () {
         expense.assignees = [assignee];
-        
+
         var item = Item.fake();
         expense.addItem(item);
 
@@ -68,19 +92,22 @@ void main() {
       });
     });
 
-    test('can indicate that it is ready to be paid for', () {
-      var firstAssignee = Assignee(uid: 'first');
-      var secondAssignee = Assignee(uid: 'second');
-      expense.assignees = [firstAssignee, secondAssignee];
+    test(
+      'is ready to be paid for when all assignees have completed their markings',
+      () {
+        var firstAssignee = Assignee(uid: 'first');
+        var secondAssignee = Assignee(uid: 'second');
+        expense.assignees = [firstAssignee, secondAssignee];
 
-      var item = Item(name: 'asd', value: 123);
-      expense.addItem(item);
+        var item = Item(name: 'asd', value: 123);
+        expense.addItem(item);
 
-      item.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-      item.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
+        item.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
+        item.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
 
-      expect(expense.isReadyToBePaidFor, isTrue);
-    });
+        expect(expense.isReadyToBePaidFor, isTrue);
+      },
+    );
 
     test('is marked by an assignee if all products are marked', () {
       expense.assignees = [assignee];
@@ -99,52 +126,166 @@ void main() {
       expect(expense.isMarkedBy(assignee.uid), isTrue);
     });
 
-    test("gets the total of its items", () {
-      var item1 = Item(name: 'big', value: 124);
-      var item2 = Item(name: 'small', value: 42);
+    test("can return the number of assignees that have marked all items", () {
+      var firstAssignee = Assignee.fake(uid: "1");
+      var secondAssignee = Assignee.fake(uid: "2");
+      var thirdAssignee = Assignee.fake(uid: "3");
+      expense.assignees = [firstAssignee, secondAssignee, thirdAssignee];
+
+      var item1 = Item.fake();
+      var item2 = Item.fake();
       expense.addItem(item1);
       expense.addItem(item2);
 
-      expect(expense.total, item1.value + item2.value);
-    });
-
-    test('gets confirmed total for assignee', () {
-      var firstAssignee = Assignee(uid: 'first');
-      var secondAssignee = Assignee(uid: 'second');
-      expense.assignees = [firstAssignee, secondAssignee];
-
-      var item1 = Item(name: 'big', value: 124);
-      var item2 = Item(name: 'small', value: 42);
-      expense.addItem(item1);
-      expense.addItem(item2);
+      expect(expense.definedAssignees, 0);
 
       item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
       item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
 
-      item1.setAssigneeDecision(secondAssignee.uid, ProductDecision.Confirmed);
-      item2.setAssigneeDecision(secondAssignee.uid, ProductDecision.Confirmed);
+      expect(expense.definedAssignees, 1);
 
-      expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 62);
-      expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 104);
+      item2.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
+
+      expect(expense.definedAssignees, 1);
     });
 
-    test('gets unconfirmed extra total for assignee', () {
-      var firstAssignee = Assignee(uid: 'first');
-      var secondAssignee = Assignee(uid: 'second');
-      expense.assignees = [firstAssignee, secondAssignee];
+    group("calculating totals", () {
+      test("gets the total of its items", () {
+        var item1 = Item(name: 'big', value: 124);
+        var item2 = Item(name: 'small', value: 42);
+        expense.addItem(item1);
+        expense.addItem(item2);
 
-      var item1 = Item(name: 'big', value: 124);
-      var item2 = Item(name: 'small', value: 42);
-      expense.addItem(item1);
-      expense.addItem(item2);
+        expect(expense.total, item1.value + item2.value);
+      });
 
-      item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-      item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
+      test('gets confirmed total for assignee', () {
+        var firstAssignee = Assignee(uid: 'first');
+        var secondAssignee = Assignee(uid: 'second');
+        expense.assignees = [firstAssignee, secondAssignee];
 
-      item2.setAssigneeDecision(secondAssignee.uid, ProductDecision.Confirmed);
+        var item1 = Item(name: 'big', value: 124);
+        var item2 = Item(name: 'small', value: 42);
+        expense.addItem(item1);
+        expense.addItem(item2);
 
-      expect(expense.getPotentialTotalForUser(firstAssignee.uid), 124);
-      expect(expense.getPotentialTotalForUser(secondAssignee.uid), 104);
+        item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
+        item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
+
+        item1.setAssigneeDecision(
+            secondAssignee.uid, ProductDecision.Confirmed);
+        item2.setAssigneeDecision(
+            secondAssignee.uid, ProductDecision.Confirmed);
+
+        expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 62);
+        expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 104);
+      });
+
+      test('gets unconfirmed extra total for assignee', () {
+        var firstAssignee = Assignee(uid: 'first');
+        var secondAssignee = Assignee(uid: 'second');
+        expense.assignees = [firstAssignee, secondAssignee];
+
+        var item1 = Item(name: 'big', value: 124);
+        var item2 = Item(name: 'small', value: 42);
+        expense.addItem(item1);
+        expense.addItem(item2);
+
+        item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
+        item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
+
+        item2.setAssigneeDecision(
+            secondAssignee.uid, ProductDecision.Confirmed);
+
+        expect(expense.getPotentialTotalForUser(firstAssignee.uid), 124);
+        expect(expense.getPotentialTotalForUser(secondAssignee.uid), 104);
+      });
+
+      test('gets a value for an item for a user', () {
+        var firstAssignee = Assignee(uid: 'first');
+        var secondAssignee = Assignee(uid: 'second');
+        expense.assignees = [firstAssignee, secondAssignee];
+
+        var item1 = Item(name: 'big', value: 124);
+        var item2 = Item(name: 'small', value: 42);
+        expense.addItem(item1);
+        expense.addItem(item2);
+
+        item1.setAssigneeDecision(
+          firstAssignee.uid,
+          ProductDecision.Confirmed,
+        );
+        item2.setAssigneeDecision(
+          firstAssignee.uid,
+          ProductDecision.Denied,
+        );
+
+        item1.setAssigneeDecision(
+          secondAssignee.uid,
+          ProductDecision.Confirmed,
+        );
+        item2.setAssigneeDecision(
+          secondAssignee.uid,
+          ProductDecision.Confirmed,
+        );
+
+        expect(expense.getItemValueForAssignee(item1.name, firstAssignee.uid), 62);
+        expect(expense.getItemValueForAssignee(item2.name, firstAssignee.uid), 0);
+        expect(expense.getItemValueForAssignee(item1.name, secondAssignee.uid), 62);
+        expect(expense.getItemValueForAssignee(item2.name, secondAssignee.uid), 42);
+      });
+    });
+
+    group("payment", () {
+      test(
+        'can perform a payment and get the number of assignees that have paid for all the items',
+        () {
+          var firstAssignee = Assignee(uid: 'first');
+          var secondAssignee = Assignee(uid: 'second');
+          expense.assignees = [firstAssignee, secondAssignee];
+
+          expense.pay(firstAssignee.uid);
+
+          expect(expense.paidAssignees, 1);
+        },
+      );
+
+      test("is in progress if there is at least 1 assignee who hasn't paid for this expense", () {
+        var firstAssignee = Assignee(uid: 'first');
+          var secondAssignee = Assignee(uid: 'second');
+          expense.assignees = [firstAssignee, secondAssignee];
+
+          expense.pay(firstAssignee.uid);
+
+          expect(expense.paymentInProgress, isTrue);
+
+          expense.pay(secondAssignee.uid);
+
+          expect(expense.paymentInProgress, isFalse);
+          expect(expense.isPaidFor, isTrue);
+      });
+    });
+
+
+    test("can be assigned to a group", () {
+      var groupMembers = [
+        Author.fake(uid: "1"),
+        Author.fake(uid: "2"),
+      ];
+      var group = Group(name: "foo", members: groupMembers);
+
+      var item = Item.fake();
+      expense.addItem(item);
+      expense.assignGroup(group);
+
+      expect(
+        expense.assignees.map((a) => a.uid),
+        orderedEquals(groupMembers.map((g) => g.uid)),
+      );
+      expect(
+        item.assignees.map((a) => a.uid),
+        orderedEquals(groupMembers.map((g) => g.uid)),
+      );
     });
   });
 }

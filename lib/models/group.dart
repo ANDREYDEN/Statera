@@ -10,18 +10,13 @@ class Group {
   late List<Author> members = [];
   String? code;
 
-  Group({
-    required this.name,
-    this.code,
-    this.id,
-    members
-  }) {
+  Group({required this.name, this.code, this.id, members}) {
     this.members = members ?? [];
   }
 
-
-  Group.fake() {
+  Group.fake({members}) {
     this.name = "foo";
+    this.members = members ?? [];
   }
 
   void addUser(User user) {
@@ -44,23 +39,23 @@ class Group {
     };
   }
 
-  factory Group.fromFirestore(Map<String, dynamic> map, { required String? id }) {
+  factory Group.fromFirestore(Map<String, dynamic> map, {required String? id}) {
     return Group(
-      name: map['name'],
-      members: List<Author>.from(map['members']?.map((x) => Author.fromFirestore(x))),
-      code: map['code'],
-      id: id
-    );
+        name: map['name'],
+        members: List<Author>.from(
+            map['members']?.map((x) => Author.fromFirestore(x))),
+        code: map['code'],
+        id: id);
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Group &&
-      other.name == name &&
-      listEquals(other.members, members) &&
-      other.code == code;
+        other.name == name &&
+        listEquals(other.members, members) &&
+        other.code == code;
   }
 
   @override

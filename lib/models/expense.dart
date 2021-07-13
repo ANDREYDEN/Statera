@@ -44,7 +44,7 @@ class Expense {
       );
 
   bool get canReceiveAssignees =>
-      assignees.length == 1 || (!isPaidFor && paidAssignees == 0);
+      assignees.length == 1 || paidAssignees == 0;
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -56,6 +56,14 @@ class Expense {
 
   bool isAuthoredBy(String uid) {
     return this.author.uid == uid;
+  }
+
+  bool isPaidBy(String uid) {
+    return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
+  }
+
+  void pay(String uid) {
+    assignees.firstWhere((assignee) => assignee.uid == uid).paid = true;
   }
 
   int get definedAssignees => assignees.fold(
@@ -93,7 +101,7 @@ class Expense {
     });
   }
 
-  double? getItemValueForUser(String itemName, String uid) {
+  double? getItemValueForAssignee(String itemName, String uid) {
     Item item = items.firstWhere(
       (item) => item.name == itemName,
       orElse: () =>
@@ -106,7 +114,7 @@ class Expense {
     );
     if (assignee.decision == ProductDecision.Undefined) return null;
 
-    return item.sharedValue;
+    return item.getValueForAssignee(uid);
   }
 
   double getConfirmedTotalForUser(String uid) {
@@ -137,14 +145,6 @@ class Expense {
         return previousValue;
       },
     );
-  }
-
-  bool isPaidBy(String uid) {
-    return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
-  }
-
-  void pay(String uid) {
-    assignees.firstWhere((assignee) => assignee.uid == uid).paid = true;
   }
 
   Map<String, dynamic> toFirestore() {

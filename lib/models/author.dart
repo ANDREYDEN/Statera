@@ -13,6 +13,12 @@ class Author {
     this.photoURL = user.photoURL;
   }
 
+  Author.fake({ String? name, String? uid, String? photoURL}) {
+    this.uid = uid ?? "foo";
+    this.name = name ?? "bar";
+    this.photoURL = photoURL ?? "baz";
+  }
+
   static Author fromFirestore(Map<String, dynamic> data) {
     return Author(
       uid: data['uid'],

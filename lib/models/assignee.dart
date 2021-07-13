@@ -7,8 +7,8 @@ class Assignee {
     this.paid = false,
   });
 
-  Assignee.fake() {
-    this.uid = "foo";
+  Assignee.fake({ String? uid }) {
+    this.uid = uid ?? "foo";
   }
 
   Map<String, dynamic> toFirestore() {

@@ -52,6 +52,11 @@ class Item {
     assignee.decision = decision;
   }
 
+  double getValueForAssignee(String uid) {
+    return assigneeDecision(uid) == ProductDecision.Denied ? 0 : sharedValue;
+  }
+
+
   Map<String, dynamic> toFirestore() {
     return {
       "name": name,
