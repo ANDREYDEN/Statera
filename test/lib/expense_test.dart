@@ -99,6 +99,15 @@ void main() {
       expect(expense.isMarkedBy(assignee.uid), isTrue);
     });
 
+    test("gets the total of its items", () {
+      var item1 = Item(name: 'big', value: 124);
+      var item2 = Item(name: 'small', value: 42);
+      expense.addItem(item1);
+      expense.addItem(item2);
+
+      expect(expense.total, item1.value + item2.value);
+    });
+
     test('gets confirmed total for assignee', () {
       var firstAssignee = Assignee(uid: 'first');
       var secondAssignee = Assignee(uid: 'second');

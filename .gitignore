@@ -45,5 +45,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+/coverage/
 google-services.json
 *.mocks.dart
