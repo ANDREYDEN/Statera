@@ -90,7 +90,7 @@ class _ExpenseListState extends State<ExpenseList> {
               .toList();
 
           return expenses.isEmpty
-              ? ExpenseListEmpty()
+              ? ExpenseListEmpty(text: 'No Expenses')
               : ListView.builder(
                   itemCount: expenses.length,
                   itemBuilder: (context, index) {

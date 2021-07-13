@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 
 class ExpenseListEmpty extends StatelessWidget {
-  const ExpenseListEmpty({ Key? key }) : super(key: key);
+  final String text;
+  const ExpenseListEmpty({Key? key, required this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text("No expenses yet...");
+    return Center(
+      child: Text(
+        this.text,
+        style: TextStyle(
+          color: Colors.grey[400],
+          fontSize: 24,
+        ),
+      ),
+    );
   }
 }
