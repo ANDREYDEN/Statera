@@ -9,7 +9,7 @@ import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dismiss_background.dart';
-import 'package:statera/widgets/empty/expense_list_empty.dart';
+import 'package:statera/widgets/list_empty.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
 import 'package:statera/widgets/ok_cancel_dialog.dart';
 
@@ -90,7 +90,7 @@ class _ExpenseListState extends State<ExpenseList> {
               .toList();
 
           return expenses.isEmpty
-              ? ExpenseListEmpty(text: 'No Expenses')
+              ? ListEmpty(text: 'No Expenses')
               : ListView.builder(
                   itemCount: expenses.length,
                   itemBuilder: (context, index) {
