@@ -47,4 +47,5 @@ app.*.map.json
 
 /coverage/
 google-services.json
+GoogleService-Info.plist
 *.mocks.dart
