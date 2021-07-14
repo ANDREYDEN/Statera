@@ -205,7 +205,10 @@ class _ExpensePageState extends State<ExpensePage> {
             TextField(
               controller: newItemValueController,
               decoration: InputDecoration(labelText: "Item value"),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(
+                decimal: true,
+                signed: false,
+              ),
             ),
           ],
         ),
