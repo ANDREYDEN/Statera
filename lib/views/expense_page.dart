@@ -22,6 +22,7 @@ class ExpensePage extends StatefulWidget {
 class _ExpensePageState extends State<ExpensePage> {
   var newItemNameController = new TextEditingController();
   var newItemValueController = new TextEditingController();
+  var valueFocusNode = new FocusNode();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -201,6 +202,10 @@ class _ExpensePageState extends State<ExpensePage> {
             TextField(
               controller: newItemNameController,
               decoration: InputDecoration(labelText: "Item name"),
+              autofocus: true,
+              onSubmitted: (text) {
+                FocusScope.of(context).requestFocus(this.valueFocusNode);
+              },
             ),
             TextField(
               controller: newItemValueController,
@@ -209,27 +214,32 @@ class _ExpensePageState extends State<ExpensePage> {
                 decimal: true,
                 signed: false,
               ),
+              focusNode: this.valueFocusNode,
+              onSubmitted: (text) {
+                submitItem(context);
+              },
             ),
           ],
         ),
         actions: [
           ElevatedButton(
-            onPressed: () async {
-              await Firestore.instance.updateExpense(widget.expenseId,
-                  (expense) {
-                expense.addItem(Item(
-                  name: newItemNameController.text,
-                  value: double.parse(newItemValueController.text),
-                ));
-              });
-              newItemNameController.clear();
-              newItemValueController.clear();
-              Navigator.of(context).pop();
-            },
+            onPressed: () => submitItem(context),
             child: Text("Save"),
           )
         ],
       ),
     );
+  }
+
+  submitItem(BuildContext context) async {
+    await Firestore.instance.updateExpense(widget.expenseId, (expense) {
+      expense.addItem(Item(
+        name: newItemNameController.text,
+        value: double.parse(newItemValueController.text),
+      ));
+    });
+    newItemNameController.clear();
+    newItemValueController.clear();
+    Navigator.of(context).pop();
   }
 }
