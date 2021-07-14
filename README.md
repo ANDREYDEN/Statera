@@ -1,6 +1,8 @@
 # Statera
 
 An expense tracking app with granular price distribution.
+
+![image](https://user-images.githubusercontent.com/25109066/125558203-e66178cd-00da-4e88-b219-09e136576b08.png)
 ![image](https://user-images.githubusercontent.com/25109066/125557693-e5ae08ab-ad88-4d5b-8480-8bc5e0202a3a.png)
 
 
