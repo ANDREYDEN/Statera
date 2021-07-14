@@ -28,7 +28,7 @@ class ItemListItem extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(item.name),
+                Expanded(child: Text(item.name)),
                 Text(item.valueString),
               ],
             ),
