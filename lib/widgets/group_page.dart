@@ -7,6 +7,7 @@ import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/views/expense_list.dart';
 import 'package:statera/views/home.dart';
 import 'package:statera/widgets/page_scaffold.dart';
+import 'package:statera/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
   static const String route = "group";
@@ -44,19 +45,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
           BottomNavigationBarItem(
             label: "Expenses",
-            icon: StreamBuilder<List<Expense>>(
-              stream: groupVm.getUnmarkedExpenses(authVm.user.uid),
-              builder: (context, snap) {
-                var unmarkedExpenses = snap.data;
-                return Badge(
-                  showBadge:
-                      unmarkedExpenses != null && unmarkedExpenses.isNotEmpty,
-                  badgeContent: Text(unmarkedExpenses?.length.toString() ?? ""),
-                  child: Icon(Icons.attach_money),
-                );
-              },
-            ),
-            // icon: Icon(Icons.attach_money),
+            icon: UnmarkedExpensesBadge(child: Icon(Icons.attach_money)),
             activeIcon: Icon(
               Icons.attach_money,
               color: Theme.of(context).primaryColor,
