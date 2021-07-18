@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/main_provider.dart';
 import 'package:statera/views/group_list.dart';
-import 'package:statera/views/group_page.dart';
+import 'package:statera/widgets/group_page.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({Key? key}) : super(key: key);

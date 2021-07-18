@@ -52,8 +52,22 @@ class Firestore {
   }
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
-    return _queryToExpensesStream(
-        expensesCollection.where("groupId", isEqualTo: groupId));
+    return _queryToExpensesStream(expensesCollection.where(
+      "groupId",
+      isEqualTo: groupId,
+    ));
+  }
+
+  Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
+    return _queryToExpensesStream(expensesCollection
+        .where(
+          "groupId",
+          isEqualTo: groupId,
+        )
+        .where(
+          "unmarkedAssigneeIds",
+          arrayContains: uid,
+        ));
   }
 
   Future<void> addExpenseToGroup(Expense expense, String? groupCode) async {

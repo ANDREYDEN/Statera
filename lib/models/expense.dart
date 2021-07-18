@@ -43,8 +43,7 @@ class Expense {
             previousValue + (isPaidBy(assignee.uid) ? 1 : 0),
       );
 
-  bool get canReceiveAssignees =>
-      assignees.length == 1 || paidAssignees == 0;
+  bool get canReceiveAssignees => assignees.length == 1 || paidAssignees == 0;
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -156,6 +155,10 @@ class Expense {
       "assigneeIds":
           assignees.map((assignee) => assignee.uid).toList().toList(),
       "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
+      "unmarkedAssigneeIds": assignees
+          .where((assignee) => !isMarkedBy(assignee.uid))
+          .map((assignee) => assignee.uid)
+          .toList()
     };
   }
 
