@@ -21,7 +21,7 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  TextEditingController newGroupNameController = TextEditingController();
+  TextEditingController groupNameController = TextEditingController();
   TextEditingController joinGroupCodeController = TextEditingController();
 
   AuthenticationViewModel get authVm =>
@@ -98,8 +98,13 @@ class _GroupListState extends State<GroupList> {
                                   : ListView.builder(
                                       itemCount: groups.length,
                                       itemBuilder: (context, index) {
-                                        return GroupListItem(
-                                          group: groups[index],
+                                        var group = groups[index];
+                                        return GestureDetector(
+                                          onLongPress: () =>
+                                              handleEditGroup(group),
+                                          child: GroupListItem(
+                                            group: group,
+                                          ),
                                         );
                                       },
                                     );
@@ -122,15 +127,39 @@ class _GroupListState extends State<GroupList> {
         child: Text("Log In with Google"),
       );
 
+  void handleEditGroup(Group group) {
+    groupNameController.text = group.name;
+    showGroupCRUDDialog(
+      title: "Edit Group",
+      action: () async {
+        group.name = groupNameController.text;
+        await Firestore.instance.saveGroup(group);
+      },
+    );
+  }
+
   void handleNewGroup() {
+    showGroupCRUDDialog(
+      title: "New Group",
+      action: () async {
+        var newGroup = Group(name: groupNameController.text);
+        await authVm.createGroup(newGroup);
+      },
+    );
+  }
+
+  void showGroupCRUDDialog({
+    required String title,
+    required Future Function() action,
+  }) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("New Group"),
+        title: Text(title),
         content: Column(
           children: [
             TextField(
-              controller: newGroupNameController,
+              controller: groupNameController,
               decoration: InputDecoration(labelText: "Group name"),
             ),
           ],
@@ -138,10 +167,7 @@ class _GroupListState extends State<GroupList> {
         actions: [
           ElevatedButton(
             onPressed: () async {
-              var newGroup = Group(
-                name: newGroupNameController.text,
-              );
-              await authVm.createGroup(newGroup);
+              await action();
               Navigator.of(context).pop();
             },
             child: Text("Save"),
