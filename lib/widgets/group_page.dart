@@ -5,7 +5,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/views/expense_list.dart';
-import 'package:statera/views/home.dart';
+import 'package:statera/views/group_home.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/widgets/unmarked_expenses_badge.dart';
 
@@ -71,7 +71,7 @@ class _GroupPageState extends State<GroupPage> {
             this.selectedNavBarItemIndex = index;
           });
         },
-        children: [Home(), ExpenseList()],
+        children: [GroupHome(), ExpenseList()],
       ),
     );
   }

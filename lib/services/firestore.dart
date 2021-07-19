@@ -130,6 +130,14 @@ class Firestore {
     );
   }
 
+  Future<void> deleteGroup(String? groupId) async {
+    var expensesSnap = await Firestore.instance.expensesCollection
+        .where('groupId', isEqualTo: groupId)
+        .get();
+    await Future.wait(expensesSnap.docs.map((doc) => doc.reference.delete()));
+    await Firestore.instance.groupsCollection.doc(groupId).delete();
+  }
+
   Stream<Map<Author, List<Expense>>> getOwingsForUserInGroup(
     String consumerUid,
     Group group,
@@ -190,5 +198,9 @@ class Firestore {
     await Future.wait(
       outstandingExpenses.map((expense) => saveExpense(expense)),
     );
+  }
+
+  Future<void> saveGroup(Group group) async {
+    return groupsCollection.doc(group.id).set(group.toFirestore());
   }
 }

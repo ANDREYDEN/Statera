@@ -8,9 +8,10 @@ import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/owing_list_item.dart';
+import 'package:statera/widgets/ok_cancel_dialog.dart';
 
-class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+class GroupHome extends StatelessWidget {
+  const GroupHome({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class Home extends StatelessWidget {
             ],
           ),
         ),
-        Divider(thickness: 1,),
+        Divider(thickness: 1),
         SizedBox(height: 20),
         Text(
           'Your Owings',
@@ -74,6 +75,27 @@ class Home extends StatelessWidget {
             },
           ),
         ),
+        TextButton(
+          onPressed: () async {
+            var decision = await showDialog<bool>(
+              context: context,
+              builder: (context) => OKCancelDialog(
+                text: "Are you sure you want to leave the group?",
+              ),
+            );
+            if (decision!) {
+              await authVm.leaveGroup(groupVm.group);
+              Navigator.pop(context);
+            }
+          },
+          child: Text(
+            "Leave group",
+            style: TextStyle(
+              color: Theme.of(context).errorColor,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        )
       ],
     );
   }

@@ -46,4 +46,15 @@ class AuthenticationViewModel {
 
     await Firestore.instance.addUserToOutstandingExpenses(user, group.id);
   }
+
+  Future<void> leaveGroup(Group group) async {
+    if (group.members.every((member) => member.uid != user.uid)) return;
+
+    group.removeUser(user);
+    if (group.members.isEmpty) {
+      return Firestore.instance.deleteGroup(group.id);
+    }
+
+    return Firestore.instance.saveGroup(group);
+  }
 }

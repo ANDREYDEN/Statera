@@ -90,7 +90,7 @@ class _ExpensePageState extends State<ExpensePage> {
                                     ? Colors.green[200]
                                     : null,
                                 child: Text(
-                                  'Ready to be paid',
+                                  'Ready to be paid for',
                                   textAlign: TextAlign.center,
                                 ),
                               ),

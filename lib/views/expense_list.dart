@@ -8,6 +8,7 @@ import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
+import 'package:statera/widgets/ok_cancel_dialog.dart';
 
 class ExpenseList extends StatefulWidget {
   const ExpenseList({Key? key}) : super(key: key);
@@ -111,40 +112,12 @@ class _ExpenseListState extends State<ExpenseList> {
                         ? Dismissible(
                             key: Key(expense.id!),
                             confirmDismiss: (dir) => showDialog<bool>(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    content: Text(
-                                      "Are you sure you want to delete this expense and all of its items?",
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context, false);
-                                        },
-                                        child: Text(
-                                          "Cancel",
-                                          style: TextStyle(
-                                            color: Theme.of(context).errorColor,
-                                          ),
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context, true);
-                                        },
-                                        child: Text("Yes"),
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.resolveWith(
-                                            (states) =>
-                                                Theme.of(context).accentColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }),
+                              context: context,
+                              builder: (context) => OKCancelDialog(
+                                text:
+                                    "Are you sure you want to delete this expense and all of its items?"
+                              ),
+                            ),
                             onDismissed: (_) {
                               Firestore.instance.deleteExpense(expense);
                             },

@@ -37,13 +37,13 @@ class Expense {
   bool get paymentInProgress =>
       !isPaidFor && assignees.any((assignee) => assignee.paid);
 
+  bool get canReceiveAssignees => assignees.length == 1 || paidAssignees == 0;
+
   int get paidAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>
             previousValue + (isPaidBy(assignee.uid) ? 1 : 0),
       );
-
-  bool get canReceiveAssignees => assignees.length == 1 || paidAssignees == 0;
 
   bool isMarkedBy(String uid) {
     return items.fold(
