@@ -110,6 +110,41 @@ class _ExpenseListState extends State<ExpenseList> {
                     return expense.isAuthoredBy(authVm.user.uid)
                         ? Dismissible(
                             key: Key(expense.id!),
+                            confirmDismiss: (dir) => showDialog<bool>(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: Text(
+                                      "Are you sure you want to delete this expense and all of its items?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, false);
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                            color: Theme.of(context).errorColor,
+                                          ),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, true);
+                                        },
+                                        child: Text("Yes"),
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.resolveWith(
+                                            (states) =>
+                                                Theme.of(context).accentColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
                             onDismissed: (_) {
                               Firestore.instance.deleteExpense(expense);
                             },
