@@ -24,9 +24,14 @@ class GroupListItem extends StatelessWidget {
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          UnmarkedExpensesBadge(
-            groupId: this.group.id,
-            child: Text(this.group.name),
+          Flexible(
+            child: UnmarkedExpensesBadge(
+              groupId: this.group.id,
+              child: Text(
+                this.group.name,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           )
         ],
       ),

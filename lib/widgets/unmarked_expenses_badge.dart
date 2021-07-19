@@ -27,12 +27,17 @@ class UnmarkedExpensesBadge extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Badge(
-              showBadge:
-                  unmarkedExpenses != null && unmarkedExpenses.isNotEmpty,
-              badgeContent: Text(unmarkedExpenses?.length.toString() ?? ""),
-              toAnimate: false,
-              child: this.child,
+            Flexible(
+              child: Badge(
+                showBadge:
+                    unmarkedExpenses != null && unmarkedExpenses.isNotEmpty,
+                badgeContent: Text(
+                  unmarkedExpenses?.length.toString() ?? "",
+                  style: TextStyle(color: Colors.white),
+                ),
+                toAnimate: false,
+                child: this.child,
+              ),
             ),
           ],
         );
