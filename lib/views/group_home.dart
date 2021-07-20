@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
-import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
@@ -58,9 +57,9 @@ class GroupHome extends StatelessWidget {
           style: Theme.of(context).textTheme.headline6,
         ),
         Flexible(
-          child: CustomStreamBuilder<Map<Author, List<Expense>>>(
+          child: CustomStreamBuilder<Map<Author, double>>(
             stream: Firestore.instance
-                .getOwingsForUserInGroup(authVm.user.uid, groupVm.group),
+                .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.id),
             builder: (context, owings) {
               return ListView.builder(
                 itemCount: owings.length,
@@ -68,7 +67,7 @@ class GroupHome extends StatelessWidget {
                   var payer = owings.keys.elementAt(index);
                   return OwingListItem(
                     payer: payer,
-                    outstandingExpenses: owings[payer]!,
+                    owing: owings[payer]!,
                   );
                 },
               );

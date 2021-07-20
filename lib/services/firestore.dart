@@ -138,32 +138,13 @@ class Firestore {
     await Firestore.instance.groupsCollection.doc(groupId).delete();
   }
 
-  Stream<Map<Author, List<Expense>>> getOwingsForUserInGroup(
+  Stream<Map<Author, double>> getOwingsForUserInGroup(
     String consumerUid,
-    Group group,
+    String? groupId,
   ) {
-    // TODO: oprtimize to only unpaid expenses
-    return _expensesQuery(groupId: group.id)
-        .snapshots()
-        .asyncMap((expensesSnap) async {
-      var expenses = expensesSnap.docs.map((doc) => Expense.fromFirestore(
-            doc.data() as Map<String, dynamic>,
-            doc.id,
-          ));
-      Map<Author, List<Expense>> owings = {};
-
-      // TODO: this might take longer as Future.forEach is consecutively waiting for each Future
-      group.members
-          .where((member) => member.uid != consumerUid)
-          .forEach((member) {
-        owings[member] = expenses
-            .where((expense) =>
-                expense.isAuthoredBy(member.uid) &&
-                !expense.isPaidBy(consumerUid))
-            .toList();
-      });
-
-      return owings;
+    return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
+      var group = Group.fromFirestore(groupSnap.data() as Map<String, dynamic>, id: groupSnap.id);
+      return group.extendedBalance(consumerUid);
     });
   }
 

@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -64,6 +63,36 @@ class Group {
     }
   }
 
+  void removeUser(User user) {
+    this.members.removeWhere((member) => member.uid == user.uid);
+    this.balance.remove(user.uid);
+    this.balance.forEach((key, value) => value.remove(user.uid));
+  }
+
+  Map<Author, double> extendedBalance(String consumerUid) {
+    return this.balance[consumerUid]!.map(
+          (uid, balance) => MapEntry(
+              this.members.where((member) => member.uid == uid).first, balance),
+        );
+  }
+
+  void payOffBalance(String payerUid, String receiverUid, double value) {
+    if (this.members.every((member) => member.uid != payerUid)) {
+      throw new Exception("User with id $payerUid is not a member of group $name");
+    }
+    if (this.members.every((member) => member.uid != receiverUid)) {
+      throw new Exception("User with id $receiverUid is not a member of group $name");
+    }
+    
+    this.balance[payerUid]![receiverUid] = this.balance[payerUid]![receiverUid]! - value;
+    this.balance[receiverUid]![payerUid] = this.balance[receiverUid]![payerUid]! + value;
+  }
+
+  void resolveBalance(String member1Uid, String member2Uid) {
+    this.balance[member1Uid]![member2Uid] = 0;
+    this.balance[member2Uid]![member1Uid] = 0;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -89,11 +118,5 @@ class Group {
                   MapEntry(uid, Map<String, double>.from(balance)))),
       id: id,
     );
-  }
-
-  void removeUser(User user) {
-    this.members.removeWhere((member) => member.uid == user.uid);
-    this.balance.remove(user.uid);
-    this.balance.forEach((key, value) => value.remove(user.uid));
   }
 }
