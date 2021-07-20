@@ -28,32 +28,30 @@ class OwingListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(this.payer.name),
-          Column(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => PaymentDialog(
-                      receiver: this.payer,
-                      value: this.owing,
-                      onPay: (value) async {
-                        groupVm.group.payOffBalance(
-                          payerUid: authVm.user.uid,
-                          receiverUid: this.payer.uid,
-                          value: value,
-                        );
-                        await Firestore.instance.saveGroup(groupVm.group);
-                      },
-                    ),
-                  );
-                },
-                child: Text(
-                  "Pay ${toStringPrice(this.owing)}",
+          this.owing <= 0
+              ? Text(toStringPrice(this.owing))
+              : ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => PaymentDialog(
+                        receiver: this.payer,
+                        value: this.owing,
+                        onPay: (value) async {
+                          groupVm.group.payOffBalance(
+                            payerUid: authVm.user.uid,
+                            receiverUid: this.payer.uid,
+                            value: value,
+                          );
+                          await Firestore.instance.saveGroup(groupVm.group);
+                        },
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Pay ${toStringPrice(this.owing)}",
+                  ),
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );

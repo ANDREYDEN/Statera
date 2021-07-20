@@ -48,7 +48,9 @@ class _ExpensePageState extends State<ExpensePage> {
 
           return PageScaffold(
             title: loading ? 'Loading...' : expense.name,
-            onFabPressed: !loading && expense.isAuthoredBy(authVm.user.uid) && !expense.completed
+            onFabPressed: !loading &&
+                    expense.isAuthoredBy(authVm.user.uid) &&
+                    !expense.completed
                 ? () => handleCreateItem(expense)
                 : null,
             child: loading
@@ -89,9 +91,8 @@ class _ExpensePageState extends State<ExpensePage> {
                             Expanded(
                               child: Container(
                                 padding: EdgeInsets.all(8),
-                                color: expense.completed
-                                    ? Colors.grey[400]
-                                    : null,
+                                color:
+                                    expense.completed ? Colors.grey[400] : null,
                                 child: Text(
                                   'Completed',
                                   textAlign: TextAlign.center,
@@ -139,12 +140,12 @@ class _ExpensePageState extends State<ExpensePage> {
                               background: DismissBackground(),
                               child: ItemListItem(
                                 item: item,
-                                onConfirm: () async {
+                                onDecisionTaken: (decision) async {
                                   if (expense.completed) return;
 
                                   expense.items[index].setAssigneeDecision(
                                     this.authVm.user.uid,
-                                    ProductDecision.Confirmed,
+                                    decision,
                                   );
                                   await Firestore.instance
                                       .updateExpense(expense);
@@ -153,22 +154,13 @@ class _ExpensePageState extends State<ExpensePage> {
                                       context,
                                       () async {
                                         groupVm.updateBalance(expense);
-                                        await Firestore.instance.saveGroup(groupVm.group);
+                                        await Firestore.instance
+                                            .saveGroup(groupVm.group);
                                       },
                                       successMessage:
                                           "The expense is now complete. Participants' balances updated.",
                                     );
                                   }
-                                },
-                                onDeny: () async {
-                                  if (expense.completed) return;
-
-                                  expense.items[index].setAssigneeDecision(
-                                    this.authVm.user.uid,
-                                    ProductDecision.Denied,
-                                  );
-                                  await Firestore.instance
-                                      .updateExpense(expense);
                                 },
                               ),
                             );

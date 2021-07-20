@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
 
-  final void Function() onConfirm;
-  final void Function() onDeny;
+  final void Function(ProductDecision) onDecisionTaken;
 
   const ItemListItem({
     Key? key,
     required this.item,
-    required this.onConfirm,
-    required this.onDeny,
+    required this.onDecisionTaken,
   }) : super(key: key);
 
   @override
@@ -40,7 +39,7 @@ class ItemListItem extends StatelessWidget {
             Container(
               color: authVm.hasConfirmed(item) ? Colors.green : Colors.white,
               child: IconButton(
-                onPressed: this.onConfirm,
+                onPressed: () => this.onDecisionTaken(ProductDecision.Confirmed),
                 icon: Icon(
                   Icons.check,
                   color:
@@ -51,7 +50,7 @@ class ItemListItem extends StatelessWidget {
             Container(
               color: authVm.hasDenied(item) ? Colors.red : Colors.white,
               child: IconButton(
-                onPressed: this.onDeny,
+                onPressed: () => this.onDecisionTaken(ProductDecision.Denied),
                 icon: Icon(
                   Icons.close,
                   color: authVm.hasDenied(item) ? Colors.white : Colors.black,
