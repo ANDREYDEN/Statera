@@ -80,7 +80,7 @@ void main() {
     });
 
     test(
-      'is ready to be paid for when all assignees have completed their markings',
+      'is completed when all assignees have completed their markings',
       () {
         var firstAssignee = Assignee(uid: 'first');
         var secondAssignee = Assignee(uid: 'second');
