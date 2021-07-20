@@ -40,19 +40,6 @@ void main() {
         },
       );
 
-      test(
-        "can not add new assignees if somebody already paid for an item",
-        () {
-          var firstAssignee = Assignee(uid: 'first');
-          var secondAssignee = Assignee(uid: 'second');
-          expense.assignees = [firstAssignee, secondAssignee];
-
-          expense.pay(firstAssignee.uid);
-
-          expect(expense.canReceiveAssignees, isFalse);
-        },
-      );
-
       test('can add an assignee', () {
         expense.assignees = [assignee];
 
@@ -105,7 +92,7 @@ void main() {
         item.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
         item.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
 
-        expect(expense.isReadyToBePaidFor, isTrue);
+        expect(expense.completed, isTrue);
       },
     );
 
@@ -235,37 +222,6 @@ void main() {
         expect(expense.getItemValueForAssignee(item2.name, secondAssignee.uid), 42);
       });
     });
-
-    group("payment", () {
-      test(
-        'can perform a payment and get the number of assignees that have paid for all the items',
-        () {
-          var firstAssignee = Assignee(uid: 'first');
-          var secondAssignee = Assignee(uid: 'second');
-          expense.assignees = [firstAssignee, secondAssignee];
-
-          expense.pay(firstAssignee.uid);
-
-          expect(expense.paidAssignees, 1);
-        },
-      );
-
-      test("is in progress if there is at least 1 assignee who hasn't paid for this expense", () {
-        var firstAssignee = Assignee(uid: 'first');
-          var secondAssignee = Assignee(uid: 'second');
-          expense.assignees = [firstAssignee, secondAssignee];
-
-          expense.pay(firstAssignee.uid);
-
-          expect(expense.paymentInProgress, isTrue);
-
-          expense.pay(secondAssignee.uid);
-
-          expect(expense.paymentInProgress, isFalse);
-          expect(expense.isPaidFor, isTrue);
-      });
-    });
-
 
     test("can be assigned to a group", () {
       var groupMembers = [

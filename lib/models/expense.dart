@@ -28,22 +28,10 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
-  bool get isPaidFor => assignees
-      .every((assignee) => assignee.uid == author.uid || assignee.paid);
+  bool get completed =>
+      items.isNotEmpty && items.every((item) => item.completed);
 
-  bool get isReadyToBePaidFor =>
-      !isPaidFor && items.every((item) => item.completed);
-
-  bool get paymentInProgress =>
-      !isPaidFor && assignees.any((assignee) => assignee.paid);
-
-  bool get canReceiveAssignees => assignees.length == 1 || paidAssignees == 0;
-
-  int get paidAssignees => assignees.fold(
-        0,
-        (previousValue, assignee) =>
-            previousValue + (isPaidBy(assignee.uid) ? 1 : 0),
-      );
+  bool get canReceiveAssignees => assignees.length == 1 || !completed;
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -55,14 +43,6 @@ class Expense {
 
   bool isAuthoredBy(String uid) {
     return this.author.uid == uid;
-  }
-
-  bool isPaidBy(String uid) {
-    return assignees.firstWhere((assignee) => assignee.uid == uid).paid;
-  }
-
-  void pay(String uid) {
-    assignees.firstWhere((assignee) => assignee.uid == uid).paid = true;
   }
 
   int get definedAssignees => assignees.fold(
@@ -133,7 +113,7 @@ class Expense {
   /// Total for user for an unmarked expence.
   /// All but the [Denied] expenses count.
   double getPotentialTotalForUser(String uid) {
-    if (!this.hasAssignee(uid) || this.isReadyToBePaidFor) return 0;
+    if (!this.hasAssignee(uid) || this.completed) return 0;
 
     return items.fold<double>(
       0,

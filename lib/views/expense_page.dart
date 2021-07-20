@@ -4,7 +4,9 @@ import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/services/firestore.dart';
+import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/item_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
@@ -27,6 +29,9 @@ class _ExpensePageState extends State<ExpensePage> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
+  GroupViewModel get groupVm =>
+      Provider.of<GroupViewModel>(context, listen: false);
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Expense>(
@@ -43,8 +48,8 @@ class _ExpensePageState extends State<ExpensePage> {
 
           return PageScaffold(
             title: loading ? 'Loading...' : expense.name,
-            onFabPressed: !loading && expense.isAuthoredBy(authVm.user.uid)
-                ? handleCreateItem
+            onFabPressed: !loading && expense.isAuthoredBy(authVm.user.uid) && !expense.completed
+                ? () => handleCreateItem(expense)
                 : null,
             child: loading
                 ? Text("Loading...")
@@ -72,8 +77,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               child: Container(
                                 padding: EdgeInsets.all(8),
                                 color: expense.isMarkedBy(authVm.user.uid) &&
-                                        !expense.isReadyToBePaidFor &&
-                                        !expense.isPaidFor
+                                        !expense.completed
                                     ? Colors.yellow[300]
                                     : null,
                                 child: Text(
@@ -85,24 +89,11 @@ class _ExpensePageState extends State<ExpensePage> {
                             Expanded(
                               child: Container(
                                 padding: EdgeInsets.all(8),
-                                color: expense.isReadyToBePaidFor &&
-                                        !expense.isPaidBy(authVm.user.uid)
-                                    ? Colors.green[200]
-                                    : null,
-                                child: Text(
-                                  'Ready to be paid for',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                color: expense.isPaidBy(authVm.user.uid)
+                                color: expense.completed
                                     ? Colors.grey[400]
                                     : null,
                                 child: Text(
-                                  'Paid',
+                                  'Completed',
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -125,15 +116,6 @@ class _ExpensePageState extends State<ExpensePage> {
                                 )
                               ],
                             ),
-                            Row(
-                              children: [
-                                Text("Paid: "),
-                                Icon(Icons.person),
-                                Text(
-                                  "${expense.paidAssignees}/${expense.assignees.length - 1}",
-                                )
-                              ],
-                            )
                           ],
                         ),
                       ),
@@ -148,37 +130,45 @@ class _ExpensePageState extends State<ExpensePage> {
                             return Dismissible(
                               key: Key(item.hashCode.toString()),
                               onDismissed: (_) async {
-                                if (expense.paymentInProgress) return;
+                                if (expense.completed) return;
 
-                                await Firestore.instance
-                                    .updateExpense(expense.id, (expense) {
-                                  expense.items.removeAt(index);
-                                });
+                                expense.items.removeAt(index);
+                                await Firestore.instance.updateExpense(expense);
                               },
                               direction: DismissDirection.startToEnd,
                               background: DismissBackground(),
                               child: ItemListItem(
                                 item: item,
                                 onConfirm: () async {
-                                  if (expense.paymentInProgress) return;
+                                  if (expense.completed) return;
+
+                                  expense.items[index].setAssigneeDecision(
+                                    this.authVm.user.uid,
+                                    ProductDecision.Confirmed,
+                                  );
                                   await Firestore.instance
-                                      .updateExpense(expense.id, (expense) {
-                                    expense.items[index].setAssigneeDecision(
-                                      this.authVm.user.uid,
-                                      ProductDecision.Confirmed,
+                                      .updateExpense(expense);
+                                  if (expense.completed) {
+                                    snackbarCatch(
+                                      context,
+                                      () async {
+                                        groupVm.updateBalance(expense);
+                                        await Firestore.instance.saveGroup(groupVm.group);
+                                      },
+                                      successMessage:
+                                          "The expense is now complete. Participants' balances updated.",
                                     );
-                                  });
+                                  }
                                 },
                                 onDeny: () async {
-                                  if (expense.paymentInProgress) return;
+                                  if (expense.completed) return;
 
+                                  expense.items[index].setAssigneeDecision(
+                                    this.authVm.user.uid,
+                                    ProductDecision.Denied,
+                                  );
                                   await Firestore.instance
-                                      .updateExpense(expense.id, (expense) {
-                                    expense.items[index].setAssigneeDecision(
-                                      this.authVm.user.uid,
-                                      ProductDecision.Denied,
-                                    );
-                                  });
+                                      .updateExpense(expense);
                                 },
                               ),
                             );
@@ -191,7 +181,7 @@ class _ExpensePageState extends State<ExpensePage> {
         });
   }
 
-  handleCreateItem() {
+  handleCreateItem(Expense expense) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -216,14 +206,14 @@ class _ExpensePageState extends State<ExpensePage> {
               ),
               focusNode: this.valueFocusNode,
               onSubmitted: (text) {
-                submitItem(context);
+                submitItem(context, expense);
               },
             ),
           ],
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => submitItem(context),
+            onPressed: () => submitItem(context, expense),
             child: Text("Save"),
           )
         ],
@@ -231,13 +221,12 @@ class _ExpensePageState extends State<ExpensePage> {
     );
   }
 
-  submitItem(BuildContext context) async {
-    await Firestore.instance.updateExpense(widget.expenseId, (expense) {
-      expense.addItem(Item(
-        name: newItemNameController.text,
-        value: double.parse(newItemValueController.text),
-      ));
-    });
+  submitItem(BuildContext context, Expense expense) async {
+    expense.addItem(Item(
+      name: newItemNameController.text,
+      value: double.parse(newItemValueController.text),
+    ));
+    await Firestore.instance.updateExpense(expense);
     newItemNameController.clear();
     newItemValueController.clear();
     Navigator.of(context).pop();

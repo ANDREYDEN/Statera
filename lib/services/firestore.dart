@@ -87,17 +87,10 @@ class Firestore {
   }
 
   Future<void> updateExpense(
-      String? expenseId, Function(Expense) update) async {
-    await _firestore.runTransaction((transaction) async {
-      var docRef = expensesCollection.doc(expenseId);
-      var expenseSnap = await transaction.get(docRef);
-      Expense expense = Expense.fromFirestore(
-        expenseSnap.data() as Map<String, dynamic>,
-        expenseSnap.id,
-      );
-      update(expense);
-      transaction.set(docRef, expense.toFirestore());
-    });
+    Expense expense
+  ) async {
+      var docRef = expensesCollection.doc(expense.id);
+      expensesCollection.doc(docRef.id).set(expense.toFirestore());
   }
 
   Stream<Expense> listenForExpense(String? expenseId) {
@@ -143,7 +136,8 @@ class Firestore {
     String? groupId,
   ) {
     return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
-      var group = Group.fromFirestore(groupSnap.data() as Map<String, dynamic>, id: groupSnap.id);
+      var group = Group.fromFirestore(groupSnap.data() as Map<String, dynamic>,
+          id: groupSnap.id);
       return group.extendedBalance(consumerUid);
     });
   }

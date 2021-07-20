@@ -11,10 +11,9 @@ class ExpenseListItem extends StatelessWidget {
 
   Color? getCardColor(String uid) {
     if (this.expense.isAuthoredBy(uid)) {
-      if (this.expense.isPaidFor) return Colors.grey[400];
+      if (this.expense.completed) return Colors.grey[400];
     }
-    if (this.expense.isPaidBy(uid)) return Colors.grey[400];
-    if (this.expense.isReadyToBePaidFor) return Colors.green[200];
+    if (this.expense.completed) return Colors.grey[400];
     if (!this.expense.isMarkedBy(uid)) return Colors.red[200];
     return Colors.yellow[300];
   }

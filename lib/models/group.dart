@@ -76,7 +76,7 @@ class Group {
         );
   }
 
-  void payOffBalance(String payerUid, String receiverUid, double value) {
+  void payOffBalance({required String payerUid, required String receiverUid, required double value}) {
     if (this.members.every((member) => member.uid != payerUid)) {
       throw new Exception("User with id $payerUid is not a member of group $name");
     }

@@ -92,11 +92,8 @@ class _ExpenseListState extends State<ExpenseList> {
             if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
             if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
 
-            if (!firstExpense.isPaidBy(authVm.user.uid)) return -1;
-            if (!secondExpense.isPaidBy(authVm.user.uid)) return 1;
-
-            if (firstExpense.isReadyToBePaidFor) return -1;
-            if (secondExpense.isReadyToBePaidFor) return 1;
+            if (firstExpense.completed) return -1;
+            if (secondExpense.completed) return 1;
 
             return 0;
           });
@@ -108,7 +105,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   itemBuilder: (context, index) {
                     var expense = expenses[index];
 
-                    return expense.isAuthoredBy(authVm.user.uid)
+                    return expense.isAuthoredBy(authVm.user.uid) && !expense.completed
                         ? Dismissible(
                             key: Key(expense.id!),
                             confirmDismiss: (dir) => showDialog<bool>(

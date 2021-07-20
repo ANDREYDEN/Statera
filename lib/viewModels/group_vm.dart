@@ -17,4 +17,16 @@ class GroupViewModel {
   set group(Group value) {
     _group = value;
   }
+
+  void updateBalance(Expense expense) {
+    expense.assignees
+        .where((assignee) => assignee.uid != expense.author.uid)
+        .forEach((assignee) {
+      this.group.payOffBalance(
+            payerUid: expense.author.uid,
+            receiverUid: assignee.uid,
+            value: expense.getConfirmedTotalForUser(assignee.uid),
+          );
+    });
+  }
 }

@@ -1,10 +1,8 @@
 class Assignee {
   late String uid;
-  bool paid = false;
 
   Assignee({
     required this.uid,
-    this.paid = false,
   });
 
   Assignee.fake({ String? uid }) {
@@ -14,14 +12,12 @@ class Assignee {
   Map<String, dynamic> toFirestore() {
     return {
       'uid': uid,
-      'paid': paid,
     };
   }
 
   factory Assignee.fromFirestore(Map<String, dynamic> map) {
     return Assignee(
       uid: map['uid'],
-      paid: map['paid'],
     );
   }
 
@@ -30,10 +26,9 @@ class Assignee {
     if (identical(this, other)) return true;
   
     return other is Assignee &&
-      other.uid == uid &&
-      other.paid == paid;
+      other.uid == uid;
   }
 
   @override
-  int get hashCode => uid.hashCode ^ paid.hashCode;
+  int get hashCode => uid.hashCode;
 }
