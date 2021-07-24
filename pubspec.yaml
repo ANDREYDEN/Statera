@@ -16,7 +16,7 @@ scripts:
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
   deploy-web: firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
-  emulate: firebase emulators:start
+  emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start
 
 dependencies:
   flutter:
