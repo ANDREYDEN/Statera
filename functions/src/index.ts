@@ -2,19 +2,31 @@ import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
 import "firebase-functions";
 
-export const quickstart = functions.https.onRequest(
+export const getReceiptDataTest = functions.https.onRequest(
   async (request, response) => {
-    if (!request.query.receiptUrl) {
+    const receiptUrl = request.query.receiptUrl;
+    if (!receiptUrl) {
       response.status(400).send("Parameter receiptUrl is required");
     }
-    // Creates a client
-    const client = new vision.ImageAnnotatorClient();
 
-    // Performs label detection on the image file
-    const [result] = await client.textDetection(
-      request.query.receiptUrl as string
-    );
-    const labels = result.textAnnotations;
-    response.send(labels?.map((label) => label.description));
+    const result = await analyzeReceipt(receiptUrl as string);
+    response.send(result);
   }
 );
+
+export const getReceiptData = functions.https.onCall(async (data, context) => {
+  if (!data.receiptUrl) {
+    throw Error("The parameter receiptUrl is required.");
+  }
+
+  return analyzeReceipt(data.receiptUrl);
+});
+
+async function analyzeReceipt(receiptUrl: string): Promise<string[]> {
+  const client = new vision.ImageAnnotatorClient();
+
+  const [result] = await client.textDetection(receiptUrl);
+  const labels = result.textAnnotations ?? [];
+  
+  return labels.map((label) => label.description ?? 'UNRECOGNIZABLE');
+}
