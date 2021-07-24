@@ -14,6 +14,9 @@ scripts:
   build: pub run build_runner build --delete-conflicting-outputs
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
+  deploy-web: firebase deploy --only hosting
+  deploy-functions: firebase deploy --only functions
+  emulate: firebase emulators:start
 
 dependencies:
   flutter:
