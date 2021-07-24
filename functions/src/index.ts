@@ -22,11 +22,37 @@ export const getReceiptData = functions.https.onCall(async (data, context) => {
   return analyzeReceipt(data.receiptUrl);
 });
 
-async function analyzeReceipt(receiptUrl: string): Promise<string[]> {
+async function analyzeReceipt(receiptUrl: string): Promise<any> {
   const client = new vision.ImageAnnotatorClient();
 
   const [result] = await client.textDetection(receiptUrl);
   const labels = result.textAnnotations ?? [];
   
-  return labels.map((label) => label.description ?? 'UNRECOGNIZABLE');
+  const lines: Map<number, any[]> = new Map();
+
+  labels.forEach(label => {
+    const THRESHOLD = 15;
+    const labelHeight = baselineHeight(label);
+    
+    let similarHeight = labelHeight;
+    for (const height of lines.keys()) {
+      if (Math.abs(labelHeight - height) < THRESHOLD) {
+        similarHeight = height;
+      }
+    }
+
+    console.log(similarHeight);
+    
+
+    const previousValue = lines.has(similarHeight) ? lines.get(similarHeight)! : [];
+    lines.set(similarHeight, [...previousValue, label.description]);
+  })
+  
+  return Array.from(lines.values());
+}
+
+function baselineHeight(label: any): number {
+  const corners = label.boundingPoly.vertices;
+  const sortedCorners = corners.sort((corner: any, otherCorner: any) => otherCorner.y - corner.y);
+  return (sortedCorners[0].y + sortedCorners[1].y) / 2;
 }
