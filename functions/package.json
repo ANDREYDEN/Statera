@@ -7,7 +7,9 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "emulate": "export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && firebase emulators:start",
+    "listen-emulate": "npm run build -- --watch & npm run emulate"
   },
   "engines": {
     "node": "12"
