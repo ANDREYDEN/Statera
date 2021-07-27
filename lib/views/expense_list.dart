@@ -5,6 +5,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
@@ -19,6 +20,11 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   var newExpenseNameController = TextEditingController();
+  List<String> _filters = [
+    "Not Marked",
+    "Pending",
+    "Completed"
+  ];
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -36,6 +42,34 @@ class _ExpenseListState extends State<ExpenseList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Row(
+          children: [
+            Flexible(
+              child: CustomFilterChip(
+                label: "Not Marked",
+                color: Colors.red[200]!,
+                filtersList: _filters,
+                onSelected: (selected) => setState(() => {}),
+              ),
+            ),
+            Flexible(
+              child: CustomFilterChip(
+                label: "Pending",
+                color: Colors.yellow[200]!,
+                filtersList: _filters,
+                onSelected: (selected) => setState(() => {}),
+              ),
+            ),
+            Flexible(
+              child: CustomFilterChip(
+                label: "Completed",
+                color: Colors.grey[400]!,
+                filtersList: _filters,
+                onSelected: (selected) => setState(() => {}),
+              ),
+            ),
+          ],
+        ),
         Expanded(child: buildExpensesList()),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -98,6 +132,25 @@ class _ExpenseListState extends State<ExpenseList> {
             return 0;
           });
 
+          expenses = expenses.where((expense) {
+            if (_filters.contains("Not Marked") &&
+                !expense.isMarkedBy(authVm.user.uid)) {
+              return true;
+            }
+
+            if (_filters.contains("Pending") &&
+                expense.isMarkedBy(authVm.user.uid) &&
+                !expense.completed) {
+              return true;
+            }
+
+            if (_filters.contains("Completed") && expense.completed) {
+              return true;
+            }
+
+            return false;
+          }).toList();
+
           return expenses.isEmpty
               ? Text("No expenses yet...")
               : ListView.builder(
@@ -105,15 +158,15 @@ class _ExpenseListState extends State<ExpenseList> {
                   itemBuilder: (context, index) {
                     var expense = expenses[index];
 
-                    return expense.isAuthoredBy(authVm.user.uid) && !expense.completed
+                    return expense.isAuthoredBy(authVm.user.uid) &&
+                            !expense.completed
                         ? Dismissible(
                             key: Key(expense.id!),
                             confirmDismiss: (dir) => showDialog<bool>(
                               context: context,
                               builder: (context) => OKCancelDialog(
-                                text:
-                                    "Are you sure you want to delete this expense and all of its items?"
-                              ),
+                                  text:
+                                      "Are you sure you want to delete this expense and all of its items?"),
                             ),
                             onDismissed: (_) {
                               Firestore.instance.deleteExpense(expense);

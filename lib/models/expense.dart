@@ -35,10 +35,11 @@ class Expense {
 
   bool isMarkedBy(String uid) {
     return items.fold(
-        true,
-        (previousValue, item) =>
-            previousValue &&
-            item.assigneeDecision(uid) != ProductDecision.Undefined);
+      true,
+      (previousValue, item) =>
+          previousValue &&
+          item.assigneeDecision(uid) != ProductDecision.Undefined,
+    );
   }
 
   bool isAuthoredBy(String uid) {
