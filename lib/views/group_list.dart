@@ -23,6 +23,7 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   TextEditingController groupNameController = TextEditingController();
   TextEditingController joinGroupCodeController = TextEditingController();
+  String inputText = "";
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -159,6 +160,11 @@ class _GroupListState extends State<GroupList> {
         content: Column(
           children: [
             TextField(
+              onChanged: (value) {
+                setState(() {
+                  inputText = value;
+                });
+              },
               controller: groupNameController,
               decoration: InputDecoration(labelText: "Group name"),
             ),
@@ -167,6 +173,8 @@ class _GroupListState extends State<GroupList> {
         actions: [
           ElevatedButton(
             onPressed: () async {
+              if (inputText == '') return;
+
               await action();
               Navigator.of(context).pop();
             },
