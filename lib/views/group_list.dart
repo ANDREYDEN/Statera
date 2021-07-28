@@ -7,6 +7,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
@@ -23,7 +24,6 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   TextEditingController groupNameController = TextEditingController();
   TextEditingController joinGroupCodeController = TextEditingController();
-  String inputText = "";
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -154,34 +154,11 @@ class _GroupListState extends State<GroupList> {
     required Future Function() action,
   }) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          children: [
-            TextField(
-              onChanged: (value) {
-                setState(() {
-                  inputText = value;
-                });
-              },
+        context: context,
+        builder: (context) => CRUDDialog(
               controller: groupNameController,
-              decoration: InputDecoration(labelText: "Group name"),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              if (inputText == '') return;
-
-              await action();
-              Navigator.of(context).pop();
-            },
-            child: Text("Save"),
-          )
-        ],
-      ),
-    );
+              title: title,
+              action: action,
+            ));
   }
 }
