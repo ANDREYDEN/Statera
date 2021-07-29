@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 class FieldData {
   String id;
   String label;
-  TextEditingController controller;
+  late TextEditingController controller;
+  TextInputType inputType;
 
   FieldData({
     required this.id,
     required this.label,
-    required this.controller,
-  });
+    TextEditingController? controller,
+    this.inputType = TextInputType.name
+  }) {
+    this.controller = controller ?? TextEditingController();
+  }
 }
 
 class CRUDDialog extends StatefulWidget {
@@ -50,6 +54,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
             .map(
               (field) => TextField(
                 controller: field.controller,
+                keyboardType: field.inputType,
                 decoration: InputDecoration(
                   labelText: field.label,
                   errorText: field.controller.text.isEmpty && this._dirty
