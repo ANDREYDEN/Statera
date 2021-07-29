@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:statera/models/assignee_decision.dart';
+import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/services/auth.dart';
@@ -19,6 +21,27 @@ class AuthenticationViewModel {
     if (_user == null)
       throw new Exception('Trying to get user when not signed in.');
     return _user!;
+  }
+
+  List<ExpenseStage> get expenseStages {
+    return [
+      ExpenseStage(
+        name: "Not Marked",
+        color: Colors.red[200]!,
+        test: (expense) => !expense.isMarkedBy(user.uid),
+      ),
+      ExpenseStage(
+        name: "Pending",
+        color: Colors.yellow[200]!,
+        test: (expense) =>
+            expense.isMarkedBy(user.uid) && !expense.completed,
+      ),
+      ExpenseStage(
+        name: "Completed",
+        color: Colors.grey[400]!,
+        test: (expense) => expense.completed,
+      ),
+    ];
   }
 
   bool hasConfirmed(Item item) {

@@ -20,11 +20,7 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   var newExpenseNameController = TextEditingController();
-  List<String> _filters = [
-    "Not Marked",
-    "Pending",
-    "Completed"
-  ];
+  List<String> _filters = [];
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -34,6 +30,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   void initState() {
+    _filters = authVm.expenseStages.map((stage) => stage.name).toList();
     super.initState();
   }
 
@@ -44,30 +41,15 @@ class _ExpenseListState extends State<ExpenseList> {
       children: [
         Row(
           children: [
-            Flexible(
-              child: CustomFilterChip(
-                label: "Not Marked",
-                color: Colors.red[200]!,
-                filtersList: _filters,
-                onSelected: (selected) => setState(() => {}),
-              ),
-            ),
-            Flexible(
-              child: CustomFilterChip(
-                label: "Pending",
-                color: Colors.yellow[200]!,
-                filtersList: _filters,
-                onSelected: (selected) => setState(() => {}),
-              ),
-            ),
-            Flexible(
-              child: CustomFilterChip(
-                label: "Completed",
-                color: Colors.grey[400]!,
-                filtersList: _filters,
-                onSelected: (selected) => setState(() => {}),
-              ),
-            ),
+            for (var stage in authVm.expenseStages)
+              Flexible(
+                child: CustomFilterChip(
+                  label: stage.name,
+                  color: stage.color,
+                  filtersList: _filters,
+                  onSelected: (selected) => setState(() => {}),
+                ),
+              )
           ],
         ),
         Expanded(child: buildExpensesList()),
@@ -123,33 +105,22 @@ class _ExpenseListState extends State<ExpenseList> {
             .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
         builder: (context, expenses) {
           expenses.sort((firstExpense, secondExpense) {
-            if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
-            if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
-
-            if (firstExpense.completed) return -1;
-            if (secondExpense.completed) return 1;
+            for (var stage in authVm.expenseStages) {
+              if (stage.test(firstExpense)) return -1;
+              if (stage.test(secondExpense)) return 1;
+            }
 
             return 0;
           });
 
-          expenses = expenses.where((expense) {
-            if (_filters.contains("Not Marked") &&
-                !expense.isMarkedBy(authVm.user.uid)) {
-              return true;
-            }
-
-            if (_filters.contains("Pending") &&
-                expense.isMarkedBy(authVm.user.uid) &&
-                !expense.completed) {
-              return true;
-            }
-
-            if (_filters.contains("Completed") && expense.completed) {
-              return true;
-            }
-
-            return false;
-          }).toList();
+          expenses = expenses
+              .where(
+                (expense) => authVm.expenseStages.any(
+                  (stage) =>
+                      _filters.contains(stage.name) && stage.test(expense),
+                ),
+              )
+              .toList();
 
           return expenses.isEmpty
               ? Text("No expenses yet...")

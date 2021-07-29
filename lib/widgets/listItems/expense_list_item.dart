@@ -9,19 +9,17 @@ class ExpenseListItem extends StatelessWidget {
   final Expense expense;
   const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
 
-  Color? getCardColor(String uid) {
-    if (this.expense.isAuthoredBy(uid)) {
-      if (this.expense.completed) return Colors.grey[400];
-    }
-    if (this.expense.completed) return Colors.grey[400];
-    if (!this.expense.isMarkedBy(uid)) return Colors.red[200];
-    return Colors.yellow[300];
-  }
-
   @override
   Widget build(BuildContext context) {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context);
+
+    Color? cardColor = Colors.blue[200];
+    authVm.expenseStages.forEach((stage) { 
+      if (stage.test(this.expense)) {
+        cardColor = stage.color;
+      }
+    });
 
     return GestureDetector(
       onTap: () {
@@ -33,7 +31,7 @@ class ExpenseListItem extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.all(5),
-        color: this.getCardColor(authVm.user.uid),
+        color: cardColor,
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Row(

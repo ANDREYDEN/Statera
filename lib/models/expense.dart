@@ -1,8 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
+
+class ExpenseStage {
+  String name;
+  Color color;
+  bool Function(Expense) test;
+
+  ExpenseStage({
+    required this.name,
+    required this.color,
+    required this.test,
+  });
+}
 
 class Expense {
   String? id = "";

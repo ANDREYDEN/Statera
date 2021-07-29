@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/services/firestore.dart';
@@ -59,46 +58,25 @@ class _ExpensePageState extends State<ExpensePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        height: 50,
+                        height: 40,
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                color: !expense.isMarkedBy(authVm.user.uid)
-                                    ? Colors.red[200]
-                                    : null,
-                                child: Text(
-                                  'Requires marking',
-                                  textAlign: TextAlign.center,
+                            for (var expenseStage in authVm.expenseStages)
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  color: expenseStage.test(expense)
+                                      ? expenseStage.color
+                                      : null,
+                                  child: Center(
+                                    child: Text(
+                                      expenseStage.name,
+                                      // textAlign: TextAlign.center,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                color: expense.isMarkedBy(authVm.user.uid) &&
-                                        !expense.completed
-                                    ? Colors.yellow[300]
-                                    : null,
-                                child: Text(
-                                  'Marked',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                color:
-                                    expense.completed ? Colors.grey[400] : null,
-                                child: Text(
-                                  'Completed',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
