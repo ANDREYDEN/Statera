@@ -154,12 +154,17 @@ class _ExpenseListState extends State<ExpenseList> {
       context: context,
       builder: (context) => CRUDDialog(
         title: "New Expense",
-        label: "Expense Name",
-        controller: expenseNameController,
-        action: () async {
+        fields: [
+          FieldData(
+            id: "expense_name",
+            label: "Expense Name",
+            controller: expenseNameController,
+          )
+        ],
+        onSubmit: (values) async {
           var newExpense = Expense(
             author: Author.fromUser(this.authVm.user),
-            name: expenseNameController.text,
+            name: values["expense_name"]!,
             groupId: groupVm.group.id,
           );
           await Firestore.instance.addExpenseToGroup(
@@ -178,10 +183,15 @@ class _ExpenseListState extends State<ExpenseList> {
       context: context,
       builder: (context) => CRUDDialog(
         title: "Edit Expense",
-        label: "Expense name",
-        controller: expenseNameController,
-        action: () async {
-          expense.name = expenseNameController.text;
+        fields: [
+          FieldData(
+            id: "expense_name",
+            label: "Expense name",
+            controller: expenseNameController,
+          )
+        ],
+        onSubmit: (values) async {
+          expense.name = values["expense_name"]!;
           await Firestore.instance.updateExpense(expense);
         },
       ),
