@@ -7,6 +7,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
 import 'package:statera/widgets/page_scaffold.dart';
@@ -55,7 +56,7 @@ class _GroupListState extends State<GroupList> {
                     child: Text("Sign Out"),
                   ),
                 ],
-          onFabPressed: user == null ? null : handleNewGroup,
+          onFabPressed: user == null ? null : handleCreateGroup,
           child: loading
               ? Text("Loading...")
               : user == null
@@ -127,53 +128,46 @@ class _GroupListState extends State<GroupList> {
         child: Text("Log In with Google"),
       );
 
-  void handleEditGroup(Group group) {
+  void handleEditGroup(Group group) async {
     groupNameController.text = group.name;
-    showGroupCRUDDialog(
-      title: "Edit Group",
-      action: () async {
-        group.name = groupNameController.text;
-        await Firestore.instance.saveGroup(group);
-      },
-    );
-  }
-
-  void handleNewGroup() {
-    showGroupCRUDDialog(
-      title: "New Group",
-      action: () async {
-        var newGroup = Group(name: groupNameController.text);
-        await authVm.createGroup(newGroup);
-      },
-    );
-  }
-
-  void showGroupCRUDDialog({
-    required String title,
-    required Future Function() action,
-  }) {
-    showDialog(
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Column(
-          children: [
-            TextField(
-              controller: groupNameController,
-              decoration: InputDecoration(labelText: "Group name"),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              await action();
-              Navigator.of(context).pop();
-            },
-            child: Text("Save"),
+      builder: (context) => CRUDDialog(
+        title: "Edit Group",
+        fields: [
+          FieldData(
+            id: "group_name",
+            label: "Group Name",
+            controller: groupNameController,
           )
         ],
+        onSubmit: (values) async {
+          group.name = values["group_name"]!;
+          await Firestore.instance.saveGroup(group);
+        },
       ),
     );
+    groupNameController.clear();
+  }
+
+  void handleCreateGroup() async {
+    await showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        title: "New Group",
+        fields: [
+          FieldData(
+            id: 'group_name',
+            label: "Group Name",
+            controller: groupNameController,
+          )
+        ],
+        onSubmit: (values) async {
+          var newGroup = Group(name: values["group_name"]!);
+          await authVm.createGroup(newGroup);
+        },
+      ),
+    );
+    groupNameController.clear();
   }
 }
