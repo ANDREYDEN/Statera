@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CRUDDialog extends StatefulWidget {
   final TextEditingController controller;
   final String title;
+  final String label;
   final Future Function() action;
 
   const CRUDDialog({
@@ -10,6 +11,7 @@ class CRUDDialog extends StatefulWidget {
     required this.controller,
     required this.title,
     required this.action,
+    required this.label,
   }) : super(key: key);
 
   @override
@@ -17,9 +19,13 @@ class CRUDDialog extends StatefulWidget {
 }
 
 class _CRUDDialogState extends State<CRUDDialog> {
+  bool _dirty = false;
+
   @override
   void initState() {
-    widget.controller.addListener(() => setState(() {}));
+    widget.controller.addListener(() => setState(() {
+          this._dirty = true;
+        }));
     super.initState();
   }
 
@@ -32,9 +38,10 @@ class _CRUDDialogState extends State<CRUDDialog> {
           TextField(
             controller: widget.controller,
             decoration: InputDecoration(
-              labelText: "Group name",
-              errorText:
-                  widget.controller.text.isEmpty ? "Can't be empty" : null,
+              labelText: widget.label,
+              errorText: widget.controller.text.isEmpty && this._dirty
+                  ? "Can't be empty"
+                  : null,
             ),
           ),
         ],
@@ -43,6 +50,9 @@ class _CRUDDialogState extends State<CRUDDialog> {
         ElevatedButton(
           onPressed: () async {
             if (widget.controller.text.isEmpty) {
+              setState(() {
+                this._dirty = true;
+              });
               return;
             }
 

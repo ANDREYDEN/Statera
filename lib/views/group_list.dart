@@ -133,8 +133,9 @@ class _GroupListState extends State<GroupList> {
     await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
-        controller: groupNameController,
         title: "Edit Group",
+        label: "Group Name",
+        controller: groupNameController,
         action: () async {
           group.name = groupNameController.text;
           await Firestore.instance.saveGroup(group);
@@ -148,8 +149,9 @@ class _GroupListState extends State<GroupList> {
     await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
-        controller: groupNameController,
         title: "New Group",
+        label: "Group Name",
+        controller: groupNameController,
         action: () async {
           var newGroup = Group(name: groupNameController.text);
           await authVm.createGroup(newGroup);

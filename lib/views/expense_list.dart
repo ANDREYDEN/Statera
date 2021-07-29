@@ -153,8 +153,9 @@ class _ExpenseListState extends State<ExpenseList> {
     await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
-        controller: expenseNameController,
         title: "New Expense",
+        label: "Expense Name",
+        controller: expenseNameController,
         action: () async {
           var newExpense = Expense(
             author: Author.fromUser(this.authVm.user),
@@ -176,8 +177,9 @@ class _ExpenseListState extends State<ExpenseList> {
     await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
-        controller: expenseNameController,
         title: "Edit Expense",
+        label: "Expense name",
+        controller: expenseNameController,
         action: () async {
           expense.name = expenseNameController.text;
           await Firestore.instance.updateExpense(expense);
