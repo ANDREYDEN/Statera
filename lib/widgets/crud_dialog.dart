@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class CRUDDialog extends StatefulWidget {
   final TextEditingController controller;
@@ -18,7 +17,11 @@ class CRUDDialog extends StatefulWidget {
 }
 
 class _CRUDDialogState extends State<CRUDDialog> {
-  String inputText = "";
+  @override
+  void initState() {
+    widget.controller.addListener(() => setState(() {}));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +30,11 @@ class _CRUDDialogState extends State<CRUDDialog> {
       content: Column(
         children: [
           TextField(
-            onChanged: (value) {
-              setState(() {
-                inputText = value;
-              });
-            },
             controller: widget.controller,
             decoration: InputDecoration(
               labelText: "Group name",
-              errorText: inputText == "" ? "Can't be empty" : null,
+              errorText:
+                  widget.controller.text.isEmpty ? "Can't be empty" : null,
             ),
           ),
         ],
@@ -43,11 +42,12 @@ class _CRUDDialogState extends State<CRUDDialog> {
       actions: [
         ElevatedButton(
           onPressed: () async {
-            if (inputText == '') {
+            if (widget.controller.text.isEmpty) {
               return;
             }
 
             await widget.action();
+            widget.controller.clear();
             Navigator.of(context).pop();
           },
           child: Text("Save"),

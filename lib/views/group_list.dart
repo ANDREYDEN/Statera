@@ -56,7 +56,7 @@ class _GroupListState extends State<GroupList> {
                     child: Text("Sign Out"),
                   ),
                 ],
-          onFabPressed: user == null ? null : handleNewGroup,
+          onFabPressed: user == null ? null : handleCreateGroup,
           child: loading
               ? Text("Loading...")
               : user == null
@@ -128,37 +128,34 @@ class _GroupListState extends State<GroupList> {
         child: Text("Log In with Google"),
       );
 
-  void handleEditGroup(Group group) {
+  void handleEditGroup(Group group) async {
     groupNameController.text = group.name;
-    showGroupCRUDDialog(
-      title: "Edit Group",
-      action: () async {
-        group.name = groupNameController.text;
-        await Firestore.instance.saveGroup(group);
-      },
+    await showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        controller: groupNameController,
+        title: "Edit Group",
+        action: () async {
+          group.name = groupNameController.text;
+          await Firestore.instance.saveGroup(group);
+        },
+      ),
     );
+    groupNameController.clear();
   }
 
-  void handleNewGroup() {
-    showGroupCRUDDialog(
-      title: "New Group",
-      action: () async {
-        var newGroup = Group(name: groupNameController.text);
-        await authVm.createGroup(newGroup);
-      },
+  void handleCreateGroup() async {
+    await showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        controller: groupNameController,
+        title: "New Group",
+        action: () async {
+          var newGroup = Group(name: groupNameController.text);
+          await authVm.createGroup(newGroup);
+        },
+      ),
     );
-  }
-
-  void showGroupCRUDDialog({
-    required String title,
-    required Future Function() action,
-  }) {
-    showDialog(
-        context: context,
-        builder: (context) => CRUDDialog(
-              controller: groupNameController,
-              title: title,
-              action: action,
-            ));
+    groupNameController.clear();
   }
 }

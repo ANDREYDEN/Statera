@@ -6,6 +6,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
+import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
@@ -19,12 +20,12 @@ class ExpenseList extends StatefulWidget {
 }
 
 class _ExpenseListState extends State<ExpenseList> {
-  var newExpenseNameController = TextEditingController();
   List<String> _filters = [
     "Not Marked",
     "Pending",
     "Completed"
   ];
+  var expenseNameController = TextEditingController();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -74,7 +75,7 @@ class _ExpenseListState extends State<ExpenseList> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
-            onPressed: handleNewExpense,
+            onPressed: handleCreateExpense,
             child: Icon(Icons.add, color: Colors.white),
           ),
         ),
@@ -82,55 +83,20 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  void handleNewExpense() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("New Expense"),
-        content: Column(
-          children: [
-            TextField(
-              controller: newExpenseNameController,
-              decoration: InputDecoration(labelText: "Expense name"),
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              var newExpense = Expense(
-                author: Author.fromUser(this.authVm.user),
-                name: newExpenseNameController.text,
-                groupId: groupVm.group.id,
-              );
-              await Firestore.instance.addExpenseToGroup(
-                newExpense,
-                groupVm.group.code,
-              );
-              newExpenseNameController.clear();
-              Navigator.of(context).pop();
-            },
-            child: Text("Save"),
-          )
-        ],
-      ),
-    );
-  }
-
   Widget buildExpensesList() {
     return CustomStreamBuilder<List<Expense>>(
-        stream: Firestore.instance
-            .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
-        builder: (context, expenses) {
-          expenses.sort((firstExpense, secondExpense) {
-            if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
-            if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
+      stream: Firestore.instance
+          .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
+      builder: (context, expenses) {
+        expenses.sort((firstExpense, secondExpense) {
+          if (!firstExpense.isMarkedBy(authVm.user.uid)) return -1;
+          if (!secondExpense.isMarkedBy(authVm.user.uid)) return 1;
 
-            if (firstExpense.completed) return -1;
-            if (secondExpense.completed) return 1;
+          if (firstExpense.completed) return -1;
+          if (secondExpense.completed) return 1;
 
-            return 0;
-          });
+          return 0;
+        });
 
           expenses = expenses.where((expense) {
             if (_filters.contains("Not Marked") &&
@@ -158,9 +124,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   itemBuilder: (context, index) {
                     var expense = expenses[index];
 
-                    return expense.isAuthoredBy(authVm.user.uid) &&
-                            !expense.completed
-                        ? Dismissible(
+                    return Dismissible(
                             key: Key(expense.id!),
                             confirmDismiss: (dir) => showDialog<bool>(
                               context: context,
@@ -171,13 +135,56 @@ class _ExpenseListState extends State<ExpenseList> {
                             onDismissed: (_) {
                               Firestore.instance.deleteExpense(expense);
                             },
-                            direction: DismissDirection.startToEnd,
-                            background: DismissBackground(),
-                            child: ExpenseListItem(expense: expense),
-                          )
-                        : ExpenseListItem(expense: expense);
+                            direction: expense.isAuthoredBy(authVm.user.uid) &&
+                            !expense.completed
+                        ? DismissDirection.startToEnd
+                        : DismissDirection.none,
+                    background: DismissBackground(),
+                    child: GestureDetector(
+                      onLongPress: () => handleEditExpense(expense),
+                      child: ExpenseListItem(expense: expense),
+                    ),);
                   },
                 );
         });
+  }
+  
+  void handleCreateExpense() async {
+    await showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        controller: expenseNameController,
+        title: "New Expense",
+        action: () async {
+          var newExpense = Expense(
+            author: Author.fromUser(this.authVm.user),
+            name: expenseNameController.text,
+            groupId: groupVm.group.id,
+          );
+          await Firestore.instance.addExpenseToGroup(
+            newExpense,
+            groupVm.group.code,
+          );
+        },
+      ),
+    );
+    expenseNameController.clear();
+  }
+
+  handleEditExpense(Expense expense) async {
+    expenseNameController.text = expense.name;
+    await showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        controller: expenseNameController,
+        title: "Edit Expense",
+        action: () async {
+          expense.name = expenseNameController.text;
+          await Firestore.instance.updateExpense(expense);
+        },
+      ),
+    );
+
+    expenseNameController.clear();
   }
 }
