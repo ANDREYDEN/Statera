@@ -22,9 +22,10 @@ class GroupHome extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Invite people to the group with the code:",
+                "Invite people with the code:",
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               TextButton(
@@ -36,7 +37,6 @@ class GroupHome extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.copy),
                     Text(
                       groupVm.group.code.toString(),
                       style: TextStyle(
@@ -44,6 +44,7 @@ class GroupHome extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
+                    Icon(Icons.copy),
                   ],
                 ),
               )
