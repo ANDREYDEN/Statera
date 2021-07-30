@@ -5,7 +5,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/widgets/OptionallyDismissible.dart';
+import 'package:statera/widgets/optionally_dismissible.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';

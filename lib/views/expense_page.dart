@@ -6,7 +6,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/widgets/OptionallyDismissible.dart';
+import 'package:statera/widgets/optionally_dismissible.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/list_empty.dart';
