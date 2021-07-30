@@ -6,6 +6,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/OptionallyDismissible.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/list_empty.dart';
@@ -97,17 +98,18 @@ class _ExpensePageState extends State<ExpensePage> {
                   Divider(thickness: 1),
                   Flexible(
                     child: expense.items.length == 0
-                        ? ListEmpty(
-                            text: 'Add items to this expense'
-                          )
+                        ? ListEmpty(text: 'Add items to this expense')
                         : ListView.builder(
                             itemCount: expense.items.length,
                             itemBuilder: (context, index) {
                               var item = expense.items[index];
 
                               // TODO: make this conditionally dismissable if finalized
-                              return Dismissible(
+                              return OptionallyDismissible(
                                 key: Key(item.hashCode.toString()),
+                                isDismissible:
+                                    expense.isAuthoredBy(authVm.user.uid) &&
+                                        !expense.completed,
                                 onDismissed: (_) async {
                                   if (expense.completed) return;
 
@@ -115,8 +117,6 @@ class _ExpensePageState extends State<ExpensePage> {
                                   await Firestore.instance
                                       .updateExpense(expense);
                                 },
-                                direction: DismissDirection.startToEnd,
-                                background: DismissBackground(),
                                 child: ItemListItem(
                                   item: item,
                                   onDecisionTaken: (decision) async {

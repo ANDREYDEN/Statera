@@ -5,6 +5,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/widgets/OptionallyDismissible.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
@@ -99,22 +100,15 @@ class _ExpenseListState extends State<ExpenseList> {
                 itemBuilder: (context, index) {
                   var expense = expenses[index];
 
-                  return Dismissible(
+                  return OptionallyDismissible(
                     key: Key(expense.id!),
-                    confirmDismiss: (dir) => showDialog<bool>(
-                      context: context,
-                      builder: (context) => OKCancelDialog(
-                          text:
-                              "Are you sure you want to delete this expense and all of its items?"),
-                    ),
+                    isDismissible: expense.isAuthoredBy(authVm.user.uid) &&
+                        !expense.completed,
+                    confirmation:
+                        "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {
                       Firestore.instance.deleteExpense(expense);
                     },
-                    direction: expense.isAuthoredBy(authVm.user.uid) &&
-                            !expense.completed
-                        ? DismissDirection.startToEnd
-                        : DismissDirection.none,
-                    background: DismissBackground(),
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
                       child: ExpenseListItem(expense: expense),
