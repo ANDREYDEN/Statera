@@ -59,6 +59,10 @@ class _ExpenseListState extends State<ExpenseList> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             onPressed: handleCreateExpense,
+            style: ElevatedButton.styleFrom(
+              shape: CircleBorder(),
+              padding: EdgeInsets.all(18),
+            ),
             child: Icon(Icons.add, color: Colors.white),
           ),
         ),
@@ -68,46 +72,45 @@ class _ExpenseListState extends State<ExpenseList> {
 
   Widget buildExpensesList() {
     return CustomStreamBuilder<List<Expense>>(
-        stream: Firestore.instance
-            .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
-        builder: (context, expenses) {
-          expenses.sort((firstExpense, secondExpense) {
-            for (var stage in authVm.expenseStages) {
-              if (stage.test(firstExpense)) return -1;
-              if (stage.test(secondExpense)) return 1;
-            }
+      stream: Firestore.instance
+          .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
+      builder: (context, expenses) {
+        expenses.sort((firstExpense, secondExpense) {
+          for (var stage in authVm.expenseStages) {
+            if (stage.test(firstExpense)) return -1;
+            if (stage.test(secondExpense)) return 1;
+          }
 
           return 0;
         });
 
-          expenses = expenses
-              .where(
-                (expense) => authVm.expenseStages.any(
-                  (stage) =>
-                      _filters.contains(stage.name) && stage.test(expense),
-                ),
-              )
-              .toList();
+        expenses = expenses
+            .where(
+              (expense) => authVm.expenseStages.any(
+                (stage) => _filters.contains(stage.name) && stage.test(expense),
+              ),
+            )
+            .toList();
 
-          return expenses.isEmpty
-              ? ListEmpty(text: 'No Expenses')
-              : ListView.builder(
-                  itemCount: expenses.length,
-                  itemBuilder: (context, index) {
-                    var expense = expenses[index];
+        return expenses.isEmpty
+            ? ListEmpty(text: "Start by adding an expense")
+            : ListView.builder(
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  var expense = expenses[index];
 
-                    return Dismissible(
-                            key: Key(expense.id!),
-                            confirmDismiss: (dir) => showDialog<bool>(
-                              context: context,
-                              builder: (context) => OKCancelDialog(
-                                  text:
-                                      "Are you sure you want to delete this expense and all of its items?"),
-                            ),
-                            onDismissed: (_) {
-                              Firestore.instance.deleteExpense(expense);
-                            },
-                            direction: expense.isAuthoredBy(authVm.user.uid) &&
+                  return Dismissible(
+                    key: Key(expense.id!),
+                    confirmDismiss: (dir) => showDialog<bool>(
+                      context: context,
+                      builder: (context) => OKCancelDialog(
+                          text:
+                              "Are you sure you want to delete this expense and all of its items?"),
+                    ),
+                    onDismissed: (_) {
+                      Firestore.instance.deleteExpense(expense);
+                    },
+                    direction: expense.isAuthoredBy(authVm.user.uid) &&
                             !expense.completed
                         ? DismissDirection.startToEnd
                         : DismissDirection.none,
@@ -115,12 +118,14 @@ class _ExpenseListState extends State<ExpenseList> {
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
                       child: ExpenseListItem(expense: expense),
-                    ),);
-                  },
-                );
-        });
+                    ),
+                  );
+                },
+              );
+      },
+    );
   }
-  
+
   void handleCreateExpense() async {
     await showDialog(
       context: context,

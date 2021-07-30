@@ -98,11 +98,7 @@ class _ExpensePageState extends State<ExpensePage> {
                   Flexible(
                     child: expense.items.length == 0
                         ? ListEmpty(
-                            text: 'No Items',
-                            icon: Icon(
-                              Icons.hourglass_empty,
-                              color: Colors.grey[400],
-                            ),
+                            text: 'Add items to this expense'
                           )
                         : ListView.builder(
                             itemCount: expense.items.length,

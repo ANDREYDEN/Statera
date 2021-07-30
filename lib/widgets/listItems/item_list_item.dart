@@ -36,40 +36,31 @@ class ItemListItem extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          VerticalDivider(
-            thickness: 1,
-            indent: 10,
-            endIndent: 10,
-          ),
+          VerticalDivider(thickness: 1, indent: 10, endIndent: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(
-                child: ElevatedButton(
-                  onPressed: () =>
-                      this.onDecisionTaken(ProductDecision.Confirmed),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    primary: authVm.hasConfirmed(item)
-                        ? Colors.green[400]
-                        : Colors.grey[300],
-                  ),
-                  child: Icon(Icons.check, color: Colors.white),
+              ElevatedButton(
+                onPressed: () =>
+                    this.onDecisionTaken(ProductDecision.Confirmed),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  primary: authVm.hasConfirmed(item)
+                      ? Colors.green[400]
+                      : Colors.grey[300],
                 ),
+                child: Icon(Icons.check, color: Colors.white),
               ),
-            
-              Flexible(
-                child: ElevatedButton(
-                  onPressed: () => this.onDecisionTaken(ProductDecision.Denied),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    primary: authVm.hasDenied(item)
-                        ? Colors.red[400]
-                        : Colors.grey[300],
-                    padding: EdgeInsets.all(0),
-                  ),
-                  child: Icon(Icons.close, color: Colors.white),
+              ElevatedButton(
+                onPressed: () => this.onDecisionTaken(ProductDecision.Denied),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  primary: authVm.hasDenied(item)
+                      ? Colors.red[400]
+                      : Colors.grey[300],
+                  padding: EdgeInsets.all(0),
                 ),
+                child: Icon(Icons.close, color: Colors.white),
               ),
             ],
           )

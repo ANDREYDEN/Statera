@@ -32,7 +32,7 @@ class AuthenticationViewModel {
       ),
       ExpenseStage(
         name: "Pending",
-        color: Colors.yellow[200]!,
+        color: Colors.yellow[300]!,
         test: (expense) =>
             expense.isMarkedBy(user.uid) && !expense.completed,
       ),
