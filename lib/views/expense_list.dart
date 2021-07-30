@@ -55,16 +55,28 @@ class _ExpenseListState extends State<ExpenseList> {
               )
           ],
         ),
-        Expanded(child: buildExpensesList()),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: handleCreateExpense,
-            style: ElevatedButton.styleFrom(
-              shape: CircleBorder(),
-              padding: EdgeInsets.all(18),
-            ),
-            child: Icon(Icons.add, color: Colors.white),
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.center,
+            children: [
+              buildExpensesList(),
+              Positioned(
+                bottom: 10,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: handleCreateExpense,
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(18),
+                      elevation: 5,
+                    ),
+                    child: Icon(Icons.add, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
