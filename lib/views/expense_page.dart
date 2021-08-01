@@ -54,18 +54,25 @@ class _ExpensePageState extends State<ExpensePage> {
           child: loading
               ? Text("Loading...")
               : Column(mainAxisSize: MainAxisSize.min, children: [
-                  SizedBox(
-                    height: 40,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (var expenseStage in authVm.expenseStages)
-                          Expanded(
+                  Row(
+                    children: [
+                      for (var expenseStage in authVm.expenseStages)
+                        Expanded(
+                          child: Opacity(
+                            opacity: expenseStage.test(expense) ? 1 : 0.7,
                             child: Container(
-                              padding: EdgeInsets.all(8),
-                              color: expenseStage.test(expense)
-                                  ? expenseStage.color
-                                  : null,
+                              margin: const EdgeInsets.all(8.0),
+                              height: 30,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(
+                                  color: expenseStage.color,
+                                  width: 2,
+                                ),
+                                color: expenseStage.test(expense)
+                                    ? expenseStage.color
+                                    : null,
+                              ),
                               child: Center(
                                 child: Text(
                                   expenseStage.name,
@@ -74,8 +81,8 @@ class _ExpensePageState extends State<ExpensePage> {
                               ),
                             ),
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
