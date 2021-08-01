@@ -55,9 +55,9 @@ class Expense {
     );
   }
 
-  bool isAuthoredBy(String uid) {
-    return this.author.uid == uid;
-  }
+  bool isAuthoredBy(String uid) => this.author.uid == uid;
+
+  bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.completed;
 
   int get definedAssignees => assignees.fold(
         0,
@@ -71,6 +71,11 @@ class Expense {
         .map((assignee) => AssigneeDecision(uid: assignee.uid))
         .toList();
     this.items.add(newItem);
+  }
+
+  void updateItem(Item newItem) {
+    var itemIdx = this.items.indexWhere((item) => item.id == newItem.id);
+    this.items[itemIdx] = newItem;
   }
 
   addAssignee(Assignee newAssignee) {
@@ -140,6 +145,10 @@ class Expense {
     );
   }
 
+  bool hasAssignee(String uid) {
+    return this.assignees.any((assignee) => assignee.uid == uid);
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       "groupId": groupId,
@@ -169,9 +178,5 @@ class Expense {
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
-  }
-
-  hasAssignee(String uid) {
-    return this.assignees.any((assignee) => assignee.uid == uid);
   }
 }

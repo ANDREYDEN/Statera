@@ -33,6 +33,7 @@ dependencies:
   mockito: ^5.0.10
   build_runner: ^2.0.6
   badges: ^2.0.1
+  uuid: ^3.0.4
   
 dev_dependencies:
   flutter_test:

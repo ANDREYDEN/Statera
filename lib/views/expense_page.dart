@@ -108,8 +108,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               return OptionallyDismissible(
                                 key: Key(item.hashCode.toString()),
                                 isDismissible:
-                                    expense.isAuthoredBy(authVm.user.uid) &&
-                                        !expense.completed,
+                                    expense.canBeUpdatedBy(authVm.user.uid),
                                 onDismissed: (_) async {
                                   if (expense.completed) return;
 
@@ -117,30 +116,34 @@ class _ExpensePageState extends State<ExpensePage> {
                                   await Firestore.instance
                                       .updateExpense(expense);
                                 },
-                                child: ItemListItem(
-                                  item: item,
-                                  onDecisionTaken: (decision) async {
-                                    if (expense.completed) return;
+                                child: GestureDetector(
+                                  onLongPress: () =>
+                                      handleEditItem(expense, item),
+                                  child: ItemListItem(
+                                    item: item,
+                                    onDecisionTaken: (decision) async {
+                                      if (expense.completed) return;
 
-                                    expense.items[index].setAssigneeDecision(
-                                      this.authVm.user.uid,
-                                      decision,
-                                    );
-                                    await Firestore.instance
-                                        .updateExpense(expense);
-                                    if (expense.completed) {
-                                      snackbarCatch(
-                                        context,
-                                        () async {
-                                          groupVm.updateBalance(expense);
-                                          await Firestore.instance
-                                              .saveGroup(groupVm.group);
-                                        },
-                                        successMessage:
-                                            "The expense is now complete. Participants' balances updated.",
+                                      expense.items[index].setAssigneeDecision(
+                                        this.authVm.user.uid,
+                                        decision,
                                       );
-                                    }
-                                  },
+                                      await Firestore.instance
+                                          .updateExpense(expense);
+                                      if (expense.completed) {
+                                        snackbarCatch(
+                                          context,
+                                          () async {
+                                            groupVm.updateBalance(expense);
+                                            await Firestore.instance
+                                                .saveGroup(groupVm.group);
+                                          },
+                                          successMessage:
+                                              "The expense is now complete. Participants' balances updated.",
+                                        );
+                                      }
+                                    },
+                                  ),
                                 ),
                               );
                             },
@@ -170,6 +173,36 @@ class _ExpensePageState extends State<ExpensePage> {
             name: values["item_name"]!,
             value: double.parse(values["item_value"]!),
           ));
+          await Firestore.instance.updateExpense(expense);
+        },
+      ),
+    );
+  }
+
+  handleEditItem(Expense expense, Item item) {
+    if (!expense.canBeUpdatedBy(authVm.user.uid)) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        title: "Edit Item",
+        fields: [
+          FieldData(
+            id: "item_name",
+            label: "Item Name",
+            initialData: item.name,
+          ),
+          FieldData(
+            id: "item_value",
+            label: "Item Value",
+            initialData: item.value,
+            inputType: TextInputType.numberWithOptions(decimal: true),
+          ),
+        ],
+        onSubmit: (values) async {
+          item.name = values["item_name"]!;
+          item.value = double.parse(values["item_value"]!);
+          expense.updateItem(item);
           await Firestore.instance.updateExpense(expense);
         },
       ),
