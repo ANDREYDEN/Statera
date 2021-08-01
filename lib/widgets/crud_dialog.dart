@@ -5,13 +5,17 @@ class FieldData {
   String label;
   late TextEditingController controller;
   TextInputType inputType;
+  dynamic initialData;
 
-  FieldData(
-      {required this.id,
-      required this.label,
-      TextEditingController? controller,
-      this.inputType = TextInputType.name}) {
+  FieldData({
+    required this.id,
+    required this.label,
+    this.initialData,
+    TextEditingController? controller,
+    this.inputType = TextInputType.name,
+  }) {
     this.controller = controller ?? TextEditingController();
+    this.controller.text = initialData?.toString() ?? '';
   }
 }
 
@@ -54,28 +58,28 @@ class _CRUDDialogState extends State<CRUDDialog> {
   }
 
   Iterable<Widget> get textFields sync* {
-    var focusNodes = widget.fields.map((field) => FocusNode(debugLabel: field.id)).toList();
+    var focusNodes =
+        widget.fields.map((field) => FocusNode(debugLabel: field.id)).toList();
     for (var i = 0; i < widget.fields.length; i++) {
       var field = widget.fields[i];
       yield TextField(
-        autofocus: i == 0,
-        focusNode: focusNodes[i],
-        controller: field.controller,
-        keyboardType: field.inputType,
-        decoration: InputDecoration(
-          labelText: field.label,
-          errorText: field.controller.text.isEmpty && this._dirty
-              ? "Can't be empty"
-              : null,
-        ),
-        onSubmitted: (_) {
-          if (i == widget.fields.length - 1) {
-            submit();
-          } else {
-            focusNodes[i+1].requestFocus();
-          }
-        }
-      );
+          autofocus: i == 0,
+          focusNode: focusNodes[i],
+          controller: field.controller,
+          keyboardType: field.inputType,
+          decoration: InputDecoration(
+            labelText: field.label,
+            errorText: field.controller.text.isEmpty && this._dirty
+                ? "Can't be empty"
+                : null,
+          ),
+          onSubmitted: (_) {
+            if (i == widget.fields.length - 1) {
+              submit();
+            } else {
+              focusNodes[i + 1].requestFocus();
+            }
+          });
     }
   }
 

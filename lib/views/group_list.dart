@@ -10,6 +10,7 @@ import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/crud_dialog.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/listItems/group_list_item.dart';
+import 'package:statera/widgets/list_empty.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
 class GroupList extends StatefulWidget {
@@ -22,7 +23,6 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  TextEditingController groupNameController = TextEditingController();
   TextEditingController joinGroupCodeController = TextEditingController();
 
   AuthenticationViewModel get authVm =>
@@ -95,7 +95,7 @@ class _GroupListState extends State<GroupList> {
                                 .userGroupsStream(authVm.user.uid),
                             builder: (context, groups) {
                               return groups.isEmpty
-                                  ? Text("You don't have any groups yet...")
+                                  ? ListEmpty(text: "Join or create a group!")
                                   : ListView.builder(
                                       itemCount: groups.length,
                                       itemBuilder: (context, index) {
@@ -128,9 +128,8 @@ class _GroupListState extends State<GroupList> {
         child: Text("Log In with Google"),
       );
 
-  void handleEditGroup(Group group) async {
-    groupNameController.text = group.name;
-    await showDialog(
+  void handleEditGroup(Group group) {
+    showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: "Edit Group",
@@ -138,7 +137,7 @@ class _GroupListState extends State<GroupList> {
           FieldData(
             id: "group_name",
             label: "Group Name",
-            controller: groupNameController,
+            initialData: group.name,
           )
         ],
         onSubmit: (values) async {
@@ -147,11 +146,10 @@ class _GroupListState extends State<GroupList> {
         },
       ),
     );
-    groupNameController.clear();
   }
 
-  void handleCreateGroup() async {
-    await showDialog(
+  void handleCreateGroup() {
+    showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: "New Group",
@@ -159,7 +157,6 @@ class _GroupListState extends State<GroupList> {
           FieldData(
             id: 'group_name',
             label: "Group Name",
-            controller: groupNameController,
           )
         ],
         onSubmit: (values) async {
@@ -168,6 +165,5 @@ class _GroupListState extends State<GroupList> {
         },
       ),
     );
-    groupNameController.clear();
   }
 }

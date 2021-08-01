@@ -18,48 +18,54 @@ class ItemListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(child: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(item.name),
-              )),
-              Text(item.valueString),
-            ],
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(item.name),
+                )),
+                Text(item.valueString),
+              ],
+            ),
           ),
-        ),
-        SizedBox(width: 20),
-        Row(
-          children: [
-            Container(
-              color: authVm.hasConfirmed(item) ? Colors.green : Colors.white,
-              child: IconButton(
-                onPressed: () => this.onDecisionTaken(ProductDecision.Confirmed),
-                icon: Icon(
-                  Icons.check,
-                  color:
-                      authVm.hasConfirmed(item) ? Colors.white : Colors.black,
+          SizedBox(width: 10),
+          VerticalDivider(thickness: 1, indent: 10, endIndent: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () =>
+                    this.onDecisionTaken(ProductDecision.Confirmed),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  primary: authVm.hasConfirmed(item)
+                      ? Colors.green[400]
+                      : Colors.grey[300],
                 ),
+                child: Icon(Icons.check, color: Colors.white),
               ),
-            ),
-            Container(
-              color: authVm.hasDenied(item) ? Colors.red : Colors.white,
-              child: IconButton(
+              ElevatedButton(
                 onPressed: () => this.onDecisionTaken(ProductDecision.Denied),
-                icon: Icon(
-                  Icons.close,
-                  color: authVm.hasDenied(item) ? Colors.white : Colors.black,
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  primary: authVm.hasDenied(item)
+                      ? Colors.red[400]
+                      : Colors.grey[300],
+                  padding: EdgeInsets.all(0),
                 ),
+                child: Icon(Icons.close, color: Colors.white),
               ),
-            ),
-          ],
-        )
-      ],
+            ],
+          )
+        ],
+      ),
     );
   }
 }
