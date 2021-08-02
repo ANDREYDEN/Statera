@@ -32,6 +32,8 @@ async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
 
   const lines: Map<number, any[]> = new Map();
 
+  console.log(JSON.stringify(labels));
+  
   labels.forEach((label) => {
     const THRESHOLD = 12;
     const labelHeight = baselineHeight(label);
@@ -47,14 +49,15 @@ async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
     lines.set(similarHeight, [...previousValue, label.description]);
   });
 
-  const rows = Array.from(lines.values());
-
   // first element contains information about all lines
-  rows.splice(0, 1); 
+  const rows = Array.from(lines.values()).slice(1);
 
-  const products = rows.map(normalize);
+  let products = rows.map(normalize);
 
-  return mergeProducts(products);
+  products = mergeProducts(products);
+  console.log(products);
+  
+  return products;
 }
 
 function baselineHeight(label: any): number {

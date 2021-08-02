@@ -11,8 +11,12 @@ String toStringPrice(double value) {
   return "\$${value.toStringAsFixed(2)}";
 }
 
-Future<bool> snackbarCatch(BuildContext context, dynamic Function() operation,
-    {String? successMessage, String? errorMessage}) async {
+Future<bool> snackbarCatch(
+  BuildContext context,
+  dynamic Function() operation, {
+  String? successMessage,
+  String? errorMessage,
+}) async {
   bool errorOccured = false;
   try {
     await operation();
