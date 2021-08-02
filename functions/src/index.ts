@@ -2,7 +2,7 @@
 import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
 import "firebase-functions";
-import {mergePrices, normalize} from "./normalizers";
+import { mergeProducts, normalize} from "./normalizers";
 
 export const getReceiptDataTest = functions.https.onRequest(
     async (request, response) => {
@@ -24,7 +24,7 @@ export const getReceiptData = functions.https.onCall(async (data, context) => {
   return analyzeReceipt(data.receiptUrl);
 });
 
-async function analyzeReceipt(receiptUrl: string): Promise<{ [k: string]: any[]; }> {
+async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
   const client = new vision.ImageAnnotatorClient();
 
   const [result] = await client.textDetection(receiptUrl);
@@ -42,25 +42,19 @@ async function analyzeReceipt(receiptUrl: string): Promise<{ [k: string]: any[];
         similarHeight = height;
       }
     }
-    console.log(similarHeight);
 
     const previousValue = lines.has(similarHeight) ? lines.get(similarHeight)! : [];
     lines.set(similarHeight, [...previousValue, label.description]);
   });
 
+  const rows = Array.from(lines.values());
 
-  const data = Object.fromEntries(lines.entries());
+  // first element contains information about all lines
+  rows[0].splice(0, 1); 
 
-  console.log("before loop");
-  console.log("Normalized: ", mergePrices(data));
+  const products = rows.map(normalize);
 
-  for (const key in data) {
-    const returnValue = normalize(data[key]);
-    console.log("Normalized: ", returnValue);
-  }
-
-
-  return data;
+  return mergeProducts(products);
 }
 
 function baselineHeight(label: any): number {

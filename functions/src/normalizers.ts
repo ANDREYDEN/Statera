@@ -1,29 +1,48 @@
 /* eslint-disable require-jsdoc */
 const CODE_REGEX = /\d{11,13}/;
+const VALUE_REGEX = /\d+(\.|,)\d+/;
 
-export function normalize(row: string[]) {
-  const name: string | null = null;
-  let code: string | null = null;
-  const value: number | null = null;
-
-  row.forEach((element) => {
-    const codeMatcher = element.match(CODE_REGEX);
-    if (codeMatcher) {
-      code = codeMatcher[0];
-      element.replace(codeMatcher[0], "");
-    }
-  });
-
-  return {name, code, value};
+interface Product {
+  name: string;
+  code: string;
+  value: number;
 }
 
-export function mergePrices(rows: { [height: string] : any[] }): { [height: string] : any[] } {
-  const result: { [height: string] : any[] } = {};
-  Object.entries(rows).forEach(([height, row], i) => {
-    if (row[1] === 'H') {
-      result[i-1] = [...result[i-1], ...row];
+export function normalize(row: string[]): Partial<Product> {
+  const product: Partial<Product> = {};
+
+  row.forEach((element, i) => {
+    const codeMatcher = element.match(CODE_REGEX);
+    const valueMatcher = element.match(VALUE_REGEX);
+    if (codeMatcher) {
+      product.code = codeMatcher[0];
+      row[i] = element.replace(codeMatcher[0], "");
+    }
+
+    if (valueMatcher) {
+      product.value = +valueMatcher[0];
+      row[i] = element.replace(valueMatcher[0], "");
+    }
+  });
+  product.name = row.join("");
+
+  return product;
+}
+
+export function mergeProducts(rows: Partial<Product>[]): Partial<Product>[] {
+  rows.forEach((row, i) => {
+    if (i > 0 && i < rows.length - 1 && !row.value) {
+      for (const closeIdx of [i - 1, i + 1]) {
+        if ((rows[closeIdx].name?.length ?? 0) <= 2) {
+          rows[i].value = rows[closeIdx].value;
+          rows[i].code =
+            (rows[i].code?.length ?? 0) > (rows[closeIdx].code?.length ?? 0)
+              ? rows[i].code
+              : rows[closeIdx].code;
+        }
+      }
     }
   });
 
-  return result;
+  return rows.filter((row) => row.code && row.value && row.name);
 }
