@@ -28,6 +28,7 @@ dependencies:
   firebase_core: ^1.3.0
   firebase_auth: ^1.4.1
   cloud_firestore: ^2.2.2
+  cloud_functions: ^3.0.0
   google_sign_in: ^5.0.4
   multi_select_flutter: ^4.0.0
   mockito: ^5.0.10

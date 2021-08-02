@@ -1,8 +1,11 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/models/item.dart';
 import 'package:statera/services/firestore.dart';
+import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
@@ -58,6 +61,7 @@ class _ExpenseListState extends State<ExpenseList> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             onPressed: handleCreateExpense,
+            onLongPress: handleScan,
             child: Icon(Icons.add, color: Colors.white),
           ),
         ),
@@ -67,46 +71,45 @@ class _ExpenseListState extends State<ExpenseList> {
 
   Widget buildExpensesList() {
     return CustomStreamBuilder<List<Expense>>(
-        stream: Firestore.instance
-            .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
-        builder: (context, expenses) {
-          expenses.sort((firstExpense, secondExpense) {
-            for (var stage in authVm.expenseStages) {
-              if (stage.test(firstExpense)) return -1;
-              if (stage.test(secondExpense)) return 1;
-            }
+      stream: Firestore.instance
+          .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
+      builder: (context, expenses) {
+        expenses.sort((firstExpense, secondExpense) {
+          for (var stage in authVm.expenseStages) {
+            if (stage.test(firstExpense)) return -1;
+            if (stage.test(secondExpense)) return 1;
+          }
 
           return 0;
         });
 
-          expenses = expenses
-              .where(
-                (expense) => authVm.expenseStages.any(
-                  (stage) =>
-                      _filters.contains(stage.name) && stage.test(expense),
-                ),
-              )
-              .toList();
+        expenses = expenses
+            .where(
+              (expense) => authVm.expenseStages.any(
+                (stage) => _filters.contains(stage.name) && stage.test(expense),
+              ),
+            )
+            .toList();
 
-          return expenses.isEmpty
-              ? Text("No expenses yet...")
-              : ListView.builder(
-                  itemCount: expenses.length,
-                  itemBuilder: (context, index) {
-                    var expense = expenses[index];
+        return expenses.isEmpty
+            ? Text("No expenses yet...")
+            : ListView.builder(
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  var expense = expenses[index];
 
-                    return Dismissible(
-                            key: Key(expense.id!),
-                            confirmDismiss: (dir) => showDialog<bool>(
-                              context: context,
-                              builder: (context) => OKCancelDialog(
-                                  text:
-                                      "Are you sure you want to delete this expense and all of its items?"),
-                            ),
-                            onDismissed: (_) {
-                              Firestore.instance.deleteExpense(expense);
-                            },
-                            direction: expense.isAuthoredBy(authVm.user.uid) &&
+                  return Dismissible(
+                    key: Key(expense.id!),
+                    confirmDismiss: (dir) => showDialog<bool>(
+                      context: context,
+                      builder: (context) => OKCancelDialog(
+                          text:
+                              "Are you sure you want to delete this expense and all of its items?"),
+                    ),
+                    onDismissed: (_) {
+                      Firestore.instance.deleteExpense(expense);
+                    },
+                    direction: expense.isAuthoredBy(authVm.user.uid) &&
                             !expense.completed
                         ? DismissDirection.startToEnd
                         : DismissDirection.none,
@@ -114,12 +117,42 @@ class _ExpenseListState extends State<ExpenseList> {
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
                       child: ExpenseListItem(expense: expense),
-                    ),);
-                  },
-                );
-        });
+                    ),
+                  );
+                },
+              );
+      },
+    );
   }
-  
+
+  void handleScan() async {
+    // TODO: get photo from photo picker
+    // TODO: upload photo to storage and get the url
+    const url =
+        "https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/receipt.jpg?alt=media%26token=ae9766ca-063d-4aad-a510-d168b9dde125";
+    var getItemsFromImage =
+        FirebaseFunctions.instance.httpsCallable('getReceiptData');
+    var expense = new Expense(
+      author: Author.fromUser(this.authVm.user),
+      name: "Scanned expense",
+      groupId: groupVm.group.id,
+    );
+    await snackbarCatch(context, () async {
+      var response = await getItemsFromImage({
+        'receiptUrl': url
+      });
+      List<dynamic> items = response.data;
+
+      items.forEach((item) {
+        expense.addItem(Item.fromFirestore(item));
+      });
+    });
+    await Firestore.instance.addExpenseToGroup(
+      expense,
+      groupVm.group.code,
+    );
+  }
+
   void handleCreateExpense() async {
     await showDialog(
       context: context,
