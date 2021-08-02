@@ -67,6 +67,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: handleCreateExpense,
+                    onLongPress: handleScan,
                     style: ElevatedButton.styleFrom(
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(18),
@@ -136,7 +137,7 @@ class _ExpenseListState extends State<ExpenseList> {
     // TODO: get photo from photo picker
     // TODO: upload photo to storage and get the url
     const url =
-        "https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/receipt.jpg?alt=media%26token=ae9766ca-063d-4aad-a510-d168b9dde125";
+        "https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/receipt.jpg?alt=media&token=ae9766ca-063d-4aad-a510-d168b9dde125";
     var getItemsFromImage =
         FirebaseFunctions.instance.httpsCallable('getReceiptData');
     var expense = new Expense(
@@ -144,20 +145,33 @@ class _ExpenseListState extends State<ExpenseList> {
       name: "Scanned expense",
       groupId: groupVm.group.id,
     );
-    await snackbarCatch(context, () async {
-      var response = await getItemsFromImage({
-        'receiptUrl': url
-      });
-      List<dynamic> items = response.data;
+    var scanSuccessful = await snackbarCatch(
+      context,
+      () async {
+        var response = await getItemsFromImage({'receiptUrl': url});
+        List<dynamic> items = response.data;
 
-      items.forEach((item) {
-        expense.addItem(Item.fromFirestore(item));
-      });
-    });
-    await Firestore.instance.addExpenseToGroup(
-      expense,
-      groupVm.group.code,
+        items.forEach((itemData) {
+          try {
+            var item = Item(
+              name: itemData["name"] ?? "",
+              value: double.tryParse(itemData["value"].toString()) ?? 0,
+            );
+            expense.addItem(item);
+          } catch (e) {
+            print("Could not parse item $itemData: $e");
+          }
+        });
+      },
+      errorMessage: 'Something went wrong while processing your photo',
     );
+
+    if (scanSuccessful) {
+      await Firestore.instance.addExpenseToGroup(
+        expense,
+        groupVm.group.code,
+      );
+    }
   }
 
   void handleCreateExpense() {

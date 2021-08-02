@@ -12,20 +12,20 @@ String toStringPrice(double value) {
 }
 
 Future<bool> snackbarCatch(BuildContext context, dynamic Function() operation,
-    {String? successMessage}) async {
-  String errorMessage = "";
+    {String? successMessage, String? errorMessage}) async {
+  bool errorOccured = false;
   try {
     await operation();
   } catch (e) {
-    errorMessage = e.toString();
+    errorOccured = true;
+    errorMessage = errorMessage ?? e.toString();
   }
 
-  if (errorMessage.isNotEmpty ||
-      (successMessage != null && successMessage.isNotEmpty)) {
+  if (errorOccured || (successMessage != null && successMessage.isNotEmpty)) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(errorMessage.isNotEmpty ? errorMessage : successMessage!),
+      content: Text(errorOccured ? errorMessage! : successMessage!),
       margin: EdgeInsets.all(8),
-      backgroundColor: errorMessage.isNotEmpty
+      backgroundColor: errorOccured
           ? Theme.of(context).errorColor
           : Theme.of(context).accentColor,
       duration: Duration(seconds: 3),
@@ -33,5 +33,5 @@ Future<bool> snackbarCatch(BuildContext context, dynamic Function() operation,
     ));
   }
 
-  return errorMessage.isEmpty;
+  return errorOccured;
 }

@@ -50,7 +50,7 @@ async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
   const rows = Array.from(lines.values());
 
   // first element contains information about all lines
-  rows[0].splice(0, 1); 
+  rows.splice(0, 1); 
 
   const products = rows.map(normalize);
 
