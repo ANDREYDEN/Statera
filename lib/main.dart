@@ -12,6 +12,7 @@ class Statera extends StatelessWidget {
       title: 'Statera',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: "Nunito",
       ),
       home: MainNavigation(),
     );

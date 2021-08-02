@@ -8,12 +8,12 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/crud_dialog.dart';
+import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
-import 'package:statera/widgets/dismiss_background.dart';
 import 'package:statera/widgets/listItems/expense_list_item.dart';
-import 'package:statera/widgets/ok_cancel_dialog.dart';
+import 'package:statera/widgets/list_empty.dart';
+import 'package:statera/widgets/optionally_dismissible.dart';
 
 class ExpenseList extends StatefulWidget {
   const ExpenseList({Key? key}) : super(key: key);
@@ -24,7 +24,6 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   List<String> _filters = [];
-  var expenseNameController = TextEditingController();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -56,13 +55,28 @@ class _ExpenseListState extends State<ExpenseList> {
               )
           ],
         ),
-        Expanded(child: buildExpensesList()),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: handleCreateExpense,
-            onLongPress: handleScan,
-            child: Icon(Icons.add, color: Colors.white),
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.center,
+            children: [
+              buildExpensesList(),
+              Positioned(
+                bottom: 10,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: handleCreateExpense,
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(18),
+                      elevation: 5,
+                    ),
+                    child: Icon(Icons.add, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -92,28 +106,21 @@ class _ExpenseListState extends State<ExpenseList> {
             .toList();
 
         return expenses.isEmpty
-            ? Text("No expenses yet...")
+            ? ListEmpty(text: "Start by adding an expense")
             : ListView.builder(
                 itemCount: expenses.length,
                 itemBuilder: (context, index) {
                   var expense = expenses[index];
 
-                  return Dismissible(
+                  return OptionallyDismissible(
                     key: Key(expense.id!),
-                    confirmDismiss: (dir) => showDialog<bool>(
-                      context: context,
-                      builder: (context) => OKCancelDialog(
-                          text:
-                              "Are you sure you want to delete this expense and all of its items?"),
-                    ),
+                    isDismissible: expense.isAuthoredBy(authVm.user.uid) &&
+                        !expense.completed,
+                    confirmation:
+                        "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {
                       Firestore.instance.deleteExpense(expense);
                     },
-                    direction: expense.isAuthoredBy(authVm.user.uid) &&
-                            !expense.completed
-                        ? DismissDirection.startToEnd
-                        : DismissDirection.none,
-                    background: DismissBackground(),
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
                       child: ExpenseListItem(expense: expense),
@@ -153,8 +160,8 @@ class _ExpenseListState extends State<ExpenseList> {
     );
   }
 
-  void handleCreateExpense() async {
-    await showDialog(
+  void handleCreateExpense() {
+    showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: "New Expense",
@@ -162,7 +169,6 @@ class _ExpenseListState extends State<ExpenseList> {
           FieldData(
             id: "expense_name",
             label: "Expense Name",
-            controller: expenseNameController,
           )
         ],
         onSubmit: (values) async {
@@ -178,12 +184,10 @@ class _ExpenseListState extends State<ExpenseList> {
         },
       ),
     );
-    expenseNameController.clear();
   }
 
-  handleEditExpense(Expense expense) async {
-    expenseNameController.text = expense.name;
-    await showDialog(
+  handleEditExpense(Expense expense) {
+    showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: "Edit Expense",
@@ -191,7 +195,7 @@ class _ExpenseListState extends State<ExpenseList> {
           FieldData(
             id: "expense_name",
             label: "Expense name",
-            controller: expenseNameController,
+            initialData: expense.name,
           )
         ],
         onSubmit: (values) async {
@@ -200,7 +204,5 @@ class _ExpenseListState extends State<ExpenseList> {
         },
       ),
     );
-
-    expenseNameController.clear();
   }
 }

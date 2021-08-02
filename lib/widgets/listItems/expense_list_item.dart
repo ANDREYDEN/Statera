@@ -15,7 +15,7 @@ class ExpenseListItem extends StatelessWidget {
         Provider.of<AuthenticationViewModel>(context);
 
     Color? cardColor = Colors.blue[200];
-    authVm.expenseStages.forEach((stage) { 
+    authVm.expenseStages.forEach((stage) {
       if (stage.test(this.expense)) {
         cardColor = stage.color;
       }
@@ -31,7 +31,11 @@ class ExpenseListItem extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.all(5),
-        color: cardColor,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: cardColor ?? Colors.transparent, width: 2),
+          color: Colors.grey[100],
+        ),
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Row(

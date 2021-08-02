@@ -1,6 +1,8 @@
 import 'package:statera/models/assignee_decision.dart';
+import 'package:uuid/uuid.dart';
 
 class Item {
+  late String id;
   late String name;
   late double value;
   List<AssigneeDecision> assignees = [];
@@ -8,7 +10,10 @@ class Item {
   Item({
     required this.name,
     required this.value,
-  });
+  }) {
+    var uuid = Uuid();
+    this.id = uuid.v1();
+  }
 
   Item.fake() {
     this.name = "foo";
@@ -59,6 +64,7 @@ class Item {
 
   Map<String, dynamic> toFirestore() {
     return {
+      "id": id,
       "name": name,
       "value": value,
       "assignees": assignees.map((assignee) => assignee.toFirestore()).toList()
@@ -66,10 +72,12 @@ class Item {
   }
 
   static Item fromFirestore(Map<String, dynamic> data) {
+    var uuid = Uuid();
     var item = Item(
       name: data["name"],
       value: double.parse(data["value"].toString()),
     );
+    item.id = data["id"] ?? uuid.v1();
     item.assignees = data["assignees"]
         .map<AssigneeDecision>((assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
         .toList();
