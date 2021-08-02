@@ -149,16 +149,15 @@ class _ExpenseListState extends State<ExpenseList> {
         .putFile(File(pickedFile.path));
 
     String url = await task.ref.getDownloadURL();
-    print(url);
-    // const url =
-    //     "https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/receipt.jpg?alt=media&token=ae9766ca-063d-4aad-a510-d168b9dde125";
     var getItemsFromImage =
         FirebaseFunctions.instance.httpsCallable('getReceiptData');
+
     var expense = new Expense(
       author: Author.fromUser(this.authVm.user),
       name: "Scanned expense",
       groupId: groupVm.group.id,
     );
+
     var scanSuccessful = await snackbarCatch(
       context,
       () async {

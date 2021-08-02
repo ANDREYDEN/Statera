@@ -2,18 +2,18 @@
 import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
 import "firebase-functions";
-import { mergeProducts, normalize} from "./normalizers";
+import { mergeProducts, normalize } from "./normalizers";
 
 export const getReceiptDataTest = functions.https.onRequest(
-    async (request, response) => {
-      const receiptUrl = request.query.receiptUrl;
-      if (!receiptUrl) {
-        response.status(400).send("Parameter receiptUrl is required");
-      }
-
-      const result = await analyzeReceipt(receiptUrl as string);
-      response.send(result);
+  async (request, response) => {
+    const receiptUrl = request.query.receiptUrl;
+    if (!receiptUrl) {
+      response.status(400).send("Parameter receiptUrl is required");
     }
+
+    const result = await analyzeReceipt(receiptUrl as string);
+    response.send(result);
+  }
 );
 
 export const getReceiptData = functions.https.onCall(async (data, context) => {
@@ -28,40 +28,46 @@ async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
   const client = new vision.ImageAnnotatorClient();
 
   const [result] = await client.textDetection(receiptUrl);
-  const labels = result.textAnnotations ?? [];
 
-  const lines: Map<number, any[]> = new Map();
+  // first element contains information about all lines
+  const labels = result.textAnnotations?.slice(1) ?? [];
 
-  console.log(JSON.stringify(labels));
-  
+  type LabelBox = { p1: number; p2: number; description: string };
+  const lines: LabelBox[][] = [];
+
   labels.forEach((label) => {
-    const THRESHOLD = 12;
-    const labelHeight = baselineHeight(label);
+    const labelSegment = verticalSegment(label);
+    const center = (labelSegment.p1 + labelSegment.p2) / 2;
+    const labelBox = { ...labelSegment, description: label.description ?? "" };
 
-    let similarHeight = labelHeight;
-    for (const height of lines.keys()) {
-      if (Math.abs(labelHeight - height) < THRESHOLD) {
-        similarHeight = height;
+    for (const line of lines) {
+      if (line[0].p1 < center && center < line[0].p2) {
+        line.push(labelBox);
+        return;
       }
     }
 
-    const previousValue = lines.has(similarHeight) ? lines.get(similarHeight)! : [];
-    lines.set(similarHeight, [...previousValue, label.description]);
+    lines.push([labelBox]);
   });
 
-  // first element contains information about all lines
-  const rows = Array.from(lines.values()).slice(1);
+  const rows = lines.map((line) => line.map((label) => label.description));
+  console.log(rows);
 
   let products = rows.map(normalize);
 
   products = mergeProducts(products);
   console.log(products);
-  
+
   return products;
 }
 
-function baselineHeight(label: any): number {
+function verticalSegment(label: any): { p1: number; p2: number } {
   const corners = label.boundingPoly.vertices;
-  const sortedCorners = corners.sort((corner: any, otherCorner: any) => otherCorner.y - corner.y);
-  return (sortedCorners[0].y + sortedCorners[1].y) / 2;
+  const sortedCorners = corners.sort(
+    (corner: any, otherCorner: any) => corner.y - otherCorner.y
+  );
+  return {
+    p1: (sortedCorners[0].y + sortedCorners[1].y) / 2,
+    p2: (sortedCorners[2].y + sortedCorners[3].y) / 2,
+  };
 }
