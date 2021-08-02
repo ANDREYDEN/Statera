@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
@@ -24,6 +25,7 @@ class ExpenseList extends StatefulWidget {
 
 class _ExpenseListState extends State<ExpenseList> {
   List<String> _filters = [];
+  final ImagePicker _picker = ImagePicker();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -134,7 +136,8 @@ class _ExpenseListState extends State<ExpenseList> {
   }
 
   void handleScan() async {
-    // TODO: get photo from photo picker
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    print(pickedFile);
     // TODO: upload photo to storage and get the url
     const url =
         "https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/receipt.jpg?alt=media&token=ae9766ca-063d-4aad-a510-d168b9dde125";

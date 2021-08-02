@@ -33,5 +33,5 @@ Future<bool> snackbarCatch(BuildContext context, dynamic Function() operation,
     ));
   }
 
-  return errorOccured;
+  return !errorOccured;
 }

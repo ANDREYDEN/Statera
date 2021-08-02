@@ -52,5 +52,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Functionality of picking a saved receipt image</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Functionality of scanning receipt image</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Camera access</string>
 </dict>
 </plist>
