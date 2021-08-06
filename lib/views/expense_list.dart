@@ -139,7 +139,7 @@ class _ExpenseListState extends State<ExpenseList> {
   }
 
   void handleScan() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     print("File picked");
     if (pickedFile == null)
       throw new Exception("Something went wrong while taking a photo");
