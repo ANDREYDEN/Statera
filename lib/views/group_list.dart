@@ -35,6 +35,7 @@ class _GroupListState extends State<GroupList> {
     return StreamBuilder<User?>(
       stream: Auth.instance.currentUserStream(),
       builder: (context, userSnapshot) {
+        print(userSnapshot);
         if (userSnapshot.hasError) {
           return Text(userSnapshot.error.toString());
         }

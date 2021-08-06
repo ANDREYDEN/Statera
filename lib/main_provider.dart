@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
@@ -11,21 +10,14 @@ class MainProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Firebase.initializeApp(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData ||
-            snapshot.connectionState != ConnectionState.done) {
-          return Container(child: Text("Loading"));
-        }
-
-        return MultiProvider(providers: [
-          Provider<AuthenticationViewModel>(
-            create: (context) => AuthenticationViewModel(),
-          ),
-          Provider<GroupViewModel>(create: (context) => GroupViewModel()),
-        ], builder: (context, _) => this.child);
-      },
+    return MultiProvider(
+      providers: [
+        Provider<AuthenticationViewModel>(
+          create: (context) => AuthenticationViewModel(),
+        ),
+        Provider<GroupViewModel>(create: (context) => GroupViewModel()),
+      ],
+      builder: (context, _) => this.child,
     );
   }
 }
