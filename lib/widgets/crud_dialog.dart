@@ -1,21 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class FieldFormatter {}
 
 class FieldData {
   String id;
   String label;
   late TextEditingController controller;
+  late FocusNode focusNode;
   TextInputType inputType;
   dynamic initialData;
+  List<String Function(String)> formatters;
 
   FieldData({
     required this.id,
     required this.label,
     this.initialData,
     TextEditingController? controller,
+    this.formatters = const [],
     this.inputType = TextInputType.name,
   }) {
     this.controller = controller ?? TextEditingController();
     this.controller.text = initialData?.toString() ?? '';
+    this.focusNode = FocusNode(debugLabel: this.id);
+  }
+
+  static String requiredFormatter(String text) =>
+      text.isEmpty ? "Can't be empty" : "";
+  static String numberFormatter(String text) =>
+      double.tryParse(text) == null ? "Must be a number" : "";
+
+  String getError() {
+    for (final formatter in this.formatters) {
+      var error = formatter(this.controller.text);
+      if (error.isNotEmpty) return error;
+    }
+    return '';
   }
 }
 
@@ -39,16 +59,6 @@ class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
 
   @override
-  void initState() {
-    widget.fields.forEach((field) {
-      field.controller.addListener(() => setState(() {
-            this._dirty = true;
-          }));
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
@@ -58,33 +68,38 @@ class _CRUDDialogState extends State<CRUDDialog> {
   }
 
   Iterable<Widget> get textFields sync* {
-    var focusNodes =
-        widget.fields.map((field) => FocusNode(debugLabel: field.id)).toList();
     for (var i = 0; i < widget.fields.length; i++) {
       var field = widget.fields[i];
       yield TextField(
-          autofocus: i == 0,
-          focusNode: focusNodes[i],
-          controller: field.controller,
-          keyboardType: field.inputType,
-          decoration: InputDecoration(
-            labelText: field.label,
-            errorText: field.controller.text.isEmpty && this._dirty
-                ? "Can't be empty"
-                : null,
-          ),
-          onSubmitted: (_) {
-            if (i == widget.fields.length - 1) {
-              submit();
-            } else {
-              focusNodes[i + 1].requestFocus();
-            }
+        autofocus: i == 0,
+        focusNode: field.focusNode,
+        controller: field.controller,
+        keyboardType: field.inputType,
+        decoration: InputDecoration(
+          labelText: field.label,
+          errorText: this._dirty && field.getError().isNotEmpty
+              ? field.getError()
+              : null,
+        ),
+        onChanged: (text) {
+          setState(() {
+            this._dirty = true;
           });
+        },
+        onSubmitted: (_) {
+          var isLastField = i == widget.fields.length - 1;
+          if (isLastField) {
+            submit();
+          } else {
+            widget.fields[i + 1].focusNode.requestFocus();
+          }
+        },
+      );
     }
   }
 
   submit() async {
-    if (widget.fields.any((field) => field.controller.text.isEmpty)) {
+    if (widget.fields.any((field) => field.getError().isNotEmpty)) {
       setState(() {
         this._dirty = true;
       });

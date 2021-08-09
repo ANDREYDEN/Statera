@@ -167,11 +167,19 @@ class _ExpensePageState extends State<ExpensePage> {
       builder: (context) => CRUDDialog(
         title: "New Item",
         fields: [
-          FieldData(id: "item_name", label: "Item Name"),
+          FieldData(
+            id: "item_name",
+            label: "Item Name",
+            formatters: [FieldData.requiredFormatter],
+          ),
           FieldData(
             id: "item_value",
             label: "Item Value",
             inputType: TextInputType.numberWithOptions(decimal: true),
+            formatters: [
+              FieldData.requiredFormatter,
+              FieldData.numberFormatter
+            ],
           ),
         ],
         onSubmit: (values) async {
@@ -197,12 +205,17 @@ class _ExpensePageState extends State<ExpensePage> {
             id: "item_name",
             label: "Item Name",
             initialData: item.name,
+            formatters: [FieldData.requiredFormatter],
           ),
           FieldData(
             id: "item_value",
             label: "Item Value",
             initialData: item.value,
             inputType: TextInputType.numberWithOptions(decimal: true),
+            formatters: [
+              FieldData.requiredFormatter,
+              FieldData.numberFormatter
+            ],
           ),
         ],
         onSubmit: (values) async {
