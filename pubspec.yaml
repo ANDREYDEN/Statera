@@ -12,13 +12,14 @@ environment:
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="USE_EMULATORS=true"
-  run-android-emulate: flutter run -d emulator-5554 --dart-define="USE_EMULATORS=true"
+  run-emulate: flutter run --dart-define="USE_EMULATORS=true"
   build: pub run build_runner build --delete-conflicting-outputs
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
-  emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start
+  emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data
+  export-emulators: firebase emulators:export ./emulator_data
 
 dependencies:
   flutter:

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -72,7 +73,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: handleCreateExpense,
-                    onLongPress: handleScan,
+                    onLongPress: kIsWeb ? () {} : handleScan, // TODO: handle picker on web
                     style: ElevatedButton.styleFrom(
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(18),
@@ -140,7 +141,6 @@ class _ExpenseListState extends State<ExpenseList> {
 
   void handleScan() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    print("File picked");
     if (pickedFile == null)
       throw new Exception("Something went wrong while taking a photo");
 
