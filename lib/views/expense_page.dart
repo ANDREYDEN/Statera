@@ -170,17 +170,19 @@ class _ExpensePageState extends State<ExpensePage> {
           FieldData(
             id: "item_name",
             label: "Item Name",
-            formatters: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredFormatter],
           ),
           FieldData(
-            id: "item_value",
-            label: "Item Value",
-            inputType: TextInputType.numberWithOptions(decimal: true),
-            formatters: [
-              FieldData.requiredFormatter,
-              FieldData.numberFormatter
-            ],
-          ),
+              id: "item_value",
+              label: "Item Value",
+              inputType: TextInputType.numberWithOptions(decimal: true),
+              validators: [
+                FieldData.requiredFormatter,
+                FieldData.numberFormatter
+              ],
+              formatters: [
+                CommaReplacerTextInputFormatter()
+              ]),
         ],
         onSubmit: (values) async {
           expense.addItem(Item(
@@ -205,18 +207,20 @@ class _ExpensePageState extends State<ExpensePage> {
             id: "item_name",
             label: "Item Name",
             initialData: item.name,
-            formatters: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredFormatter],
           ),
           FieldData(
-            id: "item_value",
-            label: "Item Value",
-            initialData: item.value,
-            inputType: TextInputType.numberWithOptions(decimal: true),
-            formatters: [
-              FieldData.requiredFormatter,
-              FieldData.numberFormatter
-            ],
-          ),
+              id: "item_value",
+              label: "Item Value",
+              initialData: item.value,
+              inputType: TextInputType.numberWithOptions(decimal: true),
+              validators: [
+                FieldData.requiredFormatter,
+                FieldData.numberFormatter
+              ],
+              formatters: [
+                CommaReplacerTextInputFormatter()
+              ]),
         ],
         onSubmit: (values) async {
           item.name = values["item_name"]!;

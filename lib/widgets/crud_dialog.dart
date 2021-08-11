@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class FieldFormatter {}
+class CommaReplacerTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String truncated = newValue.text;
+    TextSelection newSelection = newValue.selection;
+
+    truncated = newValue.text.replaceAll(RegExp(','), '.');
+    return TextEditingValue(
+      text: truncated,
+      selection: newSelection,
+    );
+  }
+}
 
 class FieldData {
   String id;
@@ -10,13 +25,15 @@ class FieldData {
   late FocusNode focusNode;
   TextInputType inputType;
   dynamic initialData;
-  List<String Function(String)> formatters;
+  List<String Function(String)> validators;
+  List<TextInputFormatter> formatters;
 
   FieldData({
     required this.id,
     required this.label,
     this.initialData,
     TextEditingController? controller,
+    this.validators = const [],
     this.formatters = const [],
     this.inputType = TextInputType.name,
   }) {
@@ -31,7 +48,7 @@ class FieldData {
       double.tryParse(text) == null ? "Must be a number" : "";
 
   String getError() {
-    for (final formatter in this.formatters) {
+    for (final formatter in this.validators) {
       var error = formatter(this.controller.text);
       if (error.isNotEmpty) return error;
     }
@@ -75,6 +92,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
         focusNode: field.focusNode,
         controller: field.controller,
         keyboardType: field.inputType,
+        inputFormatters: field.formatters,
         decoration: InputDecoration(
           labelText: field.label,
           errorText: this._dirty && field.getError().isNotEmpty
