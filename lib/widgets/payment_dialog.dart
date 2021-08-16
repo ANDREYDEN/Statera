@@ -3,6 +3,7 @@ import 'package:statera/models/author.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentDialog extends StatefulWidget {
+  final bool isReceiving;
   final Author receiver;
   final double value;
   final Future Function(double) onPay;
@@ -12,6 +13,7 @@ class PaymentDialog extends StatefulWidget {
     required this.receiver,
     required this.value,
     required this.onPay,
+    this.isReceiving = false,
   }) : super(key: key);
 
   @override
@@ -49,7 +51,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
           ),
           SizedBox(height: 10),
           Text(
-            "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
+            widget.isReceiving ? "You aknowledge that you received a payment of ${toStringPrice(-this.balanceToPay)} from ${this.widget.receiver.name}." : "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
           ),
         ],
       ),

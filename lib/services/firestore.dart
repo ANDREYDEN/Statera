@@ -86,11 +86,9 @@ class Firestore {
     );
   }
 
-  Future<void> updateExpense(
-    Expense expense
-  ) async {
-      var docRef = expensesCollection.doc(expense.id);
-      expensesCollection.doc(docRef.id).set(expense.toFirestore());
+  Future<void> updateExpense(Expense expense) async {
+    var docRef = expensesCollection.doc(expense.id);
+    expensesCollection.doc(docRef.id).set(expense.toFirestore());
   }
 
   Stream<Expense> listenForExpense(String? expenseId) {
@@ -146,16 +144,12 @@ class Firestore {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
         .snapshots()
-        .map(
-          (event) => event.docs
-              .map(
-                (doc) => Group.fromFirestore(
+        .map((event) => event.docs
+            .map((doc) => Group.fromFirestore(
                   doc.data() as Map<String, dynamic>,
                   id: doc.id,
-                ),
-              )
-              .toList(),
-        );
+                ))
+            .toList());
   }
 
   Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
