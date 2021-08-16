@@ -76,16 +76,23 @@ class Group {
         );
   }
 
-  void payOffBalance({required String payerUid, required String receiverUid, required double value}) {
+  void payOffBalance(
+      {required String payerUid,
+      required String receiverUid,
+      required double value}) {
     if (this.members.every((member) => member.uid != payerUid)) {
-      throw new Exception("User with id $payerUid is not a member of group $name");
+      throw new Exception(
+          "User with id $payerUid is not a member of group $name");
     }
     if (this.members.every((member) => member.uid != receiverUid)) {
-      throw new Exception("User with id $receiverUid is not a member of group $name");
+      throw new Exception(
+          "User with id $receiverUid is not a member of group $name");
     }
-    
-    this.balance[payerUid]![receiverUid] = this.balance[payerUid]![receiverUid]! - value;
-    this.balance[receiverUid]![payerUid] = this.balance[receiverUid]![payerUid]! + value;
+
+    this.balance[payerUid]![receiverUid] =
+        this.balance[payerUid]![receiverUid]! - value;
+    this.balance[receiverUid]![payerUid] =
+        this.balance[receiverUid]![payerUid]! + value;
   }
 
   void resolveBalance(String member1Uid, String member2Uid) {
@@ -107,16 +114,23 @@ class Group {
     var members = List<Author>.from(
       map['members']?.map((x) => Author.fromFirestore(x)),
     );
+
     return Group(
+      id: id,
       name: map['name'],
       members: members,
       code: map['code'],
       balance: map['balance'] == null
           ? null
           : Map<String, Map<String, double>>.from(map['balance'].map(
-              (uid, balance) =>
-                  MapEntry(uid, Map<String, double>.from(balance)))),
-      id: id,
+              (uid, balance) => MapEntry(
+                uid,
+                Map<String, double>.from(
+                  (balance as Map<String, dynamic>).map((otherUid, value) =>
+                      MapEntry(otherUid, double.tryParse(value.toString()))),
+                ),
+              ),
+            )),
     );
   }
 }
