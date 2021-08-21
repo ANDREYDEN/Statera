@@ -4,6 +4,7 @@ import 'package:statera/models/expense.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/views/expense_page.dart';
+import 'package:statera/widgets/author_avatar.dart';
 
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
@@ -46,14 +47,7 @@ class ExpenseListItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      backgroundImage: this.expense.author.photoURL == null
-                          ? null
-                          : NetworkImage(this.expense.author.photoURL!),
-                      child: this.expense.author.photoURL != null
-                          ? null
-                          : Container(color: Colors.grey),
-                    ),
+                    AuthorAvatar(author: this.expense.author),
                     SizedBox(width: 15),
                     Flexible(
                       child: Column(

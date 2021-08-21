@@ -5,7 +5,8 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/widgets/payment_dialog.dart';
+import 'package:statera/widgets/author_avatar.dart';
+import 'package:statera/widgets/dialogs/payment_dialog.dart';
 
 class OwingListItem extends StatelessWidget {
   final Author payer;
@@ -29,14 +30,7 @@ class OwingListItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                backgroundImage: this.payer.photoURL == null
-                    ? null
-                    : NetworkImage(this.payer.photoURL!),
-                child: this.payer.photoURL != null
-                    ? null
-                    : Container(color: Colors.grey),
-              ),
+              AuthorAvatar(author: this.payer),
               SizedBox(width: 10),
               Text(this.payer.name),
             ],

@@ -6,8 +6,8 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
+import 'package:statera/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/widgets/listItems/owing_list_item.dart';
-import 'package:statera/widgets/ok_cancel_dialog.dart';
 
 class GroupHome extends StatelessWidget {
   const GroupHome({Key? key}) : super(key: key);

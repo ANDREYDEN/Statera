@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/widgets/dismiss_background.dart';
-import 'package:statera/widgets/ok_cancel_dialog.dart';
+
+import 'dialogs/ok_cancel_dialog.dart';
 
 class OptionallyDismissible extends StatelessWidget {
   final bool isDismissible;
