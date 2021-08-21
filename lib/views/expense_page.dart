@@ -9,6 +9,7 @@ import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/author_avatar.dart';
+import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/widgets/listItems/item_list_item.dart';
 import 'package:statera/widgets/list_empty.dart';
@@ -95,39 +96,14 @@ class _ExpensePageState extends State<ExpensePage> {
                         AuthorAvatar(
                           author: expense.author,
                           onTap: () async {
+                            if (!expense.canBeUpdatedBy(authVm.user.uid))
+                              return;
+
                             Author? newAuthor = await showDialog<Author>(
                               context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Assign a new expense author'),
-                                  content: Container(
-                                    width: 200,
-                                    child: ListView.builder(
-                                      itemCount:
-                                          this.groupVm.group.members.length,
-                                      itemBuilder: (context, index) {
-                                        final authorOption =
-                                            this.groupVm.group.members[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                          child: AuthorAvatar(
-                                            onTap: () => Navigator.pop(
-                                                context, authorOption),
-                                            author: authorOption,
-                                            withName: true,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('Cancel'),
-                                    ),
-                                  ],
-                                );
-                              },
+                              builder: (context) => AuthorChangeDialog(
+                                authorOptions: this.groupVm.group.members,
+                              ),
                             );
 
                             if (newAuthor == null) return;
