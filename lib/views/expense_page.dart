@@ -89,28 +89,34 @@ class _ExpensePageState extends State<ExpensePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Payer:"),
-                        AuthorAvatar(
-                          author: expense.author,
-                          onTap: () async {
-                            if (!expense.canBeUpdatedBy(authVm.user.uid))
-                              return;
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Payer:"),
+                            AuthorAvatar(
+                              author: expense.author,
+                              onTap: () async {
+                                if (!expense.canBeUpdatedBy(authVm.user.uid))
+                                  return;
 
-                            Author? newAuthor = await showDialog<Author>(
-                              context: context,
-                              builder: (context) => AuthorChangeDialog(
-                                authorOptions: this.groupVm.group.members,
-                              ),
-                            );
+                                Author? newAuthor = await showDialog<Author>(
+                                  context: context,
+                                  builder: (context) => AuthorChangeDialog(
+                                    authorOptions: this.groupVm.group.members,
+                                  ),
+                                );
 
-                            if (newAuthor == null) return;
+                                if (newAuthor == null) return;
 
-                            expense.author = newAuthor;
-                            await Firestore.instance.updateExpense(expense);
-                          },
+                                expense.author = newAuthor;
+                                await Firestore.instance.updateExpense(expense);
+                              },
+                            ),
+                          ],
                         ),
                         Row(
                           children: [
