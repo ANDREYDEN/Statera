@@ -28,6 +28,13 @@ class Group {
     }
   }
 
+  void generateCode() {
+    code = "";
+    for (var i = 0; i < 5; i++) {
+      code = code! + getRandomLetter();
+    }
+  }
+
   static Map<String, Map<String, double>> createBalanceFromMembers(
     List<Author> members,
   ) {
@@ -45,6 +52,10 @@ class Group {
     );
   }
 
+  Author? getUser(String uid) {
+    return this.members.firstWhere((member) => member.uid == uid, orElse: null);
+  }
+
   void addUser(User user) {
     var newAuthor = Author.fromUser(user);
     this.members.add(newAuthor);
@@ -54,13 +65,6 @@ class Group {
     this.balance[newAuthor.uid] = Map.fromEntries(
       this.balance.entries.map((entry) => MapEntry(entry.key, 0)),
     );
-  }
-
-  void generateCode() {
-    code = "";
-    for (var i = 0; i < 5; i++) {
-      code = code! + getRandomLetter();
-    }
   }
 
   void removeUser(User user) {

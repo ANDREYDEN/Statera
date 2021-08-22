@@ -11,7 +11,7 @@ class AuthorChangeDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Assign a new expense author'),
+      title: Text('Assign payer'),
       content: Container(
         width: 200,
         child: ListView.builder(
@@ -19,7 +19,7 @@ class AuthorChangeDialog extends StatelessWidget {
           itemBuilder: (context, index) {
             final authorOption = this.authorOptions[index];
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: AuthorAvatar(
                 onTap: () => Navigator.pop(context, authorOption),
                 author: authorOption,

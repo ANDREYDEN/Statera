@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
@@ -9,6 +11,7 @@ import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/author_avatar.dart';
+import 'package:statera/widgets/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/widgets/listItems/item_list_item.dart';
@@ -116,15 +119,41 @@ class _ExpensePageState extends State<ExpensePage> {
                                 await Firestore.instance.updateExpense(expense);
                               },
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text("Marked: "),
-                            Icon(Icons.person),
-                            Text(
-                              "${expense.definedAssignees}/${expense.assignees.length}",
-                            )
+                            Text("Assignees:"),
+                            GestureDetector(
+                              onTap: () {
+                                if (!expense.canBeUpdatedBy(authVm.user.uid))
+                                  return;
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AssigneePickerDialog(
+                                    group: groupVm.group,
+                                    expense: expense,
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                // TODO: make this dynamically stretch
+                                width: 54.0 * expense.assignees.length,
+                                child: ListView.builder(
+                                  itemCount: expense.assignees.length,
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: (context, index) {
+                                    final uid = expense.assignees[index].uid;
+                                    final assignee =
+                                        this.groupVm.group.getUser(uid);
+
+                                    if (assignee == null)
+                                      return Icon(Icons.error);
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 4),
+                                      child: AuthorAvatar(author: assignee),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
