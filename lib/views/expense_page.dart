@@ -140,15 +140,21 @@ class _ExpensePageState extends State<ExpensePage> {
                                   itemCount: expense.assignees.length,
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
-                                    final uid = expense.assignees[index].uid;
-                                    final assignee =
-                                        this.groupVm.group.getUser(uid);
+                                    final assignee = expense.assignees[index];
+                                    final member = this
+                                        .groupVm
+                                        .group
+                                        .getUser(assignee.uid);
 
-                                    if (assignee == null)
+                                    if (member == null)
                                       return Icon(Icons.error);
                                     return Padding(
                                       padding: const EdgeInsets.only(right: 4),
-                                      child: AuthorAvatar(author: assignee),
+                                      child: AuthorAvatar(
+                                        author: member,
+                                        checked:
+                                            expense.isMarkedBy(assignee.uid),
+                                      ),
                                     );
                                   },
                                 ),
