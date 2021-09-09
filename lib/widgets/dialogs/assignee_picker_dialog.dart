@@ -9,20 +9,23 @@ class AssigneePickerDialog extends StatefulWidget {
   final Expense expense;
   final Group group;
 
-  const AssigneePickerDialog(
-      {Key? key, required this.expense, required this.group})
-      : super(key: key);
+  const AssigneePickerDialog({
+    Key? key,
+    required this.expense,
+    required this.group,
+  }) : super(key: key);
 
   @override
   _AssigneePickerDialogState createState() => _AssigneePickerDialogState();
 }
 
 class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
-  late List<Assignee> _selectedAssignees;
+  late List<String> _selectedUids;
 
   @override
   initState() {
-    _selectedAssignees = [...widget.expense.assignees];
+    _selectedUids =
+        widget.expense.assignees.map((assignee) => assignee.uid).toList();
     super.initState();
   }
 
@@ -33,27 +36,24 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
       content: Container(
         width: 200,
         child: ListView.builder(
-          itemCount: this.widget.expense.assignees.length,
+          itemCount: this.widget.group.members.length,
           itemBuilder: (context, index) {
-            final assignee = widget.expense.assignees[index];
-            final authorOption = widget.group.getUser(assignee.uid);
-
-            if (authorOption == null) return Icon(Icons.error);
+            final member = widget.group.members[index];
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: AuthorAvatar(
-                author: authorOption,
-                borderColor: this._selectedAssignees.contains(assignee)
+                author: member,
+                borderColor: this._selectedUids.contains(member.uid)
                     ? Colors.green
                     : Colors.transparent,
                 withName: true,
                 onTap: () {
                   setState(() {
-                    if (this._selectedAssignees.contains(assignee)) {
-                      this._selectedAssignees.remove(assignee);
+                    if (this._selectedUids.contains(member.uid)) {
+                      this._selectedUids.remove(member.uid);
                     } else {
-                      this._selectedAssignees.add(assignee);
+                      this._selectedUids.add(member.uid);
                     }
                   });
                 },
@@ -69,8 +69,10 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
         ),
         ElevatedButton(
           onPressed: () async {
-            widget.expense.assignees = this._selectedAssignees;
+            widget.expense.assignees =
+                this._selectedUids.map((uid) => Assignee(uid: uid)).toList();
             await Firestore.instance.updateExpense(widget.expense);
+            Navigator.pop(context);
           },
           child: Text('Save'),
         ),
