@@ -23,7 +23,6 @@ class AuthorAvatar extends StatelessWidget {
       onTap: this.onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Stack(
             children: [
@@ -62,6 +61,7 @@ class AuthorAvatar extends StatelessWidget {
                     ))
             ],
           ),
+          if (this.withName) SizedBox(width: 10),
           if (this.withName) Text(this.author.name),
         ],
       ),

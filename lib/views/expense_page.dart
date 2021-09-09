@@ -109,7 +109,8 @@ class _ExpensePageState extends State<ExpensePage> {
                                 Author? newAuthor = await showDialog<Author>(
                                   context: context,
                                   builder: (context) => AuthorChangeDialog(
-                                    authorOptions: this.groupVm.group.members,
+                                    group: this.groupVm.group,
+                                    expense: expense
                                   ),
                                 );
 
