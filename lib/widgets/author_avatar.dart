@@ -40,7 +40,21 @@ class AuthorAvatar extends StatelessWidget {
                       : NetworkImage(this.author.photoURL!),
                   child: this.author.photoURL != null
                       ? null
-                      : Container(color: Colors.grey),
+                      : Stack(
+                          alignment: AlignmentDirectional.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              this.author.name[0],
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ],
+                        ),
                 ),
               ),
               if (this.checked)

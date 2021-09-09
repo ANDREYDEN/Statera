@@ -76,7 +76,9 @@ class Group {
   Map<Author, double> extendedBalance(String consumerUid) {
     return this.balance[consumerUid]!.map(
           (uid, balance) => MapEntry(
-              this.members.where((member) => member.uid == uid).first, balance),
+            this.members.where((member) => member.uid == uid).first,
+            balance,
+          ),
         );
   }
 
