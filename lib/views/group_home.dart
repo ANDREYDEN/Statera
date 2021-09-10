@@ -58,11 +58,12 @@ class GroupHome extends StatelessWidget {
           style: Theme.of(context).textTheme.headline6,
         ),
         Flexible(
-          child: CustomStreamBuilder<Map<Author, double>>(
-            stream: Firestore.instance
+          child: StreamProvider<Map<Author, double>>(
+            initialData: {},
+            create: (context) => Firestore.instance
                 .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.id),
-            builder: (context, owings) {
-              return ListView.builder(
+            child: Consumer<Map<Author, double>>(
+              builder: (_, owings, __) => ListView.builder(
                 itemCount: owings.length,
                 itemBuilder: (context, index) {
                   var payer = owings.keys.elementAt(index);
@@ -71,8 +72,8 @@ class GroupHome extends StatelessWidget {
                     owing: owings[payer]!,
                   );
                 },
-              );
-            },
+              ),
+            ),
           ),
         ),
         TextButton(

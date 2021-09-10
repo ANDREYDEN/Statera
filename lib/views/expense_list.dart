@@ -28,6 +28,7 @@ class ExpenseList extends StatefulWidget {
 }
 
 class _ExpenseListState extends State<ExpenseList> {
+  late Stream<List<Expense>> _expenseStream;
   List<String> _filters = [];
   final ImagePicker _picker = ImagePicker();
 
@@ -40,6 +41,7 @@ class _ExpenseListState extends State<ExpenseList> {
   @override
   void initState() {
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
+    _expenseStream = Firestore.instance.listenForRelatedExpenses(authVm.user.uid, groupVm.group.id);
     super.initState();
   }
 
@@ -92,8 +94,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
   Widget buildExpensesList() {
     return CustomStreamBuilder<List<Expense>>(
-      stream: Firestore.instance
-          .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id),
+      stream: this._expenseStream,
       builder: (context, expenses) {
         expenses.sort((firstExpense, secondExpense) {
           for (var stage in authVm.expenseStages) {
