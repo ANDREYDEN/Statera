@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/assignee.dart';
+import 'package:intl/intl.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
@@ -101,6 +101,34 @@ class _ExpensePageState extends State<ExpensePage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.schedule, size: 20),
+                                  TextButton(
+                                    onPressed: () async {
+                                      DateTime? newDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate:
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                0),
+                                        lastDate: DateTime.now().add(
+                                          Duration(days: 30),
+                                        ),
+                                      );
+
+                                      expense.date = newDate;
+                                      await Firestore.instance.updateExpense(expense);
+                                    },
+                                    child: Text(
+                                      expense.date == null
+                                          ? 'Not set'
+                                          : DateFormat('dd MMM, yyyy')
+                                              .format(expense.date!),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               Text("Payer:"),
                               AuthorAvatar(
                                 author: expense.author,

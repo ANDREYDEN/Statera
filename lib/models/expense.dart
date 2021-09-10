@@ -21,9 +21,10 @@ class Expense {
   String? id = "";
   String? groupId;
   List<Item> items = [];
+  List<Assignee> assignees = [];
   late String name;
   late Author author; // UID
-  List<Assignee> assignees = [];
+  DateTime? date;
 
   Expense({
     required this.name,
@@ -31,11 +32,13 @@ class Expense {
     required this.groupId,
   }) {
     this.assignees = [Assignee(uid: author.uid)];
+    this.date = DateTime.now();
   }
 
   Expense.fake() {
     this.name = "foo";
     this.author = Author(name: "foo", uid: "foo");
+    this.date = DateTime.now();
   }
 
   double get total => items.fold<double>(
@@ -161,7 +164,8 @@ class Expense {
       "unmarkedAssigneeIds": assignees
           .where((assignee) => !isMarkedBy(assignee.uid))
           .map((assignee) => assignee.uid)
-          .toList()
+          .toList(),
+      "date": date
     };
   }
 
@@ -171,10 +175,11 @@ class Expense {
       name: data["name"],
       groupId: data["groupId"],
     );
+    expense.id = id;
+    expense.date = data["date"] == null ? null : DateTime.parse(data["date"].toDate().toString());
     expense.assignees = data["assignees"]
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();
-    expense.id = id;
     data["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
