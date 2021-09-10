@@ -59,168 +59,173 @@ class _ExpensePageState extends State<ExpensePage> {
               : null,
           child: loading
               ? Text("Loading...")
-              : Column(mainAxisSize: MainAxisSize.min, children: [
-                  Row(
-                    children: [
-                      for (var expenseStage in authVm.expenseStages)
-                        Expanded(
-                          child: Opacity(
-                            opacity: expenseStage.test(expense) ? 1 : 0.7,
-                            child: Container(
-                              margin: const EdgeInsets.all(8.0),
-                              height: 30,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                border: Border.all(
-                                  color: expenseStage.color,
-                                  width: 2,
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        for (var expenseStage in authVm.expenseStages)
+                          Expanded(
+                            child: Opacity(
+                              opacity: expenseStage.test(expense) ? 1 : 0.7,
+                              child: Container(
+                                margin: const EdgeInsets.all(8.0),
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(
+                                    color: expenseStage.color,
+                                    width: 2,
+                                  ),
+                                  color: expenseStage.test(expense)
+                                      ? expenseStage.color
+                                      : null,
                                 ),
-                                color: expenseStage.test(expense)
-                                    ? expenseStage.color
-                                    : null,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  expenseStage.name,
-                                  // textAlign: TextAlign.center,
+                                child: Center(
+                                  child: Text(
+                                    expenseStage.name,
+                                    // textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Payer:"),
-                            AuthorAvatar(
-                              author: expense.author,
-                              onTap: () async {
-                                if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                  return;
-
-                                Author? newAuthor = await showDialog<Author>(
-                                  context: context,
-                                  builder: (context) => AuthorChangeDialog(
-                                    group: this.groupVm.group,
-                                    expense: expense
-                                  ),
-                                );
-
-                                if (newAuthor == null) return;
-
-                                expense.author = newAuthor;
-                                await Firestore.instance.updateExpense(expense);
-                              },
-                            ),
-                            Text("Assignees:"),
-                            GestureDetector(
-                              onTap: () {
-                                if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                  return;
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AssigneePickerDialog(
-                                    group: groupVm.group,
-                                    expense: expense,
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                // TODO: make this dynamically stretch
-                                width: 54.0 * expense.assignees.length,
-                                child: ListView.builder(
-                                  itemCount: expense.assignees.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    final assignee = expense.assignees[index];
-                                    final member = this
-                                        .groupVm
-                                        .group
-                                        .getUser(assignee.uid);
-
-                                    if (member == null)
-                                      return Icon(Icons.error);
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 4),
-                                      child: AuthorAvatar(
-                                        author: member,
-                                        checked:
-                                            expense.isMarkedBy(assignee.uid),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
-                  ),
-                  Divider(thickness: 1),
-                  Flexible(
-                    child: expense.items.length == 0
-                        ? ListEmpty(text: 'Add items to this expense')
-                        : ListView.builder(
-                            itemCount: expense.items.length,
-                            itemBuilder: (context, index) {
-                              var item = expense.items[index];
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Payer:"),
+                              AuthorAvatar(
+                                author: expense.author,
+                                onTap: () async {
+                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
+                                    return;
 
-                              // TODO: make this conditionally dismissable if finalized
-                              return OptionallyDismissible(
-                                key: Key(item.hashCode.toString()),
-                                isDismissible:
-                                    expense.canBeUpdatedBy(authVm.user.uid),
-                                onDismissed: (_) async {
-                                  if (expense.completed) return;
+                                  Author? newAuthor = await showDialog<Author>(
+                                    context: context,
+                                    builder: (context) => AuthorChangeDialog(
+                                        group: this.groupVm.group,
+                                        expense: expense),
+                                  );
 
-                                  expense.items.removeAt(index);
+                                  if (newAuthor == null) return;
+
+                                  expense.author = newAuthor;
                                   await Firestore.instance
                                       .updateExpense(expense);
                                 },
-                                child: GestureDetector(
-                                  onLongPress: () =>
-                                      handleEditItem(expense, item),
-                                  child: ItemListItem(
-                                    item: item,
-                                    onDecisionTaken: (decision) async {
-                                      if (expense.completed) return;
+                              ),
+                              Text("Assignees:"),
+                              GestureDetector(
+                                onTap: () {
+                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
+                                    return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AssigneePickerDialog(
+                                      group: groupVm.group,
+                                      expense: expense,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 50,
+                                  // TODO: make this dynamically stretch
+                                  width: 54.0 * expense.assignees.length,
+                                  child: ListView.builder(
+                                    itemCount: expense.assignees.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (context, index) {
+                                      final assignee = expense.assignees[index];
+                                      final member = this
+                                          .groupVm
+                                          .group
+                                          .getUser(assignee.uid);
 
-                                      expense.items[index].setAssigneeDecision(
-                                        this.authVm.user.uid,
-                                        decision,
+                                      if (member == null)
+                                        return Icon(Icons.error);
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 4),
+                                        child: AuthorAvatar(
+                                          author: member,
+                                          checked:
+                                              expense.isMarkedBy(assignee.uid),
+                                        ),
                                       );
-                                      await Firestore.instance
-                                          .updateExpense(expense);
-                                      if (expense.completed) {
-                                        snackbarCatch(
-                                          context,
-                                          () async {
-                                            groupVm.updateBalance(expense);
-                                            await Firestore.instance
-                                                .saveGroup(groupVm.group);
-                                          },
-                                          successMessage:
-                                              "The expense is now complete. Participants' balances updated.",
-                                        );
-                                      }
                                     },
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
-                  ),
-                ]),
+                        ],
+                      ),
+                    ),
+                    Divider(thickness: 1),
+                    Flexible(
+                      child: expense.items.length == 0
+                          ? ListEmpty(text: 'Add items to this expense')
+                          : ListView.builder(
+                              itemCount: expense.items.length,
+                              itemBuilder: (context, index) {
+                                var item = expense.items[index];
+
+                                // TODO: make this conditionally dismissable if finalized
+                                return OptionallyDismissible(
+                                  key: Key(item.hashCode.toString()),
+                                  isDismissible:
+                                      expense.canBeUpdatedBy(authVm.user.uid),
+                                  onDismissed: (_) async {
+                                    if (expense.completed) return;
+
+                                    expense.items.removeAt(index);
+                                    await Firestore.instance
+                                        .updateExpense(expense);
+                                  },
+                                  child: GestureDetector(
+                                    onLongPress: () =>
+                                        handleEditItem(expense, item),
+                                    child: ItemListItem(
+                                      item: item,
+                                      onDecisionTaken: (decision) async {
+                                        if (expense.completed) return;
+
+                                        expense.items[index]
+                                            .setAssigneeDecision(
+                                          this.authVm.user.uid,
+                                          decision,
+                                        );
+                                        await Firestore.instance
+                                            .updateExpense(expense);
+                                        if (expense.completed) {
+                                          snackbarCatch(
+                                            context,
+                                            () async {
+                                              groupVm.updateBalance(expense);
+                                              await Firestore.instance
+                                                  .saveGroup(groupVm.group);
+                                            },
+                                            successMessage:
+                                                "The expense is now complete. Participants' balances updated.",
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
         );
       },
     );
@@ -238,16 +243,15 @@ class _ExpensePageState extends State<ExpensePage> {
             validators: [FieldData.requiredFormatter],
           ),
           FieldData(
-              id: "item_value",
-              label: "Item Value",
-              inputType: TextInputType.numberWithOptions(decimal: true),
-              validators: [
-                FieldData.requiredFormatter,
-                FieldData.numberFormatter
-              ],
-              formatters: [
-                CommaReplacerTextInputFormatter()
-              ]),
+            id: "item_value",
+            label: "Item Value",
+            inputType: TextInputType.numberWithOptions(decimal: true),
+            validators: [
+              FieldData.requiredFormatter,
+              FieldData.numberFormatter
+            ],
+            formatters: [CommaReplacerTextInputFormatter()],
+          ),
         ],
         onSubmit: (values) async {
           expense.addItem(Item(
