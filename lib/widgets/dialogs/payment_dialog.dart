@@ -40,7 +40,10 @@ class _PaymentDialogState extends State<PaymentDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Pay off balance (${toStringPrice(this.widget.value)})"),
+      title: Text(
+        (widget.isReceiving ? "Receiving balance" : "Pay off balance") +
+            " (${toStringPrice(this.widget.value)})",
+      ),
       content: Column(
         children: [
           // TODO: disable paying over balance or negative
@@ -51,7 +54,9 @@ class _PaymentDialogState extends State<PaymentDialog> {
           ),
           SizedBox(height: 10),
           Text(
-            widget.isReceiving ? "You aknowledge that you received a payment of ${toStringPrice(-this.balanceToPay)} from ${this.widget.receiver.name}." : "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
+            widget.isReceiving
+                ? "You aknowledge that you received a payment of ${toStringPrice(-this.balanceToPay)} from ${this.widget.receiver.name}."
+                : "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
           ),
         ],
       ),
@@ -65,12 +70,16 @@ class _PaymentDialogState extends State<PaymentDialog> {
             await snackbarCatch(
               context,
               () => this.widget.onPay(this.balanceToPay),
-              successMessage:
-                  "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
+              successMessage: widget.isReceiving
+                  ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
+                  : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
             );
             Navigator.of(context).pop();
           },
-          child: Text("Pay ${toStringPrice(this.balanceToPay)}"),
+          child: Text(
+            (widget.isReceiving ? "Recieve" : "Pay") +
+                " ${toStringPrice(this.balanceToPay)}",
+          ),
         ),
       ],
     );
