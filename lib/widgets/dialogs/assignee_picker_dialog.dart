@@ -69,8 +69,7 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
         ),
         ElevatedButton(
           onPressed: () async {
-            widget.expense.assignees =
-                this._selectedUids.map((uid) => Assignee(uid: uid)).toList();
+            widget.expense.updateAssignees(this._selectedUids);
             await Firestore.instance.updateExpense(widget.expense);
             Navigator.pop(context);
           },
