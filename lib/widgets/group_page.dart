@@ -43,7 +43,10 @@ class _GroupPageState extends State<GroupPage> {
           ),
           BottomNavigationBarItem(
             label: "Expenses",
-            icon: UnmarkedExpensesBadge(child: Icon(Icons.attach_money)),
+            icon: UnmarkedExpensesBadge(
+              groupId: groupVm.group.id,
+              child: Icon(Icons.attach_money),
+            ),
             activeIcon: Icon(
               Icons.attach_money,
               color: Theme.of(context).primaryColor,
