@@ -17,7 +17,7 @@ class ExpenseListItem extends StatelessWidget {
 
     Color? cardColor = Colors.blue[200];
     authVm.expenseStages.forEach((stage) {
-      if (stage.test(this.expense)) {
+      if (this.expense.isIn(stage)) {
         cardColor = stage.color;
       }
     });

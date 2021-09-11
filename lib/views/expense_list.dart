@@ -98,11 +98,11 @@ class _ExpenseListState extends State<ExpenseList> {
       builder: (context, expenses) {
         expenses.sort((firstExpense, secondExpense) {
           for (var stage in authVm.expenseStages) {
-            if (stage.test(firstExpense) && stage.test(secondExpense)) {
+            if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
               return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
             }
-            if (stage.test(firstExpense)) return -1;
-            if (stage.test(secondExpense)) return 1;
+            if (firstExpense.isIn(stage)) return -1;
+            if (secondExpense.isIn(stage)) return 1;
           }
 
           return 0;
@@ -111,7 +111,7 @@ class _ExpenseListState extends State<ExpenseList> {
         expenses = expenses
             .where(
               (expense) => authVm.expenseStages.any(
-                (stage) => _filters.contains(stage.name) && stage.test(expense),
+                (stage) => _filters.contains(stage.name) && expense.isIn(stage),
               ),
             )
             .toList();

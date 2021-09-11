@@ -55,6 +55,8 @@ class Expense {
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
+  bool isIn(ExpenseStage stage) => stage.test(this);
+
   bool get completed =>
       items.isNotEmpty && items.every((item) => item.completed);
 

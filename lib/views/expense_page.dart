@@ -66,7 +66,7 @@ class _ExpensePageState extends State<ExpensePage> {
                         for (var expenseStage in authVm.expenseStages)
                           Expanded(
                             child: Opacity(
-                              opacity: expenseStage.test(expense) ? 1 : 0.7,
+                              opacity: expense.isIn(expenseStage) ? 1 : 0.7,
                               child: Container(
                                 margin: const EdgeInsets.all(8.0),
                                 height: 30,
@@ -76,7 +76,7 @@ class _ExpensePageState extends State<ExpensePage> {
                                     color: expenseStage.color,
                                     width: 2,
                                   ),
-                                  color: expenseStage.test(expense)
+                                  color: expense.isIn(expenseStage)
                                       ? expenseStage.color
                                       : null,
                                 ),
