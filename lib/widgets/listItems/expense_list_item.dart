@@ -60,7 +60,12 @@ class ExpenseListItem extends StatelessWidget {
                               style: TextStyle(fontSize: 20),
                             ),
                           ),
-                          Text("${this.expense.items.length} item(s)"),
+                          Text(
+                            pluralize('item', this.expense.items.length) +
+                                (this.expense.formattedDate == null
+                                    ? ""
+                                    : " on ${this.expense.formattedDate!}"),
+                          ),
                         ],
                       ),
                     ),

@@ -39,3 +39,8 @@ Future<bool> snackbarCatch(
 
   return !errorOccured;
 }
+
+pluralize(term, quantity) {
+  var pluralTerm = (quantity % 10 == 1 && quantity % 100 != 11) ? term : '${term}s';
+  return '$quantity $pluralTerm';
+}

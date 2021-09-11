@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/item.dart';
@@ -118,13 +117,11 @@ class _ExpensePageState extends State<ExpensePage> {
                                       );
 
                                       expense.date = newDate;
-                                      await Firestore.instance.updateExpense(expense);
+                                      await Firestore.instance
+                                          .updateExpense(expense);
                                     },
                                     child: Text(
-                                      expense.date == null
-                                          ? 'Not set'
-                                          : DateFormat('dd MMM, yyyy')
-                                              .format(expense.date!),
+                                      expense.formattedDate ?? 'Not set',
                                     ),
                                   ),
                                 ],

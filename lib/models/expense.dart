@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
@@ -41,13 +42,18 @@ class Expense {
     this.date = DateTime.now();
   }
 
+  String? get formattedDate =>
+      this.date == null ? null : DateFormat('d MMM, yyyy').format(this.date!);
+
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
   bool get completed =>
       items.isNotEmpty && items.every((item) => item.completed);
 
-  bool get canReceiveAssignees => assignees.length == 1 || !completed;
+  bool get canReceiveAssignees =>
+      (assignees.length == 1 && this.isAuthoredBy(assignees.first.uid)) ||
+      !completed;
 
   bool isMarkedBy(String uid) {
     return items.fold(
@@ -88,6 +94,22 @@ class Expense {
       ));
     });
     this.assignees.add(newAssignee);
+  }
+
+  void updateAssignees(List<String> selectedUids) {
+    if (selectedUids.isEmpty) throw new Exception('Assignee list can not be empty');
+
+    this.assignees = selectedUids.map((uid) => Assignee(uid: uid)).toList();
+
+    this.items.forEach((item) {
+      item.assignees = selectedUids.map((uid) {
+        try {
+          return item.assignees.firstWhere((assignee) => assignee.uid == uid);
+        } catch (e) {
+          return AssigneeDecision(uid: uid);
+        }
+      }).toList();
+    });
   }
 
   assignGroup(Group group) {
@@ -176,7 +198,9 @@ class Expense {
       groupId: data["groupId"],
     );
     expense.id = id;
-    expense.date = data["date"] == null ? null : DateTime.parse(data["date"].toDate().toString());
+    expense.date = data["date"] == null
+        ? null
+        : DateTime.parse(data["date"].toDate().toString());
     expense.assignees = data["assignees"]
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();
