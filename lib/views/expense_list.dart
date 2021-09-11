@@ -98,6 +98,9 @@ class _ExpenseListState extends State<ExpenseList> {
       builder: (context, expenses) {
         expenses.sort((firstExpense, secondExpense) {
           for (var stage in authVm.expenseStages) {
+            if (stage.test(firstExpense) && stage.test(secondExpense)) {
+              return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
+            }
             if (stage.test(firstExpense)) return -1;
             if (stage.test(secondExpense)) return 1;
           }

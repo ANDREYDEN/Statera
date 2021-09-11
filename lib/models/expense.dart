@@ -45,6 +45,13 @@ class Expense {
   String? get formattedDate =>
       this.date == null ? null : DateFormat('d MMM, yyyy').format(this.date!);
 
+  bool wasEarlierThan(Expense other) {
+    if (this.date == null) return true;
+    if (other.date == null) return false;
+
+    return this.date!.compareTo(other.date!) < 0;
+  }
+
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
