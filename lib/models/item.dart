@@ -51,7 +51,11 @@ class Item {
   }
 
   ProductDecision assigneeDecision(String uid) {
-    return getAssigneeById(uid).decision;
+    try {
+      return getAssigneeById(uid).decision;
+    } catch (e) {
+      return ProductDecision.Undefined;
+    }
   }
 
   void setAssigneeDecision(String uid, ProductDecision decision) {

@@ -68,6 +68,8 @@ class Expense {
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.completed;
 
+  bool canBeMarkedBy(String uid) => !this.completed && this.assignees.any((assignee) => assignee.uid == uid);
+
   int get definedAssignees => assignees.fold(
         0,
         (previousValue, assignee) =>

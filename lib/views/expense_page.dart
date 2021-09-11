@@ -105,6 +105,9 @@ class _ExpensePageState extends State<ExpensePage> {
                                   Icon(Icons.schedule, size: 20),
                                   TextButton(
                                     onPressed: () async {
+                                      if (!expense.canBeUpdatedBy(
+                                          authVm.user.uid)) return;
+
                                       DateTime? newDate = await showDatePicker(
                                         context: context,
                                         initialDate: DateTime.now(),
@@ -115,6 +118,8 @@ class _ExpensePageState extends State<ExpensePage> {
                                           Duration(days: 30),
                                         ),
                                       );
+
+                                      if (newDate == null) return;
 
                                       expense.date = newDate;
                                       await Firestore.instance
@@ -206,11 +211,8 @@ class _ExpensePageState extends State<ExpensePage> {
                                 // TODO: make this conditionally dismissable if finalized
                                 return OptionallyDismissible(
                                   key: Key(item.hashCode.toString()),
-                                  isDismissible:
-                                      expense.canBeUpdatedBy(authVm.user.uid),
+                                  isDismissible: authVm.canUpdate(expense),
                                   onDismissed: (_) async {
-                                    if (expense.completed) return;
-
                                     expense.items.removeAt(index);
                                     await Firestore.instance
                                         .updateExpense(expense);
@@ -221,7 +223,7 @@ class _ExpensePageState extends State<ExpensePage> {
                                     child: ItemListItem(
                                       item: item,
                                       onDecisionTaken: (decision) async {
-                                        if (expense.completed) return;
+                                        if (!authVm.canMark(expense)) return;
 
                                         expense.items[index]
                                             .setAssigneeDecision(
@@ -290,7 +292,7 @@ class _ExpensePageState extends State<ExpensePage> {
   }
 
   handleEditItem(Expense expense, Item item) {
-    if (!expense.canBeUpdatedBy(authVm.user.uid)) return;
+    if (!authVm.canUpdate(expense)) return;
 
     showDialog(
       context: context,

@@ -33,8 +33,7 @@ class AuthenticationViewModel {
       ExpenseStage(
         name: "Pending",
         color: Colors.yellow[300]!,
-        test: (expense) =>
-            expense.isMarkedBy(user.uid) && !expense.completed,
+        test: (expense) => expense.isMarkedBy(user.uid) && !expense.completed,
       ),
       ExpenseStage(
         name: "Completed",
@@ -80,4 +79,8 @@ class AuthenticationViewModel {
 
     return Firestore.instance.saveGroup(group);
   }
+
+  bool canMark(Expense expense) => expense.canBeMarkedBy(this.user.uid);
+
+  bool canUpdate(Expense expense) => expense.canBeUpdatedBy(this.user.uid);
 }
