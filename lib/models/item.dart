@@ -16,6 +16,8 @@ class Item {
   }
 
   Item.fake() {
+    var uuid = Uuid();
+    this.id = uuid.v1();
     this.name = "foo";
     this.value = 145;
   }

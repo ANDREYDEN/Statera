@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/assignee_decision.dart';
@@ -9,14 +11,10 @@ import 'package:statera/models/item.dart';
 void main() {
   group('Expense', () {
     late Expense expense;
-    late Author author;
-    late Assignee assignee;
+    Author author = Author(name: 'foo', uid: 'bar');
+    Assignee assignee = Assignee(uid: 'qwe');
 
     setUp(() {
-      assignee = Assignee(uid: 'qwe');
-
-      author = Author(name: 'foo', uid: 'bar');
-
       expense = Expense(
         author: author,
         name: 'baz',
@@ -24,58 +22,90 @@ void main() {
       );
     });
 
-    test('adds the author to the assignees by default', () {
-      expect(expense.assignees, hasLength(1));
-      expect(expense.assignees.first.uid, author.uid);
-      expect(expense.isAuthoredBy(author.uid), isTrue);
-    });
-
-    group('adding assignees', () {
-      test(
-        "can add new assignees if there's noone but the author assigned",
-        () {
-          expense.assignees = [assignee];
-
-          expect(expense.canReceiveAssignees, isTrue);
-        },
-      );
-
-      test('can add an assignee', () {
-        expense.assignees = [assignee];
-
-        var item = Item.fake();
-        expense.addItem(item);
-        var firstAssigneeDecision = ProductDecision.Confirmed;
-        item.setAssigneeDecision(assignee.uid, firstAssigneeDecision);
-
-        var newAssignee = Assignee.fake();
-        expense.addAssignee(newAssignee);
-
-        expect(expense.assignees, hasLength(2));
-        expect(expense.assignees[1].uid, newAssignee.uid);
-        expect(
-          item.assigneeDecision(assignee.uid),
-          firstAssigneeDecision,
-          reason: "First assignee decision was removed",
-        );
-        expect(
-          item.assigneeDecision(newAssignee.uid),
-          ProductDecision.Undefined,
-        );
+    group('assignee CRUD', () {
+      test('adds the author to the assignees by default', () {
+        expect(expense.assignees, hasLength(1));
+        expect(expense.assignees.first.uid, author.uid);
+        expect(expense.isAuthoredBy(author.uid), isTrue);
       });
 
-      test('can add assignee decisions to existing items', () {
-        expense.assignees = [assignee];
+      group('updating assignees', () {
+        test("updates and preserves the old assignees' product decisions", () {
+          var item = Item.fake();
+          expense.addItem(item);
+          expense.addAssignee(assignee);
+          var initialDecision = ProductDecision.Confirmed;
+          item.setAssigneeDecision(assignee.uid, initialDecision);
+          var newAssigneeIds = [assignee.uid, '2', '3'];
 
-        var item = Item.fake();
-        expense.addItem(item);
+          expense.updateAssignees(newAssigneeIds);
 
-        var itemAssigneeIds = item.assignees
-            .map((assigneeDecision) => assigneeDecision.uid)
-            .toList();
-        var expenseAssigneeIds =
-            expense.assignees.map((assignee) => assignee.uid).toList();
-        expect(itemAssigneeIds, containsAll(expenseAssigneeIds));
+          expect(item.assignees, hasLength(newAssigneeIds.length));
+          expect(item.assigneeDecision('2'), ProductDecision.Undefined);
+          expect(item.assigneeDecision(assignee.uid), initialDecision);
+        });
+
+        test("restricts updating with an empty list", () {
+          expect(() => expense.updateAssignees([]), throwsException);
+        });
+      });
+
+      group('adding assignees', () {
+        test('can be performed', () {
+          expense.assignees = [assignee];
+
+          var item = Item.fake();
+          expense.addItem(item);
+          var firstAssigneeDecision = ProductDecision.Confirmed;
+          item.setAssigneeDecision(assignee.uid, firstAssigneeDecision);
+
+          var newAssignee = Assignee.fake();
+          expense.addAssignee(newAssignee);
+
+          expect(expense.assignees, hasLength(2));
+          expect(expense.assignees[1].uid, newAssignee.uid);
+          expect(
+            item.assigneeDecision(assignee.uid),
+            firstAssigneeDecision,
+            reason: "First assignee decision was removed",
+          );
+          expect(
+            item.assigneeDecision(newAssignee.uid),
+            ProductDecision.Undefined,
+          );
+        });
+
+        test("can be performed if there's noone but the author assigned", () {
+          expense.addItem(Item.fake());
+          expense.assignees = [Assignee(uid: author.uid)];
+          expense.items.first
+              .setAssigneeDecision(author.uid, ProductDecision.Confirmed);
+
+          expect(expense.canReceiveAssignees, isTrue);
+        });
+
+        test("can't be performed if the only assignee is not the author", () {
+          expense.addItem(Item.fake());
+          expense.assignees = [assignee];
+          expense.items.first
+              .setAssigneeDecision(author.uid, ProductDecision.Confirmed);
+
+          expect(expense.canReceiveAssignees, isFalse);
+        });
+
+        test('can add assignee decisions to existing items', () {
+          expense.assignees = [assignee];
+
+          var item = Item.fake();
+          expense.addItem(item);
+
+          var itemAssigneeIds = item.assignees
+              .map((assigneeDecision) => assigneeDecision.uid)
+              .toList();
+          var expenseAssigneeIds =
+              expense.assignees.map((assignee) => assignee.uid).toList();
+          expect(itemAssigneeIds, containsAll(expenseAssigneeIds));
+        });
       });
     });
 
@@ -216,10 +246,14 @@ void main() {
           ProductDecision.Confirmed,
         );
 
-        expect(expense.getItemValueForAssignee(item1.name, firstAssignee.uid), 62);
-        expect(expense.getItemValueForAssignee(item2.name, firstAssignee.uid), 0);
-        expect(expense.getItemValueForAssignee(item1.name, secondAssignee.uid), 62);
-        expect(expense.getItemValueForAssignee(item2.name, secondAssignee.uid), 42);
+        expect(
+            expense.getItemValueForAssignee(item1.name, firstAssignee.uid), 62);
+        expect(
+            expense.getItemValueForAssignee(item2.name, firstAssignee.uid), 0);
+        expect(expense.getItemValueForAssignee(item1.name, secondAssignee.uid),
+            62);
+        expect(expense.getItemValueForAssignee(item2.name, secondAssignee.uid),
+            42);
       });
     });
 
@@ -242,6 +276,67 @@ void main() {
         item.assignees.map((a) => a.uid),
         orderedEquals(groupMembers.map((g) => g.uid)),
       );
+    });
+
+    test("can only be updated by the author if not completed", () {
+      var item = Item.fake();
+      expense.addItem(item);
+      var somebodyElse = Assignee.fake(uid: 'other');
+      expense.addAssignee(somebodyElse);
+
+      expect(expense.canBeUpdatedBy(author.uid), isTrue);
+      expect(expense.canBeUpdatedBy(somebodyElse.uid), isFalse);
+
+      item.setAssigneeDecision(author.uid, ProductDecision.Confirmed);
+      item.setAssigneeDecision(somebodyElse.uid, ProductDecision.Denied);
+
+      expect(expense.canBeUpdatedBy(author.uid), isFalse);
+    });
+
+    group("conversion", () {
+      test('expense can be converted to Firestore object', () {
+        var expense = Expense(name: 'foo', author: author, groupId: '123');
+
+        var firestoreData = expense.toFirestore();
+
+        expect(firestoreData['name'], expense.name);
+        expect(
+          Author.fromFirestore(firestoreData['author']).uid,
+          expense.author.uid,
+        );
+        expect(
+          expense.date!.difference(firestoreData['date']),
+          lessThan(Duration(seconds: 1)),
+        );
+      });
+
+      test('expense can be created from a Firestore object', () {
+        var item = Item.fake();
+        var testData = {
+          "groupId": '123',
+          "name": "foo",
+          "items": [item.toFirestore()],
+          "author": author.toFirestore(),
+          "assigneeIds": [],
+          "assignees": [],
+          "unmarkedAssigneeIds": [],
+          "date": Timestamp.now()
+        };
+
+        var id = '123';
+        var expense = Expense.fromFirestore(testData, id);
+
+        expect(expense.id, id);
+        expect(expense.name, testData['name']);
+        expect(expense.author.uid, author.uid);
+        expect(
+          DateTime.parse((testData['date'] as Timestamp).toDate().toString())
+              .difference(expense.date!),
+          lessThan(Duration(seconds: 1)),
+        );
+        expect(expense.items, hasLength(1));
+        expect(expense.items.first.id, item.id);
+      });
     });
   });
 }
