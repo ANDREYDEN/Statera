@@ -1,3 +1,5 @@
+import 'dart:math';
+
 enum ProductDecision { Undefined, Confirmed, Denied }
 
 const pdToString = {
@@ -25,7 +27,7 @@ class AssigneeDecision {
   }
 
   int get parts => _parts ?? (decision == ProductDecision.Confirmed ? 1 : 0);
-  set parts(int value) => _parts = value;
+  set parts(int value) => _parts = max(value, 0);
 
   bool get madeDecision => decision != ProductDecision.Undefined;
 

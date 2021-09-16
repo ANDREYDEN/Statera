@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:statera/models/assignee_decision.dart';
 import 'package:uuid/uuid.dart';
 
@@ -45,12 +47,12 @@ class Item {
 
   bool get completed =>
       assignees.every((assignee) => assignee.madeDecision) &&
-      undefinedParts == 0;
+      (!isPartitioned || undefinedParts == 0);
 
   int get confirmedParts =>
       assignees.fold<int>(0, (acc, assignee) => acc + assignee.parts);
 
-  int get undefinedParts => partition - confirmedParts;
+  int get undefinedParts => max(0, partition - confirmedParts);
 
   AssigneeDecision getAssigneeById(uid) {
     return assignees.firstWhere(
@@ -79,12 +81,15 @@ class Item {
 
   void setAssigneeDecision(String uid, int parts) {
     var assignee = getAssigneeById(uid);
-    var partsIncrease = parts - assignee.parts;
     assignee.decision =
         parts <= 0 ? ProductDecision.Denied : ProductDecision.Confirmed;
 
-    if (parts < 0 || partsIncrease > undefinedParts) return;
-    assignee.parts = parts;
+    if (isPartitioned) {
+      if (parts > undefinedParts + assignee.parts) return;
+      assignee.parts = parts;
+    } else {
+      assignee.parts = parts.clamp(0, 1);
+    }
   }
 
   Map<String, dynamic> toFirestore() {
