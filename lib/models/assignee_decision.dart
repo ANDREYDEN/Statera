@@ -26,7 +26,9 @@ class AssigneeDecision {
     }
   }
 
-  int get parts => _parts ?? (decision == ProductDecision.Confirmed ? 1 : 0);
+  int get parts => decision == ProductDecision.Undefined
+      ? 0
+      : _parts ?? (decision == ProductDecision.Confirmed ? 1 : 0);
   set parts(int value) => _parts = max(value, 0);
 
   bool get madeDecision => decision != ProductDecision.Undefined;
