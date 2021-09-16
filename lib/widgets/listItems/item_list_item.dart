@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/item.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
+import 'package:statera/widgets/progress_bar.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
@@ -57,7 +58,7 @@ class ItemListItem extends StatelessWidget {
                         padding: EdgeInsets.all(0),
                       ),
                       child: Icon(
-                        !authVm.hasDecidedOn(item)
+                        !authVm.hasDecidedOn(item) || !item.isPartitioned
                             ? Icons.close
                             : authVm.hasDenied(item)
                                 ? Icons.close
@@ -80,7 +81,7 @@ class ItemListItem extends StatelessWidget {
                                 : Colors.grey[500],
                       ),
                       child: Icon(
-                        !authVm.hasDecidedOn(item)
+                        !authVm.hasDecidedOn(item) || !item.isPartitioned
                             ? Icons.check
                             : item.undefinedParts == 0 &&
                                     authVm.hasConfirmed(item)
@@ -91,41 +92,15 @@ class ItemListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  height: 10,
-                  child: Row(
-                    children: [
-                      Flexible(
-                        flex: item.confirmedParts,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              topLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(item.undefinedParts == 0 ? 10 : 0),
-                              topRight: Radius.circular(item.undefinedParts == 0 ? 10 : 0),
-                            ),
-                            color: Colors.green[400],
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: item.undefinedParts,
-                        child: Container(decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(item.confirmedParts == 0 ? 10 : 0),
-                              topLeft: Radius.circular(item.confirmedParts == 0 ? 10 : 0),
-                            ),
-                            color: Colors.grey[300],
-                          ),),
-                      )
-                    ],
+                if (item.isPartitioned)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                    child: ProgressBar(
+                      progress: item.confirmedParts,
+                      total: item.partition,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
+                // SizedBox(height: 10),
               ],
             ),
           )
