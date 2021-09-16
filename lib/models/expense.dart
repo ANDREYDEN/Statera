@@ -77,7 +77,8 @@ class Expense {
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.completed;
 
-  bool canBeMarkedBy(String uid) => !this.completed && this.assignees.any((assignee) => assignee.uid == uid);
+  bool canBeMarkedBy(String uid) =>
+      !this.completed && this.assignees.any((assignee) => assignee.uid == uid);
 
   int get definedAssignees => assignees.fold(
         0,
@@ -108,7 +109,8 @@ class Expense {
   }
 
   void updateAssignees(List<String> selectedUids) {
-    if (selectedUids.isEmpty) throw new Exception('Assignee list can not be empty');
+    if (selectedUids.isEmpty)
+      throw new Exception('Assignee list can not be empty');
 
     this.assignees = selectedUids.map((uid) => Assignee(uid: uid)).toList();
 
@@ -135,22 +137,6 @@ class Expense {
     });
   }
 
-  double? getItemValueForAssignee(String itemName, String uid) {
-    Item item = items.firstWhere(
-      (item) => item.name == itemName,
-      orElse: () =>
-          throw Exception("No expense item found with name $itemName"),
-    );
-    AssigneeDecision assignee = item.assignees.firstWhere(
-      (element) => element.uid == uid,
-      orElse: () => throw Exception(
-          "Can not find assignee in expense $name with UID $uid"),
-    );
-    if (assignee.decision == ProductDecision.Undefined) return null;
-
-    return item.getValueForAssignee(uid);
-  }
-
   double getConfirmedTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 
@@ -158,22 +144,6 @@ class Expense {
       0,
       (previousValue, item) {
         if (item.assigneeDecision(uid) == ProductDecision.Confirmed) {
-          return previousValue + item.sharedValue;
-        }
-        return previousValue;
-      },
-    );
-  }
-
-  /// Total for user for an unmarked expence.
-  /// All but the [Denied] expenses count.
-  double getPotentialTotalForUser(String uid) {
-    if (!this.hasAssignee(uid) || this.completed) return 0;
-
-    return items.fold<double>(
-      0,
-      (previousValue, item) {
-        if (item.assigneeDecision(uid) != ProductDecision.Denied) {
           return previousValue + item.getSharedValueFor(uid);
         }
         return previousValue;

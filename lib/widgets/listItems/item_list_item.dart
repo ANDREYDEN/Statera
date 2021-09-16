@@ -62,7 +62,7 @@ class ItemListItem extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              Text("${authVm.getItemParts(item)}/${item.partition}"),
+              Text("${authVm.hasDecidedOn(item) ? authVm.getItemParts(item) : '-'}/${item.partition}"),
               ElevatedButton(
                 onPressed: () =>
                     this.onChangePartition(authVm.getItemParts(item) + 1),

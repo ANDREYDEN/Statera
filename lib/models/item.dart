@@ -5,7 +5,10 @@ class Item {
   late String id;
   late String name;
   late double value;
-  int? _partition; // some items might consist of multiple equal parts that need to be treated separately
+
+  // some items might consist of multiple equal parts
+  // that need to be treated separately
+  int? _partition;
   List<AssigneeDecision> assignees = [];
 
   Item({required this.name, required this.value, int? partition = 1}) {
@@ -34,23 +37,17 @@ class Item {
 
   bool get isPartitioned => partition > 1;
 
-  double get sharedValue =>
-      confirmedCount == 0 ? value : value / confirmedCount;
-
-  double getSharedValueFor(String uid) {
-    if (assigneeDecision(uid) == ProductDecision.Confirmed) {
-      return sharedValue;
-    }
-    return value / (confirmedCount + 1);
-  }
+  double getSharedValueFor(String uid) =>
+      getAssigneeParts(uid) / partition * value;
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
-  bool get completed => assignees.every((assignee) => assignee.madeDecision) && undefinedParts == 0;
+  bool get completed =>
+      assignees.every((assignee) => assignee.madeDecision) &&
+      undefinedParts == 0;
 
-  int get confirmedParts => assignees
-      .map((assignee) => assignee.parts)
-      .reduce((acc, element) => acc + element);
+  int get confirmedParts =>
+      assignees.fold<int>(0, (acc, assignee) => acc + assignee.parts);
 
   int get undefinedParts => partition - confirmedParts;
 
@@ -58,7 +55,8 @@ class Item {
     return assignees.firstWhere(
       (element) => element.uid == uid,
       orElse: () => throw new Exception(
-          "Can not find assignee with uid $uid for item $name"),
+        "Can not find assignee with uid $uid for item $name",
+      ),
     );
   }
 
@@ -86,10 +84,6 @@ class Item {
 
     if (parts < 0 || partsIncrease > undefinedParts) return;
     assignee.parts = parts;
-  }
-
-  double getValueForAssignee(String uid) {
-    return assigneeDecision(uid) == ProductDecision.Denied ? 0 : sharedValue;
   }
 
   Map<String, dynamic> toFirestore() {
