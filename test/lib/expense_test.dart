@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/models/assignee.dart';
 import 'package:statera/models/assignee_decision.dart';
@@ -34,15 +33,15 @@ void main() {
           var item = Item.fake();
           expense.addItem(item);
           expense.addAssignee(assignee);
-          var initialDecision = ProductDecision.Confirmed;
-          item.setAssigneeDecision(assignee.uid, initialDecision);
+          var initialParts = 1;
+          item.setAssigneeDecision(assignee.uid, initialParts);
           var newAssigneeIds = [assignee.uid, '2', '3'];
 
           expense.updateAssignees(newAssigneeIds);
 
           expect(item.assignees, hasLength(newAssigneeIds.length));
           expect(item.assigneeDecision('2'), ProductDecision.Undefined);
-          expect(item.assigneeDecision(assignee.uid), initialDecision);
+          expect(item.getAssigneeParts(assignee.uid), initialParts);
         });
 
         test("restricts updating with an empty list", () {
@@ -56,8 +55,8 @@ void main() {
 
           var item = Item.fake();
           expense.addItem(item);
-          var firstAssigneeDecision = ProductDecision.Confirmed;
-          item.setAssigneeDecision(assignee.uid, firstAssigneeDecision);
+          var firstAssigneeParts = 1;
+          item.setAssigneeDecision(assignee.uid, firstAssigneeParts);
 
           var newAssignee = Assignee.fake();
           expense.addAssignee(newAssignee);
@@ -65,8 +64,8 @@ void main() {
           expect(expense.assignees, hasLength(2));
           expect(expense.assignees[1].uid, newAssignee.uid);
           expect(
-            item.assigneeDecision(assignee.uid),
-            firstAssigneeDecision,
+            item.getAssigneeParts(assignee.uid),
+            firstAssigneeParts,
             reason: "First assignee decision was removed",
           );
           expect(
@@ -78,8 +77,7 @@ void main() {
         test("can be performed if there's noone but the author assigned", () {
           expense.addItem(Item.fake());
           expense.assignees = [Assignee(uid: author.uid)];
-          expense.items.first
-              .setAssigneeDecision(author.uid, ProductDecision.Confirmed);
+          expense.items.first.setAssigneeDecision(author.uid, 1);
 
           expect(expense.canReceiveAssignees, isTrue);
         });
@@ -87,8 +85,7 @@ void main() {
         test("can't be performed if the only assignee is not the author", () {
           expense.addItem(Item.fake());
           expense.assignees = [assignee];
-          expense.items.first
-              .setAssigneeDecision(author.uid, ProductDecision.Confirmed);
+          expense.items.first.setAssigneeDecision(author.uid, 1);
 
           expect(expense.canReceiveAssignees, isFalse);
         });
@@ -119,8 +116,8 @@ void main() {
         var item = Item(name: 'asd', value: 123);
         expense.addItem(item);
 
-        item.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-        item.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
+        item.setAssigneeDecision(firstAssignee.uid, 1);
+        item.setAssigneeDecision(secondAssignee.uid, 0);
 
         expect(expense.completed, isTrue);
       },
@@ -134,11 +131,11 @@ void main() {
       expense.addItem(item1);
       expense.addItem(item2);
 
-      item1.setAssigneeDecision(assignee.uid, ProductDecision.Confirmed);
+      item1.setAssigneeDecision(assignee.uid, 1);
 
       expect(expense.isMarkedBy(assignee.uid), isFalse);
 
-      item2.setAssigneeDecision(assignee.uid, ProductDecision.Denied);
+      item2.setAssigneeDecision(assignee.uid, 0);
 
       expect(expense.isMarkedBy(assignee.uid), isTrue);
     });
@@ -156,12 +153,12 @@ void main() {
 
       expect(expense.definedAssignees, 0);
 
-      item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-      item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
+      item1.setAssigneeDecision(firstAssignee.uid, 1);
+      item2.setAssigneeDecision(firstAssignee.uid, 0);
 
       expect(expense.definedAssignees, 1);
 
-      item2.setAssigneeDecision(secondAssignee.uid, ProductDecision.Denied);
+      item2.setAssigneeDecision(secondAssignee.uid, 0);
 
       expect(expense.definedAssignees, 1);
     });
@@ -186,74 +183,14 @@ void main() {
         expense.addItem(item1);
         expense.addItem(item2);
 
-        item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-        item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
+        item1.setAssigneeDecision(firstAssignee.uid, 1);
+        item2.setAssigneeDecision(firstAssignee.uid, 0);
 
-        item1.setAssigneeDecision(
-            secondAssignee.uid, ProductDecision.Confirmed);
-        item2.setAssigneeDecision(
-            secondAssignee.uid, ProductDecision.Confirmed);
+        item1.setAssigneeDecision(secondAssignee.uid, 1);
+        item2.setAssigneeDecision(secondAssignee.uid, 1);
 
         expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 62);
         expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 104);
-      });
-
-      test('gets unconfirmed extra total for assignee', () {
-        var firstAssignee = Assignee(uid: 'first');
-        var secondAssignee = Assignee(uid: 'second');
-        expense.assignees = [firstAssignee, secondAssignee];
-
-        var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42);
-        expense.addItem(item1);
-        expense.addItem(item2);
-
-        item1.setAssigneeDecision(firstAssignee.uid, ProductDecision.Confirmed);
-        item2.setAssigneeDecision(firstAssignee.uid, ProductDecision.Denied);
-
-        item2.setAssigneeDecision(
-            secondAssignee.uid, ProductDecision.Confirmed);
-
-        expect(expense.getPotentialTotalForUser(firstAssignee.uid), 124);
-        expect(expense.getPotentialTotalForUser(secondAssignee.uid), 104);
-      });
-
-      test('gets a value for an item for a user', () {
-        var firstAssignee = Assignee(uid: 'first');
-        var secondAssignee = Assignee(uid: 'second');
-        expense.assignees = [firstAssignee, secondAssignee];
-
-        var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42);
-        expense.addItem(item1);
-        expense.addItem(item2);
-
-        item1.setAssigneeDecision(
-          firstAssignee.uid,
-          ProductDecision.Confirmed,
-        );
-        item2.setAssigneeDecision(
-          firstAssignee.uid,
-          ProductDecision.Denied,
-        );
-
-        item1.setAssigneeDecision(
-          secondAssignee.uid,
-          ProductDecision.Confirmed,
-        );
-        item2.setAssigneeDecision(
-          secondAssignee.uid,
-          ProductDecision.Confirmed,
-        );
-
-        expect(
-            expense.getItemValueForAssignee(item1.name, firstAssignee.uid), 62);
-        expect(
-            expense.getItemValueForAssignee(item2.name, firstAssignee.uid), 0);
-        expect(expense.getItemValueForAssignee(item1.name, secondAssignee.uid),
-            62);
-        expect(expense.getItemValueForAssignee(item2.name, secondAssignee.uid),
-            42);
       });
     });
 
@@ -287,8 +224,8 @@ void main() {
       expect(expense.canBeUpdatedBy(author.uid), isTrue);
       expect(expense.canBeUpdatedBy(somebodyElse.uid), isFalse);
 
-      item.setAssigneeDecision(author.uid, ProductDecision.Confirmed);
-      item.setAssigneeDecision(somebodyElse.uid, ProductDecision.Denied);
+      item.setAssigneeDecision(author.uid, 1);
+      item.setAssigneeDecision(somebodyElse.uid, 0);
 
       expect(expense.canBeUpdatedBy(author.uid), isFalse);
     });

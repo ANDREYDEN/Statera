@@ -37,8 +37,9 @@ class Item {
 
   bool get isPartitioned => partition > 1;
 
-  double getSharedValueFor(String uid) =>
-      getAssigneeParts(uid) / partition * value;
+  double getSharedValueFor(String uid) => isPartitioned
+      ? value * getAssigneeParts(uid) / partition
+      : value / confirmedParts;
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
