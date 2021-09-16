@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
@@ -80,12 +81,7 @@ class _ExpensePageState extends State<ExpensePage> {
                                       ? expenseStage.color
                                       : null,
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    expenseStage.name,
-                                    // textAlign: TextAlign.center,
-                                  ),
-                                ),
+                                child: Center(child: Text(expenseStage.name)),
                               ),
                             ),
                           ),
@@ -222,16 +218,17 @@ class _ExpensePageState extends State<ExpensePage> {
                                         handleEditItem(expense, item),
                                     child: ItemListItem(
                                       item: item,
-                                      onDecisionTaken: (decision) async {
+                                      onChangePartition: (parts) async {
                                         if (!authVm.canMark(expense)) return;
 
                                         expense.items[index]
                                             .setAssigneeDecision(
                                           this.authVm.user.uid,
-                                          decision,
+                                          parts,
                                         );
                                         await Firestore.instance
                                             .updateExpense(expense);
+                                        // TODO: convert into a cloud function
                                         if (expense.completed) {
                                           snackbarCatch(
                                             context,
@@ -267,23 +264,35 @@ class _ExpensePageState extends State<ExpensePage> {
           FieldData(
             id: "item_name",
             label: "Item Name",
-            validators: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredValidator],
           ),
           FieldData(
             id: "item_value",
             label: "Item Value",
             inputType: TextInputType.numberWithOptions(decimal: true),
             validators: [
-              FieldData.requiredFormatter,
-              FieldData.numberFormatter
+              FieldData.requiredValidator,
+              FieldData.doubleValidator
             ],
             formatters: [CommaReplacerTextInputFormatter()],
+          ),
+          FieldData(
+            id: "item_partition",
+            label: "Item Parts",
+            inputType: TextInputType.number,
+            initialData: 1,
+            validators: [
+              FieldData.requiredValidator,
+              FieldData.intValidator
+            ],
+            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           ),
         ],
         onSubmit: (values) async {
           expense.addItem(Item(
             name: values["item_name"]!,
             value: double.parse(values["item_value"]!),
+            partition: int.parse(values["item_partition"]!),
           ));
           await Firestore.instance.updateExpense(expense);
         },
@@ -303,7 +312,7 @@ class _ExpensePageState extends State<ExpensePage> {
             id: "item_name",
             label: "Item Name",
             initialData: item.name,
-            validators: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredValidator],
           ),
           FieldData(
               id: "item_value",
@@ -311,8 +320,8 @@ class _ExpensePageState extends State<ExpensePage> {
               initialData: item.value,
               inputType: TextInputType.numberWithOptions(decimal: true),
               validators: [
-                FieldData.requiredFormatter,
-                FieldData.numberFormatter
+                FieldData.requiredValidator,
+                FieldData.doubleValidator
               ],
               formatters: [
                 CommaReplacerTextInputFormatter()

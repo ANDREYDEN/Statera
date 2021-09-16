@@ -200,7 +200,7 @@ class _ExpenseListState extends State<ExpenseList> {
           FieldData(
             id: "expense_name",
             label: "Expense Name",
-            validators: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredValidator],
           )
         ],
         onSubmit: (values) async {
@@ -227,7 +227,7 @@ class _ExpenseListState extends State<ExpenseList> {
           FieldData(
             id: "expense_name",
             label: "Expense name",
-            validators: [FieldData.requiredFormatter],
+            validators: [FieldData.requiredValidator],
             initialData: expense.name,
           )
         ],

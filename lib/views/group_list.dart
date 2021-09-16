@@ -139,7 +139,7 @@ class _GroupListState extends State<GroupList> {
             id: "group_name",
             label: "Group Name",
             initialData: group.name,
-            validators: [FieldData.requiredFormatter]
+            validators: [FieldData.requiredValidator]
           )
         ],
         onSubmit: (values) async {
@@ -159,7 +159,7 @@ class _GroupListState extends State<GroupList> {
           FieldData(
             id: 'group_name',
             label: "Group Name",
-            validators: [FieldData.requiredFormatter]
+            validators: [FieldData.requiredValidator]
           )
         ],
         onSubmit: (values) async {

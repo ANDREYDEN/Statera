@@ -25,10 +25,12 @@ class FieldData {
     this.focusNode = FocusNode(debugLabel: this.id);
   }
 
-  static String requiredFormatter(String text) =>
+  static String requiredValidator(String text) =>
       text.isEmpty ? "Can't be empty" : "";
-  static String numberFormatter(String text) =>
+  static String doubleValidator(String text) =>
       double.tryParse(text) == null ? "Must be a number" : "";
+  static String intValidator(String text) =>
+      int.tryParse(text) == null ? "Must be a whole number" : "";
 
   String getError() {
     for (final formatter in this.validators) {

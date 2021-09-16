@@ -7,12 +7,12 @@ import 'package:statera/viewModels/authentication_vm.dart';
 class ItemListItem extends StatelessWidget {
   final Item item;
 
-  final void Function(ProductDecision) onDecisionTaken;
+  final void Function(int) onChangePartition;
 
   const ItemListItem({
     Key? key,
     required this.item,
-    required this.onDecisionTaken,
+    required this.onChangePartition,
   }) : super(key: key);
 
   @override
@@ -27,10 +27,11 @@ class ItemListItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(item.name),
-                )),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(item.name),
+                  ),
+                ),
                 Text(item.valueString),
               ],
             ),
@@ -42,25 +43,45 @@ class ItemListItem extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () =>
-                    this.onDecisionTaken(ProductDecision.Confirmed),
+                    this.onChangePartition(authVm.getItemParts(item) - 1),
                 style: ElevatedButton.styleFrom(
                   shape: CircleBorder(),
-                  primary: authVm.hasConfirmed(item)
-                      ? Colors.green[400]
-                      : Colors.grey[300],
-                ),
-                child: Icon(Icons.check, color: Colors.white),
-              ),
-              ElevatedButton(
-                onPressed: () => this.onDecisionTaken(ProductDecision.Denied),
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  primary: authVm.hasDenied(item)
-                      ? Colors.red[400]
-                      : Colors.grey[300],
+                  primary: !authVm.hasDecidedOn(item)
+                      ? Colors.grey[300]
+                      : authVm.hasDenied(item)
+                          ? Colors.red[400]
+                          : Colors.grey[500],
                   padding: EdgeInsets.all(0),
                 ),
-                child: Icon(Icons.close, color: Colors.white),
+                child: Icon(
+                  !authVm.hasDecidedOn(item)
+                      ? Icons.close
+                      : authVm.hasDenied(item)
+                          ? Icons.close
+                          : Icons.remove,
+                  color: Colors.white,
+                ),
+              ),
+              Text("${authVm.getItemParts(item)}/${item.partition}"),
+              ElevatedButton(
+                onPressed: () =>
+                    this.onChangePartition(authVm.getItemParts(item) + 1),
+                style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(),
+                  primary: !authVm.hasDecidedOn(item)
+                      ? Colors.grey[300]
+                      : item.undefinedParts == 0
+                          ? Colors.green[400]
+                          : Colors.grey[500],
+                ),
+                child: Icon(
+                  !authVm.hasDecidedOn(item)
+                      ? Icons.check
+                      : item.undefinedParts == 0
+                          ? Icons.check
+                          : Icons.add,
+                  color: Colors.white,
+                ),
               ),
             ],
           )

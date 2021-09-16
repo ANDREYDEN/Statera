@@ -31,7 +31,7 @@ void main() {
               create: (context) => mockAuthVm,
               child: ItemListItem(
                   item: item,
-                  onDecisionTaken: (newDecision) => decision = newDecision),
+                  onChangePartition: (newDecision) => decision = newDecision),
             ),
           ),
         ),

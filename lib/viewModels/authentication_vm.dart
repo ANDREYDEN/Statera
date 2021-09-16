@@ -28,12 +28,15 @@ class AuthenticationViewModel {
       ExpenseStage(
         name: "Not Marked",
         color: Colors.red[200]!,
-        test: (expense) => expense.hasAssignee(user.uid) && !expense.isMarkedBy(user.uid),
+        test: (expense) =>
+            expense.hasAssignee(user.uid) && !expense.isMarkedBy(user.uid),
       ),
       ExpenseStage(
         name: "Pending",
         color: Colors.yellow[300]!,
-        test: (expense) => (expense.isMarkedBy(user.uid) || !expense.hasAssignee(user.uid)) && !expense.completed,
+        test: (expense) =>
+            (expense.isMarkedBy(user.uid) || !expense.hasAssignee(user.uid)) &&
+            !expense.completed,
       ),
       ExpenseStage(
         name: "Completed",
@@ -43,13 +46,16 @@ class AuthenticationViewModel {
     ];
   }
 
-  bool hasConfirmed(Item item) {
-    return item.assigneeDecision(user.uid) == ProductDecision.Confirmed;
-  }
+  bool hasDecidedOn(Item item) =>
+      item.assigneeDecision(user.uid) != ProductDecision.Undefined;
 
-  bool hasDenied(Item item) {
-    return item.assigneeDecision(user.uid) == ProductDecision.Denied;
-  }
+  bool hasConfirmed(Item item) =>
+      hasDecidedOn(item) && item.getAssigneeParts(user.uid) > 0;
+
+  bool hasDenied(Item item) =>
+      hasDecidedOn(item) && item.getAssigneeParts(user.uid) == 0;
+
+  int getItemParts(Item item) => item.getAssigneeParts(user.uid);
 
   Future<void> createGroup(Group newGroup) async {
     newGroup.generateCode();
