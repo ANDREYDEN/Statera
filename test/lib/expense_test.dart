@@ -169,24 +169,72 @@ void main() {
         expect(expense.total, item1.value + item2.value);
       });
 
-      test('gets confirmed total for assignee', () {
+      group('gets confirmed total for assignees', () {
         var firstAssignee = Assignee(uid: 'first');
         var secondAssignee = Assignee(uid: 'second');
-        expense.assignees = [firstAssignee, secondAssignee];
-
         var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42);
-        expense.addItem(item1);
-        expense.addItem(item2);
+        var item2 = Item(name: 'small', value: 42, partition: 3);
+        setUp(() {
+          expense.assignees = [firstAssignee, secondAssignee];
 
-        item1.setAssigneeDecision(firstAssignee.uid, 1);
-        item2.setAssigneeDecision(firstAssignee.uid, 0);
+          expense.addItem(item1);
+          expense.addItem(item2);
+        });
 
-        item1.setAssigneeDecision(secondAssignee.uid, 1);
-        item2.setAssigneeDecision(secondAssignee.uid, 1);
+        test('when everything is not marked yet', () {
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 0);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 0);
+        });
 
-        expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 62);
-        expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 104);
+        test("when someone didn't mark the items", () {
+          item1.setAssigneeDecision(firstAssignee.uid, 1);
+          item2.setAssigneeDecision(firstAssignee.uid, 2);
+
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 152);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 0);
+        });
+
+        test('when everyone marked the items', () {
+          item1.setAssigneeDecision(firstAssignee.uid, 1);
+          item2.setAssigneeDecision(firstAssignee.uid, 2);
+
+          item1.setAssigneeDecision(secondAssignee.uid, 1);
+          item2.setAssigneeDecision(secondAssignee.uid, 1);
+
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 90);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 76);
+        });
+
+        test('when there are denials', () {
+          item1.setAssigneeDecision(firstAssignee.uid, 1);
+          item2.setAssigneeDecision(firstAssignee.uid, 0);
+
+          item1.setAssigneeDecision(secondAssignee.uid, 0);
+          item2.setAssigneeDecision(secondAssignee.uid, 1);
+
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 124);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 14);
+        });
+
+        test('when everything was denied', () {
+          item1.setAssigneeDecision(firstAssignee.uid, 0);
+          item2.setAssigneeDecision(firstAssignee.uid, 0);
+
+          item1.setAssigneeDecision(secondAssignee.uid, 0);
+          item2.setAssigneeDecision(secondAssignee.uid, 0);
+
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 0);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 0);
+        });
+
+        test('when items were denied and not marked', () {
+          item1.setAssigneeDecision(firstAssignee.uid, 0);
+
+          item2.setAssigneeDecision(secondAssignee.uid, 0);
+
+          expect(expense.getConfirmedTotalForUser(firstAssignee.uid), 0);
+          expect(expense.getConfirmedTotalForUser(secondAssignee.uid), 0);
+        });
       });
     });
 
@@ -224,6 +272,44 @@ void main() {
       item.setAssigneeDecision(somebodyElse.uid, 0);
 
       expect(expense.canBeUpdatedBy(author.uid), isFalse);
+    });
+
+    test("can't be marked by anyone if the expense is completed", () {
+      var item = Item.fake();
+      expense.addItem(item);
+      var anotherAssignee = Assignee.fake();
+      var outsider = Assignee.fake();
+      expense.addAssignee(assignee);
+      expense.addAssignee(anotherAssignee);
+
+      item.setAssigneeDecision(author.uid, 0);
+      item.setAssigneeDecision(assignee.uid, 1);
+      item.setAssigneeDecision(anotherAssignee.uid, 0);
+
+      [author.uid, assignee.uid, anotherAssignee.uid, outsider.uid]
+          .forEach((uid) {
+        expect(expense.canBeMarkedBy(uid), isFalse);
+      });
+    });
+
+    test("can't be marked by someone outside of the expense", () {
+      var item = Item.fake();
+      expense.addItem(item);
+      var outsider = Assignee.fake();
+
+      expect(expense.canBeMarkedBy(outsider.uid), isFalse);
+    });
+
+    test("can be marked by any assignee", () {
+      var item = Item.fake();
+      expense.addItem(item);
+      var anotherAssignee = Assignee.fake();
+      expense.addAssignee(assignee);
+      expense.addAssignee(anotherAssignee);
+
+      [author.uid, assignee.uid, anotherAssignee.uid].forEach((uid) {
+        expect(expense.canBeMarkedBy(uid), isTrue);
+      });
     });
 
     group("conversion", () {

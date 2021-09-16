@@ -16,7 +16,7 @@ void main() {
     });
 
     test("is incomplete when at leat one assignee hasn't made a decision", () {
-      var assignee1 = AssigneeDecision(uid: '1');
+      var assignee1 = AssigneeDecision(uid: '1', parts: 1);
       var assignee2 = AssigneeDecision(uid: '2');
 
       item.assignees = [assignee1, assignee2];
@@ -33,7 +33,7 @@ void main() {
       expect(item.completed, isTrue);
     });
 
-    group('not partitioned', () {
+    group('calculates the shared value for not partitioned item', () {
       var item = Item(name: "foo", value: 145.0);
 
       createSimpleSharedValueTest(
@@ -83,7 +83,7 @@ void main() {
       );
     });
 
-    group('partitioned', () {
+    group('calculates the shared value for partitioned item', () {
       var item = Item(name: "foo", value: 145.0, partition: 3);
 
       createPartitionedSharedValueTest(
@@ -142,7 +142,7 @@ createSharedValueTest(
   required double value,
   required double expectedValue,
 }) {
-  test('calculates the shared value when $condition', () {
+  test('when $condition', () {
     item.assignees = partsList
         .map((parts) => AssigneeDecision(
               uid: partsList.indexOf(parts).toString(),
