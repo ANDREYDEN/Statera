@@ -64,14 +64,7 @@ class Expense {
       (assignees.length == 1 && this.isAuthoredBy(assignees.first.uid)) ||
       !completed;
 
-  bool isMarkedBy(String uid) {
-    return items.fold(
-      true,
-      (previousValue, item) =>
-          previousValue &&
-          item.assigneeDecision(uid) != ProductDecision.Undefined,
-    );
-  }
+  bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
   bool isAuthoredBy(String uid) => this.author.uid == uid;
 
@@ -142,12 +135,7 @@ class Expense {
 
     return items.fold<double>(
       0,
-      (previousValue, item) {
-        if (item.assigneeDecision(uid) == ProductDecision.Confirmed) {
-          return previousValue + item.getSharedValueFor(uid);
-        }
-        return previousValue;
-      },
+      (previousValue, item) => previousValue + item.getSharedValueFor(uid),
     );
   }
 

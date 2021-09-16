@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/models/assignee.dart';
-import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
@@ -40,7 +39,7 @@ void main() {
           expense.updateAssignees(newAssigneeIds);
 
           expect(item.assignees, hasLength(newAssigneeIds.length));
-          expect(item.assigneeDecision('2'), ProductDecision.Undefined);
+          expect(item.isMarkedBy('2'), isFalse);
           expect(item.getAssigneeParts(assignee.uid), initialParts);
         });
 
@@ -68,10 +67,7 @@ void main() {
             firstAssigneeParts,
             reason: "First assignee decision was removed",
           );
-          expect(
-            item.assigneeDecision(newAssignee.uid),
-            ProductDecision.Undefined,
-          );
+          expect(item.isMarkedBy(newAssignee.uid), isFalse);
         });
 
         test("can be performed if there's noone but the author assigned", () {

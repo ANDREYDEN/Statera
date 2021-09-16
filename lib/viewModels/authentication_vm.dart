@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:statera/models/assignee_decision.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/models/item.dart';
@@ -46,8 +45,7 @@ class AuthenticationViewModel {
     ];
   }
 
-  bool hasDecidedOn(Item item) =>
-      item.assigneeDecision(user.uid) != ProductDecision.Undefined;
+  bool hasDecidedOn(Item item) => item.isMarkedBy(user.uid);
 
   bool hasConfirmed(Item item) =>
       hasDecidedOn(item) && item.getAssigneeParts(user.uid) > 0;

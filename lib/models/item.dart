@@ -10,38 +10,34 @@ class Item {
 
   // some items might consist of multiple equal parts
   // that need to be treated separately
-  int? _partition;
+  int partition;
   List<AssigneeDecision> assignees = [];
 
-  Item({required this.name, required this.value, int? partition = 1}) {
+  Item({required this.name, required this.value, this.partition = 1}) {
     var uuid = Uuid();
     this.id = uuid.v1();
-    this._partition = partition;
   }
 
-  Item.fake({int? partition = 1}) {
+  Item.fake({this.partition = 1}) {
     var uuid = Uuid();
     this.id = uuid.v1();
     this.name = "foo";
-    this._partition = partition;
     this.value = 145;
   }
 
   get confirmedCount => assignees.fold<double>(
         0,
         (previousValue, assignee) =>
-            previousValue +
-            (assignee.decision == ProductDecision.Confirmed ? 1 : 0),
+            previousValue + (assignee.parts != null ? 1 : 0),
       );
-
-  int get partition => _partition ?? 1;
-  set partition(int value) => _partition = value;
 
   bool get isPartitioned => partition > 1;
 
   double getSharedValueFor(String uid) => isPartitioned
       ? value * getAssigneeParts(uid) / partition
-      : confirmedParts == 0 ? 0 : value / confirmedParts;
+      : confirmedParts == 0
+          ? 0
+          : value * getAssigneeParts(uid) / confirmedParts;
 
   get valueString => "\$${value.toStringAsFixed(2)}";
 
@@ -49,8 +45,10 @@ class Item {
       assignees.every((assignee) => assignee.madeDecision) &&
       (!isPartitioned || undefinedParts == 0);
 
-  int get confirmedParts =>
-      assignees.fold<int>(0, (acc, assignee) => acc + assignee.parts);
+  int get confirmedParts => assignees.fold<int>(
+        0,
+        (acc, assignee) => acc + getAssigneeParts(assignee.uid),
+      );
 
   int get undefinedParts => max(0, partition - confirmedParts);
 
@@ -63,33 +61,20 @@ class Item {
     );
   }
 
-  int getAssigneeParts(String uid) {
-    try {
-      return getAssigneeById(uid).parts;
-    } catch (e) {
-      return 0;
-    }
-  }
+  bool isMarkedBy(String uid) => getAssigneeById(uid).madeDecision;
 
-  ProductDecision assigneeDecision(String uid) {
-    try {
-      return getAssigneeById(uid).decision;
-    } catch (e) {
-      return ProductDecision.Undefined;
-    }
+  int getAssigneeParts(String uid) {
+    var definiteParts = getAssigneeById(uid).parts ?? 0;
+    return isPartitioned ? definiteParts : definiteParts.clamp(0, 1);
   }
 
   void setAssigneeDecision(String uid, int parts) {
     var assignee = getAssigneeById(uid);
-    assignee.decision =
-        parts <= 0 ? ProductDecision.Denied : ProductDecision.Confirmed;
 
-    if (isPartitioned) {
-      if (parts > undefinedParts + assignee.parts) return;
-      assignee.parts = parts;
-    } else {
-      assignee.parts = parts.clamp(0, 1);
-    }
+    if (isPartitioned &&
+        assignee.parts != null &&
+        parts > undefinedParts + assignee.parts!) return;
+    assignee.parts = parts;
   }
 
   Map<String, dynamic> toFirestore() {
@@ -107,7 +92,7 @@ class Item {
     var item = Item(
       name: data["name"],
       value: double.parse(data["value"].toString()),
-      partition: data["partition"],
+      partition: data["partition"] ?? 1,
     );
     item.id = data["id"] ?? uuid.v1();
     item.assignees = data["assignees"]
