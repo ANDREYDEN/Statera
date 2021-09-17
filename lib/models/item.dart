@@ -56,7 +56,7 @@ class Item {
     return assignees.firstWhere(
       (element) => element.uid == uid,
       orElse: () => throw new Exception(
-        "Can not find assignee with uid $uid for item $name",
+        "Can not find assignee with uid $uid for item '$name' (id: $id)",
       ),
     );
   }

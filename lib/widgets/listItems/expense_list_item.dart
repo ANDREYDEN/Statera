@@ -16,11 +16,16 @@ class ExpenseListItem extends StatelessWidget {
         Provider.of<AuthenticationViewModel>(context);
 
     Color? cardColor = Colors.blue[200];
-    authVm.expenseStages.forEach((stage) {
-      if (this.expense.isIn(stage)) {
-        cardColor = stage.color;
-      }
-    });
+
+    try {
+      authVm.expenseStages.forEach((stage) {
+        if (this.expense.isIn(stage)) {
+          cardColor = stage.color;
+        }
+      });
+    } catch (e) {
+      return Text(e.toString());
+    }
 
     return GestureDetector(
       onTap: () {

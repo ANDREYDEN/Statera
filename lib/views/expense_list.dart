@@ -41,7 +41,8 @@ class _ExpenseListState extends State<ExpenseList> {
   @override
   void initState() {
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
-    _expenseStream = Firestore.instance.listenForRelatedExpenses(authVm.user.uid, groupVm.group.id);
+    _expenseStream = Firestore.instance
+        .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id);
     super.initState();
   }
 
@@ -75,7 +76,9 @@ class _ExpenseListState extends State<ExpenseList> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: handleCreateExpense,
-                    onLongPress: kIsWeb ? () {} : handleScan, // TODO: handle picker on web
+                    onLongPress: kIsWeb
+                        ? () {}
+                        : handleScan, // TODO: handle picker on web
                     style: ElevatedButton.styleFrom(
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(18),
@@ -96,25 +99,28 @@ class _ExpenseListState extends State<ExpenseList> {
     return CustomStreamBuilder<List<Expense>>(
       stream: this._expenseStream,
       builder: (context, expenses) {
-        expenses.sort((firstExpense, secondExpense) {
-          for (var stage in authVm.expenseStages) {
-            if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-              return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
+        snackbarCatch(context, () {
+          expenses.sort((firstExpense, secondExpense) {
+            for (var stage in authVm.expenseStages) {
+              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
+                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
+              }
+              if (firstExpense.isIn(stage)) return -1;
+              if (secondExpense.isIn(stage)) return 1;
             }
-            if (firstExpense.isIn(stage)) return -1;
-            if (secondExpense.isIn(stage)) return 1;
-          }
 
-          return 0;
+            return 0;
+          });
+
+          expenses = expenses
+              .where(
+                (expense) => authVm.expenseStages.any(
+                  (stage) =>
+                      _filters.contains(stage.name) && expense.isIn(stage),
+                ),
+              )
+              .toList();
         });
-
-        expenses = expenses
-            .where(
-              (expense) => authVm.expenseStages.any(
-                (stage) => _filters.contains(stage.name) && expense.isIn(stage),
-              ),
-            )
-            .toList();
 
         return expenses.isEmpty
             ? ListEmpty(text: "Start by adding an expense")
