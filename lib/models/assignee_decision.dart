@@ -20,8 +20,9 @@ class AssigneeDecision {
     };
   }
 
+  // TODO: write an admin script to eliminate this
   static int? getPartsFromLegacyDecision(Map<String, dynamic> data) {
-    if (data.containsKey("decision")) return null;
+    if (!data.containsKey("decision")) return null;
     switch (data["decision"]) {
       case "Undefined":
         return null;
