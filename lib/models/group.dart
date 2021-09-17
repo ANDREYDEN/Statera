@@ -19,7 +19,7 @@ class Group {
   }
 
   Group.fake({List<Author>? members}) {
-    this.name = "foo";
+    this.name = "Empty";
     this.members = [];
     this.balance = {};
     if (members != null) {

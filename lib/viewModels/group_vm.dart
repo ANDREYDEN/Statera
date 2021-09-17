@@ -1,22 +1,27 @@
+import 'package:flutter/cupertino.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/services/firestore.dart';
 
-class GroupViewModel {
+class GroupViewModel extends ChangeNotifier {
   Group? _group;
 
   Group get group {
     if (_group == null)
-      throw Exception("Trying to get a group but nothing is chosen.");
+      return Group.fake();
     return _group!;
   }
+
+  set group(Group? value) {
+    _group = value;
+    notifyListeners();
+  }
+
+  bool get hasGroup => _group != null;
 
   Stream<List<Expense>> getUnmarkedExpenses(String uid) =>
       Firestore.instance.listenForUnmarkedExpenses(this.group.id, uid);
 
-  set group(Group value) {
-    _group = value;
-  }
 
   void updateBalance(Expense expense) {
     expense.assignees

@@ -281,10 +281,7 @@ class _ExpensePageState extends State<ExpensePage> {
             label: "Item Parts",
             inputType: TextInputType.number,
             initialData: 1,
-            validators: [
-              FieldData.requiredValidator,
-              FieldData.intValidator
-            ],
+            validators: [FieldData.requiredValidator, FieldData.intValidator],
             formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           ),
         ],

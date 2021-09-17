@@ -12,11 +12,10 @@ class GroupListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GroupViewModel groupVm = Provider.of<GroupViewModel>(context);
+
     return ListTile(
-      onTap: () {
-        Provider.of<GroupViewModel>(context, listen: false).group = this.group;
-        Navigator.of(context).pushNamed(GroupPage.route);
-      },
+      onTap: () => groupVm.group = this.group,
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -27,8 +27,6 @@ class _GroupListState extends State<GroupList> {
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
-  GroupViewModel get groupVm =>
-      Provider.of<GroupViewModel>(context, listen: false);
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +102,7 @@ class _GroupListState extends State<GroupList> {
                                         return GestureDetector(
                                           onLongPress: () =>
                                               handleEditGroup(group),
-                                          child: GroupListItem(
-                                            group: group,
-                                          ),
+                                          child: GroupListItem(group: group),
                                         );
                                       },
                                     );
@@ -136,11 +132,10 @@ class _GroupListState extends State<GroupList> {
         title: "Edit Group",
         fields: [
           FieldData(
-            id: "group_name",
-            label: "Group Name",
-            initialData: group.name,
-            validators: [FieldData.requiredValidator]
-          )
+              id: "group_name",
+              label: "Group Name",
+              initialData: group.name,
+              validators: [FieldData.requiredValidator])
         ],
         onSubmit: (values) async {
           group.name = values["group_name"]!;
@@ -157,10 +152,9 @@ class _GroupListState extends State<GroupList> {
         title: "New Group",
         fields: [
           FieldData(
-            id: 'group_name',
-            label: "Group Name",
-            validators: [FieldData.requiredValidator]
-          )
+              id: 'group_name',
+              label: "Group Name",
+              validators: [FieldData.requiredValidator])
         ],
         onSubmit: (values) async {
           var newGroup = Group(name: values["group_name"]!);

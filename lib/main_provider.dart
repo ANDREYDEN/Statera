@@ -15,7 +15,7 @@ class MainProvider extends StatelessWidget {
         Provider<AuthenticationViewModel>(
           create: (context) => AuthenticationViewModel(),
         ),
-        Provider<GroupViewModel>(create: (context) => GroupViewModel()),
+        ChangeNotifierProvider<GroupViewModel>(create: (context) => GroupViewModel()),
       ],
       builder: (context, _) => this.child,
     );
