@@ -29,11 +29,7 @@ class ExpenseListItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ExpensePage(expenseId: expense.id),
-          ),
-        );
+        Navigator.of(context).pushNamed(ExpensePage.route + '/${expense.id}');
       },
       child: Container(
         margin: EdgeInsets.all(5),

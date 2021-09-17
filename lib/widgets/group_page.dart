@@ -8,7 +8,7 @@ import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
-  static const String route = "group";
+  static const String route = "/group";
 
   const GroupPage({Key? key}) : super(key: key);
 

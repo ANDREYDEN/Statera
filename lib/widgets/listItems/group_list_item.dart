@@ -15,7 +15,10 @@ class GroupListItem extends StatelessWidget {
     GroupViewModel groupVm = Provider.of<GroupViewModel>(context);
 
     return ListTile(
-      onTap: () => groupVm.group = this.group,
+      onTap: () {
+        groupVm.group = this.group;
+        Navigator.of(context).pushNamed(GroupPage.route + '/${this.group.id}');
+      },
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
