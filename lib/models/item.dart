@@ -52,24 +52,30 @@ class Item {
 
   int get undefinedParts => max(0, partition - confirmedParts);
 
-  AssigneeDecision getAssigneeById(uid) {
-    return assignees.firstWhere(
-      (element) => element.uid == uid,
-      orElse: () => throw new Exception(
-        "Can not find assignee with uid $uid for item '$name' (id: $id)",
-      ),
-    );
+  bool hasAssignee(uid) => assignees.any((assignee) => assignee.uid == uid);
+
+  AssigneeDecision? getAssigneeById(uid) {
+    return !hasAssignee(uid)
+        ? null
+        : assignees.firstWhere(
+            (element) => element.uid == uid,
+            orElse: () => throw new Exception(
+              "Can not find assignee with uid $uid for item '$name' (id: $id)",
+            ),
+          );
   }
 
-  bool isMarkedBy(String uid) => getAssigneeById(uid).madeDecision;
+  bool isMarkedBy(String uid) => getAssigneeById(uid)?.madeDecision ?? true;
 
   int getAssigneeParts(String uid) {
-    var definiteParts = getAssigneeById(uid).parts ?? 0;
+    var definiteParts = getAssigneeById(uid)?.parts ?? 0;
     return isPartitioned ? definiteParts : definiteParts.clamp(0, 1);
   }
 
   void setAssigneeDecision(String uid, int parts) {
     var assignee = getAssigneeById(uid);
+
+    if (assignee == null) return;
 
     if (isPartitioned &&
         assignee.parts != null &&

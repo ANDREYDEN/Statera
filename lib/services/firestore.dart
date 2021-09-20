@@ -53,10 +53,17 @@ class Firestore {
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return _queryToExpensesStream(
-      expensesCollection
-          .where("groupId", isEqualTo: groupId)
-          .where("assigneeIds", arrayContains: uid),
-    );
+            expensesCollection.where("groupId", isEqualTo: groupId))
+        .map((expenses) => expenses
+            .where((expense) =>
+                expense.hasAssignee(uid) || expense.isAuthoredBy(uid))
+            .toList());
+    // final assignedExpensesStream = _queryToExpensesStream(
+    //   expensesCollection
+    //       .where("assigneeIds", arrayContains: uid)
+    // );
+
+    // return authoredExpensesStream.()
   }
 
   Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
