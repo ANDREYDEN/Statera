@@ -2,7 +2,7 @@ on:
   pull_request:
     branches: 
     - master 
-name: Bumb version, build and release apk
+name: Bump version, build and release apk
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
@@ -57,6 +57,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "build/app/outputs/apk/release.apk"
+          artifacts: "build/app/outputs/apk/release/app-release.apk"
           token: '${{ secrets.GITHUB_TOKEN }}'
           tag: ${{ steps.bump.outputs.tag_name }}
