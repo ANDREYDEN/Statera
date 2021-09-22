@@ -26,21 +26,37 @@ Future<bool> snackbarCatch(
   }
 
   if (errorOccured || (successMessage != null && successMessage.isNotEmpty)) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(errorOccured ? errorMessage! : successMessage!),
-      margin: EdgeInsets.all(8),
-      backgroundColor: errorOccured
+    showSnackBar(
+      context,
+      errorOccured ? errorMessage! : successMessage!,
+      color: errorOccured
           ? Theme.of(context).errorColor
-          : Theme.of(context).accentColor,
-      duration: Duration(seconds: 3),
-      behavior: SnackBarBehavior.floating,
-    ));
+          : Theme.of(context).colorScheme.secondary,
+    );
   }
 
   return !errorOccured;
 }
 
+void showSnackBar(
+  BuildContext context,
+  String content, {
+  Duration duration = const Duration(seconds: 3),
+  Color? color,
+}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(content),
+      margin: EdgeInsets.all(8),
+      backgroundColor: color,
+      duration: Duration(seconds: 3),
+      behavior: SnackBarBehavior.floating,
+    ),
+  );
+}
+
 pluralize(term, quantity) {
-  var pluralTerm = (quantity % 10 == 1 && quantity % 100 != 11) ? term : '${term}s';
+  var pluralTerm =
+      (quantity % 10 == 1 && quantity % 100 != 11) ? term : '${term}s';
   return '$quantity $pluralTerm';
 }

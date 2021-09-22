@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
+import 'package:statera/models/group.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
@@ -39,49 +40,41 @@ class OwingListItem extends StatelessWidget {
               ? Text(toStringPrice(this.owing))
               : this.owing < 0
                   ? TextButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => PaymentDialog(
-                            isReceiving: true,
-                            receiver: this.payer,
-                            value: this.owing,
-                            onPay: (value) async {
-                              groupVm.group.payOffBalance(
-                                payerUid: authVm.user.uid,
-                                receiverUid: this.payer.uid,
-                                value: value,
-                              );
-                              await Firestore.instance.saveGroup(groupVm.group);
-                            },
-                          ),
-                        );
-                      },
+                      onPressed: () => this._handlePayment(
+                        context,
+                        groupVm.group,
+                        authVm.user.uid,
+                      ),
                       child: Text(toStringPrice(this.owing)),
                     )
                   : ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => PaymentDialog(
-                            receiver: this.payer,
-                            value: this.owing,
-                            onPay: (value) async {
-                              groupVm.group.payOffBalance(
-                                payerUid: authVm.user.uid,
-                                receiverUid: this.payer.uid,
-                                value: value,
-                              );
-                              await Firestore.instance.saveGroup(groupVm.group);
-                            },
-                          ),
-                        );
-                      },
-                      child: Text(
-                        "Pay ${toStringPrice(this.owing)}",
+                      onPressed: () => this._handlePayment(
+                        context,
+                        groupVm.group,
+                        authVm.user.uid,
                       ),
+                      child: Text("Pay ${toStringPrice(this.owing)}"),
                     ),
         ],
+      ),
+    );
+  }
+
+  void _handlePayment(BuildContext context, Group group, String payer) {
+    showDialog(
+      context: context,
+      builder: (context) => PaymentDialog(
+        isReceiving: this.owing < 0,
+        receiver: this.payer,
+        value: this.owing,
+        onPay: (value) async {
+          group.payOffBalance(
+            payerUid: payer,
+            receiverUid: this.payer.uid,
+            value: value,
+          );
+          await Firestore.instance.saveGroup(group);
+        },
       ),
     );
   }

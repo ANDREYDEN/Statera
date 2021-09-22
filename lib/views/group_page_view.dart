@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/models/group.dart';
+import 'package:statera/providers/group_provider.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/views/expense_list.dart';
@@ -7,29 +9,26 @@ import 'package:statera/views/group_home.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/widgets/unmarked_expenses_badge.dart';
 
-class GroupPage extends StatefulWidget {
-  static const String route = "/group";
-
-  const GroupPage({Key? key}) : super(key: key);
+class GroupPageView extends StatefulWidget {
+  const GroupPageView({Key? key}) : super(key: key);
 
   @override
-  _GroupPageState createState() => _GroupPageState();
+  _GroupPageViewState createState() => _GroupPageViewState();
 }
 
-class _GroupPageState extends State<GroupPage> {
-  int selectedNavBarItemIndex = 0;
-  PageController pageController = PageController();
-
-  GroupViewModel get groupVm =>
-      Provider.of<GroupViewModel>(context, listen: false);
+class _GroupPageViewState extends State<GroupPageView> {
+  int _selectedNavBarItemIndex = 0;
+  PageController _pageController = PageController();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
+  Group get group => Provider.of<GroupViewModel>(context, listen: false).group;
+
   @override
   Widget build(BuildContext context) {
     return PageScaffold(
-      title: groupVm.group.name,
+      title: group.name,
       bottomNavBar: BottomNavigationBar(
         iconSize: 36,
         items: [
@@ -44,7 +43,7 @@ class _GroupPageState extends State<GroupPage> {
           BottomNavigationBarItem(
             label: "Expenses",
             icon: UnmarkedExpensesBadge(
-              groupId: groupVm.group.id,
+              groupId: group.id,
               child: Icon(Icons.attach_money),
             ),
             activeIcon: Icon(
@@ -53,26 +52,29 @@ class _GroupPageState extends State<GroupPage> {
             ),
           ),
         ],
-        currentIndex: this.selectedNavBarItemIndex,
+        currentIndex: this._selectedNavBarItemIndex,
         onTap: (index) {
           setState(() {
-            this.selectedNavBarItemIndex = index;
+            this._selectedNavBarItemIndex = index;
           });
-          pageController.animateToPage(
+          _pageController.animateToPage(
             index,
             duration: Duration(milliseconds: 500),
             curve: Curves.ease,
           );
         },
       ),
-      child: PageView(
-        controller: this.pageController,
-        onPageChanged: (index) {
-          setState(() {
-            this.selectedNavBarItemIndex = index;
-          });
-        },
-        children: [GroupHome(), ExpenseList()],
+      child: GroupProvider(
+        group: group,
+        child: PageView(
+          controller: this._pageController,
+          onPageChanged: (index) {
+            setState(() {
+              this._selectedNavBarItemIndex = index;
+            });
+          },
+          children: [GroupHome(), ExpenseList()],
+        ),
       ),
     );
   }

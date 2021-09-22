@@ -28,7 +28,7 @@ class OKCancelDialog extends StatelessWidget {
           child: Text("Yes"),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith(
-              (states) => Theme.of(context).accentColor,
+              (states) => Theme.of(context).colorScheme.secondary,
             ),
           ),
         ),
