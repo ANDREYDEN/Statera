@@ -57,6 +57,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "build/app/outputs/apk/release/app-release.apk"
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           token: '${{ secrets.GITHUB_TOKEN }}'
           tag: ${{ steps.bump.outputs.tag_name }}
