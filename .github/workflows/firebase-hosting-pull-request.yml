@@ -29,6 +29,11 @@ jobs:
         with:
           flutter-version: '2.0.5'
 
+      - name: Copy google-services.json
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -52,6 +57,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          artifacts: "build/app/outputs/apk/release.apk"
           token: '${{ secrets.GITHUB_TOKEN }}'
           tag: ${{ steps.bump.outputs.tag_name }}
