@@ -52,6 +52,7 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
           projectId: statera-0
+          channelId: live
 
       - name: Attach release APK
         uses: ncipollo/release-action@v1
