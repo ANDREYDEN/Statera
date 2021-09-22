@@ -39,7 +39,7 @@ dependencies:
   build_runner: ^2.0.6
   badges: ^2.0.1
   uuid: ^3.0.4
-  image_picker: ^0.8.4+2
+  image_picker: ^0.8.3
   
 dev_dependencies:
   flutter_test:
