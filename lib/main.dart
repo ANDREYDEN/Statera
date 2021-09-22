@@ -7,6 +7,7 @@ import 'package:statera/auth_guard.dart';
 import 'package:statera/providers/auth_provider.dart';
 import 'package:statera/routing/page_path.dart';
 import 'package:statera/utils/constants.dart';
+import 'package:statera/views/404.dart';
 import 'package:statera/views/expense_page.dart';
 import 'package:statera/views/group_list.dart';
 import 'package:statera/views/sign_in.dart';
@@ -41,6 +42,11 @@ class Statera extends StatefulWidget {
 
 class _StateraState extends State<Statera> {
   final List<PagePath> _paths = [
+    // PagePath(
+    //   isPublic: true,
+    //   pattern: '^${SignIn.route}\$',
+    //   builder: (context, _) => SignIn(),
+    // ),
     PagePath(
       pattern: '^${GroupList.route}\$',
       builder: (context, _) => GroupList(),
@@ -86,7 +92,7 @@ class _StateraState extends State<Statera> {
                         );
                 }
               }
-              return SignIn();
+              return PageNotFound();
             },
           );
         },
