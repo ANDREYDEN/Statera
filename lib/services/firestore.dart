@@ -123,6 +123,18 @@ class Firestore {
     );
   }
 
+  Stream<Group> groupStream(String? groupId) {
+    var groupStream = groupsCollection.doc(groupId).snapshots();
+    return groupStream.map((groupSnap) {
+      if (!groupSnap.exists)
+        throw new Exception("There was no group with id $groupId");
+      return Group.fromFirestore(
+        groupSnap.data() as Map<String, dynamic>,
+        id: groupSnap.id,
+      );
+    });
+  }
+
   Future<void> deleteGroup(String? groupId) async {
     var expensesSnap = await Firestore.instance.expensesCollection
         .where('groupId', isEqualTo: groupId)

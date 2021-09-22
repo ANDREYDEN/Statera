@@ -4,13 +4,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/auth_guard.dart';
-import 'package:statera/main_provider.dart';
+import 'package:statera/providers/auth_provider.dart';
 import 'package:statera/routing/page_path.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/views/expense_page.dart';
 import 'package:statera/views/group_list.dart';
 import 'package:statera/views/sign_in.dart';
-import 'package:statera/widgets/group_page.dart';
+import 'package:statera/views/group_page.dart';
+
+import 'providers/group_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +47,7 @@ class _StateraState extends State<Statera> {
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
-      builder: (context, _) => GroupPage(),
+      builder: (context, match) => GroupPage(groupId: match),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
@@ -55,7 +57,7 @@ class _StateraState extends State<Statera> {
 
   @override
   Widget build(BuildContext context) {
-    return MainProvider(
+    return AuthProvider(
       child: MaterialApp(
         title: kAppName,
         theme: ThemeData(
