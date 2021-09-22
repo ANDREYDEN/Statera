@@ -1,5 +1,5 @@
 on:
-  pull_request:
+  push:
     branches: 
     - master 
 name: Bump version, build and release apk
