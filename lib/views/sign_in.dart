@@ -44,7 +44,7 @@ class _SignInState extends State<SignIn> {
                       _loading = true;
                     });
                     await Auth.instance.signInWithGoogle();
-                    Navigator.of(context).pushNamed(widget.forwardRoute);
+                    Navigator.of(context).popAndPushNamed(widget.forwardRoute);
                   });
 
                   setState(() {
