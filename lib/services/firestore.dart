@@ -186,4 +186,8 @@ class Firestore {
   Future<void> saveGroup(Group group) async {
     return groupsCollection.doc(group.id).set(group.toFirestore());
   }
+
+  Stream<Group> getExpenseGroupStream(Expense expense) {
+    return this.groupStream(expense.groupId);
+  }
 }

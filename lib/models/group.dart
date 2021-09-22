@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/models/author.dart';
+import 'package:statera/models/expense.dart';
 import 'package:statera/utils/helpers.dart';
 
 class Group {
@@ -105,6 +106,18 @@ class Group {
   void resolveBalance(String member1Uid, String member2Uid) {
     this.balance[member1Uid]![member2Uid] = 0;
     this.balance[member2Uid]![member1Uid] = 0;
+  }
+
+  void updateBalance(Expense expense) {
+    expense.assignees
+        .where((assignee) => assignee.uid != expense.author.uid)
+        .forEach((assignee) {
+      this.payOffBalance(
+        payerUid: expense.author.uid,
+        receiverUid: assignee.uid,
+        value: expense.getConfirmedTotalForUser(assignee.uid),
+      );
+    });
   }
 
   Map<String, dynamic> toFirestore() {
