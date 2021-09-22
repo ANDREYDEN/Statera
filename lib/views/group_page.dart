@@ -11,7 +11,7 @@ class GroupPage extends StatelessWidget {
 
   const GroupPage({Key? key, this.groupId}) : super(key: key);
 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return StreamBuilder<Group>(
       stream: Firestore.instance.groupStream(this.groupId),
       builder: (context, snap) {

@@ -21,17 +21,4 @@ class GroupViewModel extends ChangeNotifier {
 
   Stream<List<Expense>> getUnmarkedExpenses(String uid) =>
       Firestore.instance.listenForUnmarkedExpenses(this.group.id, uid);
-
-
-  void updateBalance(Expense expense) {
-    expense.assignees
-        .where((assignee) => assignee.uid != expense.author.uid)
-        .forEach((assignee) {
-      this.group.payOffBalance(
-            payerUid: expense.author.uid,
-            receiverUid: assignee.uid,
-            value: expense.getConfirmedTotalForUser(assignee.uid),
-          );
-    });
-  }
 }

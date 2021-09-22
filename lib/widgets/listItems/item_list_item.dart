@@ -38,7 +38,7 @@ class ItemListItem extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          VerticalDivider(thickness: 1, indent: 10, endIndent: 10),
+          VerticalDivider(thickness: 1, indent: 5, endIndent: 5),
           IntrinsicWidth(
             child: Column(
               children: [

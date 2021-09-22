@@ -7,13 +7,11 @@ import 'package:statera/auth_guard.dart';
 import 'package:statera/providers/auth_provider.dart';
 import 'package:statera/routing/page_path.dart';
 import 'package:statera/utils/constants.dart';
+import 'package:statera/utils/theme.dart';
 import 'package:statera/views/404.dart';
 import 'package:statera/views/expense_page.dart';
 import 'package:statera/views/group_list.dart';
-import 'package:statera/views/sign_in.dart';
 import 'package:statera/views/group_page.dart';
-
-import 'providers/group_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,10 +64,9 @@ class _StateraState extends State<Statera> {
     return AuthProvider(
       child: MaterialApp(
         title: kAppName,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: "Nunito",
-        ),
+        theme: theme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
         initialRoute: GroupList.route,
         onGenerateRoute: (settings) {
           return MaterialPageRoute(

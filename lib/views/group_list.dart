@@ -32,7 +32,7 @@ class _GroupListState extends State<GroupList> {
     return PageScaffold(
       title: kAppName,
       actions: [
-        ElevatedButton(
+        TextButton(
           onPressed: () {
             snackbarCatch(context, () {
               Auth.instance.signOut();
