@@ -1,0 +1,52 @@
+on:
+  push:
+    branches: 
+    - master 
+name: Bumb version, build and release apk
+jobs:
+  build_and_preview:
+    if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version bump from PR label
+        id: bump
+        uses: rymndhng/release-on-push-action@master
+        with:
+          # gets overriden by PR label
+          bump_version_scheme: minor
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Download Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Download Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '2.0.5'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build project (Web + Android)
+        run: flutter build web && flutter build apk
+
+      - name: Deploy to Firebase hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
+          projectId: statera-0
+
+      - name: Attach release APK
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          tag: ${{ steps.bump.outputs.tag_name }}
