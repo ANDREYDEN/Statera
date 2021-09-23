@@ -20,6 +20,8 @@ class CustomFilterChip extends StatelessWidget {
       padding: EdgeInsets.only(left: 8.0),
       child: FilterChip(
         label: Text(this.label),
+        labelStyle: TextStyle(color: Colors.black),
+        checkmarkColor: Colors.black,
         selected: this.filtersList.contains(this.label),
         backgroundColor: this.color,
         selectedColor: this.color,
@@ -29,7 +31,7 @@ class CustomFilterChip extends StatelessWidget {
           } else if (this.filtersList.length > 1) {
             this.filtersList.remove(this.label);
           }
-          
+
           if (this.onSelected != null) {
             this.onSelected!(selected);
           }
