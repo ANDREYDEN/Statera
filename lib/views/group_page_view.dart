@@ -35,10 +35,7 @@ class _GroupPageViewState extends State<GroupPageView> {
           BottomNavigationBarItem(
             label: "Home",
             icon: Icon(Icons.home),
-            activeIcon: Icon(
-              Icons.home,
-              color: Theme.of(context).primaryColor,
-            ),
+            activeIcon: Icon(Icons.home),
           ),
           BottomNavigationBarItem(
             label: "Expenses",
@@ -46,10 +43,7 @@ class _GroupPageViewState extends State<GroupPageView> {
               groupId: group.id,
               child: Icon(Icons.attach_money),
             ),
-            activeIcon: Icon(
-              Icons.attach_money,
-              color: Theme.of(context).primaryColor,
-            ),
+            activeIcon: Icon(Icons.attach_money),
           ),
         ],
         currentIndex: this._selectedNavBarItemIndex,

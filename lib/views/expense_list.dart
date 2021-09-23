@@ -59,6 +59,7 @@ class _ExpenseListState extends State<ExpenseList> {
                   label: stage.name,
                   color: stage.color,
                   filtersList: _filters,
+                  // TODO: this is bad
                   onSelected: (selected) => setState(() => {}),
                 ),
               )
@@ -80,11 +81,13 @@ class _ExpenseListState extends State<ExpenseList> {
                         ? () {}
                         : handleScan, // TODO: handle picker on web
                     style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).colorScheme.secondary,
+                      onPrimary: Theme.of(context).colorScheme.onSecondary,
                       shape: CircleBorder(),
                       padding: EdgeInsets.all(18),
                       elevation: 5,
                     ),
-                    child: Icon(Icons.add, color: Colors.white),
+                    child: Icon(Icons.add),
                   ),
                 ),
               ),

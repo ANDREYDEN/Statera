@@ -83,7 +83,16 @@ class _ExpensePageState extends State<ExpensePage> {
                                         ? expenseStage.color
                                         : null,
                                   ),
-                                  child: Center(child: Text(expenseStage.name)),
+                                  child: Center(
+                                    child: Text(
+                                      expenseStage.name,
+                                      style: TextStyle(
+                                        color: expense.isIn(expenseStage)
+                                            ? Colors.black
+                                            : Theme.of(context).textTheme.bodyText1!.color
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -173,10 +182,9 @@ class _ExpensePageState extends State<ExpensePage> {
                       ),
                       Divider(thickness: 1),
                       Flexible(
-                        child: expense.items.length == 0
-                            ? ListEmpty(text: 'Add items to this expense')
-                            : ItemsList(expense: expense)
-                      ),
+                          child: expense.items.length == 0
+                              ? ListEmpty(text: 'Add items to this expense')
+                              : ItemsList(expense: expense)),
                     ],
                   ),
           ),
