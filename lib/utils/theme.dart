@@ -2,15 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:statera/utils/helpers.dart';
 
 final theme = ThemeData(
-  textButtonTheme: TextButtonThemeData(
-    style: ButtonStyle(
-      textStyle: MaterialStateProperty.all(
-        TextStyle(
-          decoration: TextDecoration.underline,
-        ),
-      ),
-    ),
-  ),
+  textButtonTheme: textButtonTheme,
   primarySwatch: createMaterialColor(Colors.black),
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.white,
@@ -21,6 +13,7 @@ final theme = ThemeData(
 );
 
 final darkTheme = ThemeData(
+  textButtonTheme: textButtonTheme,
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.black,
     foregroundColor: Colors.white,
@@ -37,4 +30,14 @@ final darkTheme = ThemeData(
     onSecondary: Colors.black,
   ),
   fontFamily: "Nunito",
+);
+
+final textButtonTheme = TextButtonThemeData(
+  style: ButtonStyle(
+    textStyle: MaterialStateProperty.all(
+      TextStyle(
+        decoration: TextDecoration.underline,
+      ),
+    ),
+  ),
 );
