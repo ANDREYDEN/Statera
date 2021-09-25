@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:statera/models/author.dart';
 
 class AuthorAvatar extends StatelessWidget {
@@ -7,6 +8,7 @@ class AuthorAvatar extends StatelessWidget {
   final bool withName;
   final Color? borderColor;
   final bool checked;
+  final double? width;
 
   AuthorAvatar({
     Key? key,
@@ -15,6 +17,7 @@ class AuthorAvatar extends StatelessWidget {
     this.withName = false,
     this.borderColor,
     this.checked = false,
+    this.width,
   }) : super(key: key);
 
   @override
@@ -27,6 +30,8 @@ class AuthorAvatar extends StatelessWidget {
           Stack(
             children: [
               Container(
+                width: this.width,
+                height: this.width,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
