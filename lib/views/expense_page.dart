@@ -96,82 +96,77 @@ class _ExpensePageState extends State<ExpensePage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.schedule, size: 20),
-                                    TextButton(
-                                      onPressed: () async {
-                                        if (!expense.canBeUpdatedBy(
-                                            authVm.user.uid)) return;
-
-                                        DateTime? newDate =
-                                            await showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.now(),
-                                          firstDate: DateTime
-                                              .fromMillisecondsSinceEpoch(0),
-                                          lastDate: DateTime.now().add(
-                                            Duration(days: 30),
-                                          ),
-                                        );
-
-                                        if (newDate == null) return;
-
-                                        expense.date = newDate;
-                                        await Firestore.instance
-                                            .updateExpense(expense);
-                                      },
-                                      child: Text(
-                                        expense.formattedDate ?? 'Not set',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text("Payer:"),
-                                AuthorAvatar(
-                                  author: expense.author,
-                                  onTap: () async {
+                                Icon(Icons.schedule, size: 20),
+                                TextButton(
+                                  onPressed: () async {
                                     if (!expense.canBeUpdatedBy(
                                         authVm.user.uid)) return;
 
-                                    Author? newAuthor =
-                                        await showDialog<Author>(
+                                    DateTime? newDate =
+                                        await showDatePicker(
                                       context: context,
-                                      builder: (context) => AuthorChangeDialog(
-                                        expense: expense,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime
+                                          .fromMillisecondsSinceEpoch(0),
+                                      lastDate: DateTime.now().add(
+                                        Duration(days: 30),
                                       ),
                                     );
 
-                                    if (newAuthor == null) return;
+                                    if (newDate == null) return;
 
-                                    expense.author = newAuthor;
+                                    expense.date = newDate;
                                     await Firestore.instance
                                         .updateExpense(expense);
                                   },
-                                ),
-                                Text("Assignees:"),
-                                GestureDetector(
-                                  onTap: () {
-                                    if (!expense.canBeUpdatedBy(
-                                        authVm.user.uid)) return;
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) =>
-                                          AssigneePickerDialog(
-                                        expense: expense,
-                                      ),
-                                    );
-                                  },
-                                  child: AssigneeList(),
+                                  child: Text(
+                                    expense.formattedDate ?? 'Not set',
+                                  ),
                                 ),
                               ],
+                            ),
+                            Text("Payer:"),
+                            AuthorAvatar(
+                              author: expense.author,
+                              onTap: () async {
+                                if (!expense.canBeUpdatedBy(
+                                    authVm.user.uid)) return;
+
+                                Author? newAuthor =
+                                    await showDialog<Author>(
+                                  context: context,
+                                  builder: (context) => AuthorChangeDialog(
+                                    expense: expense,
+                                  ),
+                                );
+
+                                if (newAuthor == null) return;
+
+                                expense.author = newAuthor;
+                                await Firestore.instance
+                                    .updateExpense(expense);
+                              },
+                            ),
+                            Text("Assignees:"),
+                            GestureDetector(
+                              onTap: () {
+                                if (!expense.canBeUpdatedBy(
+                                    authVm.user.uid)) return;
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      AssigneePickerDialog(
+                                    expense: expense,
+                                  ),
+                                );
+                              },
+                              child: AssigneeList(),
                             ),
                           ],
                         ),
