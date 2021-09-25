@@ -29,7 +29,6 @@ class ItemsList extends StatelessWidget {
       itemBuilder: (context, index) {
         var item = this.expense.items[index];
 
-        // TODO: make this conditionally dismissable if finalized
         return OptionallyDismissible(
           key: Key(item.hashCode.toString()),
           isDismissible: authVm.canUpdate(this.expense),

@@ -46,7 +46,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
       ),
       content: Column(
         children: [
-          // TODO: disable paying over balance or negative
           TextField(
             controller: balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
