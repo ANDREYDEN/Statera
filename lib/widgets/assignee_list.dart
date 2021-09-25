@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/services/firestore.dart';
-import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/author_avatar.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 

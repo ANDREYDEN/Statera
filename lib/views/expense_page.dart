@@ -8,18 +8,14 @@ import 'package:statera/models/item.dart';
 import 'package:statera/providers/expense_provider.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/formatters.dart';
-import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/assignee_list.dart';
 import 'package:statera/widgets/author_avatar.dart';
 import 'package:statera/widgets/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/widgets/items_list.dart';
-import 'package:statera/widgets/listItems/item_list_item.dart';
 import 'package:statera/widgets/list_empty.dart';
-import 'package:statera/widgets/optionally_dismissible.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatefulWidget {

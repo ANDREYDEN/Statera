@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/viewModels/group_vm.dart';
 
 class AuthProvider extends StatelessWidget {
   final Widget child;
