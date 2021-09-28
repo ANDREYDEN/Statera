@@ -3,6 +3,9 @@ import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
 import "firebase-functions";
 import { mergeProducts, normalize } from "./normalizers";
+import { firestoreBackup } from "./admin";
+
+export const scheduledBackup = firestoreBackup;
 
 export const getReceiptDataTest = functions.https.onRequest(
   async (request, response) => {

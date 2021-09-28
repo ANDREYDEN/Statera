@@ -51,3 +51,4 @@ GoogleService-Info.plist
 *.mocks.dart
 /emulator_data
 *.cache
+/admin
