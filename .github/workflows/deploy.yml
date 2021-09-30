@@ -2,9 +2,9 @@ on:
   push:
     branches: 
     - master 
-name: Bump version, build and release apk
+name: Bump version, build, deploy web and release apk
 jobs:
-  build_and_preview:
+  deploy:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
