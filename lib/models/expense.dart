@@ -92,6 +92,8 @@ class Expense {
     this.items[itemIdx] = newItem;
   }
 
+  get hasNoItems => this.items.isEmpty;
+
   addAssignee(Assignee newAssignee) {
     this.items.forEach((item) {
       item.assignees.add(AssigneeDecision(
