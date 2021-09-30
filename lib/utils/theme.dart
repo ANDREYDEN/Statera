@@ -6,7 +6,12 @@ final theme = ThemeData(
   primarySwatch: createMaterialColor(Colors.black),
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.white,
-    foregroundColor: Colors.black,
+    // foregroundColor: Colors.black,
+    titleTextStyle: TextStyle(
+      color: Colors.black,
+      fontSize: 20,
+      fontFamily: 'Nunito',
+    ),
     elevation: 0,
   ),
   fontFamily: "Nunito",
@@ -16,7 +21,11 @@ final darkTheme = ThemeData(
   textButtonTheme: textButtonTheme,
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.black,
-    foregroundColor: Colors.white,
+    titleTextStyle: TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+      fontFamily: 'Nunito',
+    ),
     elevation: 0,
   ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
