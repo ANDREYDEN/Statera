@@ -1,50 +1,59 @@
 import 'package:flutter/material.dart';
 
-class ProgressBar extends StatelessWidget {
-  final int progress;
-  final int total;
+class ProgressPart {
+  int progress;
+  Color? color;
 
-  ProgressBar({
-    Key? key,
-    required this.progress,
-    required this.total,
-  }) : super(key: key);
+  ProgressPart({required this.progress, this.color});
+}
+
+class ProgressBar extends StatelessWidget {
+  final List<ProgressPart> progressParts;
+
+  ProgressBar({Key? key, required this.progressParts}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 10,
       child: Row(
-        children: [
-          Flexible(
-            flex: progress,
+        children: progressParts.map((part) {
+          bool isFirst = progressParts
+              .sublist(0, progressParts.indexOf(part))
+              .every((part) => part.progress == 0);
+          bool isLast = progressParts.indexOf(part) == progressParts.length ||
+              progressParts
+                  .sublist(progressParts.indexOf(part) + 1)
+                  .every((part) => part.progress == 0);
+          return Flexible(
+            flex: part.progress,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  topLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(progress == total ? 10 : 0),
-                  topRight: Radius.circular(progress == total ? 10 : 0),
+                  bottomLeft: Radius.circular(isFirst ? 10 : 0),
+                  topLeft: Radius.circular(isFirst ? 10 : 0),
+                  bottomRight: Radius.circular(isLast ? 10 : 0),
+                  topRight: Radius.circular(isLast ? 10 : 0),
                 ),
-                color: Colors.green[400],
+                color: part.color,
               ),
             ),
-          ),
-          Flexible(
-            flex: total - progress,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                  bottomLeft: Radius.circular(progress == 0 ? 10 : 0),
-                  topLeft: Radius.circular(progress == 0 ? 10 : 0),
-                ),
-                color: Colors.grey[300],
-              ),
-            ),
-          )
-        ],
+          );
+        }).toList(),
+        // Flexible(
+        //   flex: total - progress,
+        //   child: Container(
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.only(
+        //         bottomRight: Radius.circular(10),
+        //         topRight: Radius.circular(10),
+        //         bottomLeft: Radius.circular(progress == 0 ? 10 : 0),
+        //         topLeft: Radius.circular(progress == 0 ? 10 : 0),
+        //       ),
+        //       color: Colors.grey[300],
+        //     ),
+        //   ),
+        // )
       ),
     );
   }
