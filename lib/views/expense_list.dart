@@ -31,7 +31,6 @@ class ExpenseList extends StatefulWidget {
 class _ExpenseListState extends State<ExpenseList> {
   late Stream<List<Expense>> _expenseStream;
   List<String> _filters = [];
-  final ImagePicker _picker = ImagePicker();
 
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
@@ -78,9 +77,6 @@ class _ExpenseListState extends State<ExpenseList> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: handleCreateExpense,
-                    onLongPress: kIsWeb
-                        ? () {}
-                        : handleScan, // TODO: handle picker on web
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).colorScheme.secondary,
                       onPrimary: Theme.of(context).colorScheme.onSecondary,
@@ -151,54 +147,6 @@ class _ExpenseListState extends State<ExpenseList> {
               );
       },
     );
-  }
-
-  void handleScan() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null)
-      throw new Exception("Something went wrong while taking a photo");
-
-    var task = await FirebaseStorage.instance
-        .ref(pickedFile.name)
-        .putFile(File(pickedFile.path));
-
-    String url = await task.ref.getDownloadURL();
-    var getItemsFromImage =
-        FirebaseFunctions.instance.httpsCallable('getReceiptData');
-
-    var expense = new Expense(
-      author: Author.fromUser(this.authVm.user),
-      name: "Scanned expense",
-      groupId: groupVm.group.id,
-    );
-
-    var scanSuccessful = await snackbarCatch(
-      context,
-      () async {
-        var response = await getItemsFromImage({'receiptUrl': url});
-        List<dynamic> items = response.data;
-
-        items.forEach((itemData) {
-          try {
-            var item = Item(
-              name: itemData["name"] ?? "",
-              value: double.tryParse(itemData["value"].toString()) ?? 0,
-            );
-            expense.addItem(item);
-          } catch (e) {
-            print("Could not parse item $itemData: $e");
-          }
-        });
-      },
-      errorMessage: 'Something went wrong while processing your photo',
-    );
-
-    if (scanSuccessful) {
-      await Firestore.instance.addExpenseToGroup(
-        expense,
-        groupVm.group.code,
-      );
-    }
   }
 
   void handleCreateExpense() {
