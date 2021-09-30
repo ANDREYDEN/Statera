@@ -26,6 +26,10 @@ final theme = ThemeData(
       borderRadius: BorderRadius.all(Radius.circular(20)),
     ),
   ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.black,
+    foregroundColor: Colors.white,
+  ),
   fontFamily: "Nunito",
 );
 

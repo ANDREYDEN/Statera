@@ -80,16 +80,20 @@ class _ExpensePageState extends State<ExpensePage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    expense.name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline3!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
+                                  Flexible(
+                                    child: Text(
+                                      expense.name,
+                                      overflow: TextOverflow.fade,
+                                      softWrap: false,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline3!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                          ),
+                                    ),
                                   ),
                                   Card(
                                     color: Colors.grey[700],
