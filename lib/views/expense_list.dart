@@ -1,14 +1,8 @@
-import 'dart:io';
-
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
-import 'package:statera/models/item.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
