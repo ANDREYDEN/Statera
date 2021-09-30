@@ -13,6 +13,7 @@ import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
+import 'package:statera/views/expense_page.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
@@ -212,16 +213,18 @@ class _ExpenseListState extends State<ExpenseList> {
             validators: [FieldData.requiredValidator],
           )
         ],
+        closeAfterSubmit: false,
         onSubmit: (values) async {
           var newExpense = Expense(
             author: Author.fromUser(this.authVm.user),
             name: values["expense_name"]!,
             groupId: groupVm.group.id,
           );
-          await Firestore.instance.addExpenseToGroup(
+          final expenseId = await Firestore.instance.addExpenseToGroup(
             newExpense,
             groupVm.group.code,
           );
+          Navigator.of(context).popAndPushNamed('${ExpensePage.route}/$expenseId');
         },
       ),
     );

@@ -72,10 +72,11 @@ class Firestore {
         .where("unmarkedAssigneeIds", arrayContains: uid));
   }
 
-  Future<void> addExpenseToGroup(Expense expense, String? groupCode) async {
+  Future<String> addExpenseToGroup(Expense expense, String? groupCode) async {
     var group = await getGroup(groupCode);
     expense.assignGroup(group);
-    await expensesCollection.add(expense.toFirestore());
+    final docRef = await expensesCollection.add(expense.toFirestore());
+    return docRef.id;
   }
 
   Future<Expense> getExpense(String? expenseId) async {

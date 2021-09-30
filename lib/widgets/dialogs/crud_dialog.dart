@@ -45,12 +45,14 @@ class CRUDDialog extends StatefulWidget {
   final String title;
   final Future Function(Map<String, String>) onSubmit;
   final List<FieldData> fields;
+  final bool closeAfterSubmit;
 
   const CRUDDialog({
     Key? key,
     required this.title,
     required this.onSubmit,
     required this.fields,
+    this.closeAfterSubmit = true,
   }) : super(key: key);
 
   @override
@@ -109,6 +111,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
       return;
     }
 
+
     await widget.onSubmit(
       Map.fromEntries(widget.fields.map(
         (field) => MapEntry(
@@ -118,9 +121,12 @@ class _CRUDDialogState extends State<CRUDDialog> {
       )),
     );
 
+    if (widget.closeAfterSubmit) {
+      Navigator.of(context).pop();
+    }
+
     widget.fields.forEach((field) {
       field.controller.clear();
     });
-    Navigator.of(context).pop();
   }
 }
