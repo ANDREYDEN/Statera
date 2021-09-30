@@ -96,9 +96,19 @@ class ItemListItem extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                     child: ProgressBar(
                       progressParts: [
-                        ProgressPart(progress: item.confirmedParts - item.getAssigneeParts(authVm.user.uid), color: Colors.grey[500]),
-                        ProgressPart(progress: item.getAssigneeParts(authVm.user.uid), color: Colors.green[300]),
-                        ProgressPart(progress: item.partition - item.confirmedParts, color: Colors.grey[200]),
+                        ProgressPart(
+                          progress: item.confirmedParts -
+                              item.getAssigneeParts(authVm.user.uid),
+                          color: Colors.grey[500],
+                        ),
+                        ProgressPart(
+                          progress: item.getAssigneeParts(authVm.user.uid),
+                          color: Colors.green[300],
+                        ),
+                        ProgressPart(
+                          progress: item.partition - item.confirmedParts,
+                          color: Colors.grey[200],
+                        ),
                       ],
                     ),
                   ),
