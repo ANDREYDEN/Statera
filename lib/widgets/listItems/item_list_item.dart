@@ -93,10 +93,13 @@ class ItemListItem extends StatelessWidget {
                 ),
                 if (item.isPartitioned)
                   Padding(
-                    padding: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                    padding: EdgeInsets.all(10),
                     child: ProgressBar(
-                      progress: item.confirmedParts,
-                      total: item.partition,
+                      progressParts: [
+                        ProgressPart(progress: item.confirmedParts - item.getAssigneeParts(authVm.user.uid), color: Colors.grey[500]),
+                        ProgressPart(progress: item.getAssigneeParts(authVm.user.uid), color: Colors.green[300]),
+                        ProgressPart(progress: item.partition - item.confirmedParts, color: Colors.grey[200]),
+                      ],
                     ),
                   ),
                 // SizedBox(height: 10),
