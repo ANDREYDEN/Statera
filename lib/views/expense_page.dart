@@ -21,6 +21,7 @@ import 'package:statera/widgets/author_avatar.dart';
 import 'package:statera/widgets/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
+import 'package:statera/widgets/expense_stages.dart';
 import 'package:statera/widgets/items_list.dart';
 import 'package:statera/widgets/list_empty.dart';
 import 'package:statera/widgets/page_scaffold.dart';
@@ -53,12 +54,11 @@ class _ExpensePageState extends State<ExpensePage> {
         bool loading =
             (!snap.hasData || snap.connectionState == ConnectionState.waiting);
 
-        Expense expense = loading ? Expense.fake() : snap.data!;
+        Expense expense = loading ? Expense.empty() : snap.data!;
 
         return ExpenseProvider(
           expense: expense,
           child: PageScaffold(
-            title: loading ? 'Loading...' : expense.name,
             onFabPressed: !loading &&
                     expense.isAuthoredBy(authVm.user.uid) &&
                     !expense.completed
@@ -69,41 +69,66 @@ class _ExpensePageState extends State<ExpensePage> {
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          for (var expenseStage in authVm.expenseStages)
-                            Expanded(
-                              child: Opacity(
-                                opacity: expense.isIn(expenseStage) ? 1 : 0.7,
-                                child: Container(
-                                  margin: const EdgeInsets.all(8.0),
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    border: Border.all(
-                                      color: expenseStage.color,
-                                      width: 2,
-                                    ),
-                                    color: expense.isIn(expenseStage)
-                                        ? expenseStage.color
-                                        : null,
+                      // ExpenseStages(expense: expense),
+                      Card(
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    expense.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                        ),
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      expenseStage.name,
-                                      style: TextStyle(
-                                          color: expense.isIn(expenseStage)
-                                              ? Colors.black
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color),
+                                  Card(
+                                    color: Colors.grey[700],
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 5,
+                                      ),
+                                      child: Text(
+                                        toStringPrice(expense.total),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
+                                            ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ),
-                        ],
+                              GestureDetector(
+                                onTap: () {
+                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
+                                    return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AssigneePickerDialog(
+                                      expense: expense,
+                                    ),
+                                  );
+                                },
+                                child: AssigneeList(),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -162,30 +187,15 @@ class _ExpensePageState extends State<ExpensePage> {
                                 await Firestore.instance.updateExpense(expense);
                               },
                             ),
-                            Text("Assignees:"),
-                            GestureDetector(
-                              onTap: () {
-                                if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                  return;
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AssigneePickerDialog(
-                                    expense: expense,
-                                  ),
-                                );
-                              },
-                              child: AssigneeList(),
-                            ),
                           ],
                         ),
                       ),
                       Divider(thickness: 1),
                       if (expense.hasNoItems && !kIsWeb)
                         ElevatedButton.icon(
-                          onPressed: () => handleScan(expense),
-                          label: Text('Upload receipt'),
-                          icon: Icon(Icons.photo_camera)
-                        ),
+                            onPressed: () => handleScan(expense),
+                            label: Text('Upload receipt'),
+                            icon: Icon(Icons.photo_camera)),
                       Flexible(
                           child: expense.hasNoItems
                               ? ListEmpty(text: 'Add items to this expense')

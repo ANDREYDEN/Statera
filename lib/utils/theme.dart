@@ -14,6 +14,18 @@ final theme = ThemeData(
     ),
     elevation: 0,
   ),
+  colorScheme: ColorScheme.light(
+    primary: Colors.black,
+    onPrimary: Colors.white,
+    secondary: Colors.white,
+    onSecondary: Colors.black,
+  ),
+  cardTheme: CardTheme(
+    color: Colors.black,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+    ),
+  ),
   fontFamily: "Nunito",
 );
 

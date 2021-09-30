@@ -42,6 +42,11 @@ class Expense {
     this.date = DateTime.now();
   }
 
+  Expense.empty() {
+    this.name = "";
+    this.author = Author(name: "", uid: "");
+  }
+
   String? get formattedDate =>
       this.date == null ? null : DateFormat('d MMM, yyyy').format(this.date!);
 
