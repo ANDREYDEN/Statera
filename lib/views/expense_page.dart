@@ -21,7 +21,6 @@ import 'package:statera/widgets/author_avatar.dart';
 import 'package:statera/widgets/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/widgets/expense_stages.dart';
 import 'package:statera/widgets/items_list.dart';
 import 'package:statera/widgets/list_empty.dart';
 import 'package:statera/widgets/page_scaffold.dart';
@@ -71,7 +70,8 @@ class _ExpensePageState extends State<ExpensePage> {
                     children: [
                       // ExpenseStages(expense: expense),
                       Card(
-                        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
                           child: Column(
@@ -197,9 +197,10 @@ class _ExpensePageState extends State<ExpensePage> {
                       Divider(thickness: 1),
                       if (expense.hasNoItems && !kIsWeb)
                         ElevatedButton.icon(
-                            onPressed: () => handleScan(expense),
-                            label: Text('Upload receipt'),
-                            icon: Icon(Icons.photo_camera)),
+                          onPressed: () => handleScan(expense),
+                          label: Text('Upload receipt'),
+                          icon: Icon(Icons.photo_camera),
+                        ),
                       Flexible(
                           child: expense.hasNoItems
                               ? ListEmpty(text: 'Add items to this expense')
