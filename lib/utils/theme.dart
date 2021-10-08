@@ -17,7 +17,7 @@ final theme = ThemeData(
   cardTheme: CardTheme(
     color: Colors.black,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(20)),
+      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius),)
     ),
   ),
   fontFamily: "Nunito",
@@ -40,7 +40,6 @@ final darkTheme = ThemeData(
     backgroundColor: Colors.black,
     selectedLabelStyle: TextStyle(color: Colors.white),
   ),
-
   fontFamily: "Nunito",
 );
 
@@ -53,3 +52,5 @@ final textButtonTheme = TextButtonThemeData(
     ),
   ),
 );
+
+const cardBorderRadius = 20.0;
