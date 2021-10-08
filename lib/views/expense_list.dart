@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
-import 'package:statera/views/expense_page.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
@@ -59,32 +57,7 @@ class _ExpenseListState extends State<ExpenseList> {
               )
           ],
         ),
-        Expanded(
-          child: Stack(
-            fit: StackFit.expand,
-            alignment: Alignment.center,
-            children: [
-              buildExpensesList(),
-              Positioned(
-                bottom: 10,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: handleCreateExpense,
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).colorScheme.secondary,
-                      onPrimary: Theme.of(context).colorScheme.onSecondary,
-                      shape: CircleBorder(),
-                      padding: EdgeInsets.all(18),
-                      elevation: 5,
-                    ),
-                    child: Icon(Icons.add),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        Expanded(child: buildExpensesList()),
       ],
     );
   }
@@ -140,35 +113,6 @@ class _ExpenseListState extends State<ExpenseList> {
                 },
               );
       },
-    );
-  }
-
-  void handleCreateExpense() {
-    showDialog(
-      context: context,
-      builder: (context) => CRUDDialog(
-        title: "New Expense",
-        fields: [
-          FieldData(
-            id: "expense_name",
-            label: "Expense Name",
-            validators: [FieldData.requiredValidator],
-          )
-        ],
-        closeAfterSubmit: false,
-        onSubmit: (values) async {
-          var newExpense = Expense(
-            author: Author.fromUser(this.authVm.user),
-            name: values["expense_name"]!,
-            groupId: groupVm.group.id,
-          );
-          final expenseId = await Firestore.instance.addExpenseToGroup(
-            newExpense,
-            groupVm.group.code,
-          );
-          Navigator.of(context).popAndPushNamed('${ExpensePage.route}/$expenseId');
-        },
-      ),
     );
   }
 

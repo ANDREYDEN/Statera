@@ -26,11 +26,6 @@ class OKCancelDialog extends StatelessWidget {
             Navigator.pop(context, true);
           },
           child: Text("Yes"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.resolveWith(
-              (states) => Theme.of(context).colorScheme.secondary,
-            ),
-          ),
         ),
       ],
     );

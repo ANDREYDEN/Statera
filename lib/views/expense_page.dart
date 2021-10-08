@@ -71,7 +71,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     children: [
                       // ExpenseStages(expense: expense),
                       Card(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
                           child: Column(
