@@ -13,7 +13,7 @@ class PageScaffold extends StatelessWidget {
     required this.child,
     this.title,
     this.onFabPressed,
-    this.actions, 
+    this.actions,
     this.bottomNavBar,
   }) : super(key: key);
 
@@ -22,7 +22,9 @@ class PageScaffold extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: this.bottomNavBar,
       appBar: AppBar(
-        title: Text(this.title ?? ""),
+        title: Text(
+          this.title ?? "",
+        ),
         actions: this.actions,
       ),
       floatingActionButton: this.onFabPressed == null

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/models/author.dart';
+import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
 import 'package:statera/providers/group_provider.dart';
+import 'package:statera/services/firestore.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/views/expense_list.dart';
+import 'package:statera/views/expense_page.dart';
 import 'package:statera/views/group_home.dart';
+import 'package:statera/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 import 'package:statera/widgets/unmarked_expenses_badge.dart';
 
@@ -29,6 +34,7 @@ class _GroupPageViewState extends State<GroupPageView> {
   Widget build(BuildContext context) {
     return PageScaffold(
       title: group.name,
+      onFabPressed: _selectedNavBarItemIndex == 0 ? null : handleCreateExpense,
       bottomNavBar: BottomNavigationBar(
         iconSize: 36,
         items: [
@@ -69,6 +75,36 @@ class _GroupPageViewState extends State<GroupPageView> {
           },
           children: [GroupHome(), ExpenseList()],
         ),
+      ),
+    );
+  }
+
+  void handleCreateExpense() {
+    showDialog(
+      context: context,
+      builder: (context) => CRUDDialog(
+        title: "New Expense",
+        fields: [
+          FieldData(
+            id: "expense_name",
+            label: "Expense Name",
+            validators: [FieldData.requiredValidator],
+          )
+        ],
+        closeAfterSubmit: false,
+        onSubmit: (values) async {
+          var newExpense = Expense(
+            author: Author.fromUser(this.authVm.user),
+            name: values["expense_name"]!,
+            groupId: this.group.id,
+          );
+          final expenseId = await Firestore.instance.addExpenseToGroup(
+            newExpense,
+            this.group.code,
+          );
+          Navigator.of(context)
+              .popAndPushNamed('${ExpensePage.route}/$expenseId');
+        },
       ),
     );
   }
