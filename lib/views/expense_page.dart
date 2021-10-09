@@ -70,67 +70,68 @@ class _ExpensePageState extends State<ExpensePage> {
                     children: [
                       // ExpenseStages(expense: expense),
                       Card(
+                        clipBehavior: Clip.antiAlias,
                         margin:
                             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      expense.name,
-                                      overflow: TextOverflow.fade,
-                                      softWrap: false,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline3!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                          ),
-                                    ),
-                                  ),
-                                  Card(
-                                    color: Colors.grey[700],
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 5,
-                                      ),
-                                      child: Text(
-                                        toStringPrice(expense.total),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1!
-                                            .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary,
-                                            ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                authVm.getExpenseColor(expense),
+                                Theme.of(context).colorScheme.surface,
+                              ],
+                              stops: [0, 0.8],
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          expense.name,
+                                          softWrap: false,
+                                          style: TextStyle(color: Colors.black),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                    return;
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AssigneePickerDialog(
-                                      expense: expense,
+                                    Card(
+                                      color: Colors.grey[600],
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 5,
+                                        ),
+                                        child: Text(
+                                          toStringPrice(expense.total),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                },
-                                child: AssigneeList(),
-                              ),
-                            ],
+                                  ],
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    if (!expense.canBeUpdatedBy(
+                                        authVm.user.uid)) return;
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          AssigneePickerDialog(
+                                        expense: expense,
+                                      ),
+                                    );
+                                  },
+                                  child: AssigneeList(),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

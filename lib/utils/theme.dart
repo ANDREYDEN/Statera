@@ -7,19 +7,11 @@ final theme = ThemeData(
   colorScheme: ColorScheme.light(
     primary: Colors.black,
     onPrimary: Colors.white,
-    secondary: Colors.white,
-    onSecondary: Colors.black,
+    secondary: Colors.black,
+    onSecondary: Colors.white,
   ),
   textButtonTheme: textButtonTheme,
-  appBarTheme: AppBarTheme(
-    elevation: 0,
-  ),
-  cardTheme: CardTheme(
-    color: Colors.black,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(cardBorderRadius),)
-    ),
-  ),
+  cardTheme: cardTheme,
   fontFamily: "Nunito",
 );
 
@@ -33,9 +25,7 @@ final darkTheme = ThemeData(
     onSecondary: Colors.black,
   ),
   textButtonTheme: textButtonTheme,
-  appBarTheme: AppBarTheme(
-    elevation: 0,
-  ),
+  cardTheme: cardTheme,
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.black,
     selectedLabelStyle: TextStyle(color: Colors.white),
@@ -53,4 +43,8 @@ final textButtonTheme = TextButtonThemeData(
   ),
 );
 
-const cardBorderRadius = 20.0;
+final cardTheme = CardTheme(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  ),
+);
