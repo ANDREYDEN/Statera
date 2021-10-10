@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:statera/widgets/loader.dart';
 
 class CustomStreamBuilder<T> extends StatelessWidget {
   final Stream<T> stream;
@@ -18,7 +19,7 @@ class CustomStreamBuilder<T> extends StatelessWidget {
         }
 
         if (!snap.hasData || snap.connectionState == ConnectionState.waiting) {
-          return Text("Loading...");
+          return Loader();
         }
 
         T data = snap.data!;

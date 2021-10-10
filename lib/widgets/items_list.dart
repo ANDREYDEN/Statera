@@ -12,78 +12,81 @@ import 'package:statera/widgets/listItems/item_list_item.dart';
 import 'package:statera/widgets/optionally_dismissible.dart';
 
 class ItemsList extends StatelessWidget {
-  final Expense expense;
-
-  const ItemsList({
-    Key? key,
-    required this.expense,
-  }) : super(key: key);
+  const ItemsList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context, listen: false);
 
-    return ListView.builder(
-      itemCount: this.expense.items.length,
-      itemBuilder: (context, index) {
-        var item = this.expense.items[index];
+    // Expense expense = Provider.of<Expense>(context);
 
-        return OptionallyDismissible(
-          key: Key(item.hashCode.toString()),
-          isDismissible: authVm.canUpdate(this.expense),
-          onDismissed: (_) async {
-            this.expense.items.removeAt(index);
-            await Firestore.instance.updateExpense(this.expense);
+    return Consumer<Expense>(
+      builder: (BuildContext context, expense, _) {
+        return ListView.builder(
+          itemCount: expense.items.length,
+          itemBuilder: (context, index) {
+            var item = expense.items[index];
+
+            return OptionallyDismissible(
+              key: Key(item.hashCode.toString()),
+              isDismissible: authVm.canUpdate(expense),
+              onDismissed: (_) async {
+                expense.items.removeAt(index);
+                await Firestore.instance.updateExpense(expense);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: GestureDetector(
+                  onLongPress: () => handleEditItem(
+                    context,
+                    expense,
+                    item,
+                    authVm,
+                  ),
+                  child: ItemListItem(
+                    item: item,
+                    onChangePartition: (parts) async {
+                      if (!authVm.canMark(expense)) return;
+
+                      expense.items[index].setAssigneeDecision(
+                        authVm.user.uid,
+                        parts,
+                      );
+                      await Firestore.instance.updateExpense(expense);
+                      // TODO: convert into a cloud function
+                      if (expense.completed) {
+                        snackbarCatch(
+                          context,
+                          () async {
+                            final group = await Firestore.instance
+                                .getExpenseGroupStream(expense)
+                                .first;
+                            group.updateBalance(expense);
+                            await Firestore.instance.saveGroup(group);
+                          },
+                          successMessage:
+                              "The expense is now complete. Participants' balances updated.",
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ),
+            );
           },
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: GestureDetector(
-              onLongPress: () => handleEditItem(
-                context,
-                item,
-                authVm,
-              ),
-              child: ItemListItem(
-                item: item,
-                onChangePartition: (parts) async {
-                  if (!authVm.canMark(expense)) return;
-
-                  expense.items[index].setAssigneeDecision(
-                    authVm.user.uid,
-                    parts,
-                  );
-                  await Firestore.instance.updateExpense(expense);
-                  // TODO: convert into a cloud function
-                  if (expense.completed) {
-                    snackbarCatch(
-                      context,
-                      () async {
-                        final group = await Firestore.instance
-                            .getExpenseGroupStream(expense)
-                            .first;
-                        group.updateBalance(expense);
-                        await Firestore.instance.saveGroup(group);
-                      },
-                      successMessage:
-                          "The expense is now complete. Participants' balances updated.",
-                    );
-                  }
-                },
-              ),
-            ),
-          ),
         );
-      },
+      }
     );
   }
 
   handleEditItem(
     BuildContext context,
+    Expense expense,
     Item item,
     AuthenticationViewModel authVm,
   ) {
-    if (!authVm.canUpdate(this.expense)) return;
+    if (!authVm.canUpdate(expense)) return;
 
     showDialog(
       context: context,
@@ -112,8 +115,8 @@ class ItemsList extends StatelessWidget {
         onSubmit: (values) async {
           item.name = values["item_name"]!;
           item.value = double.parse(values["item_value"]!);
-          this.expense.updateItem(item);
-          await Firestore.instance.updateExpense(this.expense);
+          expense.updateItem(item);
+          await Firestore.instance.updateExpense(expense);
         },
       ),
     );
