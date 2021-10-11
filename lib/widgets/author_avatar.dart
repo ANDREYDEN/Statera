@@ -59,7 +59,9 @@ class AuthorAvatar extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                this.author.name[0],
+                                this.author.name.isEmpty
+                                    ? '?'
+                                    : this.author.name[0],
                                 style: TextStyle(fontSize: 24),
                               ),
                             ],

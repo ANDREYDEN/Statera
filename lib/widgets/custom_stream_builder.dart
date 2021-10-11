@@ -19,7 +19,7 @@ class CustomStreamBuilder<T> extends StatelessWidget {
         }
 
         if (!snap.hasData || snap.connectionState == ConnectionState.waiting) {
-          return Loader();
+          return Center(child: Loader());
         }
 
         T data = snap.data!;

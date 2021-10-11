@@ -19,64 +19,60 @@ class ItemsList extends StatelessWidget {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context, listen: false);
 
-    // Expense expense = Provider.of<Expense>(context);
+    Expense expense = Provider.of<Expense>(context);
 
-    return Consumer<Expense>(
-      builder: (BuildContext context, expense, _) {
-        return ListView.builder(
-          itemCount: expense.items.length,
-          itemBuilder: (context, index) {
-            var item = expense.items[index];
+    return ListView.builder(
+      itemCount: expense.items.length,
+      itemBuilder: (context, index) {
+        var item = expense.items[index];
 
-            return OptionallyDismissible(
-              key: Key(item.hashCode.toString()),
-              isDismissible: authVm.canUpdate(expense),
-              onDismissed: (_) async {
-                expense.items.removeAt(index);
-                await Firestore.instance.updateExpense(expense);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: GestureDetector(
-                  onLongPress: () => handleEditItem(
-                    context,
-                    expense,
-                    item,
-                    authVm,
-                  ),
-                  child: ItemListItem(
-                    item: item,
-                    onChangePartition: (parts) async {
-                      if (!authVm.canMark(expense)) return;
-
-                      expense.items[index].setAssigneeDecision(
-                        authVm.user.uid,
-                        parts,
-                      );
-                      await Firestore.instance.updateExpense(expense);
-                      // TODO: convert into a cloud function
-                      if (expense.completed) {
-                        snackbarCatch(
-                          context,
-                          () async {
-                            final group = await Firestore.instance
-                                .getExpenseGroupStream(expense)
-                                .first;
-                            group.updateBalance(expense);
-                            await Firestore.instance.saveGroup(group);
-                          },
-                          successMessage:
-                              "The expense is now complete. Participants' balances updated.",
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ),
-            );
+        return OptionallyDismissible(
+          key: Key(item.hashCode.toString()),
+          isDismissible: authVm.canUpdate(expense),
+          onDismissed: (_) async {
+            expense.items.removeAt(index);
+            await Firestore.instance.updateExpense(expense);
           },
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: GestureDetector(
+              onLongPress: () => handleEditItem(
+                context,
+                expense,
+                item,
+                authVm,
+              ),
+              child: ItemListItem(
+                item: item,
+                onChangePartition: (parts) async {
+                  if (!authVm.canMark(expense)) return;
+
+                  expense.items[index].setAssigneeDecision(
+                    authVm.user.uid,
+                    parts,
+                  );
+                  await Firestore.instance.updateExpense(expense);
+                  // TODO: convert into a cloud function
+                  if (expense.completed) {
+                    snackbarCatch(
+                      context,
+                      () async {
+                        final group = await Firestore.instance
+                            .getExpenseGroupStream(expense)
+                            .first;
+                        group.updateBalance(expense);
+                        await Firestore.instance.saveGroup(group);
+                      },
+                      successMessage:
+                          "The expense is now complete. Participants' balances updated.",
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
         );
-      }
+      },
     );
   }
 
