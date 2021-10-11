@@ -26,14 +26,12 @@ class AuthorChangeDialog extends StatelessWidget {
               itemCount: group.members.length,
               itemBuilder: (context, index) {
                 final authorOption = group.members[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: AuthorAvatar(
-                    onTap: () => Navigator.pop(context, authorOption),
-                    author: authorOption,
-                    withName: true,
-                    checked: authorOption.uid == this.expense.author.uid,
-                  ),
+                return AuthorAvatar(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  onTap: () => Navigator.pop(context, authorOption),
+                  author: authorOption,
+                  withName: true,
+                  checked: authorOption.uid == this.expense.author.uid,
                 );
               },
             );

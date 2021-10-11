@@ -39,24 +39,22 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
                 itemBuilder: (context, index) {
                   final member = group.members[index];
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: AuthorAvatar(
-                      author: member,
-                      borderColor: this._selectedUids.contains(member.uid)
-                          ? Colors.green
-                          : Colors.transparent,
-                      withName: true,
-                      onTap: () {
-                        setState(() {
-                          if (this._selectedUids.contains(member.uid)) {
-                            this._selectedUids.remove(member.uid);
-                          } else {
-                            this._selectedUids.add(member.uid);
-                          }
-                        });
-                      },
-                    ),
+                  return AuthorAvatar(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    author: member,
+                    borderColor: this._selectedUids.contains(member.uid)
+                        ? Colors.green
+                        : Colors.transparent,
+                    withName: true,
+                    onTap: () {
+                      setState(() {
+                        if (this._selectedUids.contains(member.uid)) {
+                          this._selectedUids.remove(member.uid);
+                        } else {
+                          this._selectedUids.add(member.uid);
+                        }
+                      });
+                    },
                   );
                 },
               );

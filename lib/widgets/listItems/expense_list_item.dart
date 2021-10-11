@@ -15,79 +15,75 @@ class ExpenseListItem extends StatelessWidget {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context);
 
-    Color? cardBorderColor = Colors.blue[200];
-
-    try {
-      authVm.expenseStages.forEach((stage) {
-        if (this.expense.isIn(stage)) {
-          cardBorderColor = stage.color;
-        }
-      });
-    } catch (e) {
-      return Text(e.toString());
-    }
-
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(ExpensePage.route + '/${expense.id}');
       },
-      child: Container(
+      child: Card(
+        clipBehavior: Clip.antiAlias,
         margin: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: cardBorderColor ?? Colors.transparent, width: 2),
-          color: Theme.of(context).colorScheme.surface,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AuthorAvatar(author: this.expense.author),
-                    SizedBox(width: 15),
-                    Flexible(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              this.expense.name,
-                              style: TextStyle(fontSize: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                authVm.getExpenseColor(this.expense),
+                Theme.of(context).colorScheme.surface,
+              ],
+              stops: [0, 0.8],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AuthorAvatar(author: this.expense.author),
+                      SizedBox(width: 15),
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                this.expense.name,
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
-                          ),
-                          Text(
-                            pluralize('item', this.expense.items.length) +
-                                (this.expense.formattedDate == null
-                                    ? ""
-                                    : " on ${this.expense.formattedDate!}"),
-                          ),
-                        ],
+                            Text(
+                              pluralize('item', this.expense.items.length) +
+                                  (this.expense.formattedDate == null
+                                      ? ""
+                                      : " on ${this.expense.formattedDate!}"),
+                            ),
+                          ],
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      toStringPrice(this
+                          .expense
+                          .getConfirmedTotalForUser(authVm.user.uid)),
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    Text(
+                      toStringPrice(this.expense.total),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    toStringPrice(
-                        this.expense.getConfirmedTotalForUser(authVm.user.uid)),
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Text(
-                    toStringPrice(this.expense.total),
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

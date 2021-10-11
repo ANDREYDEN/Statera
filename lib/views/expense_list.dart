@@ -43,6 +43,7 @@ class _ExpenseListState extends State<ExpenseList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (kIsWeb) SizedBox(height: 8),
         Row(
           children: [
             for (var stage in authVm.expenseStages)

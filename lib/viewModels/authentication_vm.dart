@@ -55,6 +55,15 @@ class AuthenticationViewModel {
 
   int getItemParts(Item item) => item.getAssigneeParts(user.uid);
 
+  Color getExpenseColor(Expense expense) {
+    for (var stage in expenseStages) {
+      if (expense.isIn(stage)) {
+        return stage.color;
+      }
+    }
+    return Colors.blue[200]!;
+  }
+
   Future<void> createGroup(Group newGroup) async {
     newGroup.generateCode();
     newGroup.addUser(user);
