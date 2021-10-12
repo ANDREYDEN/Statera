@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/utils/helpers.dart';
+import 'package:statera/widgets/loader.dart';
 
 class PaymentDialog extends StatefulWidget {
   final bool isReceiving;
@@ -21,21 +24,23 @@ class PaymentDialog extends StatefulWidget {
 }
 
 class _PaymentDialogState extends State<PaymentDialog> {
-  TextEditingController balanceController = TextEditingController();
-  late String inputValue;
+  TextEditingController _balanceController = TextEditingController();
+  StreamController<bool> _paymentStateController = StreamController();
 
   @override
   initState() {
-    balanceController.text = inputValue = widget.value.toString();
-    balanceController.addListener(() {
-      setState(() {
-        inputValue = balanceController.text;
-      });
-    });
+    _balanceController.text = widget.value.toString();
+    _paymentStateController.add(false);
     super.initState();
   }
 
-  double get balanceToPay => double.tryParse(this.balanceController.text) ?? 0;
+  @override
+  void dispose() {
+    _paymentStateController.close();
+    super.dispose();
+  }
+
+  double get balanceToPay => double.tryParse(this._balanceController.text) ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +52,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
       content: Column(
         children: [
           TextField(
-            controller: balanceController,
+            controller: _balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(labelText: "Balance"),
           ),
@@ -64,21 +69,29 @@ class _PaymentDialogState extends State<PaymentDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text("Cancel"),
         ),
-        ElevatedButton(
-          onPressed: () async {
-            await snackbarCatch(
-              context,
-              () => this.widget.onPay(this.balanceToPay),
-              successMessage: widget.isReceiving
-                  ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
-                  : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
+        StreamBuilder(
+          stream: _paymentStateController.stream,
+          builder: (context, snapshot) {
+            final paymentInProgress =
+                !snapshot.hasData || snapshot.data == true;
+            return ElevatedButton(
+              onPressed: paymentInProgress
+                  ? null
+                  : () async {
+                      _paymentStateController.add(true);
+                      await snackbarCatch(
+                        context,
+                        () => this.widget.onPay(this.balanceToPay),
+                        successMessage: widget.isReceiving
+                            ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
+                            : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
+                      );
+                      Navigator.of(context).pop();
+                    },
+              child: Text((widget.isReceiving ? "Recieve" : "Pay") +
+                      " ${toStringPrice(this.balanceToPay)}"),
             );
-            Navigator.of(context).pop();
           },
-          child: Text(
-            (widget.isReceiving ? "Recieve" : "Pay") +
-                " ${toStringPrice(this.balanceToPay)}",
-          ),
         ),
       ],
     );
