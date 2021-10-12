@@ -81,12 +81,14 @@ class _StateraState extends State<Statera> {
                       (firstMatch != null && firstMatch.groupCount == 1)
                           ? firstMatch.group(1)
                           : null;
-                  return path.isPublic
-                      ? path.builder(context, match)
-                      : AuthGuard(
-                          originalRoute: route,
-                          builder: () => path.builder(context, match),
-                        );
+                  return SafeArea(
+                    child: path.isPublic
+                        ? path.builder(context, match)
+                        : AuthGuard(
+                            originalRoute: route,
+                            builder: () => path.builder(context, match),
+                          ),
+                  );
                 }
               }
               return PageNotFound();
