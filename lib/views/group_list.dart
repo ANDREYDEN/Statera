@@ -32,13 +32,13 @@ class _GroupListState extends State<GroupList> {
     return PageScaffold(
       title: kAppName,
       actions: [
-        TextButton(
+        IconButton(
           onPressed: () {
             snackbarCatch(context, () {
               Auth.instance.signOut();
             });
           },
-          child: Text("Sign Out"),
+          icon: Icon(Icons.logout),
         ),
       ],
       onFabPressed: handleCreateGroup,
