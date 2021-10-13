@@ -58,5 +58,6 @@ jobs:
         with:
           allowUpdates: true
           artifacts: "build/app/outputs/apk/release/app-release.apk"
+          body: ${{ github.event.pull_request.body }}
           token: '${{ secrets.GITHUB_TOKEN }}'
           tag: ${{ steps.bump.outputs.tag_name }}
