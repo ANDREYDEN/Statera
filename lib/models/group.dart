@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
+import 'package:statera/models/payment.dart';
 import 'package:statera/utils/helpers.dart';
 
 class Group {
@@ -83,29 +84,20 @@ class Group {
         );
   }
 
-  void payOffBalance({
-    required String payerUid,
-    required String receiverUid,
-    required double value,
-  }) {
-    if (this.members.every((member) => member.uid != payerUid)) {
+  void payOffBalance({required Payment payment}) {
+    if (this.members.every((member) => member.uid != payment.payerId)) {
       throw new Exception(
-          "User with id $payerUid is not a member of group $name");
+          "User with id ${payment.payerId} is not a member of group $name");
     }
-    if (this.members.every((member) => member.uid != receiverUid)) {
+    if (this.members.every((member) => member.uid != payment.receiverId)) {
       throw new Exception(
-          "User with id $receiverUid is not a member of group $name");
+          "User with id ${payment.receiverId} is not a member of group $name");
     }
 
-    this.balance[payerUid]![receiverUid] =
-        this.balance[payerUid]![receiverUid]! - value;
-    this.balance[receiverUid]![payerUid] =
-        this.balance[receiverUid]![payerUid]! + value;
-  }
-
-  void resolveBalance(String member1Uid, String member2Uid) {
-    this.balance[member1Uid]![member2Uid] = 0;
-    this.balance[member2Uid]![member1Uid] = 0;
+    this.balance[payment.payerId]![payment.receiverId] =
+        this.balance[payment.payerId]![payment.receiverId]! - payment.value;
+    this.balance[payment.receiverId]![payment.payerId] =
+        this.balance[payment.receiverId]![payment.payerId]! + payment.value;
   }
 
   void updateBalance(Expense expense) {
@@ -113,9 +105,12 @@ class Group {
         .where((assignee) => assignee.uid != expense.author.uid)
         .forEach((assignee) {
       this.payOffBalance(
-        payerUid: expense.author.uid,
-        receiverUid: assignee.uid,
-        value: expense.getConfirmedTotalForUser(assignee.uid),
+        payment: Payment(
+          groupId: this.id,
+          payerId: expense.author.uid,
+          receiverId: assignee.uid,
+          value: expense.getConfirmedTotalForUser(assignee.uid),
+        ),
       );
     });
   }

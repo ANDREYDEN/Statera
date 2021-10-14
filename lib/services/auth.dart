@@ -38,9 +38,6 @@ class Auth {
   }
 
   Future<void> signOut() async {
-    if (!kIsWeb) {
-      await _googleSignIn.disconnect();
-    }
     await _auth.signOut();
   }
 

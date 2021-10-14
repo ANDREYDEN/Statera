@@ -78,10 +78,20 @@ void main() {
           expect(expense.canReceiveAssignees, isTrue);
         });
 
-        test("can't be performed if the only assignee is not the author", () {
+        test("can be performed even if all assignees have made their decisions",
+            () {
           expense.addItem(Item.fake());
           expense.assignees = [assignee];
           expense.items.first.setAssigneeDecision(author.uid, 1);
+
+          expect(expense.canReceiveAssignees, isTrue);
+        });
+
+        test("can't be performed if the expense is finalized", () {
+          expense.addItem(Item.fake());
+          expense.assignees = [assignee];
+          expense.items.first.setAssigneeDecision(author.uid, 1);
+          expense.finalizedDate = DateTime.now();
 
           expect(expense.canReceiveAssignees, isFalse);
         });
@@ -259,7 +269,7 @@ void main() {
       );
     });
 
-    test("can only be updated by the author if not completed", () {
+    test("can only be updated by the author if not finalized", () {
       var item = Item.fake();
       expense.addItem(item);
       var somebodyElse = Assignee.fake(uid: 'other');
@@ -271,10 +281,14 @@ void main() {
       item.setAssigneeDecision(author.uid, 1);
       item.setAssigneeDecision(somebodyElse.uid, 0);
 
+      expect(expense.canBeUpdatedBy(author.uid), isTrue);
+
+      expense.finalizedDate = DateTime.now();
+
       expect(expense.canBeUpdatedBy(author.uid), isFalse);
     });
 
-    test("can't be marked by anyone if the expense is completed", () {
+    test("can't be marked by anyone if the expense is finalized", () {
       var item = Item.fake();
       expense.addItem(item);
       var anotherAssignee = Assignee.fake();
@@ -285,6 +299,13 @@ void main() {
       item.setAssigneeDecision(author.uid, 0);
       item.setAssigneeDecision(assignee.uid, 1);
       item.setAssigneeDecision(anotherAssignee.uid, 0);
+
+      [author.uid, assignee.uid, anotherAssignee.uid, outsider.uid]
+          .forEach((uid) {
+        expect(expense.canBeMarkedBy(uid), isTrue);
+      });
+
+      expense.finalizedDate = DateTime.now();
 
       [author.uid, assignee.uid, anotherAssignee.uid, outsider.uid]
           .forEach((uid) {

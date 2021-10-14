@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
+import 'package:statera/models/payment.dart';
 
 class Firestore {
   late FirebaseFirestore _firestore;
@@ -25,6 +26,9 @@ class Firestore {
       _firestore.collection("expenses");
 
   CollectionReference get groupsCollection => _firestore.collection("groups");
+
+  CollectionReference get paymentsCollection =>
+      _firestore.collection("payments");
 
   Query _expensesQuery({
     String? groupId,
@@ -124,6 +128,16 @@ class Firestore {
     );
   }
 
+  Future<Group> getGroupById(String? groupId) async {
+    var groupDoc = await groupsCollection.doc(groupId).get();
+    if (!groupDoc.exists)
+      throw new Exception("There was no group with id $groupId");
+    return Group.fromFirestore(
+      groupDoc.data() as Map<String, dynamic>,
+      id: groupDoc.id,
+    );
+  }
+
   Stream<Group> groupStream(String? groupId) {
     var groupStream = groupsCollection.doc(groupId).snapshots();
     return groupStream.map((groupSnap) {
@@ -153,6 +167,13 @@ class Firestore {
           id: groupSnap.id);
       return group.extendedBalance(consumerUid);
     });
+  }
+
+  Future<void> payOffBalance({required Payment payment}) async {
+    Group group = await getGroupById(payment.groupId);
+    group.payOffBalance(payment: payment);
+    await paymentsCollection.add(payment.toFirestore());
+    await saveGroup(group);
   }
 
   Stream<List<Group>> userGroupsStream(String uid) {
@@ -190,5 +211,9 @@ class Firestore {
 
   Stream<Group> getExpenseGroupStream(Expense expense) {
     return this.groupStream(expense.groupId);
+  }
+
+  Future<void> finalizeExpense(Expense expense) async {
+    await expensesCollection.doc(expense.id).update({'finalizedDate': Timestamp.now()});
   }
 }

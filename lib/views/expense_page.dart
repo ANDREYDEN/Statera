@@ -22,7 +22,6 @@ import 'package:statera/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/widgets/items_list.dart';
 import 'package:statera/widgets/list_empty.dart';
-import 'package:statera/widgets/loader.dart';
 import 'package:statera/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatefulWidget {
@@ -50,10 +49,9 @@ class _ExpensePageState extends State<ExpensePage> {
       child: Consumer<Expense>(
         builder: (context, expense, _) {
           return PageScaffold(
-            onFabPressed:
-                expense.isAuthoredBy(authVm.user.uid) && !expense.completed
-                    ? () => handleCreateItem(expense)
-                    : null,
+            onFabPressed: authVm.canUpdate(expense)
+                ? () => handleCreateItem(expense)
+                : null,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

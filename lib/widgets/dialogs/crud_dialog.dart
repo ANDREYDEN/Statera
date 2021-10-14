@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:statera/widgets/protected_elevated_button.dart';
 
 class FieldData {
   String id;
@@ -67,7 +68,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
     return AlertDialog(
       title: Text(widget.title),
       content: Column(children: [...textFields]),
-      actions: [ElevatedButton(onPressed: submit, child: Text("Save"))],
+      actions: [ProtectedElevatedButton(onPressed: submit, child: Text("Save"))],
     );
   }
 
