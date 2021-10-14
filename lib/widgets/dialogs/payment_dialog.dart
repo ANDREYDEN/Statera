@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/utils/helpers.dart';
-import 'package:statera/widgets/loader.dart';
 
 class PaymentDialog extends StatefulWidget {
   final bool isReceiving;
