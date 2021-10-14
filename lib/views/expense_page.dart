@@ -49,10 +49,9 @@ class _ExpensePageState extends State<ExpensePage> {
       child: Consumer<Expense>(
         builder: (context, expense, _) {
           return PageScaffold(
-            onFabPressed:
-                expense.isAuthoredBy(authVm.user.uid) && !expense.completed
-                    ? () => handleCreateItem(expense)
-                    : null,
+            onFabPressed: authVm.canUpdate(expense)
+                ? () => handleCreateItem(expense)
+                : null,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

@@ -212,4 +212,8 @@ class Firestore {
   Stream<Group> getExpenseGroupStream(Expense expense) {
     return this.groupStream(expense.groupId);
   }
+
+  Future<void> finalizeExpense(Expense expense) async {
+    await expensesCollection.doc(expense.id).update({'finalizedDate': Timestamp.now()});
+  }
 }

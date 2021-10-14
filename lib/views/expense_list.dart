@@ -99,8 +99,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
                   return OptionallyDismissible(
                     key: Key(expense.id!),
-                    isDismissible: expense.isAuthoredBy(authVm.user.uid) &&
-                        !expense.completed,
+                    isDismissible: authVm.canUpdate(expense),
                     confirmation:
                         "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {

@@ -52,21 +52,6 @@ class ItemsList extends StatelessWidget {
                     parts,
                   );
                   await Firestore.instance.updateExpense(expense);
-                  // TODO: convert into a cloud function
-                  if (expense.completed) {
-                    snackbarCatch(
-                      context,
-                      () async {
-                        final group = await Firestore.instance
-                            .getExpenseGroupStream(expense)
-                            .first;
-                        group.updateBalance(expense);
-                        await Firestore.instance.saveGroup(group);
-                      },
-                      successMessage:
-                          "The expense is now complete. Participants' balances updated.",
-                    );
-                  }
                 },
               ),
             ),

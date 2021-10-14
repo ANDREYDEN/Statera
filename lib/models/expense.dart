@@ -26,6 +26,7 @@ class Expense {
   late String name;
   late Author author; // UID
   DateTime? date;
+  DateTime? finalizedDate;
 
   Expense({
     required this.name,
@@ -62,21 +63,24 @@ class Expense {
 
   bool isIn(ExpenseStage stage) => stage.test(this);
 
-  bool get completed =>
-      items.isNotEmpty && items.every((item) => item.completed);
+  bool get finalized => finalizedDate != null;
+      
+  bool get completed => items.isNotEmpty && items.every((item) => item.completed);
 
   bool get canReceiveAssignees =>
       (assignees.length == 1 && this.isAuthoredBy(assignees.first.uid)) ||
-      !completed;
+      !finalized;
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
   bool isAuthoredBy(String uid) => this.author.uid == uid;
 
-  bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.completed;
+  bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.finalized;
+
+  bool canBeFinalizedBy(String uid) => !this.finalized && this.completed && this.isAuthoredBy(uid);
 
   bool canBeMarkedBy(String uid) =>
-      !this.completed && this.assignees.any((assignee) => assignee.uid == uid);
+      !this.finalized && this.assignees.any((assignee) => assignee.uid == uid);
 
   int get definedAssignees => assignees.fold(
         0,
@@ -163,7 +167,8 @@ class Expense {
           .where((assignee) => !isMarkedBy(assignee.uid))
           .map((assignee) => assignee.uid)
           .toList(),
-      "date": date
+      "date": date,
+      "finalizedDate": finalizedDate
     };
   }
 
@@ -177,6 +182,9 @@ class Expense {
     expense.date = data["date"] == null
         ? null
         : DateTime.parse(data["date"].toDate().toString());
+    expense.finalizedDate = data["finalizedDate"] == null
+        ? null
+        : DateTime.parse(data["finalizedDate"].toDate().toString());
     expense.assignees = data["assignees"]
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();

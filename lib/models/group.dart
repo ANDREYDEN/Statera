@@ -100,11 +100,6 @@ class Group {
         this.balance[payment.receiverId]![payment.payerId]! + payment.value;
   }
 
-  void resolveBalance(String member1Uid, String member2Uid) {
-    this.balance[member1Uid]![member2Uid] = 0;
-    this.balance[member2Uid]![member1Uid] = 0;
-  }
-
   void updateBalance(Expense expense) {
     expense.assignees
         .where((assignee) => assignee.uid != expense.author.uid)

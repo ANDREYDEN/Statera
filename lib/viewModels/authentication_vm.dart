@@ -35,12 +35,12 @@ class AuthenticationViewModel {
         color: Colors.yellow[300]!,
         test: (expense) =>
             (expense.isMarkedBy(user.uid) || !expense.hasAssignee(user.uid)) &&
-            !expense.completed,
+            !expense.finalized,
       ),
       ExpenseStage(
-        name: "Completed",
+        name: "Finalized",
         color: Colors.grey[400]!,
-        test: (expense) => expense.completed,
+        test: (expense) => expense.finalized,
       ),
     ];
   }
