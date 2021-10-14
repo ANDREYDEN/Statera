@@ -1,11 +1,45 @@
 /* eslint-disable require-jsdoc */
 import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
+// import * as admin from "firebase-admin";
 import "firebase-functions";
 import { mergeProducts, normalize } from "./normalizers";
 import { firestoreBackup } from "./admin";
 
+// admin.initializeApp();
+// const db = admin.firestore();
+
 export const scheduledBackup = firestoreBackup;
+
+// export const updateBalanceOnExpenseCompletion = functions.firestore
+//   .document("expenses/{expenseId}")
+//   .onUpdate(async (change, context) => {
+//     const logWithReason = (reason: string) =>
+//       `[eid: ${context.params.expenseId}] Balance not updated: ${reason}`;
+//     const expense = change.after.data();
+//     if (expense.completedDate) {
+//       logWithReason("Expense has already been completed");
+//       return;
+//     }
+//     const isCompleted = expense.items.every((item: any) =>
+//       item.assignees.every((assignee: any) => assignee.decision !== "Undefined")
+//     );
+
+//     if (!isCompleted) {
+//       logWithReason("Expense has not been completed yet");
+//       return;
+//     }
+
+//     const groupDoc = await db.collection("groups").doc(expense.groupId).get();
+//     if (!groupDoc.exists) {
+//       logWithReason("Expense does not have a group");
+//     }
+//     const group = groupDoc.data()!;
+
+//     // update the balance
+
+//     await groupDoc.ref.update(group);
+//   });
 
 export const getReceiptDataTest = functions.https.onRequest(
   async (request, response) => {
