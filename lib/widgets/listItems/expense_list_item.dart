@@ -6,6 +6,7 @@ import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
 import 'package:statera/views/expense_page.dart';
 import 'package:statera/widgets/author_avatar.dart';
+import 'package:statera/widgets/protected_elevated_button.dart';
 
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
@@ -89,7 +90,7 @@ class ExpenseListItem extends StatelessWidget {
                   ],
                 ),
                 if (expense.canBeFinalizedBy(authVm.user.uid))
-                  ElevatedButton(
+                  ProtectedElevatedButton(
                     onPressed: () {
                       snackbarCatch(
                         context,
