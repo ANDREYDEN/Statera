@@ -68,12 +68,12 @@ class OwingListItem extends StatelessWidget {
         receiver: this.payer,
         value: this.owing,
         onPay: (value) async {
-          group.payOffBalance(
+          await Firestore.instance.payOffBalance(
+            groupId: group.id,
             payerUid: payer,
             receiverUid: this.payer.uid,
             value: value,
           );
-          await Firestore.instance.saveGroup(group);
         },
       ),
     );

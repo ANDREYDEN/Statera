@@ -124,6 +124,16 @@ class Firestore {
     );
   }
 
+  Future<Group> getGroupById(String? groupId) async {
+    var groupDoc = await groupsCollection.doc(groupId).get();
+    if (!groupDoc.exists)
+      throw new Exception("There was no group with id $groupId");
+    return Group.fromFirestore(
+      groupDoc.data() as Map<String, dynamic>,
+      id: groupDoc.id,
+    );
+  }
+
   Stream<Group> groupStream(String? groupId) {
     var groupStream = groupsCollection.doc(groupId).snapshots();
     return groupStream.map((groupSnap) {
@@ -153,6 +163,21 @@ class Firestore {
           id: groupSnap.id);
       return group.extendedBalance(consumerUid);
     });
+  }
+
+  Future<void> payOffBalance({
+    String? groupId,
+    required String payerUid,
+    required String receiverUid,
+    required double value,
+  }) async {
+    Group group = await getGroupById(groupId);
+    group.payOffBalance(
+      payerUid: payerUid,
+      receiverUid: receiverUid,
+      value: value,
+    );
+    await saveGroup(group);
   }
 
   Stream<List<Group>> userGroupsStream(String uid) {
