@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/utils/helpers.dart';
+import 'package:statera/widgets/protected_elevated_button.dart';
 
 class PaymentDialog extends StatefulWidget {
   final bool isReceiving;
@@ -24,19 +25,11 @@ class PaymentDialog extends StatefulWidget {
 
 class _PaymentDialogState extends State<PaymentDialog> {
   TextEditingController _balanceController = TextEditingController();
-  StreamController<bool> _paymentStateController = StreamController();
 
   @override
   initState() {
     _balanceController.text = widget.value.toString();
-    _paymentStateController.add(false);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _paymentStateController.close();
-    super.dispose();
   }
 
   double get balanceToPay => double.tryParse(this._balanceController.text) ?? 0;
@@ -68,29 +61,20 @@ class _PaymentDialogState extends State<PaymentDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text("Cancel"),
         ),
-        StreamBuilder(
-          stream: _paymentStateController.stream,
-          builder: (context, snapshot) {
-            final paymentInProgress =
-                !snapshot.hasData || snapshot.data == true;
-            return ElevatedButton(
-              onPressed: paymentInProgress
-                  ? null
-                  : () async {
-                      _paymentStateController.add(true);
-                      await snackbarCatch(
-                        context,
-                        () => this.widget.onPay(this.balanceToPay),
-                        successMessage: widget.isReceiving
-                            ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
-                            : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
-                      );
-                      Navigator.of(context).pop();
-                    },
-              child: Text((widget.isReceiving ? "Recieve" : "Pay") +
-                      " ${toStringPrice(this.balanceToPay)}"),
+        ProtectedElevatedButton(
+          onPressed: () async {
+            await Future.delayed(Duration(seconds: 2));
+            await snackbarCatch(
+              context,
+              () => this.widget.onPay(this.balanceToPay),
+              successMessage: widget.isReceiving
+                  ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
+                  : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
             );
+            Navigator.of(context).pop();
           },
+          child: Text((widget.isReceiving ? "Recieve" : "Pay") +
+              " ${toStringPrice(this.balanceToPay)}"),
         ),
       ],
     );
