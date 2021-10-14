@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/group.dart';
+import 'package:statera/models/payment.dart';
 import 'package:statera/services/firestore.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
@@ -68,12 +69,13 @@ class OwingListItem extends StatelessWidget {
         receiver: this.payer,
         value: this.owing,
         onPay: (value) async {
-          await Firestore.instance.payOffBalance(
+          final payment = Payment(
             groupId: group.id,
-            payerUid: payer,
-            receiverUid: this.payer.uid,
+            payerId: payer,
+            receiverId: this.payer.uid,
             value: value,
           );
+          await Firestore.instance.payOffBalance(payment: payment);
         },
       ),
     );

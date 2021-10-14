@@ -4,6 +4,7 @@ import 'package:statera/models/assignee.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/models/group.dart';
+import 'package:statera/models/payment.dart';
 
 class Firestore {
   late FirebaseFirestore _firestore;
@@ -25,6 +26,9 @@ class Firestore {
       _firestore.collection("expenses");
 
   CollectionReference get groupsCollection => _firestore.collection("groups");
+
+  CollectionReference get paymentsCollection =>
+      _firestore.collection("payments");
 
   Query _expensesQuery({
     String? groupId,
@@ -165,18 +169,10 @@ class Firestore {
     });
   }
 
-  Future<void> payOffBalance({
-    String? groupId,
-    required String payerUid,
-    required String receiverUid,
-    required double value,
-  }) async {
-    Group group = await getGroupById(groupId);
-    group.payOffBalance(
-      payerUid: payerUid,
-      receiverUid: receiverUid,
-      value: value,
-    );
+  Future<void> payOffBalance({required Payment payment}) async {
+    Group group = await getGroupById(payment.groupId);
+    group.payOffBalance(payment: payment);
+    await paymentsCollection.add(payment.toFirestore());
     await saveGroup(group);
   }
 
