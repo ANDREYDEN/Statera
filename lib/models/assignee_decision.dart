@@ -20,25 +20,10 @@ class AssigneeDecision {
     };
   }
 
-  // TODO: write an admin script to eliminate this
-  static int? getPartsFromLegacyDecision(Map<String, dynamic> data) {
-    if (!data.containsKey("decision")) return null;
-    switch (data["decision"]) {
-      case "Undefined":
-        return null;
-      case "Confirmed":
-        return 1;
-      case "Denied":
-        return 0;
-    }
-  }
-
   static AssigneeDecision fromFirestore(Map<String, dynamic> data) {
     return AssigneeDecision(
       uid: data["uid"],
-      parts: data.containsKey("parts")
-          ? data["parts"]
-          : getPartsFromLegacyDecision(data),
+      parts: data["parts"],
     );
   }
 }

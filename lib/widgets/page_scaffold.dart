@@ -24,7 +24,7 @@ class PageScaffold extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           this.title ?? "",
-          overflow: TextOverflow.fade,
+          overflow: TextOverflow.ellipsis,
         ),
         actions: this.actions,
       ),
