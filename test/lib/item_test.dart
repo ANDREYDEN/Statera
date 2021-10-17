@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:statera/models/assignee_decision.dart';
-import 'package:statera/models/item.dart';
+import 'package:statera/data/models/assignee_decision.dart';
+import 'package:statera/data/models/item.dart';
 
 void main() {
   group('Item', () {

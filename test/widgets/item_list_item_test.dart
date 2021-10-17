@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/models/item.dart';
-import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/widgets/listItems/item_list_item.dart';
+import 'package:statera/data/models/item.dart';
+import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/ui/widgets/listItems/item_list_item.dart';
 
 import 'item_list_item_test.mocks.dart';
 
