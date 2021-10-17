@@ -27,7 +27,7 @@ class PaymentListItem extends StatelessWidget {
         color:
             payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red,
       ),
-      subtitle: Text(toStringDate(payment.timeCreated) ?? "Some time in the past"),
+      subtitle: Text(toStringDateTime(payment.timeCreated) ?? "Some time in the past"),
     );
   }
 }

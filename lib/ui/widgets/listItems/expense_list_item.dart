@@ -64,10 +64,9 @@ class ExpenseListItem extends StatelessWidget {
                                 ),
                                 Text(
                                   pluralize('item', this.expense.items.length) +
-                                          (toStringDate(this.expense.date) ==
-                                              null)
-                                      ? ""
-                                      : " on ${toStringDate(this.expense.date)!}",
+                                      (toStringDate(this.expense.date) == null
+                                          ? ""
+                                          : " on ${toStringDate(this.expense.date)!}"),
                                 ),
                               ],
                             ),

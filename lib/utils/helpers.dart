@@ -16,6 +16,10 @@ String? toStringDate(DateTime? date) {
   return date == null ? null : DateFormat('d MMM, yyyy').format(date);
 }
 
+String? toStringDateTime(DateTime? date) {
+  return date == null ? null : DateFormat('d MMM, yyyy h:mm:ss a').format(date);
+}
+
 Future<bool> snackbarCatch(
   BuildContext context,
   dynamic Function() operation, {

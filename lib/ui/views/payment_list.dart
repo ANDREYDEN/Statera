@@ -41,13 +41,23 @@ class PaymentList extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                AuthorAvatar(author: otherMember),
+                AuthorAvatar(
+                  author: otherMember,
+                  width: 100,
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                ),
                 CustomStreamBuilder<Group>(
                   stream: Firestore.instance.groupStream(groupId),
                   builder: (context, group) {
                     final payment =
                         group.balance[authVm.user.uid]![otherMemberId]!;
-                    return Text(toStringPrice(payment));
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        toStringPrice(payment),
+                        style: TextStyle(fontSize: 32),
+                      ),
+                    );
                   },
                 ),
                 Flexible(

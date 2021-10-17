@@ -37,14 +37,14 @@ class OwingListItem extends StatelessWidget {
             TextButton(
               onPressed: this.owing.abs() < 0.01
                   ? null
-                  : () => this._handlePayment(context),
+                  : () => this._handlePayment(context, groupState),
               child: Text(toStringPrice(this.owing)),
             )
           else
             ElevatedButton(
               onPressed: this.owing.abs() < 0.01
                   ? null
-                  : () => this._handlePayment(context),
+                  : () => this._handlePayment(context, groupState),
               child: Text("Pay ${toStringPrice(this.owing)}"),
             ),
           IconButton(
@@ -58,9 +58,8 @@ class OwingListItem extends StatelessWidget {
     );
   }
 
-  void _handlePayment(BuildContext context) {
-    var groupState = Provider.of<GroupState>(context);
-    var payer = Provider.of<AuthenticationViewModel>(context).user.uid;
+  void _handlePayment(BuildContext context, GroupState groupState) {
+    var payer = Provider.of<AuthenticationViewModel>(context, listen: false).user.uid;
 
     showDialog(
       context: context,
