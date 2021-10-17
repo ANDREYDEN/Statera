@@ -41,6 +41,12 @@ export const scheduledBackup = firestoreBackup;
 //     await groupDoc.ref.update(group);
 //   });
 
+export const setTimestampOnPaymentCreation = functions.firestore
+  .document("payments/{paymentId}")
+  .onCreate(async (snap, context) => {
+    await snap.ref.update({ timeCreated: snap.createTime });
+  });
+
 export const getReceiptDataTest = functions.https.onRequest(
   async (request, response) => {
     const receiptUrl = request.query.receiptUrl;

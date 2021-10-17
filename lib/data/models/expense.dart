@@ -49,9 +49,6 @@ class Expense {
     this.author = Author(name: "", uid: "");
   }
 
-  String? get formattedDate =>
-      this.date == null ? null : DateFormat('d MMM, yyyy').format(this.date!);
-
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
     if (other.date == null) return false;

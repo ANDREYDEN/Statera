@@ -17,16 +17,17 @@ class PaymentListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var authVm = Provider.of<AuthenticationViewModel>(context);
 
-    return Row(
-      children: [
-        Icon(Icons.receipt_long),
-        Text(toStringPrice(payment.value)),
-        Icon(
-          payment.receiverId == authVm.user.uid
-              ? Icons.call_received
-              : Icons.call_made,
-        ),
-      ],
+    return ListTile(
+      title: Text(toStringPrice(payment.value)),
+      leading: Icon(Icons.receipt_long),
+      trailing: Icon(
+        payment.isReceivedBy(authVm.user.uid)
+            ? Icons.call_received
+            : Icons.call_made,
+        color:
+            payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red,
+      ),
+      subtitle: Text(toStringDate(payment.timeCreated) ?? "Some time in the past"),
     );
   }
 }

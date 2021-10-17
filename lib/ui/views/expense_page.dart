@@ -150,7 +150,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               await Firestore.instance.updateExpense(expense);
                             },
                             child: Text(
-                              expense.formattedDate ?? 'Not set',
+                              toStringDate(expense.date) ?? 'Not set',
                             ),
                           ),
                         ],

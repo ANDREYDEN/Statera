@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -65,9 +64,10 @@ class ExpenseListItem extends StatelessWidget {
                                 ),
                                 Text(
                                   pluralize('item', this.expense.items.length) +
-                                      (this.expense.formattedDate == null
-                                          ? ""
-                                          : " on ${this.expense.formattedDate!}"),
+                                          (toStringDate(this.expense.date) ==
+                                              null)
+                                      ? ""
+                                      : " on ${toStringDate(this.expense.date)!}",
                                 ),
                               ],
                             ),
