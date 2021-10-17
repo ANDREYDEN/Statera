@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,9 +7,10 @@ import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/ui/views/group_page.dart';
+import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/ui/widgets/listItems/owing_list_item.dart';
-
 
 class GroupHome extends StatelessWidget {
   const GroupHome({Key? key}) : super(key: key);
@@ -70,9 +70,14 @@ class GroupHome extends StatelessWidget {
                 itemCount: owings.length,
                 itemBuilder: (context, index) {
                   var payer = owings.keys.elementAt(index);
-                  return OwingListItem(
-                    payer: payer,
-                    owing: owings[payer]!,
+                  return GestureDetector(
+                    onTap: () => Navigator.of(context).pushNamed(
+                      "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${payer.uid}",
+                    ),
+                    child: OwingListItem(
+                      payer: payer,
+                      owing: owings[payer]!,
+                    ),
                   );
                 },
               ),

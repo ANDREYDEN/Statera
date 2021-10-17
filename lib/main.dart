@@ -11,6 +11,7 @@ import 'package:statera/ui/views/404.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/views/group_list.dart';
 import 'package:statera/ui/views/group_page.dart';
+import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
 
@@ -52,12 +53,17 @@ class _StateraState extends State<Statera> {
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
-      builder: (context, match) => GroupPage(groupId: match),
+      builder: (context, matches) => GroupPage(groupId: matches?[0]),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
-      builder: (context, match) => ExpensePage(expenseId: match),
+      builder: (context, matches) => ExpensePage(expenseId: matches?[0]),
     ),
+    PagePath(
+      pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
+      builder: (context, matches) =>
+          PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+    )
   ];
 
   @override
@@ -80,16 +86,16 @@ class _StateraState extends State<Statera> {
                     final regExpPattern = RegExp(path.pattern);
                     if (regExpPattern.hasMatch(route)) {
                       final firstMatch = regExpPattern.firstMatch(route);
-                      final match =
-                          (firstMatch != null && firstMatch.groupCount == 1)
-                              ? firstMatch.group(1)
-                              : null;
+                      final matches = firstMatch?.groups(
+                        List.generate(
+                            firstMatch.groupCount, (index) => index + 1),
+                      );
                       return SafeArea(
                         child: path.isPublic
-                            ? path.builder(context, match)
+                            ? path.builder(context, matches)
                             : AuthGuard(
                                 originalRoute: route,
-                                builder: () => path.builder(context, match),
+                                builder: () => path.builder(context, matches),
                               ),
                       );
                     }
