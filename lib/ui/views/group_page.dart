@@ -65,9 +65,9 @@ class _GroupPageState extends State<GroupPage> {
                   label: "Expenses",
                   icon: UnmarkedExpensesBadge(
                     groupId: groupState.group.id,
-                    child: Icon(Icons.attach_money),
+                    child: Icon(Icons.receipt_long),
                   ),
-                  activeIcon: Icon(Icons.attach_money),
+                  activeIcon: Icon(Icons.receipt_long),
                 ),
               ],
               currentIndex: this._selectedNavBarItemIndex,

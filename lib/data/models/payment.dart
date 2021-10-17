@@ -1,19 +1,23 @@
 class Payment {
   String? groupId;
-  late String payerId;
-  late String receiverId;
-  late double value;
-  final DateTime? timeCreated;
+  String payerId;
+  String receiverId;
+  double value;
+  String? relatedExpenseId;
+  DateTime? timeCreated;
 
   Payment({
     required this.groupId,
     required this.payerId,
     required this.receiverId,
     required this.value,
+    this.relatedExpenseId,
     this.timeCreated,
   });
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
+
+  bool get hasRelatedExpense => relatedExpenseId != null;
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -21,6 +25,7 @@ class Payment {
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
+      'relatedExpenseId': relatedExpenseId
     };
   }
 
@@ -30,6 +35,7 @@ class Payment {
       payerId: map['payerId'],
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),
+      relatedExpenseId: map['relatedExpenseId'],
       timeCreated: map['timeCreated'] == null ? null : DateTime.parse(map['timeCreated'].toDate().toString())
     );
   }

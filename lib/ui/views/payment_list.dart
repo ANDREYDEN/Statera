@@ -70,6 +70,17 @@ class PaymentList extends StatelessWidget {
                       if (payments.isEmpty) {
                         return ListEmpty(text: "Payment History is empty");
                       }
+
+                      payments.sort((Payment payment1, Payment payment2) {
+                        if (payment1.timeCreated == null) {
+                          return 1;
+                        }
+                        if (payment2.timeCreated == null) {
+                          return -1;
+                        }
+                        return payment1.timeCreated!.isAfter(payment2.timeCreated!) ? -1 : 1;
+                      });
+
                       return ListView.builder(
                         itemCount: payments.length,
                         itemBuilder: (context, index) {

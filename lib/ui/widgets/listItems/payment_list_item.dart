@@ -19,15 +19,20 @@ class PaymentListItem extends StatelessWidget {
 
     return ListTile(
       title: Text(toStringPrice(payment.value)),
-      leading: Icon(Icons.receipt_long),
+      leading: Icon(
+        payment.hasRelatedExpense ? Icons.receipt_long : Icons.paid,
+        size: 30,
+      ),
       trailing: Icon(
         payment.isReceivedBy(authVm.user.uid)
             ? Icons.call_received
             : Icons.call_made,
         color:
             payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red,
+        size: 30,
       ),
-      subtitle: Text(toStringDateTime(payment.timeCreated) ?? "Some time in the past"),
+      subtitle: Text(
+          toStringDateTime(payment.timeCreated) ?? "Some time in the past"),
     );
   }
 }

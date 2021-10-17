@@ -234,6 +234,18 @@ class Firestore {
     await expensesCollection
         .doc(expense.id)
         .update({'finalizedDate': Timestamp.now()});
+    // add expense payments from author to all assignees
+    await Future.wait(
+      expense.assignees.map((assignee) => paymentsCollection.add(
+            Payment(
+              groupId: expense.groupId,
+              payerId: expense.author.uid,
+              receiverId: assignee.uid,
+              value: expense.getConfirmedTotalForUser(assignee.uid),
+              relatedExpenseId: expense.id,
+            ).toFirestore(),
+          )),
+    );
   }
 
   Stream<List<Payment>> paymentsStream({
