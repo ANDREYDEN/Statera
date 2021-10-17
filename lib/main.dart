@@ -69,42 +69,43 @@ class _StateraState extends State<Statera> {
   @override
   Widget build(BuildContext context) {
     return Provider<AuthenticationViewModel>(
-        create: (context) => AuthenticationViewModel(),
-        builder: (context, _) {
-          return MaterialApp(
-            title: kAppName,
-            theme: theme,
-            darkTheme: darkTheme,
-            themeMode: ThemeMode.system,
-            initialRoute: GroupList.route,
-            onGenerateRoute: (settings) {
-              return MaterialPageRoute(
-                settings: settings,
-                builder: (context) {
-                  var route = settings.name ?? '/404';
-                  for (PagePath path in _paths) {
-                    final regExpPattern = RegExp(path.pattern);
-                    if (regExpPattern.hasMatch(route)) {
-                      final firstMatch = regExpPattern.firstMatch(route);
-                      final matches = firstMatch?.groups(
-                        List.generate(
-                            firstMatch.groupCount, (index) => index + 1),
-                      );
-                      return SafeArea(
-                        child: path.isPublic
-                            ? path.builder(context, matches)
-                            : AuthGuard(
-                                originalRoute: route,
-                                builder: () => path.builder(context, matches),
-                              ),
-                      );
-                    }
+      create: (context) => AuthenticationViewModel(),
+      builder: (context, _) {
+        return MaterialApp(
+          title: kAppName,
+          theme: theme,
+          darkTheme: darkTheme,
+          themeMode: ThemeMode.system,
+          initialRoute: GroupList.route,
+          onGenerateRoute: (settings) {
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) {
+                var route = settings.name ?? '/404';
+                for (PagePath path in _paths) {
+                  final regExpPattern = RegExp(path.pattern);
+                  if (regExpPattern.hasMatch(route)) {
+                    final firstMatch = regExpPattern.firstMatch(route);
+                    final matches = firstMatch?.groups(
+                      List.generate(
+                          firstMatch.groupCount, (index) => index + 1),
+                    );
+                    return SafeArea(
+                      child: path.isPublic
+                          ? path.builder(context, matches)
+                          : AuthGuard(
+                              originalRoute: route,
+                              builder: () => path.builder(context, matches),
+                            ),
+                    );
                   }
-                  return PageNotFound();
-                },
-              );
-            },
-          );
-        });
+                }
+                return PageNotFound();
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }

@@ -70,14 +70,9 @@ class GroupHome extends StatelessWidget {
                 itemCount: owings.length,
                 itemBuilder: (context, index) {
                   var payer = owings.keys.elementAt(index);
-                  return GestureDetector(
-                    onTap: () => Navigator.of(context).pushNamed(
-                      "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${payer.uid}",
-                    ),
-                    child: OwingListItem(
-                      payer: payer,
-                      owing: owings[payer]!,
-                    ),
+                  return OwingListItem(
+                    payer: payer,
+                    owing: owings[payer]!,
                   );
                 },
               ),

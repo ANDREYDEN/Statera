@@ -158,6 +158,23 @@ class Firestore {
     await Firestore.instance.groupsCollection.doc(groupId).delete();
   }
 
+  Stream<Author> getGroupMemberStream(
+      {String? groupId, required String memberId}) {
+    return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
+      if (!groupSnap.exists) throw new Exception("No group with id $groupId");
+
+      Group group = Group.fromFirestore(
+          groupSnap.data() as Map<String, dynamic>,
+          id: groupSnap.id);
+      Author? member = group.getUser(memberId);
+
+      if (member == null)
+        throw new Exception("No member in group $groupId with id $memberId");
+
+      return member;
+    });
+  }
+
   Stream<Map<Author, double>> getOwingsForUserInGroup(
     String consumerUid,
     String? groupId,
@@ -214,6 +231,24 @@ class Firestore {
   }
 
   Future<void> finalizeExpense(Expense expense) async {
-    await expensesCollection.doc(expense.id).update({'finalizedDate': Timestamp.now()});
+    await expensesCollection
+        .doc(expense.id)
+        .update({'finalizedDate': Timestamp.now()});
+  }
+
+  Stream<List<Payment>> paymentsStream({
+    String? groupId,
+    List<String?> payerIds = const [],
+  }) {
+    return paymentsCollection
+        .where('groupId', isEqualTo: groupId)
+        .where('payerId', whereIn: payerIds)
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((doc) =>
+                  Payment.fromFirestore(doc.data() as Map<String, dynamic>))
+              .toList(),
+        );
   }
 }

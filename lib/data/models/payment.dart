@@ -25,7 +25,7 @@ class Payment {
       groupId: map['groupId'],
       payerId: map['payerId'],
       receiverId: map['receiverId'],
-      value: map['value'],
+      value: double.parse(map['value'].toString()),
     );
   }
 
