@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/author.dart';
 import 'package:statera/services/firestore.dart';
+import 'package:statera/states/group_state.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/widgets/listItems/owing_list_item.dart';
 
@@ -14,7 +14,7 @@ class GroupHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var authVm = Provider.of<AuthenticationViewModel>(context);
-    var groupVm = Provider.of<GroupViewModel>(context);
+    var groupState = Provider.of<GroupState>(context);
 
     return Column(
       children: [
@@ -30,14 +30,14 @@ class GroupHome extends StatelessWidget {
               TextButton(
                 onPressed: () async {
                   ClipboardData data = ClipboardData(
-                    text: groupVm.group.code.toString(),
+                    text: groupState.group.code.toString(),
                   );
                   await Clipboard.setData(data);
                 },
                 child: Row(
                   children: [
                     Text(
-                      groupVm.group.code.toString(),
+                      groupState.group.code.toString(),
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 16,
@@ -60,7 +60,7 @@ class GroupHome extends StatelessWidget {
           child: StreamProvider<Map<Author, double>>(
             initialData: {},
             create: (context) => Firestore.instance
-                .getOwingsForUserInGroup(authVm.user.uid, groupVm.group.id),
+                .getOwingsForUserInGroup(authVm.user.uid, groupState.group.id),
             child: Consumer<Map<Author, double>>(
               builder: (_, owings, __) => ListView.builder(
                 itemCount: owings.length,
@@ -84,7 +84,7 @@ class GroupHome extends StatelessWidget {
               ),
             );
             if (decision!) {
-              await authVm.leaveGroup(groupVm.group);
+              await authVm.leaveGroup(groupState.group);
               Navigator.pop(context);
             }
           },

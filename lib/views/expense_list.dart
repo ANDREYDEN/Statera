@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/models/expense.dart';
 import 'package:statera/services/firestore.dart';
+import 'package:statera/states/group_state.dart';
 import 'package:statera/utils/helpers.dart';
 import 'package:statera/viewModels/authentication_vm.dart';
-import 'package:statera/viewModels/group_vm.dart';
 import 'package:statera/widgets/custom_filter_chip.dart';
 import 'package:statera/widgets/custom_stream_builder.dart';
 import 'package:statera/widgets/dialogs/crud_dialog.dart';
@@ -27,15 +27,15 @@ class _ExpenseListState extends State<ExpenseList> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
-  GroupViewModel get groupVm =>
-      Provider.of<GroupViewModel>(context, listen: false);
+  GroupState get groupState =>
+      Provider.of<GroupState>(context, listen: false);
 
   @override
   void initState() {
+    super.initState();
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
     _expenseStream = Firestore.instance
-        .listenForRelatedExpenses(authVm.user.uid, groupVm.group.id);
-    super.initState();
+        .listenForRelatedExpenses(authVm.user.uid, groupState.group.id);
   }
 
   @override
