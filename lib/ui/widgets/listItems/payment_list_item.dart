@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
@@ -18,9 +19,10 @@ class PaymentListItem extends StatelessWidget {
     var authVm = Provider.of<AuthenticationViewModel>(context);
 
     return ListTile(
-      title: Text(toStringPrice(payment.value)),
+      title: Text("\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}"),
       leading: Icon(
         payment.hasRelatedExpense ? Icons.receipt_long : Icons.paid,
+        color: Theme.of(context).colorScheme.secondary,
         size: 30,
       ),
       trailing: Icon(
@@ -33,6 +35,8 @@ class PaymentListItem extends StatelessWidget {
       ),
       subtitle: Text(
           toStringDateTime(payment.timeCreated) ?? "Some time in the past"),
+      onTap: payment.hasRelatedExpense ? () => Navigator.of(context)
+          .pushNamed("${ExpensePage.route}/${payment.relatedExpenseId}") : null,
     );
   }
 }
