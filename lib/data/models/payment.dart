@@ -25,7 +25,8 @@ class Payment {
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
-      'relatedExpenseId': relatedExpenseId
+      'relatedExpenseId': relatedExpenseId,
+      'payerReceiverId': '${payerId}_$receiverId'
     };
   }
 

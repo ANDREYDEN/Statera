@@ -248,13 +248,18 @@ class Firestore {
     );
   }
 
+  /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({
     String? groupId,
-    List<String?> payerIds = const [],
+    String? userId1,
+    String? userId2,
   }) {
     return paymentsCollection
         .where('groupId', isEqualTo: groupId)
-        .where('payerId', whereIn: payerIds)
+        .where('payerReceiverId', whereIn: [
+          '${userId1}_$userId2',
+          '${userId2}_$userId1',
+        ])
         .snapshots()
         .map(
           (snap) => snap.docs

@@ -64,7 +64,8 @@ class PaymentList extends StatelessWidget {
                   child: CustomStreamBuilder<List<Payment>>(
                     stream: Firestore.instance.paymentsStream(
                       groupId: groupId,
-                      payerIds: [otherMemberId, authVm.user.uid],
+                      userId1: otherMemberId,
+                      userId2: authVm.user.uid,
                     ),
                     builder: (context, payments) {
                       if (payments.isEmpty) {
@@ -78,7 +79,10 @@ class PaymentList extends StatelessWidget {
                         if (payment2.timeCreated == null) {
                           return -1;
                         }
-                        return payment1.timeCreated!.isAfter(payment2.timeCreated!) ? -1 : 1;
+                        return payment1.timeCreated!
+                                .isAfter(payment2.timeCreated!)
+                            ? -1
+                            : 1;
                       });
 
                       return ListView.builder(
