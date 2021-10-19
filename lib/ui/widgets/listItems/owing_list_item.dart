@@ -1,8 +1,8 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
@@ -15,12 +15,12 @@ import 'package:statera/ui/widgets/dialogs/payment_dialog.dart';
 import 'package:statera/utils/helpers.dart';
 
 class OwingListItem extends StatelessWidget {
-  final Author payer;
+  final Author member;
   final double owing;
 
   const OwingListItem({
     Key? key,
-    required this.payer,
+    required this.member,
     required this.owing,
   }) : super(key: key);
 
@@ -32,7 +32,7 @@ class OwingListItem extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          Expanded(child: AuthorAvatar(author: this.payer, withName: true)),
+          Expanded(child: AuthorAvatar(author: this.member, withName: true)),
           if (this.owing < 0)
             TextButton(
               onPressed: this.owing.abs() < 0.01
@@ -49,7 +49,7 @@ class OwingListItem extends StatelessWidget {
             ),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(
-              "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${payer.uid}",
+              "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${member.uid}",
             ),
             icon: Icon(Icons.analytics_outlined),
           )
@@ -59,20 +59,20 @@ class OwingListItem extends StatelessWidget {
   }
 
   void _handlePayment(BuildContext context, GroupState groupState) {
-    var payer = Provider.of<AuthenticationViewModel>(context, listen: false).user.uid;
+    var currentUid = Provider.of<AuthenticationViewModel>(context, listen: false).user.uid;
 
     showDialog(
       context: context,
       builder: (context) => PaymentDialog(
         isReceiving: this.owing < 0,
-        receiver: this.payer,
+        receiver: this.member,
         value: this.owing,
-        onPay: (value) async {
+        onPay: () async {
           final payment = Payment(
             groupId: groupState.group.id,
-            payerId: payer,
-            receiverId: this.payer.uid,
-            value: value,
+            payerId: this.owing < 0 ? this.member.uid : currentUid,
+            receiverId: this.owing < 0 ? currentUid : this.member.uid,
+            value: this.owing.abs(),
           );
           await Firestore.instance.payOffBalance(payment: payment);
         },

@@ -17,11 +17,15 @@ class PaymentListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var authVm = Provider.of<AuthenticationViewModel>(context);
+    Color paymentColor =
+        payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red;
 
     return ListTile(
       isThreeLine: payment.hasRelatedExpense,
       title: Text(
-          "\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}"),
+        "\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+        style: TextStyle(color: paymentColor),
+      ),
       leading: Icon(
         payment.hasRelatedExpense ? Icons.receipt_long : Icons.paid,
         color: Theme.of(context).colorScheme.secondary,
@@ -31,8 +35,7 @@ class PaymentListItem extends StatelessWidget {
         payment.isReceivedBy(authVm.user.uid)
             ? Icons.call_received
             : Icons.call_made,
-        color:
-            payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red,
+        color: paymentColor,
         size: 30,
       ),
       subtitle: Column(

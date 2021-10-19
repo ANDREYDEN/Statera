@@ -9,7 +9,7 @@ class PaymentDialog extends StatefulWidget {
   final bool isReceiving;
   final Author receiver;
   final double value;
-  final Future Function(double) onPay;
+  final Future Function() onPay;
 
   const PaymentDialog({
     Key? key,
@@ -32,27 +32,29 @@ class _PaymentDialogState extends State<PaymentDialog> {
     super.initState();
   }
 
-  double get balanceToPay => double.tryParse(this._balanceController.text) ?? 0;
+  // double get balanceToPay => double.tryParse(this._balanceController.text) ?? 0;
+  String get balanceToPay => toStringPrice(widget.value.abs());
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        (widget.isReceiving ? "Receiving balance" : "Pay off balance") +
-            " (${toStringPrice(this.widget.value)})",
-      ),
+      title: Text(widget.isReceiving ? "Receive balance" : "Pay off balance"),
       content: Column(
         children: [
-          TextField(
-            controller: _balanceController,
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: "Balance"),
+          // TextField(
+          //   controller: _balanceController,
+          //   keyboardType: TextInputType.numberWithOptions(decimal: true),
+          //   decoration: InputDecoration(labelText: "Balance"),
+          // ),
+          Text(
+            toStringPrice(widget.value.abs()),
+            style: Theme.of(context).textTheme.headline3,
           ),
           SizedBox(height: 10),
           Text(
             widget.isReceiving
-                ? "You aknowledge that you received a payment of ${toStringPrice(-this.balanceToPay)} from ${this.widget.receiver.name}."
-                : "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
+                ? "You aknowledge that you received a payment of ${this.balanceToPay} from ${this.widget.receiver.name}."
+                : "At this point you should make a payment (e-Transfer or cash) of ${this.balanceToPay} to ${this.widget.receiver.name}.",
           ),
         ],
       ),
@@ -63,18 +65,17 @@ class _PaymentDialogState extends State<PaymentDialog> {
         ),
         ProtectedElevatedButton(
           onPressed: () async {
-            await Future.delayed(Duration(seconds: 2));
             await snackbarCatch(
               context,
-              () => this.widget.onPay(this.balanceToPay),
+              this.widget.onPay,
               successMessage: widget.isReceiving
-                  ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
-                  : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
+                  ? "Successfully received ${this.balanceToPay} from ${this.widget.receiver.name}"
+                  : "Successfully paid ${this.balanceToPay} to ${this.widget.receiver.name}",
             );
             Navigator.of(context).pop();
           },
           child: Text((widget.isReceiving ? "Recieve" : "Pay") +
-              " ${toStringPrice(this.balanceToPay)}"),
+              " ${this.balanceToPay}"),
         ),
       ],
     );
