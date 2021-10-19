@@ -19,7 +19,9 @@ class PaymentListItem extends StatelessWidget {
     var authVm = Provider.of<AuthenticationViewModel>(context);
 
     return ListTile(
-      title: Text("\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}"),
+      isThreeLine: payment.hasRelatedExpense,
+      title: Text(
+          "\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}"),
       leading: Icon(
         payment.hasRelatedExpense ? Icons.receipt_long : Icons.paid,
         color: Theme.of(context).colorScheme.secondary,
@@ -33,10 +35,19 @@ class PaymentListItem extends StatelessWidget {
             payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red,
         size: 30,
       ),
-      subtitle: Text(
-          toStringDateTime(payment.timeCreated) ?? "Some time in the past"),
-      onTap: payment.hasRelatedExpense ? () => Navigator.of(context)
-          .pushNamed("${ExpensePage.route}/${payment.relatedExpenseId}") : null,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            toStringDateTime(payment.timeCreated) ?? "Some time in the past",
+          ),
+          if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
+        ],
+      ),
+      onTap: payment.hasRelatedExpense
+          ? () => Navigator.of(context)
+              .pushNamed("${ExpensePage.route}/${payment.relatedExpense!.id}")
+          : null,
     );
   }
 }

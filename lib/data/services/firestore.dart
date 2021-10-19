@@ -242,7 +242,7 @@ class Firestore {
               payerId: expense.author.uid,
               receiverId: assignee.uid,
               value: expense.getConfirmedTotalForUser(assignee.uid),
-              relatedExpenseId: expense.id,
+              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
             ).toFirestore(),
           )),
     );

@@ -51,7 +51,7 @@ class OwingListItem extends StatelessWidget {
             onPressed: () => Navigator.of(context).pushNamed(
               "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${payer.uid}",
             ),
-            icon: Icon(Icons.format_list_bulleted),
+            icon: Icon(Icons.analytics_outlined),
           )
         ],
       ),

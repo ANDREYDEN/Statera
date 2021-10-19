@@ -1,9 +1,42 @@
+import 'package:statera/data/models/expense.dart';
+
+class PaymentExpenseInfo {
+  String? id;
+  String name;
+
+  PaymentExpenseInfo({
+    required this.id,
+    required this.name,
+  });
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+
+  factory PaymentExpenseInfo.fromFirestore(Map<String, dynamic> map) {
+    return PaymentExpenseInfo(
+      id: map['id'],
+      name: map['name'],
+    );
+  }
+
+  factory PaymentExpenseInfo.fromExpense(Expense expense) {
+    return PaymentExpenseInfo(
+      id: expense.id,
+      name: expense.name,
+    );
+  }
+}
+
 class Payment {
   String? groupId;
   String payerId;
   String receiverId;
   double value;
-  String? relatedExpenseId;
+  PaymentExpenseInfo? relatedExpense;
   DateTime? timeCreated;
 
   Payment({
@@ -11,13 +44,13 @@ class Payment {
     required this.payerId,
     required this.receiverId,
     required this.value,
-    this.relatedExpenseId,
+    this.relatedExpense,
     this.timeCreated,
   });
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
-  bool get hasRelatedExpense => relatedExpenseId != null;
+  bool get hasRelatedExpense => relatedExpense != null;
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -25,7 +58,7 @@ class Payment {
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
-      'relatedExpenseId': relatedExpenseId,
+      'relatedExpense': relatedExpense == null ? null : relatedExpense!.toFirestore(),
       'payerReceiverId': '${payerId}_$receiverId'
     };
   }
@@ -36,7 +69,7 @@ class Payment {
       payerId: map['payerId'],
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),
-      relatedExpenseId: map['relatedExpenseId'],
+      relatedExpense: map['relatedExpense'] == null ? null : PaymentExpenseInfo.fromFirestore(map['relatedExpense']),
       timeCreated: map['timeCreated'] == null ? null : DateTime.parse(map['timeCreated'].toDate().toString())
     );
   }
