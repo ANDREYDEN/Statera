@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:statera/models/assignee.dart';
-import 'package:statera/models/author.dart';
-import 'package:statera/models/expense.dart';
-import 'package:statera/models/group.dart';
-import 'package:statera/models/item.dart';
+import 'package:statera/data/models/assignee.dart';
+import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/models/group.dart';
+import 'package:statera/data/models/item.dart';
 
 void main() {
   group('Expense', () {

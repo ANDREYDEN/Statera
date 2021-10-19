@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,14 @@ String getRandomLetter() {
 
 String toStringPrice(double value) {
   return "\$${value.toStringAsFixed(2)}";
+}
+
+String? toStringDate(DateTime? date) {
+  return date == null ? null : DateFormat('d MMM, yyyy').format(date);
+}
+
+String? toStringDateTime(DateTime? date) {
+  return date == null ? null : DateFormat('d MMM, yyyy h:mm:ss a').format(date);
 }
 
 Future<bool> snackbarCatch(

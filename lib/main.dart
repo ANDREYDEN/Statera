@@ -3,15 +3,17 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:statera/auth_guard.dart';
-import 'package:statera/providers/auth_provider.dart';
-import 'package:statera/routing/page_path.dart';
+import 'package:provider/provider.dart';
+import 'package:statera/ui/auth_guard.dart';
+import 'package:statera/ui/routing/page_path.dart';
+import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/ui/views/404.dart';
+import 'package:statera/ui/views/expense_page.dart';
+import 'package:statera/ui/views/group_list.dart';
+import 'package:statera/ui/views/group_page.dart';
+import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
-import 'package:statera/views/404.dart';
-import 'package:statera/views/expense_page.dart';
-import 'package:statera/views/group_list.dart';
-import 'package:statera/views/group_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,51 +53,59 @@ class _StateraState extends State<Statera> {
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
-      builder: (context, match) => GroupPage(groupId: match),
+      builder: (context, matches) => GroupPage(groupId: matches?[0]),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
-      builder: (context, match) => ExpensePage(expenseId: match),
+      builder: (context, matches) => ExpensePage(expenseId: matches?[0]),
     ),
+    PagePath(
+      pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
+      builder: (context, matches) =>
+          PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+    )
   ];
 
   @override
   Widget build(BuildContext context) {
-    return AuthProvider(
-      child: MaterialApp(
-        title: kAppName,
-        theme: theme,
-        darkTheme: darkTheme,
-        themeMode: ThemeMode.system,
-        initialRoute: GroupList.route,
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            settings: settings,
-            builder: (context) {
-              var route = settings.name ?? '/404';
-              for (PagePath path in _paths) {
-                final regExpPattern = RegExp(path.pattern);
-                if (regExpPattern.hasMatch(route)) {
-                  final firstMatch = regExpPattern.firstMatch(route);
-                  final match =
-                      (firstMatch != null && firstMatch.groupCount == 1)
-                          ? firstMatch.group(1)
-                          : null;
-                  return SafeArea(
-                    child: path.isPublic
-                        ? path.builder(context, match)
-                        : AuthGuard(
-                            originalRoute: route,
-                            builder: () => path.builder(context, match),
-                          ),
-                  );
+    return Provider<AuthenticationViewModel>(
+      create: (context) => AuthenticationViewModel(),
+      builder: (context, _) {
+        return MaterialApp(
+          title: kAppName,
+          theme: theme,
+          darkTheme: darkTheme,
+          themeMode: ThemeMode.system,
+          initialRoute: GroupList.route,
+          onGenerateRoute: (settings) {
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (context) {
+                var route = settings.name ?? '/404';
+                for (PagePath path in _paths) {
+                  final regExpPattern = RegExp(path.pattern);
+                  if (regExpPattern.hasMatch(route)) {
+                    final firstMatch = regExpPattern.firstMatch(route);
+                    final matches = firstMatch?.groups(
+                      List.generate(
+                          firstMatch.groupCount, (index) => index + 1),
+                    );
+                    return SafeArea(
+                      child: path.isPublic
+                          ? path.builder(context, matches)
+                          : AuthGuard(
+                              originalRoute: route,
+                              builder: () => path.builder(context, matches),
+                            ),
+                    );
+                  }
                 }
-              }
-              return PageNotFound();
-            },
-          );
-        },
-      ),
+                return PageNotFound();
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

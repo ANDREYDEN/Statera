@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:statera/models/group.dart';
+import 'package:statera/data/models/group.dart';
 
 class MockUser extends Mock implements User {
   MockUser();
