@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -33,20 +32,23 @@ class OwingListItem extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: AuthorAvatar(author: this.member, withName: true)),
-          if (this.owing < 0)
-            TextButton(
-              onPressed: this.owing.abs() < 0.01
-                  ? null
-                  : () => this._handlePayment(context, groupState),
-              child: Text(toStringPrice(this.owing)),
-            )
-          else
-            ElevatedButton(
-              onPressed: this.owing.abs() < 0.01
-                  ? null
-                  : () => this._handlePayment(context, groupState),
-              child: Text("Pay ${toStringPrice(this.owing)}"),
+          Text(
+            toStringPrice(this.owing),
+            style: TextStyle(fontSize: 18),
+          ),
+          SizedBox(width: 10),
+          ElevatedButton(
+            onPressed: this.owing.abs() < 0.01
+                ? null
+                : () => this._handlePayment(context, groupState),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Icon(Icons.attach_money),
             ),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.green),
+            ),
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(
               "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${member.uid}",
@@ -59,7 +61,8 @@ class OwingListItem extends StatelessWidget {
   }
 
   void _handlePayment(BuildContext context, GroupState groupState) {
-    var currentUid = Provider.of<AuthenticationViewModel>(context, listen: false).user.uid;
+    var currentUid =
+        Provider.of<AuthenticationViewModel>(context, listen: false).user.uid;
 
     showDialog(
       context: context,
