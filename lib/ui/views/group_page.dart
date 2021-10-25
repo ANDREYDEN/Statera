@@ -39,61 +39,62 @@ class _GroupPageState extends State<GroupPage> {
           .groupStream(this.widget.groupId)
           .map((group) => GroupState(group: group)),
       builder: (context, _) {
-        return Consumer<GroupState>(builder: (context, groupState, _) {
-          if (groupState.isLoading) {
-            return PageScaffold(child: Center(child: Loader()));
-          }
+        return Consumer<GroupState>(
+          builder: (context, groupState, _) {
+            if (groupState.isLoading) {
+              return PageScaffold(child: Center(child: Loader()));
+            }
 
-          if (groupState.hasError) {
-            return PageScaffold(child: Text(groupState.error.toString()));
-          }
+            if (groupState.hasError) {
+              return PageScaffold(child: Text(groupState.error.toString()));
+            }
 
-          return PageScaffold(
-            title: groupState.group.name,
-            onFabPressed: _selectedNavBarItemIndex == 0
-                ? null
-                : () => handleCreateExpense(groupState.group),
-            bottomNavBar: BottomNavigationBar(
-              iconSize: 36,
-              items: [
-                BottomNavigationBarItem(
-                  label: "Home",
-                  icon: Icon(Icons.home),
-                  activeIcon: Icon(Icons.home),
-                ),
-                BottomNavigationBarItem(
-                  label: "Expenses",
-                  icon: UnmarkedExpensesBadge(
-                    groupId: groupState.group.id,
-                    child: Icon(Icons.receipt_long),
+            return PageScaffold(
+              title: groupState.group.name,
+              onFabPressed: _selectedNavBarItemIndex == 0
+                  ? null
+                  : () => handleCreateExpense(groupState.group),
+              bottomNavBar: BottomNavigationBar(
+                iconSize: 36,
+                items: [
+                  BottomNavigationBarItem(
+                    label: "Home",
+                    icon: Icon(Icons.home),
+                    activeIcon: Icon(Icons.home),
                   ),
-                  activeIcon: Icon(Icons.receipt_long),
-                ),
-              ],
-              currentIndex: this._selectedNavBarItemIndex,
-              onTap: (index) {
-                setState(() {
-                  this._selectedNavBarItemIndex = index;
-                });
-                _pageController.animateToPage(
-                  index,
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.ease,
-                );
-              },
-            ),
-            child: PageView(
-              controller: this._pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  this._selectedNavBarItemIndex = index;
-                });
-              },
-              children: [GroupHome(), ExpenseList()],
-              // children: [GroupHome(), Text("LOL")],
-            ),
-          );
-        });
+                  BottomNavigationBarItem(
+                    label: "Expenses",
+                    icon: UnmarkedExpensesBadge(
+                      groupId: groupState.group.id,
+                      child: Icon(Icons.receipt_long),
+                    ),
+                    activeIcon: Icon(Icons.receipt_long),
+                  ),
+                ],
+                currentIndex: this._selectedNavBarItemIndex,
+                onTap: (index) {
+                  setState(() {
+                    this._selectedNavBarItemIndex = index;
+                  });
+                  _pageController.animateToPage(
+                    index,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.ease,
+                  );
+                },
+              ),
+              child: PageView(
+                controller: this._pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    this._selectedNavBarItemIndex = index;
+                  });
+                },
+                children: [GroupHome(), ExpenseList()],
+              ),
+            );
+          },
+        );
       },
     );
   }
