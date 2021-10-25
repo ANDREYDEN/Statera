@@ -1,22 +1,22 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/group.dart';
+import 'package:statera/data/models/payment.dart';
+import 'package:statera/data/services/firestore.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentDialog extends StatefulWidget {
-  final bool isReceiving;
-  final Author receiver;
-  final double value;
-  final Future Function(double) onPay;
+  final Payment payment;
+  final Group group;
+  final String currentUid;
 
   const PaymentDialog({
     Key? key,
-    required this.receiver,
-    required this.value,
-    required this.onPay,
-    this.isReceiving = false,
+    required this.payment,
+    required this.group,
+    required this.currentUid,
   }) : super(key: key);
 
   @override
@@ -25,34 +25,48 @@ class PaymentDialog extends StatefulWidget {
 
 class _PaymentDialogState extends State<PaymentDialog> {
   TextEditingController _balanceController = TextEditingController();
+  late String _enteredPaymentValue;
 
   @override
   initState() {
-    _balanceController.text = widget.value.toString();
+    _balanceController.text = widget.payment.value.toStringAsFixed(2).toString();
+    _enteredPaymentValue = widget.payment.value.toStringAsFixed(2).toString();
+    _balanceController.addListener(() => setState(() {
+          _enteredPaymentValue = _balanceController.text;
+        }));
     super.initState();
   }
 
-  double get balanceToPay => double.tryParse(this._balanceController.text) ?? 0;
+  double get balanceToPay => double.tryParse(this._enteredPaymentValue) ?? 0;
+
+  bool get currentUserIsReceiving =>
+      widget.payment.receiverId == widget.currentUid;
+
+  String get actionWord => currentUserIsReceiving ? "Receive" : "Pay";
+
+  String get otherMemberUid => currentUserIsReceiving
+      ? widget.payment.payerId
+      : widget.payment.receiverId;
+
+  Author get otherMember => widget.group.getUser(otherMemberUid)!;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        (widget.isReceiving ? "Receiving balance" : "Pay off balance") +
-            " (${toStringPrice(this.widget.value)})",
-      ),
+      title: Text(actionWord),
       content: Column(
         children: [
           TextField(
             controller: _balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: "Balance"),
+            decoration: InputDecoration(labelText: "Value to $actionWord"),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\.\d]'))],
           ),
           SizedBox(height: 10),
           Text(
-            widget.isReceiving
-                ? "You aknowledge that you received a payment of ${toStringPrice(-this.balanceToPay)} from ${this.widget.receiver.name}."
-                : "At this point you should make a payment (e-Transfer or cash) of ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}.",
+            currentUserIsReceiving
+                ? "You aknowledge that you received a payment of ${this.balanceToPay} from ${this.otherMember.name}."
+                : "At this point you should make a payment (e-Transfer or cash) of ${this.balanceToPay} to ${this.otherMember.name}.",
           ),
         ],
       ),
@@ -62,19 +76,23 @@ class _PaymentDialogState extends State<PaymentDialog> {
           child: Text("Cancel"),
         ),
         ProtectedElevatedButton(
-          onPressed: () async {
-            await Future.delayed(Duration(seconds: 2));
-            await snackbarCatch(
-              context,
-              () => this.widget.onPay(this.balanceToPay),
-              successMessage: widget.isReceiving
-                  ? "Successfully received ${toStringPrice(this.balanceToPay)} from ${this.widget.receiver.name}"
-                  : "Successfully paid ${toStringPrice(this.balanceToPay)} to ${this.widget.receiver.name}",
-            );
-            Navigator.of(context).pop();
-          },
-          child: Text((widget.isReceiving ? "Recieve" : "Pay") +
-              " ${toStringPrice(this.balanceToPay)}"),
+          onPressed: this.balanceToPay < 0.01
+              ? null
+              : () async {
+                  await snackbarCatch(
+                    context,
+                    () async {
+                      widget.payment.value = this.balanceToPay;
+                      await Firestore.instance
+                          .payOffBalance(payment: widget.payment);
+                      Navigator.of(context).pop();
+                    },
+                    successMessage: currentUserIsReceiving
+                        ? "Successfully received ${this.balanceToPay} from ${this.otherMember.name}"
+                        : "Successfully paid ${this.balanceToPay} to ${this.otherMember.name}",
+                  );
+                },
+          child: Text("$actionWord ${this.balanceToPay}"),
         ),
       ],
     );

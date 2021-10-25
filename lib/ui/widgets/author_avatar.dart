@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -88,8 +87,16 @@ class AuthorAvatar extends StatelessWidget {
                       ))
               ],
             ),
-            if (this.withName) SizedBox(width: 10),
-            if (this.withName) Text(this.author.name),
+            if (this.withName)
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    this.author.name,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

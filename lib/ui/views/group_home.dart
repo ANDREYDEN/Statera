@@ -69,7 +69,7 @@ class GroupHome extends StatelessWidget {
                 itemBuilder: (context, index) {
                   var payer = owings.keys.elementAt(index);
                   return OwingListItem(
-                    payer: payer,
+                    member: payer,
                     owing: owings[payer]!,
                   );
                 },
