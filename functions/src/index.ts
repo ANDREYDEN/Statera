@@ -3,7 +3,12 @@ import * as functions from "firebase-functions";
 import * as vision from "@google-cloud/vision";
 // import * as admin from "firebase-admin";
 import "firebase-functions";
-import { mergeProducts, normalize } from "./normalizers";
+import {
+  filterProducts,
+  filterWalmartProducts,
+  mergeProducts,
+  normalize,
+} from "./normalizers";
 import { firestoreBackup } from "./admin";
 
 // admin.initializeApp();
@@ -50,11 +55,15 @@ export const setTimestampOnPaymentCreation = functions.firestore
 export const getReceiptDataTest = functions.https.onRequest(
   async (request, response) => {
     const receiptUrl = request.query.receiptUrl;
+    const isWalmart = request.query.isWalmart;
     if (!receiptUrl) {
       response.status(400).send("Parameter receiptUrl is required");
     }
 
-    const result = await analyzeReceipt(receiptUrl as string);
+    const result = await analyzeReceipt(
+      receiptUrl as string,
+      isWalmart === "true"
+    );
     response.send(result);
   }
 );
@@ -64,11 +73,16 @@ export const getReceiptData = functions.https.onCall(async (data, context) => {
     throw Error("The parameter receiptUrl is required.");
   }
 
-  return analyzeReceipt(data.receiptUrl);
+  return analyzeReceipt(data.receiptUrl, data.isWalmart);
 });
 
-async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
+async function analyzeReceipt(
+  receiptUrl: string,
+  isWalmart: boolean
+): Promise<any[]> {
   const client = new vision.ImageAnnotatorClient();
+  console.log(receiptUrl);
+  
 
   const [result] = await client.textDetection(receiptUrl);
 
@@ -94,12 +108,19 @@ async function analyzeReceipt(receiptUrl: string): Promise<any[]> {
   });
 
   const rows = lines.map((line) => line.map((label) => label.description));
-  console.log(rows);
-
+  
   let products = rows.map(normalize);
+  console.log({ products });
+  
+  if (isWalmart) {
+    products = mergeProducts(products);
+    console.log({ mergedProducts: products });
+  }
 
-  products = mergeProducts(products);
-  console.log(products);
+  products = filterProducts(products);
+  if (isWalmart) {
+    products = filterWalmartProducts(products);
+  }
 
   return products;
 }
