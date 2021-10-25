@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class ProtectedElevatedButton extends StatefulWidget {
-  final Function onPressed;
+  final Function? onPressed;
 
   final Widget child;
 
   const ProtectedElevatedButton({
     Key? key,
-    required this.onPressed,
+    this.onPressed,
     required this.child,
   }) : super(key: key);
 
@@ -40,11 +40,11 @@ class _ProtectedElevatedButtonState extends State<ProtectedElevatedButton> {
       builder: (context, snapshot) {
         final actionInProgress = !snapshot.hasData || snapshot.data == true;
         return ElevatedButton(
-          onPressed: actionInProgress
+          onPressed: actionInProgress || widget.onPressed == null
               ? null
               : () async {
                   _actionStateController.add(true);
-                  await widget.onPressed();
+                  await widget.onPressed!();
                 },
           child: widget.child,
         );

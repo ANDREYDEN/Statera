@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
-import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
@@ -49,55 +47,51 @@ class PaymentList extends StatelessWidget {
                 width: 100,
                 margin: EdgeInsets.symmetric(vertical: 10),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  toStringPrice(balance),
-                  style: TextStyle(fontSize: 32),
-                ),
+              SizedBox(height: 8),
+              Text(
+                toStringPrice(balance),
+                style: TextStyle(fontSize: 32),
               ),
+              Text('You owe'),
+              SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: balance < -0.1
-                            ? null
-                            : () => showDialog(
-                                  context: context,
-                                  builder: (_) => PaymentDialog(
-                                    group: group,
-                                    currentUid: authVm.user.uid,
-                                    payment: Payment(
-                                      groupId: group.id,
-                                      payerId: authVm.user.uid,
-                                      receiverId: this.otherMemberId!,
-                                      value: balance.abs(),
-                                    ),
-                                  ),
-                                ),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => PaymentDialog(
+                            group: group,
+                            currentUid: authVm.user.uid,
+                            payment: Payment(
+                              groupId: group.id,
+                              payerId: authVm.user.uid,
+                              receiverId: this.otherMemberId!,
+                              value: balance.abs(),
+                            ),
+                          ),
+                        ),
                         child: Text("Pay"),
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: balance > 0.1
-                            ? null
-                            : () => showDialog(
-                                  context: context,
-                                  builder: (_) => PaymentDialog(
-                                    group: group,
-                                    currentUid: authVm.user.uid,
-                                    payment: Payment(
-                                      groupId: group.id,
-                                      payerId: this.otherMemberId!,
-                                      receiverId: authVm.user.uid,
-                                      value: balance.abs(),
-                                    ),
-                                  ),
-                                ),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => PaymentDialog(
+                            group: group,
+                            currentUid: authVm.user.uid,
+                            payment: Payment(
+                              groupId: group.id,
+                              payerId: this.otherMemberId!,
+                              receiverId: authVm.user.uid,
+                              value: balance.abs(),
+                            ),
+                          ),
+                        ),
                         child: Text("Receive"),
                       ),
                     ),
