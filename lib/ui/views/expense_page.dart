@@ -1,12 +1,7 @@
-import 'dart:io';
-
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
@@ -18,6 +13,7 @@ import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/author_change_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/receipt_scan_dialog.dart';
 import 'package:statera/ui/widgets/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -37,8 +33,6 @@ class ExpensePage extends StatefulWidget {
 class _ExpensePageState extends State<ExpensePage> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
-
-  final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +174,10 @@ class _ExpensePageState extends State<ExpensePage> {
                 Divider(thickness: 1),
                 if (expense.hasNoItems && !kIsWeb)
                   ElevatedButton.icon(
-                      onPressed: () => handleScan(expense),
+                      onPressed: () => showDialog(
+                            context: context,
+                            builder: (_) => ReceiptScanDialog(expense: expense),
+                          ),
                       label: Text('Upload receipt'),
                       icon: Icon(Icons.photo_camera)),
                 Flexible(
@@ -236,44 +233,5 @@ class _ExpensePageState extends State<ExpensePage> {
         },
       ),
     );
-  }
-
-  void handleScan(Expense expense) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null)
-      throw new Exception("Something went wrong while taking a photo");
-
-    var task = await FirebaseStorage.instance
-        .ref(pickedFile.name)
-        .putFile(File(pickedFile.path));
-
-    String url = await task.ref.getDownloadURL();
-    var getItemsFromImage =
-        FirebaseFunctions.instance.httpsCallable('getReceiptData');
-
-    var scanSuccessful = await snackbarCatch(
-      context,
-      () async {
-        var response = await getItemsFromImage({'receiptUrl': url});
-        List<dynamic> items = response.data;
-
-        items.forEach((itemData) {
-          try {
-            var item = Item(
-              name: itemData["name"] ?? "",
-              value: double.tryParse(itemData["value"].toString()) ?? 0,
-            );
-            expense.addItem(item);
-          } catch (e) {
-            print("Could not parse item $itemData: $e");
-          }
-        });
-      },
-      errorMessage: 'Something went wrong while processing your photo',
-    );
-
-    if (scanSuccessful) {
-      await Firestore.instance.updateExpense(expense);
-    }
   }
 }
