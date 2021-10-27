@@ -35,38 +35,42 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     return AlertDialog(
       title: Text('Scan a receipt'),
       content: _processing
-          ? Loader()
-          : Column(
-              children: [
-                Text('Store'),
-                DropdownButton<Store>(
-                  value: _selectedStore,
-                  items: Store.values
-                      .map((store) => DropdownMenuItem(
-                            child: Text(store.toString()),
-                            value: store,
-                          ))
-                      .toList(),
-                  onChanged: (store) {
-                    setState(() {
-                      _selectedStore = store ?? _selectedStore;
-                    });
-                  },
-                ),
-              ],
+          ? Center(child: Loader())
+          : DropdownButtonFormField<Store>(
+            value: _selectedStore,
+            onChanged: (store) {
+              setState(() {
+                _selectedStore = store ?? _selectedStore;
+              });
+            },
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Store',
             ),
+            items: Store.values
+                .map((store) => DropdownMenuItem(
+                      child: Text(store.toString().split('.')[1]),
+                      value: store,
+                    ))
+                .toList(),
+          ),
       actions: [
-        ElevatedButton(
+        TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text("Cancel"),
+          child: Text(
+            "Cancel",
+            style: TextStyle(
+              color: Theme.of(context).errorColor,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () => handleScan(ImageSource.camera),
-          child: Text("Take a photo"),
+          child: Icon(Icons.photo_camera),
         ),
         ElevatedButton(
           onPressed: () => handleScan(ImageSource.gallery),
-          child: Text("Choose from gallery"),
+          child: Icon(Icons.collections),
         ),
       ],
     );
