@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
@@ -97,7 +98,7 @@ class ExpenseListItem extends StatelessWidget {
                       snackbarCatch(
                         context,
                         () async {
-                          await Firestore.instance.finalizeExpense(expense);
+                          await ExpenseService.finalizeExpense(expense);
                           final group = await Firestore.instance
                               .getExpenseGroupStream(expense)
                               .first;

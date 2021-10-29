@@ -4,6 +4,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/auth.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firestore.dart';
 
 class AuthenticationViewModel {
@@ -79,7 +80,7 @@ class AuthenticationViewModel {
         .doc(group.id)
         .update(group.toFirestore());
 
-    await Firestore.instance.addUserToOutstandingExpenses(user, group.id);
+    await ExpenseService.addUserToOutstandingExpenses(user, group.id);
   }
 
   Future<void> leaveGroup(Group group) async {

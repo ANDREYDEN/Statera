@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/listItems/item_list_item.dart';
@@ -32,7 +32,7 @@ class ItemsList extends StatelessWidget {
           isDismissible: authVm.canUpdate(expense),
           onDismissed: (_) async {
             expense.items.removeAt(index);
-            await Firestore.instance.updateExpense(expense);
+            await ExpenseService.updateExpense(expense);
           },
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -52,7 +52,7 @@ class ItemsList extends StatelessWidget {
                     authVm.user.uid,
                     parts,
                   );
-                  await Firestore.instance.updateExpense(expense);
+                  await ExpenseService.updateExpense(expense);
                 },
               ),
             ),
@@ -98,7 +98,7 @@ class ItemsList extends StatelessWidget {
           item.name = values["item_name"]!;
           item.value = double.parse(values["item_value"]!);
           expense.updateItem(item);
-          await Firestore.instance.updateExpense(expense);
+          await ExpenseService.updateExpense(expense);
         },
       ),
     );

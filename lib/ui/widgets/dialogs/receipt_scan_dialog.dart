@@ -4,10 +4,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -117,7 +116,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     );
 
     if (scanSuccessful) {
-      await Firestore.instance.updateExpense(widget.expense);
+      await ExpenseService.updateExpense(widget.expense);
       Navigator.of(context).pop();
     }
 

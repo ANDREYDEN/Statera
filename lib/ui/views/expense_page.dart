@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -37,7 +37,7 @@ class _ExpensePageState extends State<ExpensePage> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<Expense>.value(
-      value: Firestore.instance.listenForExpense(widget.expenseId),
+      value: ExpenseService.listenForExpense(widget.expenseId),
       initialData: Expense.empty(),
       // catchError: (context, error) => Text(error.toString()),
       child: Consumer<Expense>(
@@ -141,7 +141,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               if (newDate == null) return;
 
                               expense.date = newDate;
-                              await Firestore.instance.updateExpense(expense);
+                              await ExpenseService.updateExpense(expense);
                             },
                             child: Text(
                               toStringDate(expense.date) ?? 'Not set',
@@ -165,7 +165,7 @@ class _ExpensePageState extends State<ExpensePage> {
                           if (newAuthor == null) return;
 
                           expense.author = newAuthor;
-                          await Firestore.instance.updateExpense(expense);
+                          await ExpenseService.updateExpense(expense);
                         },
                       ),
                     ],
@@ -229,7 +229,7 @@ class _ExpensePageState extends State<ExpensePage> {
             value: double.parse(values["item_value"]!),
             partition: int.parse(values["item_partition"]!),
           ));
-          await Firestore.instance.updateExpense(expense);
+          await ExpenseService.updateExpense(expense);
         },
       ),
     );

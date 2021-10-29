@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/payment_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
@@ -100,7 +101,7 @@ class PaymentList extends StatelessWidget {
               ),
               Flexible(
                 child: CustomStreamBuilder<List<Payment>>(
-                  stream: Firestore.instance.paymentsStream(
+                  stream: PaymentService.paymentsStream(
                     groupId: groupId,
                     userId1: otherMemberId,
                     userId2: authVm.user.uid,
