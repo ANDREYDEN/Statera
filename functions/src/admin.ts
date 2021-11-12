@@ -6,7 +6,7 @@ const client = new firestore.v1.FirestoreAdminClient();
 const bucket = "gs://statera-firestore-backup";
 
 export const firestoreBackup = functions.pubsub
-  .schedule("every 2 minutes")
+  .schedule("0 0 1 * *")
   .onRun(async (context) => {
     const projectId: string | undefined =
       process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
