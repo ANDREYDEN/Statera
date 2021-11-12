@@ -7,7 +7,7 @@ import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/payment_service.dart';
 
 class ExpenseService {
-  static get expensesCollection => Firestore.instance.expensesCollection;
+  static CollectionReference get expensesCollection => Firestore.instance.expensesCollection;
 
   static Query _expensesQuery({
     String? groupId,
@@ -74,7 +74,7 @@ class ExpenseService {
     return expensesCollection
         .doc(expenseId)
         .snapshots()
-        .map((snap) => Expense.fromFirestore(
+        .map<Expense>((snap) => Expense.fromFirestore(
               snap.data() as Map<String, dynamic>,
               snap.id,
             ));
