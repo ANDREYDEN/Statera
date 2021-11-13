@@ -171,14 +171,15 @@ class _ExpensePageState extends State<ExpensePage> {
                   ),
                 ),
                 Divider(thickness: 1),
-                if (expense.hasNoItems && !kIsWeb)
+                if (expense.hasNoItems)
                   ElevatedButton.icon(
-                      onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => ReceiptScanDialog(expense: expense),
-                          ),
-                      label: Text('Upload receipt'),
-                      icon: Icon(Icons.photo_camera)),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => ReceiptScanDialog(expense: expense),
+                    ),
+                    label: Text('Upload receipt'),
+                    icon: Icon(Icons.photo_camera),
+                  ),
                 Flexible(
                   child: expense.hasNoItems
                       ? ListEmpty(text: 'Add items to this expense')
