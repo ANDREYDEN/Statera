@@ -102,6 +102,7 @@ class PaymentList extends StatelessWidget {
               Flexible(
                 child: CustomStreamBuilder<List<Payment>>(
                   stream: PaymentService.paymentsStream(
+
                     groupId: groupId,
                     userId1: otherMemberId,
                     userId2: authVm.user.uid,
