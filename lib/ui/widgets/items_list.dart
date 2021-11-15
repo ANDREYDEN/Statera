@@ -32,7 +32,7 @@ class ItemsList extends StatelessWidget {
           isDismissible: authVm.canUpdate(expense),
           onDismissed: (_) async {
             expense.items.removeAt(index);
-            await ExpenseService.updateExpense(expense);
+            await ExpenseService.instance.updateExpense(expense);
           },
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -52,7 +52,7 @@ class ItemsList extends StatelessWidget {
                     authVm.user.uid,
                     parts,
                   );
-                  await ExpenseService.updateExpense(expense);
+                  await ExpenseService.instance.updateExpense(expense);
                 },
               ),
             ),
@@ -98,7 +98,7 @@ class ItemsList extends StatelessWidget {
           item.name = values["item_name"]!;
           item.value = double.parse(values["item_value"]!);
           expense.updateItem(item);
-          await ExpenseService.updateExpense(expense);
+          await ExpenseService.instance.updateExpense(expense);
         },
       ),
     );

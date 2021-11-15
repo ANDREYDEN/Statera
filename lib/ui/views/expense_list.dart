@@ -33,7 +33,7 @@ class _ExpenseListState extends State<ExpenseList> {
   void initState() {
     super.initState();
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
-    _expenseStream = ExpenseService.listenForRelatedExpenses(
+    _expenseStream = ExpenseService.instance.listenForRelatedExpenses(
         authVm.user.uid, groupState.group.id);
   }
 
@@ -102,7 +102,7 @@ class _ExpenseListState extends State<ExpenseList> {
                     confirmation:
                         "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {
-                      ExpenseService.deleteExpense(expense);
+                      ExpenseService.instance.deleteExpense(expense);
                     },
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
@@ -130,7 +130,7 @@ class _ExpenseListState extends State<ExpenseList> {
         ],
         onSubmit: (values) async {
           expense.name = values["expense_name"]!;
-          await ExpenseService.updateExpense(expense);
+          await ExpenseService.instance.updateExpense(expense);
         },
       ),
     );

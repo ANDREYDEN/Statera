@@ -126,7 +126,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       );
 
       if (scanSuccessful) {
-        await ExpenseService.updateExpense(widget.expense);
+        await ExpenseService.instance.updateExpense(widget.expense);
         Navigator.of(context).pop();
       }
     } catch (e) {

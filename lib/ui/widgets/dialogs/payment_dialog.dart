@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/payment_service.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -29,7 +29,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   @override
   initState() {
-    _balanceController.text = widget.payment.value.toStringAsFixed(2).toString();
+    _balanceController.text =
+        widget.payment.value.toStringAsFixed(2).toString();
     _enteredPaymentValue = widget.payment.value.toStringAsFixed(2).toString();
     _balanceController.addListener(() => setState(() {
           _enteredPaymentValue = _balanceController.text;
@@ -60,7 +61,9 @@ class _PaymentDialogState extends State<PaymentDialog> {
             controller: _balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(labelText: "Value to $actionWord"),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\.\d]'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[\.\d]'))
+            ],
           ),
           SizedBox(height: 10),
           Text(
@@ -83,7 +86,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                     context,
                     () async {
                       widget.payment.value = this.balanceToPay;
-                      await Firestore.instance
+                      await PaymentService.instance
                           .payOffBalance(payment: widget.payment);
                       Navigator.of(context).pop();
                     },

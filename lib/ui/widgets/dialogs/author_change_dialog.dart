@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 class AuthorChangeDialog extends StatelessWidget {
@@ -22,7 +22,7 @@ class AuthorChangeDialog extends StatelessWidget {
       content: Container(
         width: 200,
         child: CustomStreamBuilder<Group>(
-          stream: Firestore.instance.getExpenseGroupStream(this.expense),
+          stream: GroupService.instance.getExpenseGroupStream(this.expense),
           builder: (context, group) {
             return ListView.builder(
               itemCount: group.members.length,

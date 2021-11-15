@@ -36,7 +36,7 @@ class _ExpensePageState extends State<ExpensePage> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<Expense>.value(
-      value: ExpenseService.listenForExpense(widget.expenseId),
+      value: ExpenseService.instance.listenForExpense(widget.expenseId),
       initialData: Expense.empty(),
       // catchError: (context, error) => Text(error.toString()),
       child: Consumer<Expense>(
@@ -140,7 +140,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               if (newDate == null) return;
 
                               expense.date = newDate;
-                              await ExpenseService.updateExpense(expense);
+                              await ExpenseService.instance.updateExpense(expense);
                             },
                             child: Text(
                               toStringDate(expense.date) ?? 'Not set',
@@ -164,7 +164,7 @@ class _ExpensePageState extends State<ExpensePage> {
                           if (newAuthor == null) return;
 
                           expense.author = newAuthor;
-                          await ExpenseService.updateExpense(expense);
+                          await ExpenseService.instance.updateExpense(expense);
                         },
                       ),
                     ],
@@ -229,7 +229,7 @@ class _ExpensePageState extends State<ExpensePage> {
             value: double.parse(values["item_value"]!),
             partition: int.parse(values["item_partition"]!),
           ));
-          await ExpenseService.updateExpense(expense);
+          await ExpenseService.instance.updateExpense(expense);
         },
       ),
     );

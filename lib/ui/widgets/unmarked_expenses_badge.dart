@@ -22,7 +22,7 @@ class UnmarkedExpensesBadge extends StatelessWidget {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context, listen: false);
     return StreamBuilder<List<Expense>>(
-      stream: ExpenseService
+      stream: ExpenseService.instance
           .listenForUnmarkedExpenses(this.groupId, authVm.user.uid),
       builder: (context, snap) {
         var unmarkedExpenses = snap.data;

@@ -1,14 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/group_service.dart';
 
-class PaymentService {
-  static CollectionReference get paymentsCollection => Firestore.instance.paymentsCollection;
+class PaymentService extends Firestore {
+  static PaymentService? _instance;
+
+  PaymentService() : super();
+
+  static PaymentService get instance {
+    if (_instance == null) {
+      _instance = PaymentService();
+    }
+    return _instance!;
+  }
 
   /// in [userIds], payerId goes first
-  static Stream<List<Payment>> paymentsStream({
+  Stream<List<Payment>> paymentsStream({
     String? groupId,
     String? userId1,
     String? userId2,
@@ -28,14 +36,14 @@ class PaymentService {
         );
   }
 
-  static Future<void> addPayment(Payment payment) async {
+  Future<void> addPayment(Payment payment) async {
     await paymentsCollection.add(payment.toFirestore());
   }
 
-  static Future<void> payOffBalance({required Payment payment}) async {
-    Group group = await GroupService.getGroupById(payment.groupId);
+  Future<void> payOffBalance({required Payment payment}) async {
+    Group group = await GroupService.instance.getGroupById(payment.groupId);
     group.payOffBalance(payment: payment);
     await paymentsCollection.add(payment.toFirestore());
-    await GroupService.saveGroup(group);
+    await GroupService.instance.saveGroup(group);
   }
 }

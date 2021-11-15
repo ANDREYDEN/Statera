@@ -5,7 +5,7 @@ import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/auth.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 
 class AuthenticationViewModel {
   User? _user;
@@ -68,19 +68,19 @@ class AuthenticationViewModel {
   Future<void> createGroup(Group newGroup) async {
     newGroup.generateCode();
     newGroup.addUser(user);
-    await Firestore.instance.groupsCollection.add(newGroup.toFirestore());
+    await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
   }
 
   Future<void> joinGroup(String groupCode) async {
-    var group = await Firestore.instance.getGroup(groupCode);
+    var group = await GroupService.instance.getGroup(groupCode);
     if (group.members.any((member) => member.uid == user.uid)) return;
 
     group.addUser(user);
-    await Firestore.instance.groupsCollection
+    await GroupService.instance.groupsCollection
         .doc(group.id)
         .update(group.toFirestore());
 
-    await ExpenseService.addUserToOutstandingExpenses(user, group.id);
+    await ExpenseService.instance.addUserToOutstandingExpenses(user, group.id);
   }
 
   Future<void> leaveGroup(Group group) async {
@@ -88,10 +88,10 @@ class AuthenticationViewModel {
 
     group.removeUser(user);
     if (group.members.isEmpty) {
-      return Firestore.instance.deleteGroup(group.id);
+      return GroupService.instance.deleteGroup(group.id);
     }
 
-    return Firestore.instance.saveGroup(group);
+    return GroupService.instance.saveGroup(group);
   }
 
   bool canMark(Expense expense) => expense.canBeMarkedBy(this.user.uid);

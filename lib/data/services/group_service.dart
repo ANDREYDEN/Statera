@@ -1,14 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/firestore.dart';
 
-class GroupService {
-  static CollectionReference get groupsCollection => Firestore.instance.groupsCollection;
+class GroupService extends Firestore {
+  static GroupService? _instance;
 
+  GroupService() : super();
 
-  static Future<Group> getGroup(String? groupCode) async {
+  static GroupService get instance {
+    if (_instance == null) {
+      _instance = GroupService();
+    }
+    return _instance!;
+  }
+
+  Future<Group> getGroup(String? groupCode) async {
     var groupSnap =
         await groupsCollection.where('code', isEqualTo: groupCode).get();
     if (groupSnap.docs.isEmpty)
@@ -20,7 +27,7 @@ class GroupService {
     );
   }
 
-  static Future<Group> getGroupById(String? groupId) async {
+  Future<Group> getGroupById(String? groupId) async {
     var groupDoc = await groupsCollection.doc(groupId).get();
     if (!groupDoc.exists)
       throw new Exception("There was no group with id $groupId");
@@ -30,7 +37,7 @@ class GroupService {
     );
   }
 
-  static Stream<Group> groupStream(String? groupId) {
+  Stream<Group> groupStream(String? groupId) {
     var groupStream = groupsCollection.doc(groupId).snapshots();
     return groupStream.map((groupSnap) {
       if (!groupSnap.exists)
@@ -42,15 +49,15 @@ class GroupService {
     });
   }
 
-  static Future<void> deleteGroup(String? groupId) async {
-    var expensesSnap = await Firestore.instance.expensesCollection
+  Future<void> deleteGroup(String? groupId) async {
+    var expensesSnap = await expensesCollection
         .where('groupId', isEqualTo: groupId)
         .get();
     await Future.wait(expensesSnap.docs.map((doc) => doc.reference.delete()));
-    await Firestore.instance.groupsCollection.doc(groupId).delete();
+    await groupsCollection.doc(groupId).delete();
   }
 
-  static Stream<Author> getGroupMemberStream(
+  Stream<Author> getGroupMemberStream(
       {String? groupId, required String memberId}) {
     return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
       if (!groupSnap.exists) throw new Exception("No group with id $groupId");
@@ -67,7 +74,7 @@ class GroupService {
     });
   }
 
-  static Stream<Map<Author, double>> getOwingsForUserInGroup(
+  Stream<Map<Author, double>> getOwingsForUserInGroup(
     String consumerUid,
     String? groupId,
   ) {
@@ -78,7 +85,7 @@ class GroupService {
     });
   }
 
-  static Stream<List<Group>> userGroupsStream(String uid) {
+  Stream<List<Group>> userGroupsStream(String uid) {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
         .snapshots()
@@ -90,11 +97,11 @@ class GroupService {
             .toList());
   }
 
-  static Future<void> saveGroup(Group group) async {
+  Future<void> saveGroup(Group group) async {
     return groupsCollection.doc(group.id).set(group.toFirestore());
   }
 
-  static Stream<Group> getExpenseGroupStream(Expense expense) {
+  Stream<Group> getExpenseGroupStream(Expense expense) {
     return groupStream(expense.groupId);
   }
 }

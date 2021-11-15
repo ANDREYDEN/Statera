@@ -7,10 +7,19 @@ import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';
 
-class ExpenseService {
-  static CollectionReference get expensesCollection => Firestore.instance.expensesCollection;
+class ExpenseService extends Firestore {
+  static ExpenseService? _instance;
 
-  static Query _expensesQuery({
+  ExpenseService() : super();
+
+  static ExpenseService get instance {
+    if (_instance == null) {
+      _instance = ExpenseService();
+    }
+    return _instance!;
+  }
+
+  Query _expensesQuery({
     String? groupId,
     String? assigneeId,
     String? authorId,
@@ -28,14 +37,14 @@ class ExpenseService {
     return query;
   }
 
-  static Stream<List<Expense>> _queryToExpensesStream(Query query) {
+  Stream<List<Expense>> _queryToExpensesStream(Query query) {
     return query.snapshots().map<List<Expense>>((snap) => snap.docs
         .map((doc) =>
             Expense.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
         .toList());
   }
 
-  static Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
+  Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return _queryToExpensesStream(
             expensesCollection.where("groupId", isEqualTo: groupId))
         .map((expenses) => expenses
@@ -50,13 +59,13 @@ class ExpenseService {
     // return authoredExpensesStream.()
   }
 
-  static Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
+  Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
     return _queryToExpensesStream(expensesCollection
         .where("groupId", isEqualTo: groupId)
         .where("unmarkedAssigneeIds", arrayContains: uid));
   }
 
-  static Future<Expense> getExpense(String? expenseId) async {
+  Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
     if (!expenseDoc.exists)
       throw new Exception("Expense with id $expenseId does not exist.");
@@ -67,18 +76,18 @@ class ExpenseService {
   }
 
   Future<String> addExpenseToGroup(Expense expense, String? groupCode) async {
-    var group = await GroupService.getGroup(groupCode);
+    var group = await GroupService.instance.getGroup(groupCode);
     expense.assignGroup(group);
     final docRef = await expensesCollection.add(expense.toFirestore());
     return docRef.id;
   }
 
-  static Future<void> updateExpense(Expense expense) async {
+  Future<void> updateExpense(Expense expense) async {
     var docRef = expensesCollection.doc(expense.id);
     expensesCollection.doc(docRef.id).set(expense.toFirestore());
   }
 
-  static Stream<Expense> listenForExpense(String? expenseId) {
+  Stream<Expense> listenForExpense(String? expenseId) {
     return expensesCollection
         .doc(expenseId)
         .snapshots()
@@ -88,7 +97,7 @@ class ExpenseService {
             ));
   }
 
-  static Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
+  Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
     var expensesSnap = await _expensesQuery(groupId: groupId).get();
     List<Expense> expenses = expensesSnap.docs
         .map((doc) =>
@@ -105,13 +114,13 @@ class ExpenseService {
     );
   }
 
-  static Future<void> finalizeExpense(Expense expense) async {
+  Future<void> finalizeExpense(Expense expense) async {
     await expensesCollection
         .doc(expense.id)
         .update({'finalizedDate': Timestamp.now()});
     // add expense payments from author to all assignees
     await Future.wait(
-      expense.assignees.map((assignee) => PaymentService.addPayment(
+      expense.assignees.map((assignee) => PaymentService.instance.addPayment(
             Payment(
               groupId: expense.groupId,
               payerId: expense.author.uid,
@@ -123,11 +132,11 @@ class ExpenseService {
     );
   }
 
-  static Future<void> saveExpense(Expense expense) async {
+  Future<void> saveExpense(Expense expense) async {
     return expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
-  static Future<void> deleteExpense(Expense expense) {
+  Future<void> deleteExpense(Expense expense) {
     return expensesCollection.doc(expense.id).delete();
   }
 }

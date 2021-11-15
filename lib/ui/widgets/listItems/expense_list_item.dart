@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -96,12 +96,12 @@ class ExpenseListItem extends StatelessWidget {
                       snackbarCatch(
                         context,
                         () async {
-                          await ExpenseService.finalizeExpense(expense);
-                          final group = await Firestore.instance
+                          await ExpenseService.instance.finalizeExpense(expense);
+                          final group = await GroupService.instance
                               .getExpenseGroupStream(expense)
                               .first;
                           group.updateBalance(expense);
-                          await Firestore.instance.saveGroup(group);
+                          await GroupService.instance.saveGroup(group);
                         },
                         successMessage:
                             "The expense is now finalized. Participants' balances updated.",
