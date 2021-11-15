@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -37,7 +36,7 @@ class _ExpensePageState extends State<ExpensePage> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<Expense>.value(
-      value: Firestore.instance.listenForExpense(widget.expenseId),
+      value: ExpenseService.instance.listenForExpense(widget.expenseId),
       initialData: Expense.empty(),
       // catchError: (context, error) => Text(error.toString()),
       child: Consumer<Expense>(
@@ -141,7 +140,7 @@ class _ExpensePageState extends State<ExpensePage> {
                               if (newDate == null) return;
 
                               expense.date = newDate;
-                              await Firestore.instance.updateExpense(expense);
+                              await ExpenseService.instance.updateExpense(expense);
                             },
                             child: Text(
                               toStringDate(expense.date) ?? 'Not set',
@@ -165,21 +164,22 @@ class _ExpensePageState extends State<ExpensePage> {
                           if (newAuthor == null) return;
 
                           expense.author = newAuthor;
-                          await Firestore.instance.updateExpense(expense);
+                          await ExpenseService.instance.updateExpense(expense);
                         },
                       ),
                     ],
                   ),
                 ),
                 Divider(thickness: 1),
-                if (expense.hasNoItems && !kIsWeb)
+                if (expense.hasNoItems)
                   ElevatedButton.icon(
-                      onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => ReceiptScanDialog(expense: expense),
-                          ),
-                      label: Text('Upload receipt'),
-                      icon: Icon(Icons.photo_camera)),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => ReceiptScanDialog(expense: expense),
+                    ),
+                    label: Text('Upload receipt'),
+                    icon: Icon(Icons.photo_camera),
+                  ),
                 Flexible(
                   child: expense.hasNoItems
                       ? ListEmpty(text: 'Add items to this expense')
@@ -229,7 +229,7 @@ class _ExpensePageState extends State<ExpensePage> {
             value: double.parse(values["item_value"]!),
             partition: int.parse(values["item_partition"]!),
           ));
-          await Firestore.instance.updateExpense(expense);
+          await ExpenseService.instance.updateExpense(expense);
         },
       ),
     );

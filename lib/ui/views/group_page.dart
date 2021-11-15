@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_list.dart';
@@ -35,7 +36,7 @@ class _GroupPageState extends State<GroupPage> {
     return StreamProvider<GroupState>.value(
       initialData: GroupLoadingState(),
       catchError: (context, error) => GroupErrorState(error),
-      value: Firestore.instance
+      value: GroupService.instance
           .groupStream(this.widget.groupId)
           .map((group) => GroupState(group: group)),
       builder: (context, _) {
@@ -118,7 +119,7 @@ class _GroupPageState extends State<GroupPage> {
             name: values["expense_name"]!,
             groupId: group.id,
           );
-          final expenseId = await Firestore.instance.addExpenseToGroup(
+          final expenseId = await ExpenseService.instance.addExpenseToGroup(
             newExpense,
             group.code,
           );

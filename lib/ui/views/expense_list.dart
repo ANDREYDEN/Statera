@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/custom_filter_chip.dart';
@@ -27,15 +27,14 @@ class _ExpenseListState extends State<ExpenseList> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
-  GroupState get groupState =>
-      Provider.of<GroupState>(context, listen: false);
+  GroupState get groupState => Provider.of<GroupState>(context, listen: false);
 
   @override
   void initState() {
     super.initState();
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
-    _expenseStream = Firestore.instance
-        .listenForRelatedExpenses(authVm.user.uid, groupState.group.id);
+    _expenseStream = ExpenseService.instance.listenForRelatedExpenses(
+        authVm.user.uid, groupState.group.id);
   }
 
   @override
@@ -103,7 +102,7 @@ class _ExpenseListState extends State<ExpenseList> {
                     confirmation:
                         "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {
-                      Firestore.instance.deleteExpense(expense);
+                      ExpenseService.instance.deleteExpense(expense);
                     },
                     child: GestureDetector(
                       onLongPress: () => handleEditExpense(expense),
@@ -131,7 +130,7 @@ class _ExpenseListState extends State<ExpenseList> {
         ],
         onSubmit: (values) async {
           expense.name = values["expense_name"]!;
-          await Firestore.instance.updateExpense(expense);
+          await ExpenseService.instance.updateExpense(expense);
         },
       ),
     );

@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
@@ -61,7 +61,7 @@ class GroupHome extends StatelessWidget {
         Flexible(
           child: StreamProvider<Map<Author, double>>(
             initialData: {},
-            create: (context) => Firestore.instance
+            create: (context) => GroupService.instance
                 .getOwingsForUserInGroup(authVm.user.uid, groupState.group.id),
             child: Consumer<Map<Author, double>>(
               builder: (_, owings, __) => ListView.builder(

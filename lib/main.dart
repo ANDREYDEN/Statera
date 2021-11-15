@@ -17,7 +17,15 @@ import 'package:statera/utils/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
+      projectId: "statera-0",
+      storageBucket: "statera-0.appspot.com",
+      messagingSenderId: "630064020417",
+      appId: "1:630064020417:web:48fb8194a91bf70ec3cd40"
+    ),
+  );
 
   if (const bool.fromEnvironment('USE_EMULATORS')) {
     // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);

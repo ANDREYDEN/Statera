@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
+import 'package:statera/data/services/payment_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
@@ -33,7 +34,7 @@ class PaymentList extends StatelessWidget {
     var authVm = Provider.of<AuthenticationViewModel>(context);
 
     return CustomStreamBuilder<Group>(
-      stream: Firestore.instance.groupStream(this.groupId),
+      stream: GroupService.instance.groupStream(this.groupId),
       builder: (context, group) {
         final balance = group.balance[authVm.user.uid]![otherMemberId]!;
         var otherMember = group.getUser(this.otherMemberId!)!;
@@ -100,7 +101,7 @@ class PaymentList extends StatelessWidget {
               ),
               Flexible(
                 child: CustomStreamBuilder<List<Payment>>(
-                  stream: Firestore.instance.paymentsStream(
+                  stream: PaymentService.instance.paymentsStream(
                     groupId: groupId,
                     userId1: otherMemberId,
                     userId2: authVm.user.uid,

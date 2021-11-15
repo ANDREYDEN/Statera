@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 
 class UnmarkedExpensesBadge extends StatelessWidget {
@@ -22,7 +22,7 @@ class UnmarkedExpensesBadge extends StatelessWidget {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context, listen: false);
     return StreamBuilder<List<Expense>>(
-      stream: Firestore.instance
+      stream: ExpenseService.instance
           .listenForUnmarkedExpenses(this.groupId, authVm.user.uid),
       builder: (context, snap) {
         var unmarkedExpenses = snap.data;

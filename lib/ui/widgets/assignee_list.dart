@@ -5,7 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 
@@ -19,7 +19,7 @@ class AssigneeList extends StatelessWidget {
     return Container(
       height: 50,
       child: CustomStreamBuilder<Group>(
-        stream: Firestore.instance.getExpenseGroupStream(expense),
+        stream: GroupService.instance.getExpenseGroupStream(expense),
         builder: (context, group) {
           return Row(
             children: [
