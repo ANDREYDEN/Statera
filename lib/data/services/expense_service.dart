@@ -4,6 +4,7 @@ import 'package:statera/data/models/assignee.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';
 
 class ExpenseService {
@@ -63,6 +64,13 @@ class ExpenseService {
       expenseDoc.data() as Map<String, dynamic>,
       expenseDoc.id,
     );
+  }
+
+  Future<String> addExpenseToGroup(Expense expense, String? groupCode) async {
+    var group = await GroupService.getGroup(groupCode);
+    expense.assignGroup(group);
+    final docRef = await expensesCollection.add(expense.toFirestore());
+    return docRef.id;
   }
 
   static Future<void> updateExpense(Expense expense) async {

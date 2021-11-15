@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/group_service.dart';
 
 class PaymentService {
   static CollectionReference get paymentsCollection => Firestore.instance.paymentsCollection;
@@ -28,5 +30,12 @@ class PaymentService {
 
   static Future<void> addPayment(Payment payment) async {
     await paymentsCollection.add(payment.toFirestore());
+  }
+
+  static Future<void> payOffBalance({required Payment payment}) async {
+    Group group = await GroupService.getGroupById(payment.groupId);
+    group.payOffBalance(payment: payment);
+    await paymentsCollection.add(payment.toFirestore());
+    await GroupService.saveGroup(group);
   }
 }
