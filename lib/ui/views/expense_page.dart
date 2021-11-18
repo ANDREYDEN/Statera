@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,29 +21,24 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/formatters.dart';
 import 'package:statera/utils/helpers.dart';
 
-class ExpensePage extends StatefulWidget {
+class ExpensePage extends StatelessWidget {
   static const String route = "/expense";
 
   final String? expenseId;
   const ExpensePage({Key? key, required this.expenseId}) : super(key: key);
 
   @override
-  _ExpensePageState createState() => _ExpensePageState();
-}
-
-class _ExpensePageState extends State<ExpensePage> {
-  @override
   Widget build(BuildContext context) {
     final authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
     return StreamProvider<Expense>.value(
-      value: ExpenseService.instance.listenForExpense(widget.expenseId),
+      value: ExpenseService.instance.listenForExpense(expenseId),
       initialData: Expense.empty(),
       // catchError: (context, error) => Text(error.toString()),
       child: Consumer<Expense>(
         builder: (context, expense, _) {
           return PageScaffold(
             onFabPressed: authVm.canUpdate(expense)
-                ? () => _handleCreateItem(expense)
+                ? () => _handleCreateItem(context, expense)
                 : null,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -97,26 +94,29 @@ class _ExpensePageState extends State<ExpensePage> {
                             children: [
                               Icon(Icons.schedule, size: 20),
                               TextButton(
-                                onPressed: () async {
-                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                    return;
+                                onPressed: _expenseAction(
+                                  context,
+                                  expense,
+                                  authVm,
+                                  () async {
+                                    DateTime? newDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate:
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              0),
+                                      lastDate: DateTime.now().add(
+                                        Duration(days: 30),
+                                      ),
+                                    );
 
-                                  DateTime? newDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate:
-                                        DateTime.fromMillisecondsSinceEpoch(0),
-                                    lastDate: DateTime.now().add(
-                                      Duration(days: 30),
-                                    ),
-                                  );
+                                    if (newDate == null) return;
 
-                                  if (newDate == null) return;
-
-                                  expense.date = newDate;
-                                  await ExpenseService.instance
-                                      .updateExpense(expense);
-                                },
+                                    expense.date = newDate;
+                                    await ExpenseService.instance
+                                        .updateExpense(expense);
+                                  },
+                                ),
                                 child: Text(
                                   toStringDate(expense.date) ?? 'Not set',
                                 ),
@@ -128,37 +128,44 @@ class _ExpensePageState extends State<ExpensePage> {
                             children: [
                               AuthorAvatar(
                                 author: expense.author,
-                                onTap: () async {
-                                  if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                    return;
+                                onTap: _expenseAction(
+                                  context,
+                                  expense,
+                                  authVm,
+                                  () async {
+                                    Author? newAuthor =
+                                        await showDialog<Author>(
+                                      context: context,
+                                      builder: (context) => AuthorChangeDialog(
+                                        expense: expense,
+                                      ),
+                                    );
 
-                                  Author? newAuthor = await showDialog<Author>(
-                                    context: context,
-                                    builder: (context) => AuthorChangeDialog(
-                                      expense: expense,
-                                    ),
-                                  );
+                                    if (newAuthor == null) return;
 
-                                  if (newAuthor == null) return;
-
-                                  expense.author = newAuthor;
-                                  await ExpenseService.instance
-                                      .updateExpense(expense);
-                                },
+                                    expense.author = newAuthor;
+                                    await ExpenseService.instance
+                                        .updateExpense(expense);
+                                  },
+                                ),
                               ),
                               Icon(Icons.arrow_forward),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () {
-                                    if (!expense.canBeUpdatedBy(authVm.user.uid))
-                                      return;
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AssigneePickerDialog(
-                                        expense: expense,
-                                      ),
-                                    );
-                                  },
+                                  onTap: _expenseAction(
+                                    context,
+                                    expense,
+                                    authVm,
+                                    () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            AssigneePickerDialog(
+                                          expense: expense,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                   child: AssigneeList(),
                                 ),
                               ),
@@ -191,7 +198,7 @@ class _ExpensePageState extends State<ExpensePage> {
     );
   }
 
-  _handleCreateItem(Expense expense) {
+  _handleCreateItem(BuildContext context, Expense expense) {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -231,5 +238,26 @@ class _ExpensePageState extends State<ExpensePage> {
         },
       ),
     );
+  }
+
+  _expenseAction(
+    BuildContext context,
+    Expense expense,
+    AuthenticationViewModel authVm,
+    Function action,
+  ) {
+    return () {
+      if (!expense.canBeUpdatedBy(authVm.user.uid)) {
+        final reason = expense.completed
+            ? 'This expense can no longer be edited'
+            : "You don't have permission to edit this expense";
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(reason),
+          duration: Duration(seconds: 1),
+        ));
+        return;
+      }
+      action();
+    };
   }
 }
