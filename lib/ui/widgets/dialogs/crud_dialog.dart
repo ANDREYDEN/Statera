@@ -22,7 +22,7 @@ class FieldData {
     this.inputType = TextInputType.name,
   }) {
     this.controller = controller ?? TextEditingController();
-    this.controller.text = initialData?.toString() ?? '';
+    resetController();
     this.focusNode = FocusNode(debugLabel: this.id);
   }
 
@@ -39,6 +39,10 @@ class FieldData {
       if (error.isNotEmpty) return error;
     }
     return '';
+  }
+
+  void resetController() {
+    controller.text = initialData?.toString() ?? '';
   }
 }
 
@@ -68,7 +72,13 @@ class _CRUDDialogState extends State<CRUDDialog> {
     return AlertDialog(
       title: Text(widget.title),
       content: Column(children: [...textFields]),
-      actions: [ProtectedElevatedButton(onPressed: submit, child: Text("Save"))],
+      actions: [
+        ProtectedElevatedButton(
+          onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
+          child: Text("Save"),
+        ),
+        TextButton(onPressed: submit, child: Text('Save & add another'))
+      ],
     );
   }
 
@@ -95,7 +105,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
         onSubmitted: (_) {
           var isLastField = i == widget.fields.length - 1;
           if (isLastField) {
-            submit();
+            submit(closeAfterSubmit: widget.closeAfterSubmit);
           } else {
             widget.fields[i + 1].focusNode.requestFocus();
           }
@@ -104,14 +114,13 @@ class _CRUDDialogState extends State<CRUDDialog> {
     }
   }
 
-  submit() async {
+  submit({bool closeAfterSubmit = false}) async {
     if (widget.fields.any((field) => field.getError().isNotEmpty)) {
       setState(() {
         this._dirty = true;
       });
       return;
     }
-
 
     await widget.onSubmit(
       Map.fromEntries(widget.fields.map(
@@ -122,12 +131,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
       )),
     );
 
-    if (widget.closeAfterSubmit) {
+    if (closeAfterSubmit) {
       Navigator.of(context).pop();
+    } else {
+      widget.fields.first.focusNode.requestFocus();
     }
 
     widget.fields.forEach((field) {
-      field.controller.clear();
+      field.resetController();
     });
   }
 }
