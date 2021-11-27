@@ -1,38 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
+  final String receiverUid;
 
   const PaymentListItem({
     Key? key,
     required this.payment,
+    required this.receiverUid,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var authVm = Provider.of<AuthenticationViewModel>(context);
     Color paymentColor =
-        payment.isReceivedBy(authVm.user.uid) ? Colors.green : Colors.red;
+        payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
 
     return ListTile(
       isThreeLine: payment.hasRelatedExpense,
       title: Text(
-        "\$${payment.isReceivedBy(authVm.user.uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+        "\$${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
         style: TextStyle(color: paymentColor),
       ),
       leading: Icon(
-        payment.hasRelatedExpense ? Icons.receipt_long : Icons.paid,
-        color: Theme.of(context).colorScheme.secondary,
+        payment.isAdmin
+            ? Icons.warning
+            : payment.hasRelatedExpense
+                ? Icons.receipt_long
+                : Icons.paid,
+        color: payment.isAdmin
+            ? Colors.red
+            : Theme.of(context).colorScheme.secondary,
         size: 30,
       ),
       trailing: Icon(
-        payment.isReceivedBy(authVm.user.uid)
+        payment.isReceivedBy(receiverUid)
             ? Icons.call_received
             : Icons.call_made,
         color: paymentColor,
@@ -47,10 +51,29 @@ class PaymentListItem extends StatelessWidget {
           if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
         ],
       ),
-      onTap: payment.hasRelatedExpense
-          ? () => Navigator.of(context)
-              .pushNamed("${ExpensePage.route}/${payment.relatedExpense!.id}")
-          : null,
+      onTap: payment.isAdmin
+          ? () => _displayReason(context)
+          : payment.hasRelatedExpense
+              ? () => _navigateToExpense(context)
+              : null,
     );
+  }
+
+  _displayReason(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(payment.reason!),
+        actions: [
+          ElevatedButton(
+              onPressed: () => Navigator.pop(context), child: Text('OK'))
+        ],
+      ),
+    );
+  }
+
+  _navigateToExpense(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed("${ExpensePage.route}/${payment.relatedExpense!.id}");
   }
 }
