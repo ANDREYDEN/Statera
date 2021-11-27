@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/item.dart';
 
@@ -186,6 +187,27 @@ class Expense {
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();
     data["items"].forEach(
+        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
+    return expense;
+  }
+
+  static Expense fromSnapshot(DocumentSnapshot snap) {
+    var expense = new Expense(
+      author: Author.fromFirestore(snap["author"]),
+      name: snap["name"],
+      groupId: snap["groupId"],
+    );
+    expense.id = snap.id;
+    expense.date = snap["date"] == null
+        ? null
+        : DateTime.parse(snap["date"].toDate().toString());
+    expense.finalizedDate = snap["finalizedDate"] == null
+        ? null
+        : DateTime.parse(snap["finalizedDate"].toDate().toString());
+    expense.assignees = snap["assignees"]
+        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
+        .toList();
+    snap["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
   }
