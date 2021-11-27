@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:statera/data/models/assignee.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/payment.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';

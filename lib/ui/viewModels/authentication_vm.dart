@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/group.dart';
-import 'package:statera/data/models/item.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/group_service.dart';

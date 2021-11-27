@@ -2,22 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/data/models/author.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/dialogs/assignee_picker_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/author_change_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/receipt_scan_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:statera/utils/formatters.dart';
-import 'package:statera/utils/helpers.dart';
+import 'package:statera/utils/utils.dart';
 
 class ExpensePage extends StatelessWidget {
   static const String route = "/expense";
