@@ -127,7 +127,10 @@ class PaymentList extends StatelessWidget {
                     return ListView.builder(
                       itemCount: payments.length,
                       itemBuilder: (context, index) {
-                        return PaymentListItem(payment: payments[index]);
+                        return PaymentListItem(
+                          payment: payments[index],
+                          receiverUid: authVm.user.uid,
+                        );
                       },
                     );
                   },

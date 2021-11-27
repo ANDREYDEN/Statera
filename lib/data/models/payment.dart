@@ -38,6 +38,7 @@ class Payment {
   double value;
   PaymentExpenseInfo? relatedExpense;
   DateTime? timeCreated;
+  String? reason;
 
   Payment({
     required this.groupId,
@@ -46,11 +47,14 @@ class Payment {
     required this.value,
     this.relatedExpense,
     this.timeCreated,
+    this.reason,
   });
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
   bool get hasRelatedExpense => relatedExpense != null;
+
+  bool get isAdmin => reason != null;
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -59,7 +63,8 @@ class Payment {
       'receiverId': receiverId,
       'value': value,
       'relatedExpense': relatedExpense == null ? null : relatedExpense!.toFirestore(),
-      'payerReceiverId': '${payerId}_$receiverId'
+      'payerReceiverId': '${payerId}_$receiverId',
+      'reason': reason
     };
   }
 
@@ -70,7 +75,8 @@ class Payment {
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),
       relatedExpense: map['relatedExpense'] == null ? null : PaymentExpenseInfo.fromFirestore(map['relatedExpense']),
-      timeCreated: map['timeCreated'] == null ? null : DateTime.parse(map['timeCreated'].toDate().toString())
+      timeCreated: map['timeCreated'] == null ? null : DateTime.parse(map['timeCreated'].toDate().toString()),
+      reason: map['reason']
     );
   }
 
