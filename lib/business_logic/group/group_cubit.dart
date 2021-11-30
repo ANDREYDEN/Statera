@@ -17,5 +17,7 @@ class GroupCubit extends Cubit<GroupState> {
         .listen(update);
   }
 
-  update(GroupState groupState) {}
+  update(GroupState groupState) async {
+    await GroupService.instance.saveGroup(groupState.group);
+  }
 }

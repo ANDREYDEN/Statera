@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/auth.dart';
 import 'package:statera/data/services/group_service.dart';
+import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
@@ -107,7 +109,8 @@ class _GroupListState extends State<GroupList> {
         ],
         onSubmit: (values) async {
           group.name = values["group_name"]!;
-          await GroupService.instance.saveGroup(group);
+          context.read<GroupCubit>().update(GroupLoadedState(group));
+          // await GroupService.instance.saveGroup(group);
         },
       ),
     );
