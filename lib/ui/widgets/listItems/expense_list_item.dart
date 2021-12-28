@@ -6,6 +6,7 @@ import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -76,15 +77,15 @@ class ExpenseListItem extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          toStringPrice(this
+                        PriceText(
+                          value: this
                               .expense
-                              .getConfirmedTotalForUser(authVm.user.uid)),
-                          style: TextStyle(fontSize: 24),
+                              .getConfirmedTotalForUser(authVm.user.uid),
+                          textStyle: TextStyle(fontSize: 24),
                         ),
-                        Text(
-                          toStringPrice(this.expense.total),
-                          style: TextStyle(fontSize: 12),
+                        PriceText(
+                          value: this.expense.total,
+                          textStyle: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -97,7 +98,8 @@ class ExpenseListItem extends StatelessWidget {
                         context,
                         () async {
                           // TODO: use transaction
-                          await ExpenseService.instance.finalizeExpense(expense);
+                          await ExpenseService.instance
+                              .finalizeExpense(expense);
                           final groupCubit = context.read<GroupCubit>();
                           groupCubit.updateBalance(expense);
                         },

@@ -40,8 +40,6 @@ class Item {
           ? 0
           : value * getAssigneeParts(uid) / confirmedParts;
 
-  get valueString => "\$${value.toStringAsFixed(2)}";
-
   bool get completed =>
       assignees.every((assignee) => assignee.madeDecision) &&
       (!isPartitioned || undefinedParts == 0);

@@ -11,14 +11,23 @@ class Group {
   late List<Author> members = [];
   late Map<String, Map<String, double>> balance;
   String? code;
+  String? _currencySign;
 
-  Group({required this.name, this.code, this.id, members, balance}) {
+  Group({
+    required this.name,
+    this.code,
+    this.id,
+    members,
+    balance,
+    String? currencySign,
+  }) {
     this.members = [];
     this.balance = {};
     if (members != null) {
       this.members = members;
       this.balance = balance ?? createBalanceFromMembers(members);
     }
+    _currencySign = currencySign;
   }
 
   Group.fake({List<Author>? members}) {
@@ -31,12 +40,16 @@ class Group {
     }
   }
 
+  String get currencySign => _currencySign ?? '\$';
+
   void generateCode() {
     code = "";
     for (var i = 0; i < 5; i++) {
       code = code! + getRandomLetter();
     }
   }
+
+  String renderPrice(double value) => '$currencySign${value.toStringAsFixed(2)}';
 
   static Map<String, Map<String, double>> createBalanceFromMembers(
     List<Author> members,
@@ -122,7 +135,8 @@ class Group {
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
-      'balance': balance
+      'balance': balance,
+      'currencySign': _currencySign
     };
   }
 
@@ -147,6 +161,7 @@ class Group {
                 ),
               ),
             )),
+      currencySign: map['currencySign']
     );
   }
 }

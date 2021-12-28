@@ -7,7 +7,7 @@ import 'package:statera/data/models/author.dart';
 import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/utils/helpers.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 
 class OwingListItem extends StatelessWidget {
   final Author member;
@@ -28,10 +28,7 @@ class OwingListItem extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: AuthorAvatar(author: this.member, withName: true)),
-          Text(
-            toStringPrice(this.owing),
-            style: TextStyle(fontSize: 18),
-          ),
+          PriceText(value: this.owing, textStyle: TextStyle(fontSize: 18)),
           SizedBox(width: 10),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(

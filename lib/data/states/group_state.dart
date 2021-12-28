@@ -16,5 +16,5 @@ class GroupLoadedState extends GroupState {
 
 class GroupErrorState extends GroupState {
   Object? error;
-  GroupErrorState({this.error}) : super();
+  GroupErrorState({required this.error}) : super();
 }

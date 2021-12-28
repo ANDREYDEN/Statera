@@ -18,9 +18,15 @@ class GroupCubit extends Cubit<GroupState> {
     _groupSubscription?.cancel();
     _groupSubscription = GroupService.instance
         .groupStream(groupId)
-        .map((group) =>
-            group == null ? GroupErrorState() : GroupLoadedState(group: group))
+        .map((group) => group == null
+            ? GroupErrorState(error: 'Group does not exist')
+            : GroupLoadedState(group: group))
         .listen(emit);
+  }
+
+  loadFromExpense(String? expenseId) async {
+    final expense = await ExpenseService.instance.getExpense(expenseId);
+    load(expense.groupId);
   }
 
   updateName(String newName) {

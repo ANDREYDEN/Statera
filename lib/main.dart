@@ -17,16 +17,18 @@ import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
 
+import 'data/models/models.dart';
+import 'data/services/services.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: FirebaseOptions(
-      apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
-      projectId: "statera-0",
-      storageBucket: "statera-0.appspot.com",
-      messagingSenderId: "630064020417",
-      appId: "1:630064020417:web:48fb8194a91bf70ec3cd40"
-    ),
+        apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
+        projectId: "statera-0",
+        storageBucket: "statera-0.appspot.com",
+        messagingSenderId: "630064020417",
+        appId: "1:630064020417:web:48fb8194a91bf70ec3cd40"),
   );
 
   if (const bool.fromEnvironment('USE_EMULATORS')) {
@@ -64,17 +66,31 @@ class _StateraState extends State<Statera> {
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
       builder: (context, matches) => BlocProvider<GroupCubit>(
-        create: (context) {
-          final groupCubit = GroupCubit();
-          groupCubit.load(matches?[0]);
-          return groupCubit;
-        },
-        child: GroupPage(groupId: matches?[0])
-      ),
+          create: (context) {
+            final groupCubit = GroupCubit();
+            groupCubit.load(matches?[0]);
+            return groupCubit;
+          },
+          child: GroupPage(groupId: matches?[0])),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
-      builder: (context, matches) => ExpensePage(expenseId: matches?[0]),
+      builder: (context, matches) => MultiProvider(
+        providers: [
+          StreamProvider<Expense>.value(
+            value: ExpenseService.instance.listenForExpense(matches?[0]),
+            initialData: Expense.empty(),
+          ),
+          BlocProvider<GroupCubit>(
+            create: (context) {
+              final groupCubit = GroupCubit();
+              groupCubit.loadFromExpense(matches?[0]);
+              return groupCubit;
+            },
+          )
+        ],
+        child: ExpensePage(expenseId: matches?[0]),
+      ),
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',

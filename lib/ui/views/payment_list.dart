@@ -11,7 +11,7 @@ import 'package:statera/ui/widgets/dialogs/payment_dialog.dart';
 import 'package:statera/ui/widgets/listItems/payment_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:statera/utils/helpers.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 
 class PaymentList extends StatelessWidget {
   static const String route = "/payments";
@@ -53,10 +53,7 @@ class PaymentList extends StatelessWidget {
                 margin: EdgeInsets.symmetric(vertical: 10),
               ),
               SizedBox(height: 8),
-              Text(
-                toStringPrice(balance),
-                style: TextStyle(fontSize: 32),
-              ),
+              PriceText(value: balance, textStyle: TextStyle(fontSize: 32)),
               Text('You owe'),
               SizedBox(height: 8),
               Padding(
