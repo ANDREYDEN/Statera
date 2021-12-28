@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/custom_filter_chip.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
@@ -27,14 +27,14 @@ class _ExpenseListState extends State<ExpenseList> {
   AuthenticationViewModel get authVm =>
       Provider.of<AuthenticationViewModel>(context, listen: false);
 
-  GroupState get groupState => Provider.of<GroupState>(context, listen: false);
+  GroupCubit get groupCubit => context.read<GroupCubit>();
 
   @override
   void initState() {
     super.initState();
     _filters = authVm.expenseStages.map((stage) => stage.name).toList();
     _expenseStream = ExpenseService.instance.listenForRelatedExpenses(
-        authVm.user.uid, groupState.group.id);
+        authVm.user.uid, groupCubit.loadedState.group.id);
   }
 
   @override

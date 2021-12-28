@@ -70,10 +70,10 @@ class Group {
     );
   }
 
-  void removeUser(User user) {
-    this.members.removeWhere((member) => member.uid == user.uid);
-    this.balance.remove(user.uid);
-    this.balance.forEach((key, value) => value.remove(user.uid));
+  void removeUser(String uid) {
+    this.members.removeWhere((member) => member.uid == uid);
+    this.balance.remove(uid);
+    this.balance.forEach((key, value) => value.remove(uid));
   }
 
   Map<Author, double> extendedBalance(String consumerUid) {

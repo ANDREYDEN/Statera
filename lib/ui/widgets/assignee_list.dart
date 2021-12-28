@@ -18,9 +18,12 @@ class AssigneeList extends StatelessWidget {
 
     return Container(
       height: 50,
-      child: CustomStreamBuilder<Group>(
+      child: CustomStreamBuilder<Group?>(
         stream: GroupService.instance.getExpenseGroupStream(expense),
         builder: (context, group) {
+          if (group == null) {
+            return Text('Group does not exist');
+          }
           return Row(
             children: [
               Expanded(

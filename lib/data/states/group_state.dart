@@ -1,22 +1,20 @@
 import 'package:statera/data/models/group.dart';
 
 abstract class GroupState {
-  Group group;
-
-  GroupState({
-    required this.group,
-  });
+  GroupState();
 }
 
 class GroupLoadingState extends GroupState {
-  GroupLoadingState() : super(group: Group.fake());
+  GroupLoadingState() : super();
 }
 
 class GroupLoadedState extends GroupState {
-  GroupLoadedState(Group group) : super(group: group);
+  Group group;
+
+  GroupLoadedState({required this.group}) : super();
 }
 
 class GroupErrorState extends GroupState {
   Object? error;
-  GroupErrorState({this.error}) : super(group: Group.fake());
+  GroupErrorState({this.error}) : super();
 }

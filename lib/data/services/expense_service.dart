@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';
 
 class ExpenseService extends Firestore {
@@ -60,13 +59,6 @@ class ExpenseService extends Firestore {
     if (!expenseDoc.exists)
       throw new Exception("Expense with id $expenseId does not exist.");
     return Expense.fromSnapshot(expenseDoc);
-  }
-
-  Future<String> addExpenseToGroup(Expense expense, String? groupCode) async {
-    var group = await GroupService.instance.getGroup(groupCode);
-    expense.assignGroup(group);
-    final docRef = await expensesCollection.add(expense.toFirestore());
-    return docRef.id;
   }
 
   Future<void> updateExpense(Expense expense) async {

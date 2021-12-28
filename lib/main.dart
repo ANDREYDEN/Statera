@@ -3,7 +3,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
@@ -61,7 +63,14 @@ class _StateraState extends State<Statera> {
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
-      builder: (context, matches) => GroupPage(groupId: matches?[0]),
+      builder: (context, matches) => BlocProvider<GroupCubit>(
+        create: (context) {
+          final groupCubit = GroupCubit();
+          groupCubit.load(matches?[0]);
+          return groupCubit;
+        },
+        child: GroupPage(groupId: matches?[0])
+      ),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',

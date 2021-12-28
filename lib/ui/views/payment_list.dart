@@ -33,9 +33,13 @@ class PaymentList extends StatelessWidget {
 
     var authVm = Provider.of<AuthenticationViewModel>(context);
 
-    return CustomStreamBuilder<Group>(
+    return CustomStreamBuilder<Group?>(
       stream: GroupService.instance.groupStream(this.groupId),
       builder: (context, group) {
+        if (group == null) {
+          return PageScaffold(child: Text('Group does not exist'));
+        }
+
         final balance = group.balance[authVm.user.uid]![otherMemberId]!;
         var otherMember = group.getUser(this.otherMemberId!)!;
         return PageScaffold(

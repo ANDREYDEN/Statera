@@ -81,17 +81,6 @@ class AuthenticationViewModel {
     await ExpenseService.instance.addUserToOutstandingExpenses(user, group.id);
   }
 
-  Future<void> leaveGroup(Group group) async {
-    if (group.members.every((member) => member.uid != user.uid)) return;
-
-    group.removeUser(user);
-    if (group.members.isEmpty) {
-      return GroupService.instance.deleteGroup(group.id);
-    }
-
-    return GroupService.instance.saveGroup(group);
-  }
-
   bool canMark(Expense expense) => expense.canBeMarkedBy(this.user.uid);
 
   bool canUpdate(Expense expense) => expense.canBeUpdatedBy(this.user.uid);

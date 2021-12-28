@@ -37,11 +37,11 @@ class GroupService extends Firestore {
     );
   }
 
-  Stream<Group> groupStream(String? groupId) {
+  Stream<Group?> groupStream(String? groupId) {
     var groupStream = groupsCollection.doc(groupId).snapshots();
     return groupStream.map((groupSnap) {
       if (!groupSnap.exists)
-        throw new Exception("There was no group with id $groupId");
+        return null;
       return Group.fromFirestore(
         groupSnap.data() as Map<String, dynamic>,
         id: groupSnap.id,
@@ -101,7 +101,13 @@ class GroupService extends Firestore {
     return groupsCollection.doc(group.id).set(group.toFirestore());
   }
 
-  Stream<Group> getExpenseGroupStream(Expense expense) {
+  Future<String> addExpense(Expense expense, Group group) async {
+    expense.assignGroup(group);
+    final docRef = await expensesCollection.add(expense.toFirestore());
+    return docRef.id;
+  }
+
+  Stream<Group?> getExpenseGroupStream(Expense expense) {
     return groupStream(expense.groupId);
   }
 }

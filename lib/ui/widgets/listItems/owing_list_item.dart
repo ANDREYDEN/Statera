@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/author.dart';
-import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -21,7 +21,7 @@ class OwingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var groupState = Provider.of<GroupState>(context);
+    var groupCubit = context.read<GroupCubit>();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -35,7 +35,7 @@ class OwingListItem extends StatelessWidget {
           SizedBox(width: 10),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(
-              "${GroupPage.route}/${groupState.group.id}${PaymentList.route}/${member.uid}",
+              "${GroupPage.route}/${groupCubit.loadedState.group.id}${PaymentList.route}/${member.uid}",
             ),
             icon: Icon(Icons.analytics_outlined),
           )
