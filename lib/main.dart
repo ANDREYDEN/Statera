@@ -94,8 +94,14 @@ class _StateraState extends State<Statera> {
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
-      builder: (context, matches) =>
-          PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+      builder: (context, matches) => BlocProvider<GroupCubit>(
+        create: (context) {
+          final groupCubit = GroupCubit();
+          groupCubit.load(matches?[0]);
+          return groupCubit;
+        },
+        child: PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+      ),
     )
   ];
 
