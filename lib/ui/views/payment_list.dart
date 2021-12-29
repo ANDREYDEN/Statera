@@ -41,7 +41,7 @@ class PaymentList extends StatelessWidget {
         }
 
         final balance = group.balance[authVm.user.uid]![otherMemberId]!;
-        var otherMember = group.getUser(this.otherMemberId!)!;
+        var otherMember = group.getUser(this.otherMemberId!);
         return PageScaffold(
           title: "${otherMember.name} payments",
           child: Column(

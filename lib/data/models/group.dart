@@ -68,9 +68,9 @@ class Group {
     );
   }
 
-  Author? getUser(String uid) {
-    return this.members.firstWhere((member) => member.uid == uid, orElse: null);
-  }
+  bool userExists(String uid) => this.members.any((member) => member.uid == uid);
+
+  Author getUser(String uid) => this.members.firstWhere((member) => member.uid == uid);
 
   void addUser(User user) {
     var newAuthor = Author.fromUser(user);
