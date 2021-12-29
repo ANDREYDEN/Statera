@@ -8,6 +8,7 @@ import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/dialogs/expense_settings_dialog.dart';
 import 'package:statera/ui/widgets/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -29,6 +30,15 @@ class ExpensePage extends StatelessWidget {
           onFabPressed: authVm.canUpdate(expense)
               ? () => _handleCreateItem(context, expense)
               : null,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => ExpenseSettingsDialog(expense: expense),
+              ),
+            )
+          ],
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
