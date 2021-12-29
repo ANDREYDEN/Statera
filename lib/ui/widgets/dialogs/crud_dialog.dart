@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 
 class FieldData {
@@ -51,6 +52,7 @@ class CRUDDialog extends StatefulWidget {
   final Future Function(Map<String, String>) onSubmit;
   final List<FieldData> fields;
   final bool closeAfterSubmit;
+  final bool allowAddAnother;
 
   const CRUDDialog({
     Key? key,
@@ -58,6 +60,7 @@ class CRUDDialog extends StatefulWidget {
     required this.onSubmit,
     required this.fields,
     this.closeAfterSubmit = true,
+    this.allowAddAnother = false,
   }) : super(key: key);
 
   @override
@@ -77,7 +80,8 @@ class _CRUDDialogState extends State<CRUDDialog> {
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
           child: Text("Save"),
         ),
-        TextButton(onPressed: submit, child: Text('Save & add another'))
+        if (widget.allowAddAnother)
+          TextButton(onPressed: submit, child: Text('Save & add another'))
       ],
     );
   }

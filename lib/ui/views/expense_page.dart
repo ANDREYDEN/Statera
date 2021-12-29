@@ -222,6 +222,7 @@ class ExpensePage extends StatelessWidget {
           ));
           await ExpenseService.instance.updateExpense(expense);
         },
+        allowAddAnother: true,
       ),
     );
   }
