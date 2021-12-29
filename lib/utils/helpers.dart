@@ -54,7 +54,7 @@ void showSnackBar(
       content: Text(content),
       margin: EdgeInsets.all(8),
       backgroundColor: color,
-      duration: Duration(seconds: 3),
+      duration: duration,
       behavior: SnackBarBehavior.floating,
     ),
   );

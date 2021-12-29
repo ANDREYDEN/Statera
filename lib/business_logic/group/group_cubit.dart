@@ -51,9 +51,9 @@ class GroupCubit extends Cubit<GroupState> {
     return GroupService.instance.addExpense(expense, loadedState.group);
   }
 
-  updateBalance(Expense expense) {
+  updateBalance(Expense expense) async {
     final group = loadedState.group;
     group.updateBalance(expense);
-    GroupService.instance.saveGroup(group);
+    await GroupService.instance.saveGroup(group);
   }
 }

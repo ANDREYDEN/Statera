@@ -15,6 +15,7 @@ import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
   static const String route = "/group";
+  static final scaffoldKey = GlobalKey<ScaffoldState>();
   final String? groupId;
 
   const GroupPage({Key? key, this.groupId}) : super(key: key);
@@ -43,6 +44,7 @@ class _GroupPageState extends State<GroupPage> {
 
         if (groupState is GroupLoadedState) {
           return PageScaffold(
+            key: GroupPage.scaffoldKey,
             title: groupState.group.name,
             onFabPressed:
                 _selectedNavBarItemIndex == 0 ? null : handleCreateExpense,

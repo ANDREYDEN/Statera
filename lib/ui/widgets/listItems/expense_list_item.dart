@@ -5,6 +5,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
+import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
@@ -18,6 +19,7 @@ class ExpenseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context);
+    final groupCubit = context.read<GroupCubit>();
 
     return GestureDetector(
       onTap: () {
@@ -95,12 +97,11 @@ class ExpenseListItem extends StatelessWidget {
                   ProtectedElevatedButton(
                     onPressed: () {
                       snackbarCatch(
-                        context,
+                        GroupPage.scaffoldKey.currentContext!,
                         () async {
                           // TODO: use transaction
                           await ExpenseService.instance
                               .finalizeExpense(expense);
-                          final groupCubit = context.read<GroupCubit>();
                           groupCubit.updateBalance(expense);
                         },
                         successMessage:
