@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/progress_bar.dart';
 
 class ItemListItem extends StatelessWidget {
@@ -34,7 +35,7 @@ class ItemListItem extends StatelessWidget {
                     child: Text(item.name),
                   ),
                 ),
-                Text(item.valueString),
+                PriceText(value: item.value),
               ],
             ),
           ),

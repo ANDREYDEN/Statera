@@ -34,9 +34,13 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
       title: Text('Pick Assignees'),
       content: Container(
         width: 200,
-        child: CustomStreamBuilder<Group>(
+        child: CustomStreamBuilder<Group?>(
             stream: GroupService.instance.getExpenseGroupStream(widget.expense),
             builder: (context, group) {
+              if (group == null) {
+                return Text('Group does not exist');
+              }
+              
               return ListView.builder(
                 itemCount: group.members.length,
                 itemBuilder: (context, index) {

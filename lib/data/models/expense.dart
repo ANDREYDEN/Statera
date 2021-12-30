@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/item.dart';
 
@@ -27,12 +28,13 @@ class Expense {
   late Author author; // UID
   DateTime? date;
   DateTime? finalizedDate;
+  late bool acceptNewMembers;
 
-  Expense({
-    required this.name,
-    required this.author,
-    required this.groupId,
-  }) {
+  Expense(
+      {required this.name,
+      required this.author,
+      required this.groupId,
+      this.acceptNewMembers = true}) {
     this.assignees = [Assignee(uid: author.uid)];
     this.date = DateTime.now();
   }
@@ -41,6 +43,7 @@ class Expense {
     this.name = "foo";
     this.author = Author(name: "foo", uid: "foo");
     this.date = DateTime.now();
+    this.acceptNewMembers = true;
   }
 
   Expense.empty() {
@@ -61,8 +64,9 @@ class Expense {
   bool isIn(ExpenseStage stage) => stage.test(this);
 
   bool get finalized => finalizedDate != null;
-      
-  bool get completed => items.isNotEmpty && items.every((item) => item.completed);
+
+  bool get completed =>
+      items.isNotEmpty && items.every((item) => item.completed);
 
   bool get canReceiveAssignees =>
       (assignees.length == 1 && this.isAuthoredBy(assignees.first.uid)) ||
@@ -74,7 +78,8 @@ class Expense {
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.finalized;
 
-  bool canBeFinalizedBy(String uid) => !this.finalized && this.completed && this.isAuthoredBy(uid);
+  bool canBeFinalizedBy(String uid) =>
+      !this.finalized && this.completed && this.isAuthoredBy(uid);
 
   bool canBeMarkedBy(String uid) =>
       !this.finalized && this.assignees.any((assignee) => assignee.uid == uid);
@@ -165,7 +170,8 @@ class Expense {
           .map((assignee) => assignee.uid)
           .toList(),
       "date": date,
-      "finalizedDate": finalizedDate
+      "finalizedDate": finalizedDate,
+      "acceptNewMembers": acceptNewMembers,
     };
   }
 
@@ -174,6 +180,7 @@ class Expense {
       author: Author.fromFirestore(data["author"]),
       name: data["name"],
       groupId: data["groupId"],
+      acceptNewMembers: data["acceptNewMembers"] ?? true,
     );
     expense.id = id;
     expense.date = data["date"] == null
@@ -186,6 +193,33 @@ class Expense {
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();
     data["items"].forEach(
+        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
+    return expense;
+  }
+
+  static Expense fromSnapshot(DocumentSnapshot snap) {
+    var acceptNewMembers = true;
+    try {
+      acceptNewMembers = snap["acceptNewMembers"];
+    } catch (e) {}
+
+    var expense = new Expense(
+      author: Author.fromFirestore(snap["author"]),
+      name: snap["name"],
+      groupId: snap["groupId"],
+      acceptNewMembers: acceptNewMembers,
+    );
+    expense.id = snap.id;
+    expense.date = snap["date"] == null
+        ? null
+        : DateTime.parse(snap["date"].toDate().toString());
+    expense.finalizedDate = snap["finalizedDate"] == null
+        ? null
+        : DateTime.parse(snap["finalizedDate"].toDate().toString());
+    expense.assignees = snap["assignees"]
+        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
+        .toList();
+    snap["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
   }

@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/group.dart';
-import 'package:statera/data/models/item.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/group_service.dart';
@@ -81,17 +79,6 @@ class AuthenticationViewModel {
         .update(group.toFirestore());
 
     await ExpenseService.instance.addUserToOutstandingExpenses(user, group.id);
-  }
-
-  Future<void> leaveGroup(Group group) async {
-    if (group.members.every((member) => member.uid != user.uid)) return;
-
-    group.removeUser(user);
-    if (group.members.isEmpty) {
-      return GroupService.instance.deleteGroup(group.id);
-    }
-
-    return GroupService.instance.saveGroup(group);
   }
 
   bool canMark(Expense expense) => expense.canBeMarkedBy(this.user.uid);

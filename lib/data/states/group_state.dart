@@ -1,24 +1,20 @@
-
 import 'package:statera/data/models/group.dart';
 
-class GroupState {
-  Group group;
-  bool isLoading;
-  Object? error;
-
-  GroupState({
-    required this.group,
-    this.isLoading = false,
-    this.error,
-  });
-
-  bool get hasError => error != null;
+abstract class GroupState {
+  GroupState();
 }
 
 class GroupLoadingState extends GroupState {
-  GroupLoadingState() : super(group: Group.fake(), isLoading: true);
+  GroupLoadingState() : super();
+}
+
+class GroupLoadedState extends GroupState {
+  Group group;
+
+  GroupLoadedState({required this.group}) : super();
 }
 
 class GroupErrorState extends GroupState {
-  GroupErrorState(Object? error) : super(group: Group.fake(), error: error);
+  Object? error;
+  GroupErrorState({required this.error}) : super();
 }

@@ -1,15 +1,11 @@
-import 'package:intl/intl.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 String getRandomLetter() {
   int asciiCode = 97 + Random().nextInt(26);
   return String.fromCharCode(asciiCode);
-}
-
-String toStringPrice(double value) {
-  return "\$${value.toStringAsFixed(2)}";
 }
 
 String? toStringDate(DateTime? date) {
@@ -58,7 +54,7 @@ void showSnackBar(
       content: Text(content),
       margin: EdgeInsets.all(8),
       backgroundColor: color,
-      duration: Duration(seconds: 3),
+      duration: duration,
       behavior: SnackBarBehavior.floating,
     ),
   );

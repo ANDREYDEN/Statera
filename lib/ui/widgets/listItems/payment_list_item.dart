@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/utils/helpers.dart';
@@ -18,10 +20,12 @@ class PaymentListItem extends StatelessWidget {
     Color paymentColor =
         payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
 
+    final groupCubit = context.read<GroupCubit>();
+
     return ListTile(
       isThreeLine: payment.hasRelatedExpense,
       title: Text(
-        "\$${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+        "${groupCubit.loadedState.group.currencySign}${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
         style: TextStyle(color: paymentColor),
       ),
       leading: Icon(

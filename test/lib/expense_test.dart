@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/assignee.dart';
 import 'package:statera/data/models/author.dart';
@@ -348,34 +347,6 @@ void main() {
           expense.date!.difference(firestoreData['date']),
           lessThan(Duration(seconds: 1)),
         );
-      });
-
-      test('expense can be created from a Firestore object', () {
-        var item = Item.fake();
-        var testData = {
-          "groupId": '123',
-          "name": "foo",
-          "items": [item.toFirestore()],
-          "author": author.toFirestore(),
-          "assigneeIds": [],
-          "assignees": [],
-          "unmarkedAssigneeIds": [],
-          "date": Timestamp.now()
-        };
-
-        var id = '123';
-        var expense = Expense.fromFirestore(testData, id);
-
-        expect(expense.id, id);
-        expect(expense.name, testData['name']);
-        expect(expense.author.uid, author.uid);
-        expect(
-          DateTime.parse((testData['date'] as Timestamp).toDate().toString())
-              .difference(expense.date!),
-          lessThan(Duration(seconds: 1)),
-        );
-        expect(expense.items, hasLength(1));
-        expect(expense.items.first.id, item.id);
       });
     });
   });

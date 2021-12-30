@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
+import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -17,6 +19,7 @@ class ExpenseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     AuthenticationViewModel authVm =
         Provider.of<AuthenticationViewModel>(context);
+    final groupCubit = context.read<GroupCubit>();
 
     return GestureDetector(
       onTap: () {
@@ -76,15 +79,15 @@ class ExpenseListItem extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          toStringPrice(this
+                        PriceText(
+                          value: this
                               .expense
-                              .getConfirmedTotalForUser(authVm.user.uid)),
-                          style: TextStyle(fontSize: 24),
+                              .getConfirmedTotalForUser(authVm.user.uid),
+                          textStyle: TextStyle(fontSize: 24),
                         ),
-                        Text(
-                          toStringPrice(this.expense.total),
-                          style: TextStyle(fontSize: 12),
+                        PriceText(
+                          value: this.expense.total,
+                          textStyle: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -94,14 +97,12 @@ class ExpenseListItem extends StatelessWidget {
                   ProtectedElevatedButton(
                     onPressed: () {
                       snackbarCatch(
-                        context,
+                        GroupPage.scaffoldKey.currentContext!,
                         () async {
-                          await ExpenseService.instance.finalizeExpense(expense);
-                          final group = await GroupService.instance
-                              .getExpenseGroupStream(expense)
-                              .first;
-                          group.updateBalance(expense);
-                          await GroupService.instance.saveGroup(group);
+                          // TODO: use transaction
+                          await ExpenseService.instance
+                              .finalizeExpense(expense);
+                          groupCubit.updateBalance(expense);
                         },
                         successMessage:
                             "The expense is now finalized. Participants' balances updated.",

@@ -2,22 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/data/models/author.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/dialogs/assignee_picker_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/author_change_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/receipt_scan_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/dialogs/expense_settings_dialog.dart';
 import 'package:statera/ui/widgets/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:statera/utils/formatters.dart';
-import 'package:statera/utils/helpers.dart';
+import 'package:statera/ui/widgets/price_text.dart';
+import 'package:statera/utils/utils.dart';
 
 class ExpensePage extends StatelessWidget {
   static const String route = "/expense";
@@ -28,171 +24,178 @@ class ExpensePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
-    return StreamProvider<Expense>.value(
-      value: ExpenseService.instance.listenForExpense(expenseId),
-      initialData: Expense.empty(),
-      // catchError: (context, error) => Text(error.toString()),
-      child: Consumer<Expense>(
-        builder: (context, expense, _) {
-          return PageScaffold(
-            onFabPressed: authVm.canUpdate(expense)
-                ? () => _handleCreateItem(context, expense)
-                : null,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // ExpenseStages(expense: expense),
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          authVm.getExpenseColor(expense),
-                          Theme.of(context).colorScheme.surface,
-                        ],
-                        stops: [0, 0.8],
-                      ),
+    return Consumer<Expense>(
+      builder: (context, expense, _) {
+        return PageScaffold(
+          onFabPressed: authVm.canUpdate(expense)
+              ? () => _handleCreateItem(context, expense)
+              : null,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: _expenseAction(
+                context,
+                expense,
+                authVm,
+                () => showDialog(
+                  context: context,
+                  builder: (_) => ExpenseSettingsDialog(expense: expense),
+                ),
+              ),
+            )
+          ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ExpenseStages(expense: expense),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        authVm.getExpenseColor(expense),
+                        Theme.of(context).colorScheme.surface,
+                      ],
+                      stops: [0, 0.8],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  expense.name,
-                                  softWrap: false,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 32,
-                                  ),
-                                  overflow: TextOverflow.fade,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                expense.name,
+                                softWrap: false,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 32,
+                                ),
+                                overflow: TextOverflow.fade,
+                              ),
+                            ),
+                            Card(
+                              color: Colors.grey[600],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 5,
+                                ),
+                                child: PriceText(
+                                  value: expense.total,
+                                  textStyle: TextStyle(color: Colors.white),
                                 ),
                               ),
-                              Card(
-                                color: Colors.grey[600],
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 5,
-                                  ),
-                                  child: Text(
-                                    toStringPrice(expense.total),
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.schedule, size: 20),
-                              TextButton(
-                                onPressed: _expenseAction(
-                                  context,
-                                  expense,
-                                  authVm,
-                                  () async {
-                                    DateTime? newDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate:
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                              0),
-                                      lastDate: DateTime.now().add(
-                                        Duration(days: 30),
-                                      ),
-                                    );
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.schedule, size: 20),
+                            TextButton(
+                              onPressed: _expenseAction(
+                                context,
+                                expense,
+                                authVm,
+                                () async {
+                                  DateTime? newDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate:
+                                        DateTime.fromMillisecondsSinceEpoch(0),
+                                    lastDate: DateTime.now().add(
+                                      Duration(days: 30),
+                                    ),
+                                  );
 
-                                    if (newDate == null) return;
+                                  if (newDate == null) return;
 
-                                    expense.date = newDate;
-                                    await ExpenseService.instance
-                                        .updateExpense(expense);
-                                  },
-                                ),
-                                child: Text(
-                                  toStringDate(expense.date) ?? 'Not set',
-                                ),
+                                  expense.date = newDate;
+                                  await ExpenseService.instance
+                                      .updateExpense(expense);
+                                },
                               ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              AuthorAvatar(
-                                author: expense.author,
+                              child: Text(
+                                toStringDate(expense.date) ?? 'Not set',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AuthorAvatar(
+                              author: expense.author,
+                              onTap: _expenseAction(
+                                context,
+                                expense,
+                                authVm,
+                                () async {
+                                  Author? newAuthor = await showDialog<Author>(
+                                    context: context,
+                                    builder: (context) => AuthorChangeDialog(
+                                      expense: expense,
+                                    ),
+                                  );
+
+                                  if (newAuthor == null) return;
+
+                                  expense.author = newAuthor;
+                                  await ExpenseService.instance
+                                      .updateExpense(expense);
+                                },
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward),
+                            Expanded(
+                              child: GestureDetector(
                                 onTap: _expenseAction(
                                   context,
                                   expense,
                                   authVm,
-                                  () async {
-                                    Author? newAuthor =
-                                        await showDialog<Author>(
+                                  () {
+                                    showDialog(
                                       context: context,
-                                      builder: (context) => AuthorChangeDialog(
+                                      builder: (context) =>
+                                          AssigneePickerDialog(
                                         expense: expense,
                                       ),
                                     );
-
-                                    if (newAuthor == null) return;
-
-                                    expense.author = newAuthor;
-                                    await ExpenseService.instance
-                                        .updateExpense(expense);
                                   },
                                 ),
+                                child: AssigneeList(),
                               ),
-                              Icon(Icons.arrow_forward),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: _expenseAction(
-                                    context,
-                                    expense,
-                                    authVm,
-                                    () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            AssigneePickerDialog(
-                                          expense: expense,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  child: AssigneeList(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                if (expense.hasNoItems)
-                  ElevatedButton.icon(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => ReceiptScanDialog(expense: expense),
-                    ),
-                    label: Text('Upload receipt'),
-                    icon: Icon(Icons.photo_camera),
+              ),
+              if (expense.hasNoItems)
+                ElevatedButton.icon(
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (_) => ReceiptScanDialog(expense: expense),
                   ),
-                Flexible(
-                  child: expense.hasNoItems
-                      ? ListEmpty(text: 'Add items to this expense')
-                      : ItemsList(),
+                  label: Text('Upload receipt'),
+                  icon: Icon(Icons.photo_camera),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              Flexible(
+                child: expense.hasNoItems
+                    ? ListEmpty(text: 'Add items to this expense')
+                    : ItemsList(),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -234,6 +237,7 @@ class ExpensePage extends StatelessWidget {
           ));
           await ExpenseService.instance.updateExpense(expense);
         },
+        allowAddAnother: true,
       ),
     );
   }
