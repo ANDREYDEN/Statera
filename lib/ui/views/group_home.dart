@@ -83,7 +83,7 @@ class GroupHome extends StatelessWidget {
                 authVm.user.uid, groupCubit.loadedState.group.id),
             child: Consumer<Map<Author, double>>(
               builder: (_, owings, __) => owings.isEmpty
-                  ? ListEmpty(text: 'Nobody here accept you...')
+                  ? ListEmpty(text: 'Nobody here except you...')
                   : ListView.builder(
                       itemCount: owings.length,
                       itemBuilder: (context, index) {

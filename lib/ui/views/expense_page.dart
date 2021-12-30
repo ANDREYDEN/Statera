@@ -33,9 +33,14 @@ class ExpensePage extends StatelessWidget {
           actions: [
             IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (_) => ExpenseSettingsDialog(expense: expense),
+              onPressed: _expenseAction(
+                context,
+                expense,
+                authVm,
+                () => showDialog(
+                  context: context,
+                  builder: (_) => ExpenseSettingsDialog(expense: expense),
+                ),
               ),
             )
           ],

@@ -75,16 +75,20 @@ class ExpenseService extends Firestore {
 
   Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
     var expensesSnap = await _expensesQuery(groupId: groupId).get();
-    List<Expense> expenses =
+    final expenses =
         expensesSnap.docs.map((doc) => Expense.fromSnapshot(doc)).toList();
-    var outstandingExpenses =
-        expenses.where((expense) => expense.canReceiveAssignees);
-    outstandingExpenses.forEach((expense) {
-      expense.addAssignee(Assignee(uid: user.uid));
-    });
+
+    for (var expense in expenses) {
+      final containsUser = expense.assignees.any((a) => a.uid == user.uid);
+      if (expense.canReceiveAssignees &&
+          expense.acceptNewMembers &&
+          !containsUser) {
+        expense.addAssignee(Assignee(uid: user.uid));
+      }
+    }
 
     await Future.wait(
-      outstandingExpenses.map((expense) => saveExpense(expense)),
+      expenses.map((expense) => saveExpense(expense)),
     );
   }
 

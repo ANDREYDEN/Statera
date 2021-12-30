@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/widgets/protected_elevated_button.dart';
 
 class ExpenseSettingsDialog extends StatefulWidget {
   final Expense expense;
@@ -60,7 +61,7 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
             ),
           ),
         ),
-        ElevatedButton(
+        ProtectedElevatedButton(
           onPressed: () async {
             widget.expense.acceptNewMembers = _automaticallyAddNewMembers;
             await ExpenseService.instance.saveExpense(widget.expense);
