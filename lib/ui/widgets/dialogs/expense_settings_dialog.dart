@@ -28,25 +28,15 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
     return AlertDialog(
       content: Column(
         children: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _automaticallyAddNewMembers = !_automaticallyAddNewMembers;
-                  });
-                },
-                icon: Icon(
-                  _automaticallyAddNewMembers
-                      ? Icons.check_box_rounded
-                      : Icons.check_box_outline_blank_rounded,
-                ),
-              ),
-              Flexible(
-                child: Text('Automatically add new members to this expense'),
-              )
-            ],
-          )
+          SwitchListTile(
+            value: _automaticallyAddNewMembers,
+            onChanged: (isOn) {
+              setState(() {
+                _automaticallyAddNewMembers = !_automaticallyAddNewMembers;
+              });
+            },
+            title: Text('Automatically add new members to this expense'),
+          ),
         ],
       ),
       actions: [
