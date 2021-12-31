@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/group_service.dart';
-import 'package:statera/data/states/group_state.dart';
+import 'package:statera/business_logic/group/group_state.dart';
 import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/ui/widgets/listItems/owing_list_item.dart';

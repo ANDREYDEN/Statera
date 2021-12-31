@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/states/group_state.dart';
+import 'package:statera/business_logic/group/group_state.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class PriceText extends StatelessWidget {

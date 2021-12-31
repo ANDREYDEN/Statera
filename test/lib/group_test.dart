@@ -1,19 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:statera/data/models/group.dart';
 
-class MockUser extends Mock implements User {
-  MockUser();
-
-  @override
-  String get uid => "145";
-}
+class MockUser extends Mock implements User {}
 
 void main() {
+  var mockUser = MockUser();
+
+  setUp(() {
+    when(() => mockUser.uid).thenReturn("145");
+  });
+
   test("can add a member to the group", () {
     var group = Group.fake();
-    var mockUser = MockUser();
 
     group.addUser(mockUser);
 
