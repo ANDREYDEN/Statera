@@ -2,8 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth.dart';
-import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/group_service.dart';
 
 class AuthenticationViewModel {
   User? _user;
@@ -61,24 +59,6 @@ class AuthenticationViewModel {
       }
     }
     return Colors.blue[200]!;
-  }
-
-  Future<void> createGroup(Group newGroup) async {
-    newGroup.generateCode();
-    newGroup.addUser(user);
-    await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
-  }
-
-  Future<void> joinGroup(String groupCode) async {
-    var group = await GroupService.instance.getGroup(groupCode);
-    if (group.members.any((member) => member.uid == user.uid)) return;
-
-    group.addUser(user);
-    await GroupService.instance.groupsCollection
-        .doc(group.id)
-        .update(group.toFirestore());
-
-    await ExpenseService.instance.addUserToOutstandingExpenses(user, group.id);
   }
 
   bool canMark(Expense expense) => expense.canBeMarkedBy(this.user.uid);

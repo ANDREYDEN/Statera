@@ -5,10 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/404.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/views/group_list.dart';
@@ -107,44 +107,41 @@ class _StateraState extends State<Statera> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<AuthenticationViewModel>(
-      create: (context) => AuthenticationViewModel(),
-      builder: (context, _) {
-        return MaterialApp(
-          title: kAppName,
-          theme: theme,
-          darkTheme: darkTheme,
-          themeMode: ThemeMode.system,
-          initialRoute: GroupList.route,
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (context) {
-                var route = settings.name ?? '/404';
-                for (PagePath path in _paths) {
-                  final regExpPattern = RegExp(path.pattern);
-                  if (regExpPattern.hasMatch(route)) {
-                    final firstMatch = regExpPattern.firstMatch(route);
-                    final matches = firstMatch?.groups(
-                      List.generate(
-                          firstMatch.groupCount, (index) => index + 1),
-                    );
-                    return SafeArea(
-                      child: path.isPublic
-                          ? path.builder(context, matches)
-                          : AuthGuard(
-                              originalRoute: route,
-                              builder: () => path.builder(context, matches),
-                            ),
-                    );
-                  }
+    return BlocProvider(
+      create: (context) => AuthBloc(),
+      child: MaterialApp(
+        title: kAppName,
+        theme: theme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
+        initialRoute: GroupList.route,
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (context) {
+              var route = settings.name ?? '/404';
+              for (PagePath path in _paths) {
+                final regExpPattern = RegExp(path.pattern);
+                if (regExpPattern.hasMatch(route)) {
+                  final firstMatch = regExpPattern.firstMatch(route);
+                  final matches = firstMatch?.groups(
+                    List.generate(firstMatch.groupCount, (index) => index + 1),
+                  );
+                  return SafeArea(
+                    child: path.isPublic
+                        ? path.builder(context, matches)
+                        : AuthGuard(
+                            originalRoute: route,
+                            builder: () => path.builder(context, matches),
+                          ),
+                  );
                 }
-                return PageNotFound();
-              },
-            );
-          },
-        );
-      },
+              }
+              return PageNotFound();
+            },
+          );
+        },
+      ),
     );
   }
 }

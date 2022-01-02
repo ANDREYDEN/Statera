@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/auth.dart';
 import 'package:statera/data/services/group_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/listItems/group_list_item.dart';
@@ -25,8 +26,7 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   TextEditingController joinGroupCodeController = TextEditingController();
 
-  AuthenticationViewModel get authVm =>
-      Provider.of<AuthenticationViewModel>(context, listen: false);
+  User? get user => context.select((AuthBloc auth) => auth.state.user);
 
   @override
   Widget build(BuildContext context) {
@@ -36,61 +36,62 @@ class _GroupListState extends State<GroupList> {
         IconButton(
           onPressed: () {
             snackbarCatch(context, () {
-              Auth.instance.signOut();
+              context.read<AuthBloc>().add(LogoutRequested());
             });
           },
           icon: Icon(Icons.logout),
         ),
       ],
       onFabPressed: handleCreateGroup,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
+      child: user == null
+          ? Container()
+          : Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: joinGroupCodeController,
-                    decoration: InputDecoration(labelText: "Group code"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: joinGroupCodeController,
+                          decoration: InputDecoration(labelText: "Group code"),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          snackbarCatch(context, () {
+                            GroupService.instance
+                                .joinGroup(joinGroupCodeController.text, user!);
+                            joinGroupCodeController.clear();
+                          });
+                        },
+                        child: Text("Join"),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    snackbarCatch(context, () {
-                      authVm.joinGroup(
-                        joinGroupCodeController.text,
-                      );
-                      joinGroupCodeController.clear();
-                    });
-                  },
-                  child: Text("Join"),
+                Expanded(
+                  child: CustomStreamBuilder<List<Group>>(
+                    stream: GroupService.instance.userGroupsStream(user!.uid),
+                    builder: (context, groups) {
+                      return groups.isEmpty
+                          ? ListEmpty(text: "Join or create a group!")
+                          : ListView.builder(
+                              itemCount: groups.length,
+                              itemBuilder: (context, index) {
+                                var group = groups[index];
+                                return GestureDetector(
+                                  onLongPress: () => handleEditGroup(group),
+                                  child: GroupListItem(group: group),
+                                );
+                              },
+                            );
+                    },
+                  ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: CustomStreamBuilder<List<Group>>(
-              stream: GroupService.instance.userGroupsStream(authVm.user.uid),
-              builder: (context, groups) {
-                return groups.isEmpty
-                    ? ListEmpty(text: "Join or create a group!")
-                    : ListView.builder(
-                        itemCount: groups.length,
-                        itemBuilder: (context, index) {
-                          var group = groups[index];
-                          return GestureDetector(
-                            onLongPress: () => handleEditGroup(group),
-                            child: GroupListItem(group: group),
-                          );
-                        },
-                      );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -113,6 +114,8 @@ class _GroupListState extends State<GroupList> {
   }
 
   void handleCreateGroup() {
+    if (user == null) return;
+
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -125,7 +128,7 @@ class _GroupListState extends State<GroupList> {
         ],
         onSubmit: (values) async {
           var newGroup = Group(name: values["group_name"]!);
-          await authVm.createGroup(newGroup);
+          await GroupService.instance.createGroup(newGroup, user!);
         },
       ),
     );
