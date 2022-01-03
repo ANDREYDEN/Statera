@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
@@ -23,11 +23,16 @@ class ExpensePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
+    final authBloc = context.read<AuthBloc>();
+
     return Consumer<Expense>(
       builder: (context, expense, _) {
+        if (authBloc.state.status == AuthStatus.unauthenticated) {
+          return PageScaffold(child: Text('Unauthorized'));
+        }
+
         return PageScaffold(
-          onFabPressed: authVm.canUpdate(expense)
+          onFabPressed: expense.canBeUpdatedBy(authBloc.state.user!.uid)
               ? () => _handleCreateItem(context, expense)
               : null,
           actions: [
@@ -36,7 +41,6 @@ class ExpensePage extends StatelessWidget {
               onPressed: _expenseAction(
                 context,
                 expense,
-                authVm,
                 () => showDialog(
                   context: context,
                   builder: (_) => ExpenseSettingsDialog(expense: expense),
@@ -55,7 +59,7 @@ class ExpensePage extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        authVm.getExpenseColor(expense),
+                        authBloc.getExpenseColor(expense),
                         Theme.of(context).colorScheme.surface,
                       ],
                       stops: [0, 0.8],
@@ -101,7 +105,6 @@ class ExpensePage extends StatelessWidget {
                               onPressed: _expenseAction(
                                 context,
                                 expense,
-                                authVm,
                                 () async {
                                   DateTime? newDate = await showDatePicker(
                                     context: context,
@@ -134,7 +137,6 @@ class ExpensePage extends StatelessWidget {
                               onTap: _expenseAction(
                                 context,
                                 expense,
-                                authVm,
                                 () async {
                                   Author? newAuthor = await showDialog<Author>(
                                     context: context,
@@ -157,7 +159,6 @@ class ExpensePage extends StatelessWidget {
                                 onTap: _expenseAction(
                                   context,
                                   expense,
-                                  authVm,
                                   () {
                                     showDialog(
                                       context: context,
@@ -245,11 +246,11 @@ class ExpensePage extends StatelessWidget {
   _expenseAction(
     BuildContext context,
     Expense expense,
-    AuthenticationViewModel authVm,
     Function action,
   ) {
     return () {
-      if (!expense.canBeUpdatedBy(authVm.user.uid)) {
+      final user = context.select((AuthBloc authBloc) => authBloc.state.user);
+      if (user == null || !expense.canBeUpdatedBy(user.uid)) {
         final reason = expense.completed
             ? 'This expense can no longer be edited'
             : "You don't have permission to edit this expense";

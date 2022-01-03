@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/listItems/item_list_item.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
@@ -17,10 +17,12 @@ class ItemsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationViewModel authVm =
-        Provider.of<AuthenticationViewModel>(context, listen: false);
-
+    final user = context.select((AuthBloc authBloc) => authBloc.state.user);
     Expense expense = Provider.of<Expense>(context);
+
+    if (user == null) {
+      return Container();
+    }
 
     return ListView.builder(
       itemCount: expense.items.length,
@@ -29,7 +31,7 @@ class ItemsList extends StatelessWidget {
 
         return OptionallyDismissible(
           key: Key(item.hashCode.toString()),
-          isDismissible: authVm.canUpdate(expense),
+          isDismissible: expense.canBeUpdatedBy(user.uid),
           onDismissed: (_) async {
             expense.items.removeAt(index);
             await ExpenseService.instance.updateExpense(expense);
@@ -37,21 +39,14 @@ class ItemsList extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: GestureDetector(
-              onLongPress: () => handleEditItem(
-                context,
-                expense,
-                item,
-                authVm,
-              ),
+              onLongPress: () =>
+                  handleEditItem(context, expense, item, user.uid),
               child: ItemListItem(
                 item: item,
                 onChangePartition: (parts) async {
-                  if (!authVm.canMark(expense)) return;
+                  if (!expense.canBeMarkedBy(user.uid)) return;
 
-                  expense.items[index].setAssigneeDecision(
-                    authVm.user.uid,
-                    parts,
-                  );
+                  expense.items[index].setAssigneeDecision(user.uid, parts);
                   await ExpenseService.instance.updateExpense(expense);
                 },
               ),
@@ -62,13 +57,8 @@ class ItemsList extends StatelessWidget {
     );
   }
 
-  handleEditItem(
-    BuildContext context,
-    Expense expense,
-    Item item,
-    AuthenticationViewModel authVm,
-  ) {
-    if (!authVm.canUpdate(expense)) return;
+  handleEditItem(BuildContext context, Expense expense, Item item, String uid) {
+    if (!expense.canBeUpdatedBy(uid)) return;
 
     showDialog(
       context: context,

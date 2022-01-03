@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/payment_dialog.dart';
@@ -31,7 +31,11 @@ class PaymentList extends StatelessWidget {
       return PageScaffold(child: Text("Something went wrong"));
     }
 
-    var authVm = Provider.of<AuthenticationViewModel>(context);
+    var user = context.select((AuthBloc authBloc) => authBloc.state.user);
+
+    if (user == null) {
+      return PageScaffold(child: Text("Unauthorized"));
+    }
 
     return CustomStreamBuilder<Group?>(
       stream: GroupService.instance.groupStream(this.groupId),
@@ -40,7 +44,7 @@ class PaymentList extends StatelessWidget {
           return PageScaffold(child: Text('Group does not exist'));
         }
 
-        final balance = group.balance[authVm.user.uid]![otherMemberId]!;
+        final balance = group.balance[user.uid]![otherMemberId]!;
         var otherMember = group.getUser(this.otherMemberId!);
         return PageScaffold(
           title: "${otherMember.name} payments",
@@ -66,10 +70,10 @@ class PaymentList extends StatelessWidget {
                           context: context,
                           builder: (_) => PaymentDialog(
                             group: group,
-                            currentUid: authVm.user.uid,
+                            currentUid: user.uid,
                             payment: Payment(
                               groupId: group.id,
-                              payerId: authVm.user.uid,
+                              payerId: user.uid,
                               receiverId: this.otherMemberId!,
                               value: balance.abs(),
                             ),
@@ -85,11 +89,11 @@ class PaymentList extends StatelessWidget {
                           context: context,
                           builder: (_) => PaymentDialog(
                             group: group,
-                            currentUid: authVm.user.uid,
+                            currentUid: user.uid,
                             payment: Payment(
                               groupId: group.id,
                               payerId: this.otherMemberId!,
-                              receiverId: authVm.user.uid,
+                              receiverId: user.uid,
                               value: balance.abs(),
                             ),
                           ),
@@ -105,7 +109,7 @@ class PaymentList extends StatelessWidget {
                   stream: PaymentService.instance.paymentsStream(
                     groupId: groupId,
                     userId1: otherMemberId,
-                    userId2: authVm.user.uid,
+                    userId2: user.uid,
                   ),
                   builder: (context, payments) {
                     if (payments.isEmpty) {
@@ -130,7 +134,7 @@ class PaymentList extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return PaymentListItem(
                           payment: payments[index],
-                          receiverUid: authVm.user.uid,
+                          receiverUid: user.uid,
                         );
                       },
                     );

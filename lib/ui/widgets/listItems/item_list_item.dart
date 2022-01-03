@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/progress_bar.dart';
 
@@ -20,7 +20,10 @@ class ItemListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var authVm = Provider.of<AuthenticationViewModel>(context, listen: false);
+    final user = context.select((AuthBloc authBloc) => authBloc.state.user);
+
+    if (user == null) return Container();
+
     return IntrinsicHeight(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,45 +51,49 @@ class ItemListItem extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ElevatedButton(
-                      onPressed: () =>
-                          this.onChangePartition(authVm.getItemParts(item) - 1),
+                      onPressed: () => this.onChangePartition(
+                          item.getAssigneeParts(user.uid) - 1),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
-                        primary: !authVm.hasDecidedOn(item)
+                        primary: !item.isMarkedBy(user.uid)
                             ? Colors.grey[300]
-                            : authVm.hasDenied(item)
+                            : item.isMarkedBy(user.uid) &&
+                                    item.getAssigneeParts(user.uid) == 0
                                 ? Colors.red[400]
                                 : Colors.grey[500],
                         padding: EdgeInsets.all(0),
                       ),
                       child: Icon(
-                        !authVm.hasDecidedOn(item) || !item.isPartitioned
+                        !item.isMarkedBy(user.uid) || !item.isPartitioned
                             ? Icons.close
-                            : authVm.hasDenied(item)
+                            : item.isMarkedBy(user.uid) &&
+                                    item.getAssigneeParts(user.uid) == 0
                                 ? Icons.close
                                 : Icons.remove,
                         color: Colors.white,
                       ),
                     ),
                     Text(
-                        "${authVm.hasDecidedOn(item) ? authVm.getItemParts(item) : '-'}/${item.partition}"),
+                        "${item.isMarkedBy(user.uid) ? item.getAssigneeParts(user.uid) : '-'}/${item.partition}"),
                     ElevatedButton(
-                      onPressed: () =>
-                          this.onChangePartition(authVm.getItemParts(item) + 1),
+                      onPressed: () => this.onChangePartition(
+                          item.getAssigneeParts(user.uid) + 1),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
-                        primary: !authVm.hasDecidedOn(item)
+                        primary: !item.isMarkedBy(user.uid)
                             ? Colors.grey[300]
                             : item.undefinedParts == 0 &&
-                                    authVm.hasConfirmed(item)
+                                    item.isMarkedBy(user.uid) &&
+                                    item.getAssigneeParts(user.uid) > 0
                                 ? Colors.green[400]
                                 : Colors.grey[500],
                       ),
                       child: Icon(
-                        !authVm.hasDecidedOn(item) || !item.isPartitioned
+                        !item.isMarkedBy(user.uid) || !item.isPartitioned
                             ? Icons.check
                             : item.undefinedParts == 0 &&
-                                    authVm.hasConfirmed(item)
+                                    item.isMarkedBy(user.uid) &&
+                                    item.getAssigneeParts(user.uid) > 0
                                 ? Icons.check
                                 : Icons.add,
                         color: Colors.white,
@@ -101,11 +108,11 @@ class ItemListItem extends StatelessWidget {
                       progressParts: [
                         ProgressPart(
                           progress: item.confirmedParts -
-                              item.getAssigneeParts(authVm.user.uid),
+                              item.getAssigneeParts(user.uid),
                           color: Colors.grey[500],
                         ),
                         ProgressPart(
-                          progress: item.getAssigneeParts(authVm.user.uid),
+                          progress: item.getAssigneeParts(user.uid),
                           color: Colors.green[300],
                         ),
                         ProgressPart(

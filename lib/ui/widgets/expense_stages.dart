@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 
 
 class ExpenseStages extends StatelessWidget {
@@ -14,11 +14,11 @@ class ExpenseStages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationViewModel authVm =
-        Provider.of<AuthenticationViewModel>(context, listen: false);
+    var authBloc = context.read<AuthBloc>();
+
     return Row(
       children: [
-        for (var expenseStage in authVm.expenseStages)
+        for (var expenseStage in authBloc.expenseStages)
           Expanded(
             child: Opacity(
               opacity: expense.isIn(expenseStage) ? 1 : 0.7,

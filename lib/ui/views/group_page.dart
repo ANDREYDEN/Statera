@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/business_logic/group/group_state.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/views/expense_list.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/views/group_home.dart';
@@ -28,8 +29,7 @@ class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
-  AuthenticationViewModel get authVm =>
-      Provider.of<AuthenticationViewModel>(context, listen: false);
+  User? get user => context.select((AuthBloc b) => b.state.user);
 
   Widget build(BuildContext context) {
     return BlocBuilder<GroupCubit, GroupState>(
@@ -95,6 +95,7 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   void handleCreateExpense() {
+    if (user == null) return;
     final groupCubit = context.read<GroupCubit>();
     showDialog(
       context: context,
@@ -110,7 +111,7 @@ class _GroupPageState extends State<GroupPage> {
         closeAfterSubmit: false,
         onSubmit: (values) async {
           var newExpense = Expense(
-            author: Author.fromUser(this.authVm.user),
+            author: Author.fromUser(user!),
             name: values["expense_name"]!,
             groupId: groupCubit.loadedState.group.id,
           );

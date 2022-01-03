@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/views/expense_page.dart';
 import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -17,8 +17,7 @@ class ExpenseListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationViewModel authVm =
-        Provider.of<AuthenticationViewModel>(context);
+    AuthBloc authBloc = context.read<AuthBloc>();
     final groupCubit = context.read<GroupCubit>();
 
     return GestureDetector(
@@ -32,7 +31,7 @@ class ExpenseListItem extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                authVm.getExpenseColor(this.expense),
+                authBloc.getExpenseColor(this.expense),
                 Theme.of(context).colorScheme.surface,
               ],
               stops: [0, 0.8],
@@ -80,9 +79,8 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         PriceText(
-                          value: this
-                              .expense
-                              .getConfirmedTotalForUser(authVm.user.uid),
+                          value: this.expense.getConfirmedTotalForUser(
+                              authBloc.state.user!.uid),
                           textStyle: TextStyle(fontSize: 24),
                         ),
                         PriceText(
@@ -93,7 +91,7 @@ class ExpenseListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (expense.canBeFinalizedBy(authVm.user.uid))
+                if (expense.canBeFinalizedBy(authBloc.state.user!.uid))
                   ProtectedElevatedButton(
                     onPressed: () {
                       snackbarCatch(

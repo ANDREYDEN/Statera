@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 import 'package:statera/ui/widgets/custom_filter_chip.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
@@ -24,17 +24,20 @@ class _ExpenseListState extends State<ExpenseList> {
   late Stream<List<Expense>> _expenseStream;
   List<String> _filters = [];
 
-  AuthenticationViewModel get authVm =>
-      Provider.of<AuthenticationViewModel>(context, listen: false);
+  AuthBloc get authBloc => context.read<AuthBloc>();
 
   GroupCubit get groupCubit => context.read<GroupCubit>();
 
   @override
   void initState() {
     super.initState();
-    _filters = authVm.expenseStages.map((stage) => stage.name).toList();
-    _expenseStream = ExpenseService.instance.listenForRelatedExpenses(
-        authVm.user.uid, groupCubit.loadedState.group.id);
+    _filters = authBloc.expenseStages.map((stage) => stage.name).toList();
+    _expenseStream = authBloc.state.user == null
+        ? Stream.empty()
+        : ExpenseService.instance.listenForRelatedExpenses(
+            authBloc.state.user!.uid,
+            groupCubit.loadedState.group.id,
+          );
   }
 
   @override
@@ -45,7 +48,7 @@ class _ExpenseListState extends State<ExpenseList> {
         if (kIsWeb) SizedBox(height: 8),
         Row(
           children: [
-            for (var stage in authVm.expenseStages)
+            for (var stage in authBloc.expenseStages)
               Flexible(
                 child: CustomFilterChip(
                   label: stage.name,
@@ -57,7 +60,8 @@ class _ExpenseListState extends State<ExpenseList> {
               )
           ],
         ),
-        Expanded(child: buildExpensesList()),
+        if (authBloc.state.status == AuthStatus.authenticated)
+          Expanded(child: buildExpensesList()),
       ],
     );
   }
@@ -68,7 +72,7 @@ class _ExpenseListState extends State<ExpenseList> {
       builder: (context, expenses) {
         snackbarCatch(context, () {
           expenses.sort((firstExpense, secondExpense) {
-            for (var stage in authVm.expenseStages) {
+            for (var stage in authBloc.expenseStages) {
               if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
                 return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
               }
@@ -81,7 +85,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
           expenses = expenses
               .where(
-                (expense) => authVm.expenseStages.any(
+                (expense) => authBloc.expenseStages.any(
                   (stage) =>
                       _filters.contains(stage.name) && expense.isIn(stage),
                 ),
@@ -98,7 +102,8 @@ class _ExpenseListState extends State<ExpenseList> {
 
                   return OptionallyDismissible(
                     key: Key(expense.id!),
-                    isDismissible: authVm.canUpdate(expense),
+                    isDismissible:
+                        expense.canBeUpdatedBy(authBloc.state.user!.uid),
                     confirmation:
                         "Are you sure you want to delete this expense and all of its items?",
                     onDismissed: (_) {
