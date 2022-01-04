@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
@@ -16,9 +17,6 @@ import 'package:statera/ui/views/group_page.dart';
 import 'package:statera/ui/views/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
-
-import 'data/models/models.dart';
-import 'data/services/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,27 +64,19 @@ class _StateraState extends State<Statera> {
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
       builder: (context, matches) => BlocProvider<GroupCubit>(
-          create: (context) {
-            final groupCubit = GroupCubit();
-            groupCubit.load(matches?[0]);
-            return groupCubit;
-          },
-          child: GroupPage(groupId: matches?[0])),
+        create: (context) => GroupCubit()..load(matches?[0]),
+        child: GroupPage(groupId: matches?[0]),
+      ),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
       builder: (context, matches) => MultiProvider(
         providers: [
-          StreamProvider<Expense>.value(
-            value: ExpenseService.instance.listenForExpense(matches?[0]),
-            initialData: Expense.empty(),
+          BlocProvider<ExpenseBloc>(
+            create: (_) => ExpenseBloc()..load(matches?[0]),
           ),
           BlocProvider<GroupCubit>(
-            create: (context) {
-              final groupCubit = GroupCubit();
-              groupCubit.loadFromExpense(matches?[0]);
-              return groupCubit;
-            },
+            create: (_) => GroupCubit()..loadFromExpense(matches?[0]),
           )
         ],
         child: ExpensePage(expenseId: matches?[0]),
@@ -95,11 +85,7 @@ class _StateraState extends State<Statera> {
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
       builder: (context, matches) => BlocProvider<GroupCubit>(
-        create: (context) {
-          final groupCubit = GroupCubit();
-          groupCubit.load(matches?[0]);
-          return groupCubit;
-        },
+        create: (context) => GroupCubit()..load(matches?[0]),
         child: PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
       ),
     )

@@ -40,14 +40,15 @@ class GroupService extends Firestore {
   }
 
   Stream<Group?> groupStream(String? groupId) {
-    var groupStream = groupsCollection.doc(groupId).snapshots();
-    return groupStream.map((groupSnap) {
-      if (!groupSnap.exists) return null;
-      return Group.fromFirestore(
-        groupSnap.data() as Map<String, dynamic>,
-        id: groupSnap.id,
-      );
-    });
+    return groupsCollection
+        .doc(groupId)
+        .snapshots()
+        .map((groupSnap) => !groupSnap.exists
+            ? null
+            : Group.fromFirestore(
+                groupSnap.data() as Map<String, dynamic>,
+                id: groupSnap.id,
+              ));
   }
 
   Future<void> deleteGroup(String? groupId) async {

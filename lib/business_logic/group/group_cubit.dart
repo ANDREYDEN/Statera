@@ -14,7 +14,7 @@ class GroupCubit extends Cubit<GroupState> {
   // TODO: error handling
   GroupLoadedState get loadedState => state as GroupLoadedState;
 
-  load(String? groupId) {
+  void load(String? groupId) {
     _groupSubscription?.cancel();
     _groupSubscription = GroupService.instance
         .groupStream(groupId)

@@ -74,7 +74,7 @@ class Expense {
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
-  bool isAuthoredBy(String uid) => this.author.uid == uid;
+  bool isAuthoredBy(String? uid) => this.author.uid == uid;
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.finalized;
 

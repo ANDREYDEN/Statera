@@ -65,11 +65,11 @@ class ExpenseService extends Firestore {
     expensesCollection.doc(docRef.id).set(expense.toFirestore());
   }
 
-  Stream<Expense> listenForExpense(String? expenseId) {
+  Stream<Expense?> expenseStream(String? expenseId) {
     return expensesCollection
         .doc(expenseId)
         .snapshots()
-        .map<Expense>((snap) => Expense.fromSnapshot(snap));
+        .map((snap) => !snap.exists ? null : Expense.fromSnapshot(snap));
   }
 
   Future<void> addUserToOutstandingExpenses(String uid, String? groupId) async {

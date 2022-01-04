@@ -10,8 +10,6 @@ abstract class GroupsState extends Equatable {
 
 class GroupsLoading extends GroupsState {}
 
-class GroupsNotLoaded extends GroupsState {}
-
 class GroupsLoaded extends GroupsState {
   final List<Group> groups;
 
