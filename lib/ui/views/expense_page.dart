@@ -67,10 +67,8 @@ class ExpensePage extends StatelessWidget {
               if (expense.canBeUpdatedBy(authBloc.state.user!.uid))
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => ExpenseSettingsDialog(expense: expense),
-                  ),
+                  onPressed: () =>
+                      _handleSettingsClick(context, expenseBloc, authBloc),
                 )
             ],
             child: Column(
@@ -189,6 +187,24 @@ class ExpensePage extends StatelessWidget {
 
         return PageScaffold(child: Container());
       },
+    );
+  }
+
+  _handleSettingsClick(
+    BuildContext context,
+    ExpenseBloc expenseBloc,
+    AuthBloc authBloc,
+  ) {
+    expenseBloc.add(
+      UpdateRequested(
+        issuer: authBloc.state.user!,
+        update: (expense) async {
+          await showDialog(
+            context: context,
+            builder: (_) => ExpenseSettingsDialog(expense: expense),
+          );
+        },
+      ),
     );
   }
 

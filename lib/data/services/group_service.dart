@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/services.dart';
 
 class GroupService extends Firestore {
