@@ -12,8 +12,6 @@ class ExpenseLoaded extends ExpenseState {
   Expense expense;
 
   ExpenseLoaded({required this.expense}) : super();
-
-  bool get canBeUpdated => expense.canBeUpdatedBy(uid)
 }
 
 class ExpenseError extends ExpenseState {

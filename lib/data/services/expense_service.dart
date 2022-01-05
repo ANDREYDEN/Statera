@@ -61,8 +61,7 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> updateExpense(Expense expense) async {
-    var docRef = expensesCollection.doc(expense.id);
-    expensesCollection.doc(docRef.id).set(expense.toFirestore());
+    expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
   Stream<Expense?> expenseStream(String? expenseId) {
@@ -87,7 +86,7 @@ class ExpenseService extends Firestore {
     }
 
     await Future.wait(
-      expenses.map((expense) => saveExpense(expense)),
+      expenses.map((expense) => updateExpense(expense)),
     );
   }
 
@@ -107,10 +106,6 @@ class ExpenseService extends Firestore {
             ),
           )),
     );
-  }
-
-  Future<void> saveExpense(Expense expense) async {
-    return expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
   Future<void> deleteExpense(Expense expense) {

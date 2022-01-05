@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
@@ -88,6 +86,7 @@ class ExpensePage extends StatelessWidget {
                       padding: const EdgeInsets.all(15),
                       child: Column(
                         children: [
+                          // Name
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -117,6 +116,7 @@ class ExpensePage extends StatelessWidget {
                               ),
                             ],
                           ),
+                          // Date Picker
                           Row(
                             children: [
                               Icon(Icons.schedule, size: 20),
@@ -149,47 +149,54 @@ class ExpensePage extends StatelessWidget {
                               ),
                             ],
                           ),
+                          // Author
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               AuthorAvatar(
                                 author: expense.author,
-                                onTap: _expenseAction(
-                                  context,
-                                  expense,
-                                  () async {
-                                    Author? newAuthor =
-                                        await showDialog<Author>(
-                                      context: context,
-                                      builder: (context) => AuthorChangeDialog(
-                                        expense: expense,
-                                      ),
-                                    );
+                                onTap: () {
+                                  expenseBloc.add(
+                                    UpdateRequested(
+                                      issuer: authBloc.state.user!,
+                                      update: (expense) async {
+                                        Author? newAuthor =
+                                            await showDialog<Author>(
+                                          context: context,
+                                          builder: (_) => AuthorChangeDialog(
+                                              expense: expense),
+                                        );
+                                        if (newAuthor == null) return;
 
-                                    if (newAuthor == null) return;
-
-                                    expense.author = newAuthor;
-                                    await ExpenseService.instance
-                                        .updateExpense(expense);
-                                  },
-                                ),
+                                        expense.author = newAuthor;
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                               Icon(Icons.arrow_forward),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: _expenseAction(
-                                    context,
-                                    expense,
-                                    () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            AssigneePickerDialog(
-                                          expense: expense,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  onTap: () async {
+                                    expenseBloc.add(
+                                      UpdateRequested(
+                                        issuer: authBloc.state.user!,
+                                        update: (expense) async {
+                                          final newAssignees =
+                                              await showDialog<List<Assignee>>(
+                                            context: context,
+                                            builder: (context) =>
+                                                AssigneePickerDialog(
+                                              expense: expense,
+                                            ),
+                                          );
+                                          if (newAssignees == null) return;
+
+                                          expense.assignees = newAssignees;
+                                        },
+                                      ),
+                                    );
+                                  },
                                   child: AssigneeList(),
                                 ),
                               ),
@@ -265,26 +272,5 @@ class ExpensePage extends StatelessWidget {
         allowAddAnother: true,
       ),
     );
-  }
-
-  _expenseAction(
-    BuildContext context,
-    Expense expense,
-    Function action,
-  ) {
-    return () {
-      final user = context.select((AuthBloc authBloc) => authBloc.state.user);
-      if (user == null || !expense.canBeUpdatedBy(user.uid)) {
-        final reason = expense.completed
-            ? 'This expense can no longer be edited'
-            : "You don't have permission to edit this expense";
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(reason),
-          duration: Duration(seconds: 1),
-        ));
-        return;
-      }
-      action();
-    };
   }
 }

@@ -28,9 +28,10 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     if (state is ExpenseLoaded) {
       final expense = (state as ExpenseLoaded).expense;
       if (expense.canBeUpdatedBy(event.issuer.uid)) {
-        final updated = await event.update.call(expense);
-        if (updated) {
-          ExpenseService.instance.saveExpense(expense);
+        final hash = expense.hashCode;
+        await event.update.call(expense);
+        if (hash != expense.hashCode) {
+          ExpenseService.instance.updateExpense(expense);
         }
       }
     }

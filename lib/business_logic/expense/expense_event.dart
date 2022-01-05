@@ -11,7 +11,7 @@ class LoadRequested extends ExpenseEvent {}
 
 class UpdateRequested extends ExpenseEvent {
   final User issuer;
-  final FutureOr<bool> Function(Expense) update;
+  final FutureOr<void> Function(Expense) update;
 
   const UpdateRequested({required this.issuer, required this.update}) : super();
 

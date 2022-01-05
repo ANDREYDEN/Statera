@@ -1,12 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/custom_stream_builder.dart';
+import 'package:statera/ui/widgets/group_builder.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
   final Expense expense;
@@ -34,38 +30,34 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
       title: Text('Pick Assignees'),
       content: Container(
         width: 200,
-        child: CustomStreamBuilder<Group?>(
-            stream: GroupService.instance.getExpenseGroupStream(widget.expense),
-            builder: (context, group) {
-              if (group == null) {
-                return Text('Group does not exist');
-              }
-              
-              return ListView.builder(
-                itemCount: group.members.length,
-                itemBuilder: (context, index) {
-                  final member = group.members[index];
+        child: GroupBuilder(
+          builder: (context, group) {
+            return ListView.builder(
+              itemCount: group.members.length,
+              itemBuilder: (context, index) {
+                final member = group.members[index];
 
-                  return AuthorAvatar(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    author: member,
-                    borderColor: this._selectedUids.contains(member.uid)
-                        ? Colors.green
-                        : Colors.transparent,
-                    withName: true,
-                    onTap: () {
-                      setState(() {
-                        if (this._selectedUids.contains(member.uid)) {
-                          this._selectedUids.remove(member.uid);
-                        } else {
-                          this._selectedUids.add(member.uid);
-                        }
-                      });
-                    },
-                  );
-                },
-              );
-            }),
+                return AuthorAvatar(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  author: member,
+                  borderColor: this._selectedUids.contains(member.uid)
+                      ? Colors.green
+                      : Colors.transparent,
+                  withName: true,
+                  onTap: () {
+                    setState(() {
+                      if (this._selectedUids.contains(member.uid)) {
+                        this._selectedUids.remove(member.uid);
+                      } else {
+                        this._selectedUids.add(member.uid);
+                      }
+                    });
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
       actions: [
         ElevatedButton(

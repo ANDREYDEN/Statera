@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:statera/data/models/item.dart';
 
 import 'assignee.dart';
@@ -222,5 +224,34 @@ class Expense {
     snap["items"].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is Expense &&
+      other.id == id &&
+      other.groupId == groupId &&
+      listEquals(other.items, items) &&
+      listEquals(other.assignees, assignees) &&
+      other.name == name &&
+      other.author == author &&
+      other.date == date &&
+      other.finalizedDate == finalizedDate &&
+      other.acceptNewMembers == acceptNewMembers;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      groupId.hashCode ^
+      items.hashCode ^
+      assignees.hashCode ^
+      name.hashCode ^
+      author.hashCode ^
+      date.hashCode ^
+      finalizedDate.hashCode ^
+      acceptNewMembers.hashCode;
   }
 }

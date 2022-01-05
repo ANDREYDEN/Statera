@@ -1,5 +1,4 @@
-import 'package:statera/data/models/group.dart';
-
+part of 'group_cubit.dart';
 abstract class GroupState {
   GroupState();
 }

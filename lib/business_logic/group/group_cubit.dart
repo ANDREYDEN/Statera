@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/business_logic/group/group_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+part 'group_state.dart';
 
 class GroupCubit extends Cubit<GroupState> {
   GroupCubit() : super(GroupLoadingState());
