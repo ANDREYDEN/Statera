@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -49,7 +51,7 @@ class FieldData {
 
 class CRUDDialog extends StatefulWidget {
   final String title;
-  final Future Function(Map<String, String>) onSubmit;
+  final FutureOr<void> Function(Map<String, String>) onSubmit;
   final List<FieldData> fields;
   final bool closeAfterSubmit;
   final bool allowAddAnother;

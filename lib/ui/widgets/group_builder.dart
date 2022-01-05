@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/loader.dart';
+import 'package:statera/utils/utils.dart';
 
 class GroupBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Group) builder;
@@ -13,14 +14,13 @@ class GroupBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<GroupCubit, GroupState>(
       listener: (groupContext, state) {
-        ScaffoldMessenger.of(groupContext).showSnackBar(SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(
-            state is GroupErrorState
-                ? state.error.toString()
-                : 'Something went wrong while loading the group',
-          ),
-        ));
+        showSnackBar(
+          groupContext,
+          state is GroupErrorState
+              ? state.error.toString()
+              : 'Something went wrong while loading the group',
+          color: Colors.red,
+        );
       },
       listenWhen: (before, after) => after is GroupErrorState,
       builder: (groupContext, state) {

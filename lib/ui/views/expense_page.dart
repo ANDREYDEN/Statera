@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
@@ -28,9 +27,18 @@ class ExpensePage extends StatelessWidget {
     final expenseBloc = context.read<ExpenseBloc>();
 
     return BlocConsumer<ExpenseBloc, ExpenseState>(
-      listener: (_, state) {
-        // TODO: show snackbar
+      listener: (expenseContext, state) {
+        if (state is ExpenseLoaded && state.updateFailure != null) {
+          showSnackBar(
+            expenseContext,
+            state.updateFailure == ExpenseUpdateFailure.ExpenseFinalized
+                ? 'Expense is finalized and can no longer be edited'
+                : "You do'nt have access to edit this expense",
+          );
+        }
       },
+      listenWhen: (before, after) =>
+          before is ExpenseLoaded && after is ExpenseLoaded,
       builder: (context, expenseState) {
         if (authBloc.state.status == AuthStatus.unauthenticated) {
           return PageScaffold(child: Text('Unauthorized'));
@@ -53,7 +61,7 @@ class ExpensePage extends StatelessWidget {
 
           return PageScaffold(
             onFabPressed: expense.canBeUpdatedBy(authBloc.state.user!.uid)
-                ? () => _handleCreateItem(context, expense)
+                ? () => _handleCreateItem(context, expenseBloc, authBloc)
                 : null,
             actions: [
               if (expense.canBeUpdatedBy(authBloc.state.user!.uid))
@@ -116,32 +124,14 @@ class ExpensePage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // Date Picker
                           Row(
                             children: [
                               Icon(Icons.schedule, size: 20),
                               TextButton(
-                                onPressed: () => expenseBloc.add(
-                                  UpdateRequested(
-                                    issuer: authBloc.state.user!,
-                                    update: (expense) async {
-                                      DateTime? newDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate:
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                0),
-                                        lastDate: DateTime.now().add(
-                                          Duration(days: 30),
-                                        ),
-                                      );
-
-                                      if (newDate == null) return false;
-
-                                      expense.date = newDate;
-                                      return true;
-                                    },
-                                  ),
+                                onPressed: () => _handleUpdateDate(
+                                  context,
+                                  expenseBloc,
+                                  authBloc,
                                 ),
                                 child: Text(
                                   toStringDate(expense.date) ?? 'Not set',
@@ -149,54 +139,25 @@ class ExpensePage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // Author
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               AuthorAvatar(
                                 author: expense.author,
-                                onTap: () {
-                                  expenseBloc.add(
-                                    UpdateRequested(
-                                      issuer: authBloc.state.user!,
-                                      update: (expense) async {
-                                        Author? newAuthor =
-                                            await showDialog<Author>(
-                                          context: context,
-                                          builder: (_) => AuthorChangeDialog(
-                                              expense: expense),
-                                        );
-                                        if (newAuthor == null) return;
-
-                                        expense.author = newAuthor;
-                                      },
-                                    ),
-                                  );
-                                },
+                                onTap: () => _handleUpdateAuthor(
+                                  context,
+                                  expenseBloc,
+                                  authBloc,
+                                ),
                               ),
                               Icon(Icons.arrow_forward),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () async {
-                                    expenseBloc.add(
-                                      UpdateRequested(
-                                        issuer: authBloc.state.user!,
-                                        update: (expense) async {
-                                          final newAssignees =
-                                              await showDialog<List<Assignee>>(
-                                            context: context,
-                                            builder: (context) =>
-                                                AssigneePickerDialog(
-                                              expense: expense,
-                                            ),
-                                          );
-                                          if (newAssignees == null) return;
-
-                                          expense.assignees = newAssignees;
-                                        },
-                                      ),
-                                    );
-                                  },
+                                  onTap: () => _handleUpdateAssignees(
+                                    context,
+                                    expenseBloc,
+                                    authBloc,
+                                  ),
                                   child: AssigneeList(),
                                 ),
                               ),
@@ -231,7 +192,76 @@ class ExpensePage extends StatelessWidget {
     );
   }
 
-  _handleCreateItem(BuildContext context, Expense expense) {
+  _handleUpdateDate(
+    BuildContext context,
+    ExpenseBloc expenseBloc,
+    AuthBloc authBloc,
+  ) {
+    expenseBloc.add(
+      UpdateRequested(
+        issuer: authBloc.state.user!,
+        update: (expense) async {
+          DateTime? newDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+            lastDate: DateTime.now().add(Duration(days: 30)),
+          );
+          if (newDate == null) return;
+
+          expense.date = newDate;
+        },
+      ),
+    );
+  }
+
+  _handleUpdateAuthor(
+    BuildContext context,
+    ExpenseBloc expenseBloc,
+    AuthBloc authBloc,
+  ) {
+    expenseBloc.add(
+      UpdateRequested(
+        issuer: authBloc.state.user!,
+        update: (expense) async {
+          Author? newAuthor = await showDialog<Author>(
+            context: context,
+            builder: (_) => AuthorChangeDialog(expense: expense),
+          );
+          if (newAuthor == null) return;
+
+          expense.author = newAuthor;
+        },
+      ),
+    );
+  }
+
+  _handleUpdateAssignees(
+    BuildContext context,
+    ExpenseBloc expenseBloc,
+    AuthBloc authBloc,
+  ) async {
+    expenseBloc.add(
+      UpdateRequested(
+        issuer: authBloc.state.user!,
+        update: (expense) async {
+          final newAssignees = await showDialog<List<Assignee>>(
+            context: context,
+            builder: (context) => AssigneePickerDialog(expense: expense),
+          );
+          if (newAssignees == null) return;
+
+          expense.assignees = newAssignees;
+        },
+      ),
+    );
+  }
+
+  _handleCreateItem(
+    BuildContext context,
+    ExpenseBloc expenseBloc,
+    AuthBloc authBloc,
+  ) {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -261,13 +291,19 @@ class ExpensePage extends StatelessWidget {
             formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           ),
         ],
-        onSubmit: (values) async {
-          expense.addItem(Item(
-            name: values["item_name"]!,
-            value: double.parse(values["item_value"]!),
-            partition: int.parse(values["item_partition"]!),
-          ));
-          await ExpenseService.instance.updateExpense(expense);
+        onSubmit: (values) {
+          expenseBloc.add(
+            UpdateRequested(
+              issuer: authBloc.state.user!,
+              update: (expense) {
+                expense.addItem(Item(
+                  name: values["item_name"]!,
+                  value: double.parse(values["item_value"]!),
+                  partition: int.parse(values["item_partition"]!),
+                ));
+              },
+            ),
+          );
         },
         allowAddAnother: true,
       ),
