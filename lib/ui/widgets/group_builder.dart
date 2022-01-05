@@ -20,6 +20,7 @@ class GroupBuilder extends StatelessWidget {
               ? state.error.toString()
               : 'Something went wrong while loading the group',
           color: Colors.red,
+          duration: Duration.zero,
         );
       },
       listenWhen: (before, after) => after is GroupErrorState,

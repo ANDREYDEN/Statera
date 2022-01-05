@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/payment_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/payment_dialog.dart';
+import 'package:statera/ui/widgets/group_builder.dart';
 import 'package:statera/ui/widgets/listItems/payment_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -37,13 +36,8 @@ class PaymentList extends StatelessWidget {
       return PageScaffold(child: Text("Unauthorized"));
     }
 
-    return CustomStreamBuilder<Group?>(
-      stream: GroupService.instance.groupStream(this.groupId),
+    return GroupBuilder(
       builder: (context, group) {
-        if (group == null) {
-          return PageScaffold(child: Text('Group does not exist'));
-        }
-
         final balance = group.balance[user.uid]![otherMemberId]!;
         var otherMember = group.getUser(this.otherMemberId!);
         return PageScaffold(

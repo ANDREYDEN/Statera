@@ -33,12 +33,21 @@ class ExpensePage extends StatelessWidget {
             expenseContext,
             state.updateFailure == ExpenseUpdateFailure.ExpenseFinalized
                 ? 'Expense is finalized and can no longer be edited'
-                : "You do'nt have access to edit this expense",
+                : "You don't have access to edit this expense",
+          );
+        }
+
+        if (state is ExpenseError) {
+          showSnackBar(
+            context,
+            state.error.toString(),
+            duration: Duration.zero,
           );
         }
       },
       listenWhen: (before, after) =>
-          before is ExpenseLoaded && after is ExpenseLoaded,
+          (before is ExpenseLoaded && after is ExpenseLoaded) ||
+          after is ExpenseError,
       builder: (context, expenseState) {
         if (authBloc.state.status == AuthStatus.unauthenticated) {
           return PageScaffold(child: Text('Unauthorized'));
@@ -61,7 +70,7 @@ class ExpensePage extends StatelessWidget {
 
           return PageScaffold(
             onFabPressed: expense.canBeUpdatedBy(authBloc.state.user!.uid)
-                ? () => _handleCreateItem(context, expenseBloc, authBloc)
+                ? () => _handleNewItemClick(context, expenseBloc, authBloc)
                 : null,
             actions: [
               if (expense.canBeUpdatedBy(authBloc.state.user!.uid))
@@ -126,7 +135,7 @@ class ExpensePage extends StatelessWidget {
                             children: [
                               Icon(Icons.schedule, size: 20),
                               TextButton(
-                                onPressed: () => _handleUpdateDate(
+                                onPressed: () => _handleDateClick(
                                   context,
                                   expenseBloc,
                                   authBloc,
@@ -142,7 +151,7 @@ class ExpensePage extends StatelessWidget {
                             children: [
                               AuthorAvatar(
                                 author: expense.author,
-                                onTap: () => _handleUpdateAuthor(
+                                onTap: () => _handleAuthorClick(
                                   context,
                                   expenseBloc,
                                   authBloc,
@@ -151,7 +160,7 @@ class ExpensePage extends StatelessWidget {
                               Icon(Icons.arrow_forward),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => _handleUpdateAssignees(
+                                  onTap: () => _handleAssigneesClick(
                                     context,
                                     expenseBloc,
                                     authBloc,
@@ -208,7 +217,7 @@ class ExpensePage extends StatelessWidget {
     );
   }
 
-  _handleUpdateDate(
+  _handleDateClick(
     BuildContext context,
     ExpenseBloc expenseBloc,
     AuthBloc authBloc,
@@ -231,7 +240,7 @@ class ExpensePage extends StatelessWidget {
     );
   }
 
-  _handleUpdateAuthor(
+  _handleAuthorClick(
     BuildContext context,
     ExpenseBloc expenseBloc,
     AuthBloc authBloc,
@@ -252,7 +261,7 @@ class ExpensePage extends StatelessWidget {
     );
   }
 
-  _handleUpdateAssignees(
+  _handleAssigneesClick(
     BuildContext context,
     ExpenseBloc expenseBloc,
     AuthBloc authBloc,
@@ -273,7 +282,7 @@ class ExpensePage extends StatelessWidget {
     );
   }
 
-  _handleCreateItem(
+  _handleNewItemClick(
     BuildContext context,
     ExpenseBloc expenseBloc,
     AuthBloc authBloc,
