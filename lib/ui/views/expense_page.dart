@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -251,7 +252,10 @@ class ExpensePage extends StatelessWidget {
         update: (expense) async {
           Author? newAuthor = await showDialog<Author>(
             context: context,
-            builder: (_) => AuthorChangeDialog(expense: expense),
+            builder: (_) => BlocProvider<GroupCubit>.value(
+              value: context.read<GroupCubit>(),
+              child: AuthorChangeDialog(expense: expense),
+            ),
           );
           if (newAuthor == null) return;
 
@@ -265,14 +269,17 @@ class ExpensePage extends StatelessWidget {
     BuildContext context,
     ExpenseBloc expenseBloc,
     AuthBloc authBloc,
-  ) async {
+  ) {
     expenseBloc.add(
       UpdateRequested(
         issuer: authBloc.state.user!,
         update: (expense) async {
           final newAssignees = await showDialog<List<Assignee>>(
             context: context,
-            builder: (context) => AssigneePickerDialog(expense: expense),
+            builder: (_) => BlocProvider<GroupCubit>.value(
+              value: context.read<GroupCubit>(),
+              child: AssigneePickerDialog(expense: expense),
+            ),
           );
           if (newAssignees == null) return;
 

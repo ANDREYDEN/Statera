@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/loader.dart';
-import 'package:statera/utils/utils.dart';
 
 class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
@@ -12,28 +11,7 @@ class ExpenseBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ExpenseBloc, ExpenseState>(
-      listener: (expenseContext, state) {
-        if (state is ExpenseLoaded && state.updateFailure != null) {
-          showSnackBar(
-            expenseContext,
-            state.updateFailure == ExpenseUpdateFailure.ExpenseFinalized
-                ? 'Expense is finalized and can no longer be edited'
-                : "You don't have access to edit this expense",
-          );
-        }
-
-        if (state is ExpenseError) {
-          showSnackBar(
-            context,
-            state.error.toString(),
-            duration: Duration.zero,
-          );
-        }
-      },
-      listenWhen: (before, after) =>
-          (before is ExpenseLoaded && after is ExpenseLoaded) ||
-          after is ExpenseError,
+    return BlocBuilder<ExpenseBloc, ExpenseState>(
       builder: (expenseContext, state) {
         if (state is ExpenseLoading) {
           return Center(child: Loader());
