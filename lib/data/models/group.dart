@@ -13,6 +13,8 @@ class Group {
   String? code;
   String? _currencySign;
 
+  static const String kdefaultCurrencySign = '\$';
+
   Group({
     required this.name,
     this.code,
@@ -40,7 +42,7 @@ class Group {
     }
   }
 
-  String get currencySign => _currencySign ?? '\$';
+  String get currencySign => _currencySign ?? kdefaultCurrencySign;
 
   void generateCode() {
     code = "";

@@ -45,7 +45,7 @@ class _GroupPageState extends State<GroupPage> {
             key: GroupPage.scaffoldKey,
             title: groupState.group.name,
             onFabPressed:
-                _selectedNavBarItemIndex == 0 ? null : handleCreateExpense,
+                _selectedNavBarItemIndex == 0 ? null : _handleNewExpenseClick,
             bottomNavBar: BottomNavigationBar(
               iconSize: 36,
               items: [
@@ -92,8 +92,7 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  void handleCreateExpense() {
-    if (user == null) return;
+  void _handleNewExpenseClick() {
     final groupCubit = context.read<GroupCubit>();
     showDialog(
       context: context,
@@ -109,7 +108,7 @@ class _GroupPageState extends State<GroupPage> {
         closeAfterSubmit: false,
         onSubmit: (values) async {
           var newExpense = Expense(
-            author: Author.fromUser(user!),
+            author: Author.fromUser(this.user!),
             name: values["expense_name"]!,
             groupId: groupCubit.loadedState.group.id,
           );

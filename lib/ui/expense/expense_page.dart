@@ -322,6 +322,7 @@ class ExpensePage extends StatelessWidget {
             initialData: 1,
             validators: [FieldData.requiredValidator, FieldData.intValidator],
             formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
+            isAdvanced: true,
           ),
         ],
         onSubmit: (values) {

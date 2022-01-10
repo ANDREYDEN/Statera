@@ -13,6 +13,7 @@ import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/helpers.dart';
+import 'package:statera/utils/utils.dart';
 
 class GroupList extends StatefulWidget {
   static const String route = '/';
@@ -42,7 +43,7 @@ class _GroupListState extends State<GroupList> {
           icon: Icon(Icons.logout),
         ),
       ],
-      onFabPressed: handleCreateGroup,
+      onFabPressed: _handleNewGroupClick,
       child: user == null
           ? Container()
           : Column(
@@ -102,10 +103,11 @@ class _GroupListState extends State<GroupList> {
         title: "Edit Group",
         fields: [
           FieldData(
-              id: "group_name",
-              label: "Group Name",
-              initialData: group.name,
-              validators: [FieldData.requiredValidator])
+            id: "group_name",
+            label: "Group Name",
+            initialData: group.name,
+            validators: [FieldData.requiredValidator],
+          )
         ],
         onSubmit: (values) =>
             context.read<GroupCubit>().updateName(values["group_name"]!),
@@ -113,21 +115,30 @@ class _GroupListState extends State<GroupList> {
     );
   }
 
-  void handleCreateGroup() {
-    if (user == null) return;
-
+  void _handleNewGroupClick() {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
-        title: "New Group",
+        title: 'New Group',
         fields: [
           FieldData(
-              id: 'group_name',
-              label: "Group Name",
-              validators: [FieldData.requiredValidator])
+            id: 'group_name',
+            label: 'Group Name',
+            validators: [FieldData.requiredValidator],
+          ),
+          FieldData(
+            id: 'group_currency',
+            label: 'Group Currency',
+            initialData: Group.kdefaultCurrencySign,
+            formatters: [SingleCharacterTextInputFormatter()],
+            isAdvanced: true,
+          )
         ],
         onSubmit: (values) async {
-          var newGroup = Group(name: values["group_name"]!);
+          var newGroup = Group(
+            name: values['group_name']!,
+            currencySign: values['group_currency'],
+          );
           await GroupService.instance.createGroup(newGroup, user!);
         },
       ),

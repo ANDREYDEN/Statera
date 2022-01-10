@@ -92,17 +92,16 @@ class ItemsList extends StatelessWidget {
                   validators: [FieldData.requiredValidator],
                 ),
                 FieldData(
-                    id: "item_value",
-                    label: "Item Value",
-                    initialData: item.value,
-                    inputType: TextInputType.numberWithOptions(decimal: true),
-                    validators: [
-                      FieldData.requiredValidator,
-                      FieldData.doubleValidator
-                    ],
-                    formatters: [
-                      CommaReplacerTextInputFormatter()
-                    ]),
+                  id: "item_value",
+                  label: "Item Value",
+                  initialData: item.value,
+                  inputType: TextInputType.numberWithOptions(decimal: true),
+                  validators: [
+                    FieldData.requiredValidator,
+                    FieldData.doubleValidator
+                  ],
+                  formatters: [CommaReplacerTextInputFormatter()],
+                ),
               ],
               onSubmit: (values) async {
                 item.name = values["item_name"]!;

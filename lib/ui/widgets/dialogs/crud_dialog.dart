@@ -14,6 +14,7 @@ class FieldData {
   dynamic initialData;
   List<String Function(String)> validators;
   List<TextInputFormatter> formatters;
+  bool isAdvanced;
 
   FieldData({
     required this.id,
@@ -23,6 +24,7 @@ class FieldData {
     this.validators = const [],
     this.formatters = const [],
     this.inputType = TextInputType.name,
+    this.isAdvanced = false,
   }) {
     this.controller = controller ?? TextEditingController();
     resetController();
@@ -71,12 +73,43 @@ class CRUDDialog extends StatefulWidget {
 
 class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
+  bool _showAdvanced = false;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
-      content: Column(children: [...textFields]),
+      content: Container(
+        width: double.maxFinite,
+        child: ListView(
+          children: [
+            Column(children: [...getTextFields((f) => !f.isAdvanced)]),
+            if (widget.fields.any((f) => f.isAdvanced))
+              GestureDetector(
+                onTap: () => setState(() {
+                  _showAdvanced = !_showAdvanced;
+                }),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    children: [
+                      Text('Advanced'),
+                      Icon(
+                        _showAdvanced
+                            ? Icons.arrow_drop_up
+                            : Icons.arrow_drop_down,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Visibility(
+              visible: _showAdvanced,
+              child: Column(children: [...getTextFields((f) => f.isAdvanced)]),
+            ),
+          ],
+        ),
+      ),
       actions: [
         ProtectedElevatedButton(
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
@@ -88,9 +121,10 @@ class _CRUDDialogState extends State<CRUDDialog> {
     );
   }
 
-  Iterable<Widget> get textFields sync* {
-    for (var i = 0; i < widget.fields.length; i++) {
-      var field = widget.fields[i];
+  Iterable<Widget> getTextFields(bool Function(FieldData) criteria) sync* {
+    final selectedFields = widget.fields.where(criteria).toList();
+    for (var i = 0; i < selectedFields.length; i++) {
+      var field = selectedFields[i];
       yield TextField(
         autofocus: i == 0,
         focusNode: field.focusNode,
@@ -109,11 +143,11 @@ class _CRUDDialogState extends State<CRUDDialog> {
           });
         },
         onSubmitted: (_) {
-          var isLastField = i == widget.fields.length - 1;
+          var isLastField = i == selectedFields.length - 1;
           if (isLastField) {
             submit(closeAfterSubmit: widget.closeAfterSubmit);
           } else {
-            widget.fields[i + 1].focusNode.requestFocus();
+            selectedFields[i + 1].focusNode.requestFocus();
           }
         },
       );

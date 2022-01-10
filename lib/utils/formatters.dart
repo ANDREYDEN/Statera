@@ -16,3 +16,12 @@ class CommaReplacerTextInputFormatter extends TextInputFormatter {
     );
   }
 }
+
+class SingleCharacterTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) =>
+      newValue.text.length > 1 ? oldValue : newValue;
+}
