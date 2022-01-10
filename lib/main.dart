@@ -10,11 +10,11 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
-import 'package:statera/ui/views/404.dart';
-import 'package:statera/ui/views/expense_page.dart';
-import 'package:statera/ui/views/group_list.dart';
-import 'package:statera/ui/views/group_page.dart';
-import 'package:statera/ui/views/payment_list.dart';
+import 'package:statera/ui/routing/404.dart';
+import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
 

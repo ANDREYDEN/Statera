@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/group_builder.dart';
+import 'package:statera/ui/group/group_builder.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
   final Expense expense;

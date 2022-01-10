@@ -8,7 +8,7 @@ import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/listItems/group_list_item.dart';
+import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/constants.dart';

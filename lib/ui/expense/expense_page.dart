@@ -5,16 +5,17 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/widgets/assignee_list.dart';
+import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
-import 'package:statera/ui/widgets/dialogs/expense_settings_dialog.dart';
-import 'package:statera/ui/widgets/items_list.dart';
+import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/utils.dart';
+
+import 'dialogs/expense_dialogs.dart';
 
 class ExpensePage extends StatelessWidget {
   static const String route = "/expense";

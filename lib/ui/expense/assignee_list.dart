@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/expense_builder.dart';
-import 'package:statera/ui/widgets/group_builder.dart';
+import 'package:statera/ui/expense/expense_builder.dart';
+import 'package:statera/ui/group/group_builder.dart';
 
 class AssigneeList extends StatelessWidget {
   const AssigneeList({Key? key}) : super(key: key);

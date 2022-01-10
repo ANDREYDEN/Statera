@@ -5,8 +5,8 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/expense_builder.dart';
-import 'package:statera/ui/widgets/listItems/item_list_item.dart';
+import 'package:statera/ui/expense/expense_builder.dart';
+import 'package:statera/ui/expense/items/item_list_item.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 import 'package:statera/utils/utils.dart';
 

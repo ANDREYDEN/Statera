@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
-import 'group_list.dart';
+import '../groups/group_list.dart';
 
 class PageNotFound extends StatelessWidget {
   const PageNotFound({Key? key}) : super(key: key);

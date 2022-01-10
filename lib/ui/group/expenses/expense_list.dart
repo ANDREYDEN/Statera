@@ -8,7 +8,7 @@ import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/widgets/custom_filter_chip.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/listItems/expense_list_item.dart';
+import 'package:statera/ui/group/expenses/expense_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 import 'package:statera/utils/helpers.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/ui/views/expense_page.dart';
+import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {

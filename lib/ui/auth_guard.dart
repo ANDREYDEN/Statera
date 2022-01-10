@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/ui/views/sign_in.dart';
+import 'package:statera/ui/authentication/sign_in.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget Function() builder;

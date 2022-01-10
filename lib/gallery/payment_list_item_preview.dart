@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/ui/widgets/listItems/payment_list_item.dart';
+import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/theme.dart';
 
 main() {
