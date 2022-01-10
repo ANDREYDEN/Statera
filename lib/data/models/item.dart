@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import 'assignee_decision.dart';
@@ -105,5 +106,29 @@ class Item {
             (assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
         .toList();
     return item;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Item &&
+        other.id == id &&
+        other.name == name &&
+        other.value == value &&
+        other.partition == partition &&
+        listEquals(other.assignees, assignees);
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        value.hashCode ^
+        partition.hashCode ^
+        assignees.fold(
+          0,
+          (previousValue, element) => previousValue ^ element.hashCode,
+        );
   }
 }

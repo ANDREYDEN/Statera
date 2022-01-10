@@ -26,4 +26,16 @@ class AssigneeDecision {
       parts: data["parts"],
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is AssigneeDecision &&
+      other.uid == uid &&
+      other._parts == _parts;
+  }
+
+  @override
+  int get hashCode => uid.hashCode ^ _parts.hashCode;
 }

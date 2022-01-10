@@ -27,7 +27,7 @@ class Expense {
   List<Item> items = [];
   List<Assignee> assignees = [];
   late String name;
-  late Author author; // UID
+  late Author author;
   DateTime? date;
   DateTime? finalizedDate;
   late bool acceptNewMembers;
@@ -229,29 +229,33 @@ class Expense {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Expense &&
-      other.id == id &&
-      other.groupId == groupId &&
-      listEquals(other.items, items) &&
-      listEquals(other.assignees, assignees) &&
-      other.name == name &&
-      other.author == author &&
-      other.date == date &&
-      other.finalizedDate == finalizedDate &&
-      other.acceptNewMembers == acceptNewMembers;
+        other.id == id &&
+        other.groupId == groupId &&
+        listEquals(other.items, items) &&
+        listEquals(other.assignees, assignees) &&
+        other.name == name &&
+        other.author == author &&
+        other.date == date &&
+        other.finalizedDate == finalizedDate &&
+        other.acceptNewMembers == acceptNewMembers;
   }
+
+  int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
+
+  int get assigneesHash => assignees.fold(0, (cur, e) => cur ^ e.hashCode);
 
   @override
   int get hashCode {
     return id.hashCode ^
-      groupId.hashCode ^
-      items.hashCode ^
-      assignees.hashCode ^
-      name.hashCode ^
-      author.hashCode ^
-      date.hashCode ^
-      finalizedDate.hashCode ^
-      acceptNewMembers.hashCode;
+        groupId.hashCode ^
+        itemsHash ^
+        assigneesHash ^
+        name.hashCode ^
+        author.hashCode ^
+        date.hashCode ^
+        finalizedDate.hashCode ^
+        acceptNewMembers.hashCode;
   }
 }

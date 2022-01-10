@@ -35,20 +35,24 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         ));
       }
 
-      if (!expense.isAuthoredBy(event.issuer.uid)) {
+      final hash = expense.hashCode;
+      final itemsHash = expense.itemsHash;
+      await event.update.call(expense);
+
+      final itemsChanged = itemsHash != expense.itemsHash;
+      final expenseChanged = hash != expense.hashCode;
+
+      if (!expenseChanged) return;
+
+      // this is potentially vulnerable because other things might change together with items
+      if (!itemsChanged && !expense.isAuthoredBy(event.issuer.uid)) {
         return emit(ExpenseLoaded(
           expense: expense,
           updateFailure: ExpenseUpdateFailure.ExpenseRestricted,
         ));
       }
 
-      if (expense.canBeUpdatedBy(event.issuer.uid)) {
-        final hash = expense.hashCode;
-        await event.update.call(expense);
-        if (hash != expense.hashCode) {
-          ExpenseService.instance.updateExpense(expense);
-        }
-      }
+      ExpenseService.instance.updateExpense(expense);
     }
   }
 
