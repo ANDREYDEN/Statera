@@ -1,7 +1,5 @@
 part of 'expense_bloc.dart';
 
-enum ExpenseUpdateFailure { ExpenseFinalized, ExpenseRestricted }
-
 abstract class ExpenseState {
   ExpenseState();
 }
@@ -13,9 +11,7 @@ class ExpenseLoading extends ExpenseState {
 class ExpenseLoaded extends ExpenseState {
   Expense expense;
 
-  ExpenseUpdateFailure? updateFailure;
-
-  ExpenseLoaded({required this.expense, this.updateFailure}) : super();
+  ExpenseLoaded({required this.expense}) : super();
 }
 
 class ExpenseError extends ExpenseState {

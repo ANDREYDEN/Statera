@@ -29,15 +29,6 @@ class ExpensePage extends StatelessWidget {
 
     return BlocConsumer<ExpenseBloc, ExpenseState>(
       listener: (expenseContext, state) {
-        if (state is ExpenseLoaded && state.updateFailure != null) {
-          showSnackBar(
-            expenseContext,
-            state.updateFailure == ExpenseUpdateFailure.ExpenseFinalized
-                ? 'Expense is finalized and can no longer be edited'
-                : "You don't have access to edit this expense",
-          );
-        }
-
         if (state is ExpenseError) {
           showSnackBar(
             context,
@@ -46,9 +37,7 @@ class ExpensePage extends StatelessWidget {
           );
         }
       },
-      listenWhen: (before, after) =>
-          (before is ExpenseLoaded && after is ExpenseLoaded) ||
-          after is ExpenseError,
+      listenWhen: (before, after) => after is ExpenseError,
       builder: (context, expenseState) {
         if (authBloc.state.status == AuthStatus.unauthenticated) {
           return PageScaffold(child: Text('Unauthorized'));
@@ -68,9 +57,11 @@ class ExpensePage extends StatelessWidget {
 
         if (expenseState is ExpenseLoaded) {
           final expense = expenseState.expense;
+          final expenseCanBeUpdated =
+              expense.canBeUpdatedBy(authBloc.state.user!.uid);
 
           return PageScaffold(
-            onFabPressed: expense.canBeUpdatedBy(authBloc.state.user!.uid)
+            onFabPressed: expenseCanBeUpdated
                 ? () => _handleNewItemClick(context, expenseBloc, authBloc)
                 : null,
             actions: [
@@ -136,11 +127,13 @@ class ExpensePage extends StatelessWidget {
                             children: [
                               Icon(Icons.schedule, size: 20),
                               TextButton(
-                                onPressed: () => _handleDateClick(
-                                  context,
-                                  expenseBloc,
-                                  authBloc,
-                                ),
+                                onPressed: expenseCanBeUpdated
+                                    ? () => _handleDateClick(
+                                          context,
+                                          expenseBloc,
+                                          authBloc,
+                                        )
+                                    : null,
                                 child: Text(
                                   toStringDate(expense.date) ?? 'Not set',
                                 ),
@@ -152,20 +145,24 @@ class ExpensePage extends StatelessWidget {
                             children: [
                               AuthorAvatar(
                                 author: expense.author,
-                                onTap: () => _handleAuthorClick(
-                                  context,
-                                  expenseBloc,
-                                  authBloc,
-                                ),
+                                onTap: expenseCanBeUpdated
+                                    ? () => _handleAuthorClick(
+                                          context,
+                                          expenseBloc,
+                                          authBloc,
+                                        )
+                                    : null,
                               ),
                               Icon(Icons.arrow_forward),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => _handleAssigneesClick(
-                                    context,
-                                    expenseBloc,
-                                    authBloc,
-                                  ),
+                                  onTap: expenseCanBeUpdated
+                                      ? () => _handleAssigneesClick(
+                                            context,
+                                            expenseBloc,
+                                            authBloc,
+                                          )
+                                      : null,
                                   child: AssigneeList(),
                                 ),
                               ),
@@ -178,10 +175,13 @@ class ExpensePage extends StatelessWidget {
                 ),
                 if (expense.hasNoItems)
                   ElevatedButton.icon(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => ReceiptScanDialog(expense: expense),
-                    ),
+                    onPressed: expenseCanBeUpdated
+                        ? () => showDialog(
+                              context: context,
+                              builder: (_) =>
+                                  ReceiptScanDialog(expense: expense),
+                            )
+                        : null,
                     label: Text('Upload receipt'),
                     icon: Icon(Icons.photo_camera),
                   ),

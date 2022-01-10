@@ -27,33 +27,8 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   _handleUpdate(UpdateRequested event, Emitter<ExpenseState> emit) async {
     if (state is ExpenseLoaded) {
       final expense = (state as ExpenseLoaded).expense;
-      final authoredByIssuer = expense.isAuthoredBy(event.issuer.uid);
-
-      if (expense.finalized) {
-        return emit(ExpenseLoaded(
-          expense: expense,
-          updateFailure: ExpenseUpdateFailure.ExpenseFinalized,
-        ));
-      }
-
-      final hash = expense.hashCode;
-      final itemsHash = expense.itemsHash;
       
       await event.update.call(expense);
-
-      final itemsChanged = itemsHash != expense.itemsHash;
-      final expenseChanged = hash != expense.hashCode;
-
-      if (!expenseChanged) return;
-
-      // this is potentially vulnerable because other things might change together with items
-      if (!itemsChanged && !authoredByIssuer) {
-        return emit(ExpenseLoaded(
-          expense: expense,
-          updateFailure: ExpenseUpdateFailure.ExpenseRestricted,
-        ));
-      }
-
       ExpenseService.instance.updateExpense(expense);
     }
   }

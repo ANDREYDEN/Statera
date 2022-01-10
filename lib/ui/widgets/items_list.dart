@@ -42,21 +42,25 @@ class ItemsList extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: GestureDetector(
-                onLongPress: () =>
-                    _handleItemLongPress(context, expenseBloc, user, item),
+                onLongPress: expense.canBeUpdatedBy(user.uid)
+                    ? () =>
+                        _handleItemLongPress(context, expenseBloc, user, item)
+                    : null,
                 child: ItemListItem(
                   item: item,
-                  onChangePartition: (parts) {
-                    expenseBloc.add(
-                      UpdateRequested(
-                        issuer: user,
-                        update: (expense) {
-                          expense.items[index]
-                              .setAssigneeDecision(user.uid, parts);
-                        },
-                      ),
-                    );
-                  },
+                  onChangePartition: !expense.finalized
+                      ? (parts) {
+                          expenseBloc.add(
+                            UpdateRequested(
+                              issuer: user,
+                              update: (expense) {
+                                expense.items[index]
+                                    .setAssigneeDecision(user.uid, parts);
+                              },
+                            ),
+                          );
+                        }
+                      : (p) {},
                 ),
               ),
             ),
