@@ -80,7 +80,7 @@ class GroupService extends Firestore {
     });
   }
 
-  Stream<List<Group>> userGroupsStream(String uid) {
+  Stream<List<Group>> userGroupsStream(String? uid) {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
         .snapshots()

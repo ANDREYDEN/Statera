@@ -11,7 +11,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
 
 class MockGroupCubit extends MockCubit<GroupState> implements GroupCubit {}
-class FakeGroupLoadedState extends Fake implements GroupLoadedState {}
+class FakeGroupLoaded extends Fake implements GroupLoaded {}
 
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 class FakeAuthState extends Fake implements AuthState {}
@@ -27,7 +27,7 @@ void main() {
     late MockAuthBloc authBloc;
 
     setUpAll(() {
-      registerFallbackValue(FakeGroupLoadedState());
+      registerFallbackValue(FakeGroupLoaded());
       registerFallbackValue(FakeAuthState());
       registerFallbackValue(FakeAuthEvent());
     });
@@ -37,7 +37,7 @@ void main() {
       item = Item(name: "foo", value: 145);
       groupCubit = MockGroupCubit();
       when(() => groupCubit.state)
-          .thenReturn(GroupLoadedState(group: Group.fake()));
+          .thenReturn(GroupLoaded(group: Group.fake()));
       authBloc = MockAuthBloc();
       final fakeUser = MockUser();
       when(() => fakeUser.uid).thenReturn('');

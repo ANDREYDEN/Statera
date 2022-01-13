@@ -14,15 +14,15 @@ class PriceText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GroupCubit, GroupState>(
       builder: (context, groupState) {
-        if (groupState is GroupLoadingState) {
+        if (groupState is GroupLoading) {
           return Center(child: Loader());
         }
 
-        if (groupState is GroupErrorState) {
+        if (groupState is GroupError) {
           return Text('Error: ${groupState.error.toString()}');
         }
 
-        if (groupState is GroupLoadedState) {
+        if (groupState is GroupLoaded) {
           return Text(
             groupState.group.renderPrice(value),
             style: textStyle,

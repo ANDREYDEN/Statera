@@ -1,18 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/widgets/custom_stream_builder.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
+import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:statera/utils/constants.dart';
-import 'package:statera/utils/helpers.dart';
 import 'package:statera/utils/utils.dart';
 
 class GroupList extends StatefulWidget {
@@ -27,76 +25,113 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   TextEditingController joinGroupCodeController = TextEditingController();
 
-  User? get user => context.select((AuthBloc auth) => auth.state.user);
-
   @override
   Widget build(BuildContext context) {
-    return PageScaffold(
-      title: kAppName,
-      actions: [
-        IconButton(
-          onPressed: () {
-            snackbarCatch(context, () {
-              context.read<AuthBloc>().add(LogoutRequested());
-            });
-          },
-          icon: Icon(Icons.logout),
-        ),
-      ],
-      onFabPressed: _handleNewGroupClick,
-      child: user == null
-          ? Container()
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: joinGroupCodeController,
-                          decoration: InputDecoration(labelText: "Group code"),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          snackbarCatch(context, () {
-                            GroupService.instance
-                                .joinGroup(joinGroupCodeController.text, user!);
-                            joinGroupCodeController.clear();
-                          });
-                        },
-                        child: Text("Join"),
-                      ),
-                    ],
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState.status == AuthStatus.authenticated) {
+          var groupsCubit = context.read<GroupsCubit>();
+          groupsCubit.load(authState.user!.uid);
+        }
+      },
+      builder: (context, authState) {
+        if (authState.status == AuthStatus.unauthenticated) {
+          return PageScaffold(child: Center(child: Text('Unauthorized')));
+        }
+
+        final user = authState.user!;
+
+        return BlocBuilder<GroupsCubit, GroupsState>(
+          builder: (context, groupsState) {
+            if (groupsState is GroupsLoading) {
+              return PageScaffold(child: Center(child: Loader()));
+            }
+
+            if (groupsState is GroupsError) {
+              return PageScaffold(
+                child: Center(child: Text(groupsState.error.toString())),
+              );
+            }
+
+            if (groupsState is GroupsLoaded) {
+              final groups = groupsState.groups;
+              final groupsCubit = context.read<GroupsCubit>();
+
+              return PageScaffold(
+                title: kAppName,
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      snackbarCatch(context, () {
+                        context.read<AuthBloc>().add(LogoutRequested());
+                      });
+                    },
+                    icon: Icon(Icons.logout),
                   ),
-                ),
-                Expanded(
-                  child: CustomStreamBuilder<List<Group>>(
-                    stream: GroupService.instance.userGroupsStream(user!.uid),
-                    builder: (context, groups) {
-                      return groups.isEmpty
+                ],
+                onFabPressed: () => _handleNewGroupClick(groupsCubit, user),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: joinGroupCodeController,
+                              decoration:
+                                  InputDecoration(labelText: "Group code"),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              snackbarCatch(context, () {
+                                GroupService.instance.joinGroup(
+                                    joinGroupCodeController.text, user);
+                                joinGroupCodeController.clear();
+                              });
+                            },
+                            child: Text("Join"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox.square(
+                      dimension: 16,
+                      child: Visibility(
+                        visible: groupsState is GroupsProcessing,
+                        child: Loader(),
+                      ),
+                    ),
+                    Expanded(
+                      child: groups.isEmpty
                           ? ListEmpty(text: "Join or create a group!")
                           : ListView.builder(
                               itemCount: groups.length,
                               itemBuilder: (context, index) {
                                 var group = groups[index];
                                 return GestureDetector(
-                                  onLongPress: () => handleEditGroup(group),
+                                  onLongPress: () =>
+                                      _handleGroupLongPress(groupsCubit, group),
                                   child: GroupListItem(group: group),
                                 );
                               },
-                            );
-                    },
-                  ),
+                            ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            }
+
+            return Container();
+          },
+        );
+      },
     );
   }
 
-  void handleEditGroup(Group group) {
+  void _handleGroupLongPress(GroupsCubit groupsCubit, Group group) {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -109,13 +144,15 @@ class _GroupListState extends State<GroupList> {
             validators: [FieldData.requiredValidator],
           )
         ],
-        onSubmit: (values) =>
-            context.read<GroupCubit>().updateName(values["group_name"]!),
+        onSubmit: (values) {
+          group.name = values['group_name']!;
+          groupsCubit.updateGroup(group);
+        },
       ),
     );
   }
 
-  void _handleNewGroupClick() {
+  void _handleNewGroupClick(GroupsCubit groupsCubit, User creator) {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -139,7 +176,7 @@ class _GroupListState extends State<GroupList> {
             name: values['group_name']!,
             currencySign: values['group_currency'],
           );
-          await GroupService.instance.createGroup(newGroup, user!);
+          groupsCubit.addGroup(newGroup, creator);
         },
       ),
     );

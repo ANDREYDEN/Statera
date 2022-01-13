@@ -32,15 +32,15 @@ class _GroupPageState extends State<GroupPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<GroupCubit, GroupState>(
       builder: (context, groupState) {
-        if (groupState is GroupLoadingState) {
+        if (groupState is GroupLoading) {
           return PageScaffold(child: Center(child: Loader()));
         }
 
-        if (groupState is GroupErrorState) {
+        if (groupState is GroupError) {
           return PageScaffold(child: Text(groupState.error.toString()));
         }
 
-        if (groupState is GroupLoadedState) {
+        if (groupState is GroupLoaded) {
           return PageScaffold(
             key: GroupPage.scaffoldKey,
             title: groupState.group.name,

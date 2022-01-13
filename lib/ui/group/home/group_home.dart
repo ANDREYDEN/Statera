@@ -32,15 +32,15 @@ class GroupHome extends StatelessWidget {
               ),
               BlocBuilder<GroupCubit, GroupState>(
                   builder: (context, groupState) {
-                if (groupState is GroupLoadingState) {
+                if (groupState is GroupLoading) {
                   return Center(child: Loader());
                 }
 
-                if (groupState is GroupErrorState) {
+                if (groupState is GroupError) {
                   return Text(groupState.error.toString());
                 }
 
-                if (groupState is GroupLoadedState) {
+                if (groupState is GroupLoaded) {
                   return TextButton(
                     onPressed: () async {
                       ClipboardData data = ClipboardData(

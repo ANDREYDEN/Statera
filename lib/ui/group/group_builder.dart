@@ -16,20 +16,20 @@ class GroupBuilder extends StatelessWidget {
       listener: (groupContext, state) {
         showSnackBar(
           groupContext,
-          state is GroupErrorState
+          state is GroupError
               ? state.error.toString()
               : 'Something went wrong while loading the group',
           color: Colors.red,
           duration: Duration.zero,
         );
       },
-      listenWhen: (before, after) => after is GroupErrorState,
+      listenWhen: (before, after) => after is GroupError,
       builder: (groupContext, state) {
-        if (state is GroupLoadingState) {
+        if (state is GroupLoading) {
           return Center(child: Loader());
         }
 
-        if (state is GroupLoadedState) {
+        if (state is GroupLoaded) {
           return builder(groupContext, state.group);
         }
 

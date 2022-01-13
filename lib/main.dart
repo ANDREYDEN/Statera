@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/routing/404.dart';
@@ -59,7 +60,10 @@ class _StateraState extends State<Statera> {
     // ),
     PagePath(
       pattern: '^${GroupList.route}\$',
-      builder: (context, _) => GroupList(),
+      builder: (context, _) => BlocProvider<GroupsCubit>(
+        create: (_) => GroupsCubit(),
+        child: GroupList(),
+      ),
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',

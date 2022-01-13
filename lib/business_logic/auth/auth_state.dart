@@ -5,6 +5,7 @@ enum AuthStatus {
   unauthenticated,
 }
 
+// TODO: split this into 2 states
 class AuthState extends Equatable {
   const AuthState._({required this.status, this.user});
 
@@ -13,7 +14,7 @@ class AuthState extends Equatable {
 
   const AuthState.unauthenticated() : this._(status: AuthStatus.unauthenticated);
 
-  final AuthStatus status;
+  final AuthStatus status; 
   final User? user;
 
   @override

@@ -7,32 +7,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'group_state.dart';
 
 class GroupCubit extends Cubit<GroupState> {
-  GroupCubit() : super(GroupLoadingState());
+  GroupCubit() : super(GroupLoading());
 
   StreamSubscription? _groupSubscription;
 
   // TODO: error handling
-  GroupLoadedState get loadedState => state as GroupLoadedState;
+  GroupLoaded get loadedState => state as GroupLoaded;
 
   void load(String? groupId) {
     _groupSubscription?.cancel();
     _groupSubscription = GroupService.instance
         .groupStream(groupId)
         .map((group) => group == null
-            ? GroupErrorState(error: 'Group does not exist')
-            : GroupLoadedState(group: group))
+            ? GroupError(error: 'Group does not exist')
+            : GroupLoaded(group: group))
         .listen(emit);
   }
 
   loadFromExpense(String? expenseId) async {
     final expense = await ExpenseService.instance.getExpense(expenseId);
     load(expense.groupId);
-  }
-
-  updateName(String newName) {
-    final group = loadedState.group;
-    group.name = newName;
-    GroupService.instance.saveGroup(group);
   }
 
   removeUser(String uid) {
@@ -55,5 +49,11 @@ class GroupCubit extends Cubit<GroupState> {
     final group = loadedState.group;
     group.updateBalance(expense);
     await GroupService.instance.saveGroup(group);
+  }
+
+  @override
+  Future<void> close() {
+    _groupSubscription?.cancel();
+    return super.close();
   }
 }
