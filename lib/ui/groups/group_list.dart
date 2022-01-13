@@ -4,13 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/group_service.dart';
-import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
+import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/utils.dart';
 
 class GroupList extends StatefulWidget {
@@ -69,7 +68,7 @@ class _GroupListState extends State<GroupList> {
                     icon: Icon(Icons.logout),
                   ),
                 ],
-                onFabPressed: () => _handleNewGroupClick(groupsCubit, user),
+                onFabPressed: () => updateOrCreateGroup(groupsCubit, user),
                 child: Column(
                   children: [
                     Padding(
@@ -84,10 +83,10 @@ class _GroupListState extends State<GroupList> {
                             ),
                           ),
                           SizedBox(width: 8),
-                          ElevatedButton(
+                          ProtectedElevatedButton(
                             onPressed: () {
                               snackbarCatch(context, () {
-                                GroupService.instance.joinGroup(
+                                groupsCubit.joinGroup(
                                     joinGroupCodeController.text, user);
                                 joinGroupCodeController.clear();
                               });
@@ -112,8 +111,11 @@ class _GroupListState extends State<GroupList> {
                               itemBuilder: (context, index) {
                                 var group = groups[index];
                                 return GestureDetector(
-                                  onLongPress: () =>
-                                      _handleGroupLongPress(groupsCubit, group),
+                                  onLongPress: () => updateOrCreateGroup(
+                                    groupsCubit,
+                                    user,
+                                    group: group,
+                                  ),
                                   child: GroupListItem(group: group),
                                 );
                               },
@@ -131,52 +133,40 @@ class _GroupListState extends State<GroupList> {
     );
   }
 
-  void _handleGroupLongPress(GroupsCubit groupsCubit, Group group) {
-    showDialog(
-      context: context,
-      builder: (context) => CRUDDialog(
-        title: "Edit Group",
-        fields: [
-          FieldData(
-            id: "group_name",
-            label: "Group Name",
-            initialData: group.name,
-            validators: [FieldData.requiredValidator],
-          )
-        ],
-        onSubmit: (values) {
-          group.name = values['group_name']!;
-          groupsCubit.updateGroup(group);
-        },
-      ),
-    );
-  }
-
-  void _handleNewGroupClick(GroupsCubit groupsCubit, User creator) {
+  updateOrCreateGroup(GroupsCubit groupsCubit, User creator, {Group? group}) {
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: 'New Group',
         fields: [
           FieldData(
-            id: 'group_name',
-            label: 'Group Name',
-            validators: [FieldData.requiredValidator],
-          ),
+              id: 'group_name',
+              label: 'Group Name',
+              validators: [FieldData.requiredValidator],
+              initialData: group?.name),
           FieldData(
             id: 'group_currency',
             label: 'Group Currency',
-            initialData: Group.kdefaultCurrencySign,
+            initialData: group?.currencySign ?? Group.kdefaultCurrencySign,
+            validators: [FieldData.requiredValidator],
             formatters: [SingleCharacterTextInputFormatter()],
             isAdvanced: true,
           )
         ],
         onSubmit: (values) async {
-          var newGroup = Group(
-            name: values['group_name']!,
-            currencySign: values['group_currency'],
-          );
-          groupsCubit.addGroup(newGroup, creator);
+          var groupToModify = group ?? new Group.fake();
+          final wasModified = groupToModify.name != values['group_name']! ||
+              groupToModify.currencySign != values['group_currency'];
+
+          if (!wasModified) return;
+
+          groupToModify.name = values['group_name']!;
+          groupToModify.currencySign = values['group_currency'];
+          if (group == null) {
+            groupsCubit.addGroup(groupToModify, creator);
+          } else {
+            groupsCubit.updateGroup(groupToModify);
+          }
         },
       ),
     );
