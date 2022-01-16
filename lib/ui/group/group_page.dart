@@ -27,9 +27,13 @@ class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
-  User? get user => context.select((AuthBloc b) => b.state.user);
-
   Widget build(BuildContext context) {
+    final user = context.select((AuthBloc b) => b.state.user);
+
+    if (user == null) {
+      return PageScaffold(child: Center(child: Text('Unauthorized')));
+    }
+
     return BlocBuilder<GroupCubit, GroupState>(
       builder: (context, groupState) {
         if (groupState is GroupLoading) {
@@ -44,8 +48,9 @@ class _GroupPageState extends State<GroupPage> {
           return PageScaffold(
             key: GroupPage.scaffoldKey,
             title: groupState.group.name,
-            onFabPressed:
-                _selectedNavBarItemIndex == 0 ? null : _handleNewExpenseClick,
+            onFabPressed: _selectedNavBarItemIndex == 0
+                ? null
+                : () => _handleNewExpenseClick(user),
             bottomNavBar: BottomNavigationBar(
               iconSize: 36,
               items: [
@@ -92,7 +97,7 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  void _handleNewExpenseClick() {
+  void _handleNewExpenseClick(User user) {
     final groupCubit = context.read<GroupCubit>();
     showDialog(
       context: context,
@@ -108,7 +113,7 @@ class _GroupPageState extends State<GroupPage> {
         closeAfterSubmit: false,
         onSubmit: (values) async {
           var newExpense = Expense(
-            author: Author.fromUser(this.user!),
+            author: Author.fromUser(user),
             name: values["expense_name"]!,
             groupId: groupCubit.loadedState.group.id,
           );

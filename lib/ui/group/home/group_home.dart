@@ -31,39 +31,40 @@ class GroupHome extends StatelessWidget {
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               BlocBuilder<GroupCubit, GroupState>(
-                  builder: (context, groupState) {
-                if (groupState is GroupLoading) {
-                  return Center(child: Loader());
-                }
+                builder: (context, groupState) {
+                  if (groupState is GroupLoading) {
+                    return Center(child: Loader());
+                  }
 
-                if (groupState is GroupError) {
-                  return Text(groupState.error.toString());
-                }
+                  if (groupState is GroupError) {
+                    return Text(groupState.error.toString());
+                  }
 
-                if (groupState is GroupLoaded) {
-                  return TextButton(
-                    onPressed: () async {
-                      ClipboardData data = ClipboardData(
-                        text: groupState.group.code.toString(),
-                      );
-                      await Clipboard.setData(data);
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          groupState.group.code.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
+                  if (groupState is GroupLoaded) {
+                    return TextButton(
+                      onPressed: () async {
+                        ClipboardData data = ClipboardData(
+                          text: groupState.group.code.toString(),
+                        );
+                        await Clipboard.setData(data);
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            groupState.group.code.toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        Icon(Icons.copy),
-                      ],
-                    ),
-                  );
-                }
-                return Text('Something went wrong');
-              })
+                          Icon(Icons.copy),
+                        ],
+                      ),
+                    );
+                  }
+                  return Text('Something went wrong');
+                },
+              )
             ],
           ),
         ),

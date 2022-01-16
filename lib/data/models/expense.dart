@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -200,30 +202,8 @@ class Expense {
   }
 
   static Expense fromSnapshot(DocumentSnapshot snap) {
-    var acceptNewMembers = true;
-    try {
-      acceptNewMembers = snap["acceptNewMembers"];
-    } catch (e) {}
-
-    var expense = new Expense(
-      author: Author.fromFirestore(snap["author"]),
-      name: snap["name"],
-      groupId: snap["groupId"],
-      acceptNewMembers: acceptNewMembers,
-    );
-    expense.id = snap.id;
-    expense.date = snap["date"] == null
-        ? null
-        : DateTime.parse(snap["date"].toDate().toString());
-    expense.finalizedDate = snap["finalizedDate"] == null
-        ? null
-        : DateTime.parse(snap["finalizedDate"].toDate().toString());
-    expense.assignees = snap["assignees"]
-        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
-        .toList();
-    snap["items"].forEach(
-        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
-    return expense;
+    final data = snap.data() as Map<String, dynamic>;
+    return fromFirestore(data, snap.id);
   }
 
   @override
