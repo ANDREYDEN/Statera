@@ -19,6 +19,9 @@ import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
 
+import 'data/models/models.dart';
+import 'data/services/services.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
