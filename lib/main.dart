@@ -9,6 +9,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/routing/404.dart';
@@ -21,16 +22,7 @@ import 'package:statera/utils/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    name: 'statera',
-    options: FirebaseOptions(
-      apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
-      projectId: "statera-0",
-      storageBucket: "statera-0.appspot.com",
-      messagingSenderId: "630064020417",
-      appId: "1:630064020417:web:48fb8194a91bf70ec3cd40",
-    ),
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   if (const bool.fromEnvironment('USE_EMULATORS')) {
     // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
