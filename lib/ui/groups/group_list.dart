@@ -26,19 +26,16 @@ class _GroupListState extends State<GroupList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, authState) {
-        if (authState.status == AuthStatus.authenticated) {
-          var groupsCubit = context.read<GroupsCubit>();
-          groupsCubit.load(authState.user!.uid);
-        }
-      },
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         if (authState.status == AuthStatus.unauthenticated) {
           return PageScaffold(child: Center(child: Text('Unauthorized')));
         }
 
         final user = authState.user!;
+
+        var groupsCubit = context.read<GroupsCubit>();
+        groupsCubit.load(authState.user!.uid);
 
         return BlocBuilder<GroupsCubit, GroupsState>(
           builder: (context, groupsState) {
