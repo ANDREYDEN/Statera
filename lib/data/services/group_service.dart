@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/services/services.dart';
 
 class GroupService extends Firestore {
   static GroupService? _instance;
@@ -38,21 +39,20 @@ class GroupService extends Firestore {
   }
 
   Stream<Group?> groupStream(String? groupId) {
-    var groupStream = groupsCollection.doc(groupId).snapshots();
-    return groupStream.map((groupSnap) {
-      if (!groupSnap.exists)
-        return null;
-      return Group.fromFirestore(
-        groupSnap.data() as Map<String, dynamic>,
-        id: groupSnap.id,
-      );
-    });
+    return groupsCollection
+        .doc(groupId)
+        .snapshots()
+        .map((groupSnap) => !groupSnap.exists
+            ? null
+            : Group.fromFirestore(
+                groupSnap.data() as Map<String, dynamic>,
+                id: groupSnap.id,
+              ));
   }
 
   Future<void> deleteGroup(String? groupId) async {
-    var expensesSnap = await expensesCollection
-        .where('groupId', isEqualTo: groupId)
-        .get();
+    var expensesSnap =
+        await expensesCollection.where('groupId', isEqualTo: groupId).get();
     await Future.wait(expensesSnap.docs.map((doc) => doc.reference.delete()));
     await groupsCollection.doc(groupId).delete();
   }
@@ -65,12 +65,7 @@ class GroupService extends Firestore {
       Group group = Group.fromFirestore(
           groupSnap.data() as Map<String, dynamic>,
           id: groupSnap.id);
-      Author? member = group.getUser(memberId);
-
-      if (member == null)
-        throw new Exception("No member in group $groupId with id $memberId");
-
-      return member;
+      return group.getUser(memberId);
     });
   }
 
@@ -85,7 +80,7 @@ class GroupService extends Firestore {
     });
   }
 
-  Stream<List<Group>> userGroupsStream(String uid) {
+  Stream<List<Group>> userGroupsStream(String? uid) {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
         .snapshots()
@@ -95,6 +90,25 @@ class GroupService extends Firestore {
                   id: doc.id,
                 ))
             .toList());
+  }
+
+  Future<void> createGroup(Group newGroup, User author) async {
+    newGroup.generateCode();
+    newGroup.addUser(author);
+    await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
+  }
+
+  Future<void> joinGroup(String groupCode, User user) async {
+    var group = await GroupService.instance.getGroup(groupCode);
+    if (group.members.any((member) => member.uid == user.uid)) return;
+
+    group.addUser(user);
+    await GroupService.instance.groupsCollection
+        .doc(group.id)
+        .update(group.toFirestore());
+
+    await ExpenseService.instance
+        .addUserToOutstandingExpenses(user.uid, group.id);
   }
 
   Future<void> saveGroup(Group group) async {

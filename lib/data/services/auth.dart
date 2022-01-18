@@ -24,13 +24,6 @@ class Auth {
     return _auth.authStateChanges();
   }
 
-  Future<User> currentUserOrThrow() async {
-    var user = await _auth.authStateChanges().first;
-    if (user == null)
-      throw Exception("Tried to get a user when not logged in.");
-    return user;
-  }
-
   Future<UserCredential?> signInWithGoogle() async {
     return kIsWeb
         ? _auth.signInWithPopup(GoogleAuthProvider())

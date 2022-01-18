@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CommaReplacerTextInputFormatter extends TextInputFormatter {
@@ -16,4 +15,13 @@ class CommaReplacerTextInputFormatter extends TextInputFormatter {
       selection: newSelection,
     );
   }
+}
+
+class SingleCharacterTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) =>
+      newValue.text.length > 1 ? oldValue : newValue;
 }

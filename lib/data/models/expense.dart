@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:statera/data/models/item.dart';
 
 import 'assignee.dart';
@@ -25,7 +27,7 @@ class Expense {
   List<Item> items = [];
   List<Assignee> assignees = [];
   late String name;
-  late Author author; // UID
+  late Author author;
   DateTime? date;
   DateTime? finalizedDate;
   late bool acceptNewMembers;
@@ -74,7 +76,7 @@ class Expense {
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
-  bool isAuthoredBy(String uid) => this.author.uid == uid;
+  bool isAuthoredBy(String? uid) => this.author.uid == uid;
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.finalized;
 
@@ -198,29 +200,40 @@ class Expense {
   }
 
   static Expense fromSnapshot(DocumentSnapshot snap) {
-    var acceptNewMembers = true;
-    try {
-      acceptNewMembers = snap["acceptNewMembers"];
-    } catch (e) {}
+    final data = snap.data() as Map<String, dynamic>;
+    return fromFirestore(data, snap.id);
+  }
 
-    var expense = new Expense(
-      author: Author.fromFirestore(snap["author"]),
-      name: snap["name"],
-      groupId: snap["groupId"],
-      acceptNewMembers: acceptNewMembers,
-    );
-    expense.id = snap.id;
-    expense.date = snap["date"] == null
-        ? null
-        : DateTime.parse(snap["date"].toDate().toString());
-    expense.finalizedDate = snap["finalizedDate"] == null
-        ? null
-        : DateTime.parse(snap["finalizedDate"].toDate().toString());
-    expense.assignees = snap["assignees"]
-        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
-        .toList();
-    snap["items"].forEach(
-        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
-    return expense;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Expense &&
+        other.id == id &&
+        other.groupId == groupId &&
+        listEquals(other.items, items) &&
+        listEquals(other.assignees, assignees) &&
+        other.name == name &&
+        other.author == author &&
+        other.date == date &&
+        other.finalizedDate == finalizedDate &&
+        other.acceptNewMembers == acceptNewMembers;
+  }
+
+  int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
+
+  int get assigneesHash => assignees.fold(0, (cur, e) => cur ^ e.hashCode);
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        groupId.hashCode ^
+        itemsHash ^
+        assigneesHash ^
+        name.hashCode ^
+        author.hashCode ^
+        date.hashCode ^
+        finalizedDate.hashCode ^
+        acceptNewMembers.hashCode;
   }
 }

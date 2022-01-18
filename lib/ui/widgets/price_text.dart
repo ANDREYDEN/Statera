@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/states/group_state.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class PriceText extends StatelessWidget {
@@ -15,15 +14,15 @@ class PriceText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GroupCubit, GroupState>(
       builder: (context, groupState) {
-        if (groupState is GroupLoadingState) {
+        if (groupState is GroupLoading) {
           return Center(child: Loader());
         }
 
-        if (groupState is GroupErrorState) {
+        if (groupState is GroupError) {
           return Text('Error: ${groupState.error.toString()}');
         }
 
-        if (groupState is GroupLoadedState) {
+        if (groupState is GroupLoaded) {
           return Text(
             groupState.group.renderPrice(value),
             style: textStyle,

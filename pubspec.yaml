@@ -35,7 +35,6 @@ dependencies:
   cloud_functions: ^3.0.0
   google_sign_in: ^5.0.7
   multi_select_flutter: ^4.0.0
-  mockito: ^5.0.10
   build_runner: ^2.0.6
   badges: ^2.0.1
   uuid: ^3.0.4

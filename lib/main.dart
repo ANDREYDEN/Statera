@@ -5,30 +5,31 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/routing/page_path.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
-import 'package:statera/ui/views/404.dart';
-import 'package:statera/ui/views/expense_page.dart';
-import 'package:statera/ui/views/group_list.dart';
-import 'package:statera/ui/views/group_page.dart';
-import 'package:statera/ui/views/payment_list.dart';
+import 'package:statera/ui/routing/404.dart';
+import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/utils/constants.dart';
 import 'package:statera/utils/theme.dart';
-
-import 'data/models/models.dart';
-import 'data/services/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: 'statera',
     options: FirebaseOptions(
-        apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
-        projectId: "statera-0",
-        storageBucket: "statera-0.appspot.com",
-        messagingSenderId: "630064020417",
-        appId: "1:630064020417:web:48fb8194a91bf70ec3cd40"),
+      apiKey: "AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA",
+      projectId: "statera-0",
+      storageBucket: "statera-0.appspot.com",
+      messagingSenderId: "630064020417",
+      appId: "1:630064020417:web:48fb8194a91bf70ec3cd40",
+    ),
   );
 
   if (const bool.fromEnvironment('USE_EMULATORS')) {
@@ -61,32 +62,27 @@ class _StateraState extends State<Statera> {
     // ),
     PagePath(
       pattern: '^${GroupList.route}\$',
-      builder: (context, _) => GroupList(),
+      builder: (context, _) => BlocProvider<GroupsCubit>(
+        create: (_) => GroupsCubit(),
+        child: GroupList(),
+      ),
     ),
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)\$',
       builder: (context, matches) => BlocProvider<GroupCubit>(
-          create: (context) {
-            final groupCubit = GroupCubit();
-            groupCubit.load(matches?[0]);
-            return groupCubit;
-          },
-          child: GroupPage(groupId: matches?[0])),
+        create: (context) => GroupCubit()..load(matches?[0]),
+        child: GroupPage(groupId: matches?[0]),
+      ),
     ),
     PagePath(
       pattern: '^${ExpensePage.route}/([\\w-]+)\$',
       builder: (context, matches) => MultiProvider(
         providers: [
-          StreamProvider<Expense>.value(
-            value: ExpenseService.instance.listenForExpense(matches?[0]),
-            initialData: Expense.empty(),
+          BlocProvider<ExpenseBloc>(
+            create: (_) => ExpenseBloc()..load(matches?[0]),
           ),
           BlocProvider<GroupCubit>(
-            create: (context) {
-              final groupCubit = GroupCubit();
-              groupCubit.loadFromExpense(matches?[0]);
-              return groupCubit;
-            },
+            create: (_) => GroupCubit()..loadFromExpense(matches?[0]),
           )
         ],
         child: ExpensePage(expenseId: matches?[0]),
@@ -95,11 +91,7 @@ class _StateraState extends State<Statera> {
     PagePath(
       pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
       builder: (context, matches) => BlocProvider<GroupCubit>(
-        create: (context) {
-          final groupCubit = GroupCubit();
-          groupCubit.load(matches?[0]);
-          return groupCubit;
-        },
+        create: (context) => GroupCubit()..load(matches?[0]),
         child: PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
       ),
     )
@@ -107,44 +99,41 @@ class _StateraState extends State<Statera> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<AuthenticationViewModel>(
-      create: (context) => AuthenticationViewModel(),
-      builder: (context, _) {
-        return MaterialApp(
-          title: kAppName,
-          theme: theme,
-          darkTheme: darkTheme,
-          themeMode: ThemeMode.system,
-          initialRoute: GroupList.route,
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (context) {
-                var route = settings.name ?? '/404';
-                for (PagePath path in _paths) {
-                  final regExpPattern = RegExp(path.pattern);
-                  if (regExpPattern.hasMatch(route)) {
-                    final firstMatch = regExpPattern.firstMatch(route);
-                    final matches = firstMatch?.groups(
-                      List.generate(
-                          firstMatch.groupCount, (index) => index + 1),
-                    );
-                    return SafeArea(
-                      child: path.isPublic
-                          ? path.builder(context, matches)
-                          : AuthGuard(
-                              originalRoute: route,
-                              builder: () => path.builder(context, matches),
-                            ),
-                    );
-                  }
+    return BlocProvider(
+      create: (context) => AuthBloc(),
+      child: MaterialApp(
+        title: kAppName,
+        theme: theme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
+        initialRoute: GroupList.route,
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (context) {
+              var route = settings.name ?? '/404';
+              for (PagePath path in _paths) {
+                final regExpPattern = RegExp(path.pattern);
+                if (regExpPattern.hasMatch(route)) {
+                  final firstMatch = regExpPattern.firstMatch(route);
+                  final matches = firstMatch?.groups(
+                    List.generate(firstMatch.groupCount, (index) => index + 1),
+                  );
+                  return SafeArea(
+                    child: path.isPublic
+                        ? path.builder(context, matches)
+                        : AuthGuard(
+                            originalRoute: route,
+                            builder: () => path.builder(context, matches),
+                          ),
+                  );
                 }
-                return PageNotFound();
-              },
-            );
-          },
-        );
-      },
+              }
+              return PageNotFound();
+            },
+          );
+        },
+      ),
     );
   }
 }

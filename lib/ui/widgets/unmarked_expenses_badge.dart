@@ -1,11 +1,10 @@
 import 'package:badges/badges.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/viewModels/authentication_vm.dart';
 
 class UnmarkedExpensesBadge extends StatelessWidget {
   final Widget child;
@@ -19,11 +18,13 @@ class UnmarkedExpensesBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationViewModel authVm =
-        Provider.of<AuthenticationViewModel>(context, listen: false);
+    User? user = context.select((AuthBloc auth) => auth.state.user);
+
+    if (user == null) return Container();
+
     return StreamBuilder<List<Expense>>(
       stream: ExpenseService.instance
-          .listenForUnmarkedExpenses(this.groupId, authVm.user.uid),
+          .listenForUnmarkedExpenses(this.groupId, user.uid),
       builder: (context, snap) {
         var unmarkedExpenses = snap.data;
         return Row(

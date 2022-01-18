@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/payment_service.dart';
@@ -62,33 +61,32 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> updateExpense(Expense expense) async {
-    var docRef = expensesCollection.doc(expense.id);
-    expensesCollection.doc(docRef.id).set(expense.toFirestore());
+    expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
-  Stream<Expense> listenForExpense(String? expenseId) {
+  Stream<Expense?> expenseStream(String? expenseId) {
     return expensesCollection
         .doc(expenseId)
         .snapshots()
-        .map<Expense>((snap) => Expense.fromSnapshot(snap));
+        .map((snap) => !snap.exists ? null : Expense.fromSnapshot(snap));
   }
 
-  Future<void> addUserToOutstandingExpenses(User user, String? groupId) async {
+  Future<void> addUserToOutstandingExpenses(String uid, String? groupId) async {
     var expensesSnap = await _expensesQuery(groupId: groupId).get();
     final expenses =
         expensesSnap.docs.map((doc) => Expense.fromSnapshot(doc)).toList();
 
     for (var expense in expenses) {
-      final containsUser = expense.assignees.any((a) => a.uid == user.uid);
+      final containsUser = expense.assignees.any((a) => a.uid == uid);
       if (expense.canReceiveAssignees &&
           expense.acceptNewMembers &&
           !containsUser) {
-        expense.addAssignee(Assignee(uid: user.uid));
+        expense.addAssignee(Assignee(uid: uid));
       }
     }
 
     await Future.wait(
-      expenses.map((expense) => saveExpense(expense)),
+      expenses.map((expense) => updateExpense(expense)),
     );
   }
 
@@ -108,10 +106,6 @@ class ExpenseService extends Firestore {
             ),
           )),
     );
-  }
-
-  Future<void> saveExpense(Expense expense) async {
-    return expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
   Future<void> deleteExpense(Expense expense) {

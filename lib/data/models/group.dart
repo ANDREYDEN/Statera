@@ -13,6 +13,8 @@ class Group {
   String? code;
   String? _currencySign;
 
+  static const String kdefaultCurrencySign = '\$';
+
   Group({
     required this.name,
     this.code,
@@ -40,7 +42,10 @@ class Group {
     }
   }
 
-  String get currencySign => _currencySign ?? '\$';
+  String get currencySign => (_currencySign == null || _currencySign!.isEmpty)
+      ? kdefaultCurrencySign
+      : _currencySign!;
+  set currencySign(String? value) => _currencySign = value;
 
   void generateCode() {
     code = "";
@@ -49,7 +54,8 @@ class Group {
     }
   }
 
-  String renderPrice(double value) => '$currencySign${value.toStringAsFixed(2)}';
+  String renderPrice(double value) =>
+      '$currencySign${value.toStringAsFixed(2)}';
 
   static Map<String, Map<String, double>> createBalanceFromMembers(
     List<Author> members,
@@ -68,9 +74,11 @@ class Group {
     );
   }
 
-  bool userExists(String uid) => this.members.any((member) => member.uid == uid);
+  bool userExists(String uid) =>
+      this.members.any((member) => member.uid == uid);
 
-  Author getUser(String uid) => this.members.firstWhere((member) => member.uid == uid);
+  Author getUser(String uid) =>
+      this.members.firstWhere((member) => member.uid == uid);
 
   void addUser(User user) {
     var newAuthor = Author.fromUser(user);
@@ -152,16 +160,18 @@ class Group {
       code: map['code'],
       balance: map['balance'] == null
           ? null
-          : Map<String, Map<String, double>>.from(map['balance'].map(
-              (uid, balance) => MapEntry(
-                uid,
-                Map<String, double>.from(
-                  (balance as Map<String, dynamic>).map((otherUid, value) =>
-                      MapEntry(otherUid, double.tryParse(value.toString()))),
+          : Map<String, Map<String, double>>.from(
+              map['balance'].map(
+                (uid, balance) => MapEntry(
+                  uid,
+                  Map<String, double>.from(
+                    (balance as Map<String, dynamic>).map((otherUid, value) =>
+                        MapEntry(otherUid, double.tryParse(value.toString()))),
+                  ),
                 ),
               ),
-            )),
-      currencySign: map['currencySign']
+            ),
+      currencySign: map['currencySign'],
     );
   }
 }
