@@ -24,6 +24,10 @@ class Auth {
     return _auth.authStateChanges();
   }
 
+  Future<UserCredential> signIn(String email, String password) {
+    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
   Future<UserCredential?> signInWithGoogle() async {
     return kIsWeb
         ? _auth.signInWithPopup(GoogleAuthProvider())
