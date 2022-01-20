@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -25,16 +26,11 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   if (const bool.fromEnvironment('USE_EMULATORS')) {
-    // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
     FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     print("Emulators intialized");
-    // FirebaseFirestore.instance.settings = const Settings(
-    //   host: 'localhost:8080',
-    //   sslEnabled: false,
-    //   persistenceEnabled: false,
-    // );
   }
 
   runApp(Statera());
@@ -47,11 +43,6 @@ class Statera extends StatefulWidget {
 
 class _StateraState extends State<Statera> {
   final List<PagePath> _paths = [
-    // PagePath(
-    //   isPublic: true,
-    //   pattern: '^${SignIn.route}\$',
-    //   builder: (context, _) => SignIn(),
-    // ),
     PagePath(
       pattern: '^${GroupList.route}\$',
       builder: (context, _) => BlocProvider<GroupsCubit>(

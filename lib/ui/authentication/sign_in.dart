@@ -31,48 +31,77 @@ class _SignInState extends State<SignIn> {
           title: kAppName,
           child: Center(
             child: Container(
-              child: Column(
-                children: [
-                  Flexible(
-                    child: TextField(
+              width: 500,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(height: 50),
+                    TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(labelText: 'email'),
+                      decoration: InputDecoration(
+                        labelText: 'email',
+                        border: OutlineInputBorder(),
+                      ),
                       enabled: signInState is! SignInLoading,
                     ),
-                  ),
-                  Flexible(
-                    child: TextField(
+                    SizedBox(height: 8),
+                    TextField(
                       controller: _passwordController,
-                      decoration: InputDecoration(labelText: 'password'),
+                      decoration: InputDecoration(
+                        labelText: 'password',
+                        border: OutlineInputBorder(),
+                      ),
                       obscureText: true,
                       enabled: signInState is! SignInLoading,
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: signInState is SignInLoading
-                        ? null
-                        : () => signInCubit.signIn(
-                              _emailController.text,
-                              _passwordController.text,
-                            ),
-                    child: Text('Sign In'),
-                  ),
-                  if (signInState is SignInError)
-                    Text(
-                      signInState.error,
-                      style: TextStyle(color: Colors.red),
+                    SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: signInState is SignInLoading
+                          ? null
+                          : () => signInCubit.signIn(
+                                _emailController.text,
+                                _passwordController.text,
+                              ),
+                      child: SizedBox(
+                        height: 36,
+                        child: Center(child: Text('Sign In')),
+                      ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(),
-                  ),
-                  SignInButton(
-                    Buttons.Google,
-                    onPressed: signInState is SignInLoading
-                        ? () {}
-                        : () => signInCubit.signInWithGoogle(),
-                  ),
-                ],
+                    if (signInState is SignInError)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Center(
+                          child: Text(
+                            signInState.error,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text('or'),
+                          ),
+                          Expanded(child: Divider())
+                        ],
+                      ),
+                    ),
+                    SignInButton(
+                      Buttons.Google,
+                      onPressed: signInState is SignInLoading
+                          ? () {}
+                          : () => signInCubit.signInWithGoogle(),
+                      elevation: 2,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
