@@ -6,13 +6,13 @@ import 'package:statera/data/services/services.dart';
 part 'sign_in_state.dart';
 
 class SignInCubit extends Cubit<SignInState> {
-  SignInCubit() : super(SignInLoaded());
+  SignInCubit() : super(AuthSignIn());
 
   signIn(String email, String password) async {
     try {
       emit(SignInLoading());
       await Auth.instance.signIn(email, password);
-      emit(SignInLoaded());
+      emit(AuthSignIn());
     } on FirebaseAuthException catch (firebaseError) {
       const messages = {
         'user-not-found': 'There is no user associated with this email address',
@@ -34,7 +34,7 @@ class SignInCubit extends Cubit<SignInState> {
     try {
       emit(SignInLoading());
       await Auth.instance.signInWithGoogle();
-      emit(SignInLoaded());
+      emit(AuthSignIn());
     } on FirebaseAuthException catch (firebaseError) {
       const messages = {
         'user-not-found': 'There is no user associated with this email address',
@@ -48,5 +48,13 @@ class SignInCubit extends Cubit<SignInState> {
       emit(SignInError(
           error: 'Something went wrong: ${genericError.toString()}'));
     }
+  }
+
+  switchToSignUpState() {
+    emit(AuthSignUp());
+  }
+
+  switchToSignInState() {
+    emit(AuthSignIn());
   }
 }

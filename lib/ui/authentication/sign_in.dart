@@ -56,7 +56,36 @@ class _SignInState extends State<SignIn> {
                       obscureText: true,
                       enabled: signInState is! SignInLoading,
                     ),
+                    if (signInState is AuthSignUp)
+                      Column(
+                        children: [
+                          SizedBox(height: 8),
+                          TextField(
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              labelText: 'repeat password',
+                              border: OutlineInputBorder(),
+                            ),
+                            obscureText: true,
+                            enabled: signInState is! SignInLoading,
+                          ),
+                        ],
+                      ),
                     SizedBox(height: 8),
+                    if (signInState is AuthSignIn)
+                      TextButton(
+                        onPressed: () {
+                          signInCubit.switchToSignUpState();
+                        },
+                        child: Text('Register'),
+                      )
+                    else
+                      TextButton(
+                        onPressed: () {
+                          signInCubit.switchToSignInState();
+                        },
+                        child: Text('Sign In'),
+                      ),
                     ElevatedButton(
                       onPressed: signInState is SignInLoading
                           ? null
@@ -66,7 +95,11 @@ class _SignInState extends State<SignIn> {
                               ),
                       child: SizedBox(
                         height: 36,
-                        child: Center(child: Text('Sign In')),
+                        child: Center(
+                          child: Text(
+                            signInState is AuthSignIn ? 'Sign In' : 'Sign Up',
+                          ),
+                        ),
                       ),
                     ),
                     if (signInState is SignInError)
@@ -99,6 +132,9 @@ class _SignInState extends State<SignIn> {
                           ? () {}
                           : () => signInCubit.signInWithGoogle(),
                       elevation: 2,
+                      text: signInState is AuthSignIn
+                          ? 'Sign in with Google'
+                          : 'Sign up with Google',
                     ),
                   ],
                 ),

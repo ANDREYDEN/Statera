@@ -9,7 +9,12 @@ class SignInLoading extends SignInState {
   List<Object?> get props => [];
 }
 
-class SignInLoaded extends SignInState {
+class AuthSignIn extends SignInState {
+  @override
+  List<Object?> get props => [];
+}
+
+class AuthSignUp extends SignInState {
   @override
   List<Object?> get props => [];
 }
