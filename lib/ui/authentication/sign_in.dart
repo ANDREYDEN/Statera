@@ -87,12 +87,13 @@ class _SignInState extends State<SignIn> {
                         child: Text('Sign In'),
                       ),
                     ElevatedButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : () => signInCubit.signIn(
+                      onPressed: signInState is AuthSignIn
+                          ? () => signInCubit.signIn(
                                 _emailController.text,
                                 _passwordController.text,
-                              ),
+                              ) : () => signInCubit.signUp(
+                                _emailController.text,
+                                _passwordController.text),
                       child: SizedBox(
                         height: 36,
                         child: Center(

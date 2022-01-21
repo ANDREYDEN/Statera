@@ -30,6 +30,28 @@ class SignInCubit extends Cubit<SignInState> {
     }
   }
 
+  signUp(String email, String password) async {
+    try {
+      emit(SignInLoading());
+      await Auth.instance.signUp(email, password);
+      emit(AuthSignUp());
+    } on FirebaseAuthException catch (firebaseError) {
+      const messages = {
+        'email-already-in-use': 'Someone is already signed in with this email',
+        'invalid-email': 'The provided email is not valid',
+        'operation-not-allowed': 'This user has been disabled',
+        'weak-password': 'Your password is not strong enough',
+      };
+      final message = messages.containsKey(firebaseError.code)
+          ? messages[firebaseError.code]!
+          : 'Error while authenticating: ${firebaseError.message}';
+      emit(SignInError(error: message));
+    } catch (genericError) {
+      emit(SignInError(
+          error: 'Something went wrong: ${genericError.toString()}'));
+    }
+  }
+
   signInWithGoogle() async {
     try {
       emit(SignInLoading());
