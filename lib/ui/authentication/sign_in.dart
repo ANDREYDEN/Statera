@@ -16,15 +16,13 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  TextEditingController _passwordConfirmController = TextEditingController();
+  bool _isSignIn = true;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignInCubit, SignInState>(
       builder: (context, signInState) {
-        if (signInState is SignInLoading) {
-          return PageScaffold(child: Center(child: Loader()));
-        }
-
         final signInCubit = context.read<SignInCubit>();
 
         return PageScaffold(
@@ -41,7 +39,7 @@ class _SignInState extends State<SignIn> {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'email',
+                        labelText: 'Email',
                         border: OutlineInputBorder(),
                       ),
                       enabled: signInState is! SignInLoading,
@@ -50,20 +48,20 @@ class _SignInState extends State<SignIn> {
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'password',
+                        labelText: 'Password',
                         border: OutlineInputBorder(),
                       ),
                       obscureText: true,
                       enabled: signInState is! SignInLoading,
                     ),
-                    if (signInState is AuthSignUp)
+                    if (!_isSignIn)
                       Column(
                         children: [
                           SizedBox(height: 8),
                           TextField(
-                            controller: _passwordController,
+                            controller: _passwordConfirmController,
                             decoration: InputDecoration(
-                              labelText: 'repeat password',
+                              labelText: 'Confirm Password',
                               border: OutlineInputBorder(),
                             ),
                             obscureText: true,
@@ -72,34 +70,35 @@ class _SignInState extends State<SignIn> {
                         ],
                       ),
                     SizedBox(height: 8),
-                    if (signInState is AuthSignIn)
-                      TextButton(
-                        onPressed: () {
-                          signInCubit.switchToSignUpState();
-                        },
-                        child: Text('Register'),
-                      )
-                    else
-                      TextButton(
-                        onPressed: () {
-                          signInCubit.switchToSignInState();
-                        },
-                        child: Text('Sign In'),
-                      ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isSignIn = !_isSignIn;
+                        });
+                      },
+                      child: Text(_isSignIn ? 'Register' : 'Sign In'),
+                    ),
                     ElevatedButton(
-                      onPressed: signInState is AuthSignIn
-                          ? () => signInCubit.signIn(
-                                _emailController.text,
-                                _passwordController.text,
-                              ) : () => signInCubit.signUp(
-                                _emailController.text,
-                                _passwordController.text),
-                      child: SizedBox(
-                        height: 36,
+                      onPressed: signInState is SignInLoading
+                          ? null
+                          : _isSignIn
+                              ? () => signInCubit.signIn(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  )
+                              : () => signInCubit.signUp(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                    _passwordConfirmController.text,
+                                  ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
                         child: Center(
-                          child: Text(
-                            signInState is AuthSignIn ? 'Sign In' : 'Sign Up',
-                          ),
+                          child: signInState is SignInLoading
+                              ? Loader()
+                              : Text(
+                                  _isSignIn ? 'Sign In' : 'Sign Up',
+                                ),
                         ),
                       ),
                     ),
@@ -133,7 +132,7 @@ class _SignInState extends State<SignIn> {
                           ? () {}
                           : () => signInCubit.signInWithGoogle(),
                       elevation: 2,
-                      text: signInState is AuthSignIn
+                      text: _isSignIn
                           ? 'Sign in with Google'
                           : 'Sign up with Google',
                     ),
