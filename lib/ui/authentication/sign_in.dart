@@ -70,14 +70,6 @@ class _SignInState extends State<SignIn> {
                         ],
                       ),
                     SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignIn = !_isSignIn;
-                        });
-                      },
-                      child: Text(_isSignIn ? 'Register' : 'Sign In'),
-                    ),
                     ElevatedButton(
                       onPressed: signInState is SignInLoading
                           ? null
@@ -135,6 +127,17 @@ class _SignInState extends State<SignIn> {
                       text: _isSignIn
                           ? 'Sign in with Google'
                           : 'Sign up with Google',
+                    ),
+                    SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isSignIn = !_isSignIn;
+                        });
+                      },
+                      child: Text(_isSignIn
+                          ? 'Create an account'
+                          : 'Already have an account?'),
                     ),
                   ],
                 ),
