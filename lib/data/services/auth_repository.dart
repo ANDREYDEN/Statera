@@ -20,7 +20,10 @@ class AuthRepository {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  Future<UserCredential> signUp(String email, String password) {
+  Future<UserCredential> signUp(String email, String password, String confirmPassword) {
+    if (password != confirmPassword) {
+      throw FirebaseAuthException(code: 'password-mismatch');
+    }
     return _auth.createUserWithEmailAndPassword(email: email, password: password);
   }
 

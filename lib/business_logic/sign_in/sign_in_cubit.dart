@@ -30,14 +30,9 @@ class SignInCubit extends Cubit<SignInState> {
   }
 
   signUp(String email, String password, String confirmPassword) async {
-    if (password != confirmPassword) {
-      emit(SignInError(error: kPasswordMismatchMessage));
-      return;
-    }
-
     try {
       emit(SignInLoading());
-      await _authRepository.signUp(email, password);
+      await _authRepository.signUp(email, password, confirmPassword);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
       final message = kSignUpMessages.containsKey(firebaseError.code)

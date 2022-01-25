@@ -22,7 +22,7 @@ void main() {
       signInCubit = SignInCubit(authRepository);
       when(() => authRepository.signIn(any(), any()))
           .thenAnswer((_) async => userCredential);
-      when(() => authRepository.signUp(any(), any()))
+      when(() => authRepository.signUp(any(), any(), any()))
           .thenAnswer((_) async => userCredential);
       when(() => authRepository.signInWithGoogle())
           .thenAnswer((_) async => userCredential);
@@ -69,26 +69,14 @@ void main() {
             cubit.signUp('email', 'password', 'password'),
         expect: () => [SignInLoading(), SignInLoaded()],
         verify: (_) {
-          verify(() => authRepository.signUp(any(), any())).called(1);
-        },
-      );
-
-      blocTest(
-        'emits [SignInLoading, SignInError] when signUp is called and passwords do not match',
-        build: () => signInCubit,
-        act: (SignInCubit cubit) =>
-            cubit.signUp('email', 'password', 'something else'),
-        expect: () =>
-            [SignInError(error: kPasswordMismatchMessage)],
-        verify: (_) {
-          verifyNever(() => authRepository.signUp(any(), any()));
+          verify(() => authRepository.signUp(any(), any(), any())).called(1);
         },
       );
 
       blocTest(
         'emits [SignInLoading, SignInError] when signUp throws',
         setUp: () {
-          when(() => authRepository.signUp(any(), any()))
+          when(() => authRepository.signUp(any(), any(), any()))
               .thenThrow(FirebaseAuthException(code: 'weak-password'));
         },
         build: () => signInCubit,
@@ -99,7 +87,7 @@ void main() {
           SignInError(error: kSignUpMessages['weak-password']!)
         ],
         verify: (_) {
-          verify(() => authRepository.signUp(any(), any())).called(1);
+          verify(() => authRepository.signUp(any(), any(), any())).called(1);
         },
       );
     });

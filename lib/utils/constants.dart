@@ -12,10 +12,8 @@ const kSignUpMessages = {
   'invalid-email': 'The provided email is not valid',
   'operation-not-allowed': 'This user has been disabled',
   'weak-password': 'Your password is not strong enough',
+  'password-mismatch': 'Passwords should match'
 };
-
-const kPasswordMismatchMessage =
-    'Passwords should match'; // TODO: refactor into a FirebaseAuthException
 
 const kSignInWithGoogleMessages = {
   'user-not-found': 'There is no user associated with this email address',
