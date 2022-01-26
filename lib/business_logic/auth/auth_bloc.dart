@@ -11,15 +11,19 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc()
+  late final AuthRepository _authRepository;
+  late final StreamSubscription<User?> _userSubscription;
+
+  AuthBloc(AuthRepository authRepository)
       : super(
-          Auth.instance.currentUser != null
-              ? AuthState.authenticated(Auth.instance.currentUser)
+          authRepository.currentUser != null
+              ? AuthState.authenticated(authRepository.currentUser)
               : const AuthState.unauthenticated(),
         ) {
+    _authRepository = authRepository;
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
-    _userSubscription = Auth.instance.currentUserStream().listen(
+    _userSubscription = authRepository.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
   }
@@ -51,8 +55,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ];
   }
 
-  late final StreamSubscription<User?> _userSubscription;
-
   void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
     emit(event.user != null
         ? AuthState.authenticated(event.user)
@@ -60,7 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
-    unawaited(Auth.instance.signOut());
+    unawaited(_authRepository.signOut());
   }
 
   Color getExpenseColor(Expense expense) {

@@ -2,26 +2,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class Auth {
+class AuthRepository {
   late FirebaseAuth _auth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
-  static Auth? _instance;
 
-  Auth._privateConstructor() {
+  AuthRepository() {
     _auth = FirebaseAuth.instance;
-  }
-
-  static Auth get instance {
-    if (_instance == null) {
-      _instance = Auth._privateConstructor();
-    } 
-    return _instance!; 
   }
 
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> currentUserStream() {
     return _auth.authStateChanges();
+  }
+
+  Future<UserCredential> signIn(String email, String password) {
+    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+  Future<UserCredential> signUp(String email, String password, String confirmPassword) {
+    if (password != confirmPassword) {
+      throw FirebaseAuthException(code: 'password-mismatch');
+    }
+    return _auth.createUserWithEmailAndPassword(email: email, password: password);
   }
 
   Future<UserCredential?> signInWithGoogle() async {

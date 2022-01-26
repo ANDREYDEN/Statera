@@ -1,7 +1,23 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+configureEmulators() async {
+  const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
+  if (useEmulators) {
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
+    FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  }
+  print("Talking to Firebase " +
+      (useEmulators ? "via EMULATORS" : "in PRODUCTION"));
+}
 
 String getRandomLetter() {
   int asciiCode = 97 + Random().nextInt(26);
