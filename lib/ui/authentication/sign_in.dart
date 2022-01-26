@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -32,8 +31,7 @@ class _SignInState extends State<SignIn> {
               width: 500,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: ListView(
                   children: [
                     SizedBox(height: 50),
                     TextField(
@@ -88,9 +86,7 @@ class _SignInState extends State<SignIn> {
                         child: Center(
                           child: signInState is SignInLoading
                               ? Loader()
-                              : Text(
-                                  _isSignIn ? 'Sign In' : 'Sign Up',
-                                ),
+                              : Text(_isSignIn ? 'Sign In' : 'Sign Up'),
                         ),
                       ),
                     ),
@@ -118,15 +114,21 @@ class _SignInState extends State<SignIn> {
                         ],
                       ),
                     ),
-                    SignInButton(
-                      Buttons.Google,
+                    // TODO: Add Google icon
+                    ElevatedButton(
                       onPressed: signInState is SignInLoading
-                          ? () {}
+                          ? null
                           : () => signInCubit.signInWithGoogle(),
-                      elevation: 2,
-                      text: _isSignIn
-                          ? 'Sign in with Google'
-                          : 'Sign up with Google',
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Center(
+                          child: signInState is SignInLoading
+                              ? Loader()
+                              : Text(_isSignIn
+                                  ? 'Sign in with Google'
+                                  : 'Sign up with Google'),
+                        ),
+                      ),
                     ),
                     SizedBox(height: 20),
                     TextButton(
