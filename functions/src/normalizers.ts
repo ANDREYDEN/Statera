@@ -29,21 +29,15 @@ export function normalize(row: string[]): Partial<Product> {
   return product;
 }
 
+// handle multiline items (walmart)
 export function mergeProducts(rows: Partial<Product>[]): Partial<Product>[] {
-  rows.forEach((row, i) => {
-    if (i > 0 && i < rows.length - 1 && !row.value) {
-      for (const closeIdx of [i - 1, i + 1]) {
-        // handle multiple descriptions of the same items (walmart)
-        if ((rows[closeIdx].name?.length ?? 0) <= 2) {
-          rows[i].value = rows[closeIdx].value;
-          rows[i].code =
-            (rows[i].code?.length ?? 0) > (rows[closeIdx].code?.length ?? 0)
-              ? rows[i].code
-              : rows[closeIdx].code;
-        }
-      }
+  for (let i = 0; i < rows.length - 1; i++) {
+    const row = rows[i]
+    const nextRow = rows[i+1]
+    if (row.code && !row.value) {
+      row.value = nextRow.value;
     }
-  });
+  }
 
   return rows; 
 }

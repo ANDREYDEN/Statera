@@ -11,40 +11,7 @@ import {
 } from "./normalizers";
 import { firestoreBackup } from "./admin";
 
-// admin.initializeApp();
-// const db = admin.firestore();
-
 export const scheduledBackup = firestoreBackup;
-
-// export const updateBalanceOnExpenseCompletion = functions.firestore
-//   .document("expenses/{expenseId}")
-//   .onUpdate(async (change, context) => {
-//     const logWithReason = (reason: string) =>
-//       `[eid: ${context.params.expenseId}] Balance not updated: ${reason}`;
-//     const expense = change.after.data();
-//     if (expense.completedDate) {
-//       logWithReason("Expense has already been completed");
-//       return;
-//     }
-//     const isCompleted = expense.items.every((item: any) =>
-//       item.assignees.every((assignee: any) => assignee.decision !== "Undefined")
-//     );
-
-//     if (!isCompleted) {
-//       logWithReason("Expense has not been completed yet");
-//       return;
-//     }
-
-//     const groupDoc = await db.collection("groups").doc(expense.groupId).get();
-//     if (!groupDoc.exists) {
-//       logWithReason("Expense does not have a group");
-//     }
-//     const group = groupDoc.data()!;
-
-//     // update the balance
-
-//     await groupDoc.ref.update(group);
-//   });
 
 export const setTimestampOnPaymentCreation = functions.firestore
   .document("payments/{paymentId}")
@@ -81,8 +48,6 @@ async function analyzeReceipt(
   isWalmart: boolean
 ): Promise<any[]> {
   const client = new vision.ImageAnnotatorClient();
-  console.log(receiptUrl);
-  
 
   const [result] = await client.textDetection(receiptUrl);
 
@@ -109,17 +74,18 @@ async function analyzeReceipt(
 
   const rows = lines.map((line) => line.map((label) => label.description));
   
+  console.log({ rows });
+  
+
   let products = rows.map(normalize);
   console.log({ products });
   
   if (isWalmart) {
     products = mergeProducts(products);
     console.log({ mergedProducts: products });
-  }
-
-  products = filterProducts(products);
-  if (isWalmart) {
     products = filterWalmartProducts(products);
+  } else {
+    products = filterProducts(products);
   }
 
   return products;
