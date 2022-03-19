@@ -1,28 +1,35 @@
 import {
   filterProducts, filterWalmartProducts,
-} from "../transformators/filters"
-import { mergeWalmartProducts } from "../transformators/mergers"
+} from '../transformators/filters'
+import { mergeWalmartProducts } from '../transformators/mergers'
 import {
   normalizeProducts, normalizeWalmartProducts,
-} from "../transformators/normalizers"
-import { Product } from "./products"
+} from '../transformators/normalizers'
+import {
+  improveNaming, improveWalmartNaming,
+} from '../transformators/readability'
+import { Product } from './products'
 
-type ProductsConverter<T> = (products: T[]) => T[]
+type ProductsConverter = (products: Product[]) => Product[]
+type AsyncProductsConverter = (products: Product[]) => Promise<Product[]>
 
 export type Store = {
   normalize: (rows: string[][]) => Product[]
-  filter: ProductsConverter<Product>
-  merge: ProductsConverter<Product>
+  filter: ProductsConverter
+  merge: ProductsConverter
+  improveNaming: AsyncProductsConverter
 }
 
 export const defaultStore: Store = {
   normalize: normalizeProducts,
   filter: filterProducts,
   merge: (p) => p,
+  improveNaming: improveNaming,
 }
 
 export const walmart: Store = {
   normalize: normalizeWalmartProducts,
   filter: filterWalmartProducts,
   merge: mergeWalmartProducts,
+  improveNaming: improveWalmartNaming,
 }

@@ -1,4 +1,4 @@
-import { Product, WalmartProduct } from "../types/products"
+import { Product, WalmartProduct } from '../types/products'
 
 const CODE_REGEX = /\d{11,13}/
 const VALUE_REGEX = /\$?(\d+(\.|,)\d+)/
@@ -6,7 +6,7 @@ const VALUE_REGEX = /\$?(\d+(\.|,)\d+)/
 export function normalizeProducts(rows: string[][]): Product[] {
   return rows.map((row) => {
     const product: Product = {
-      name: "",
+      name: '',
       value: 0,
     }
 
@@ -15,10 +15,10 @@ export function normalizeProducts(rows: string[][]): Product[] {
 
       if (valueMatcher) {
         product.value = +valueMatcher[1]
-        row[i] = element.replace(valueMatcher[0], "")
+        row[i] = element.replace(valueMatcher[0], '')
       }
     })
-    product.name = row.filter((element) => element != "").join(" ")
+    product.name = row.filter((element) => element != '').join(' ')
 
     return product
   })
@@ -27,9 +27,9 @@ export function normalizeProducts(rows: string[][]): Product[] {
 export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
   return rows.map((row) => {
     const product: WalmartProduct = {
-      name: "",
+      name: '',
       value: 0,
-      sku: "",
+      sku: '',
     }
 
     row.forEach((element, i) => {
@@ -37,15 +37,15 @@ export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
       const valueMatcher = element.match(VALUE_REGEX)
       if (codeMatcher) {
         product.sku = codeMatcher[0]
-        row[i] = element.replace(codeMatcher[0], "")
+        row[i] = element.replace(codeMatcher[0], '')
       }
 
       if (valueMatcher) {
         product.value = +valueMatcher[1]
-        row[i] = element.replace(valueMatcher[0], "")
+        row[i] = element.replace(valueMatcher[0], '')
       }
     })
-    product.name = row.filter((element) => element != "").join(" ")
+    product.name = row.filter((element) => element != '').join(' ')
 
     return product
   })

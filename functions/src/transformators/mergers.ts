@@ -1,4 +1,4 @@
-import { WalmartProduct } from "../types/products"
+import { WalmartProduct } from '../types/products'
 
 // handle multiline items (walmart)
 export function mergeWalmartProducts(rows: WalmartProduct[]): WalmartProduct[] {
