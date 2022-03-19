@@ -10,7 +10,13 @@ export async function improveNaming(products: Product[]): Promise<Product[]> {
 }
 
 function improveName(name: string): string {
-  const lower = name.toLowerCase()
+  let words = name.split(' ')
+  if (words.length > 2) {
+    words = words.filter((word) => word.length > 2)
+  }
+
+  const cleanName = words.join(' ')
+  const lower = cleanName.toLowerCase()
   return lower[0].toUpperCase() + lower.slice(1)
 }
 
@@ -23,16 +29,19 @@ export async function improveWalmartNaming(
 async function improveWalmartName(
     product: WalmartProduct
 ): Promise<WalmartProduct> {
-  if (!product.sku) return { ...product, name: improveName(product.name) }
+  const improvedProduct = { ...product, name: improveName(product.name) }
 
-  const cleanSku = stripSku(product.sku)
   try {
+    if (!product.sku) throw Error('Invalid SKU')
+    const cleanSku = stripSku(product.sku)
     const { data } = await axios.get(`https://www.walmart.ca/search?q=${cleanSku}&c=10019`)
 
     console.log({ data })
   } catch (e) {
-    console.error(`Failed to improve name for ${cleanSku}: ${e}`)
+    console.error(
+        `Failed to improve name for ${product.sku ?? product.name}: ${e}`
+    )
   }
 
-  return product
+  return improvedProduct
 }
