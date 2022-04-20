@@ -35,3 +35,12 @@ jobs:
 
       - name: Build project (Web + Android)
         run: flutter build web && flutter build apk
+
+      - name: Install functions dependencies
+        run: cd functions && npm i
+      
+      - name: Run functions tests
+        run: npm test
+      
+      - name: Build functions
+        run: npm run build
