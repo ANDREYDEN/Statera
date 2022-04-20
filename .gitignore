@@ -49,6 +49,5 @@ app.*.map.json
 google-services.json
 GoogleService-Info.plist
 *.mocks.dart
-/emulator_data
 *.cache
 /admin
