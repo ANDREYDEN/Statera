@@ -14,29 +14,33 @@ export const setTimestampOnPaymentCreation = functions.firestore
       await snap.ref.update({ timeCreated: snap.createTime })
     })
 
-export const getReceiptDataTest = functions.https.onRequest(
-    async (request, response) => {
-      const receiptUrl = request.query.receiptUrl
-      const isWalmart = request.query.isWalmart
-      if (!receiptUrl) {
-        response.status(400).send('Parameter receiptUrl is required')
+export const getReceiptDataTest = functions
+    .runWith({ timeoutSeconds: 300 })
+    .https.onRequest(
+        async (request, response) => {
+          const receiptUrl = request.query.receiptUrl
+          const isWalmart = request.query.isWalmart
+          if (!receiptUrl) {
+            response.status(400).send('Parameter receiptUrl is required')
+          }
+
+          const result = await analyzeReceipt(
+            receiptUrl as string,
+            isWalmart === 'true'
+          )
+          response.send(result)
+        }
+    )
+
+export const getReceiptData = functions
+    .runWith({ timeoutSeconds: 300 })
+    .https.onCall(async (data, context) => {
+      if (!data.receiptUrl) {
+        throw Error('The parameter receiptUrl is required.')
       }
 
-      const result = await analyzeReceipt(
-      receiptUrl as string,
-      isWalmart === 'true'
-      )
-      response.send(result)
-    }
-)
-
-export const getReceiptData = functions.https.onCall(async (data, context) => {
-  if (!data.receiptUrl) {
-    throw Error('The parameter receiptUrl is required.')
-  }
-
-  return analyzeReceipt(data.receiptUrl, data.isWalmart)
-})
+      return analyzeReceipt(data.receiptUrl, data.isWalmart)
+    })
 
 async function analyzeReceipt(
     receiptUrl: string,
