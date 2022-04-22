@@ -52,3 +52,4 @@ serviceAccount.json
 *.mocks.dart
 *.cache
 /admin
+photos

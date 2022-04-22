@@ -8,6 +8,7 @@ export async function analyzeReceipt(
     isWalmart: boolean,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
+  console.log(`Analyzing receipt at ${receiptUrl}`);
   const client = new vision.ImageAnnotatorClient()
 
   console.log('Reading text from the image...');
