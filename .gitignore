@@ -48,6 +48,7 @@ app.*.map.json
 /coverage/
 google-services.json
 GoogleService-Info.plist
+serviceAccount.json
 *.mocks.dart
 *.cache
 /admin
