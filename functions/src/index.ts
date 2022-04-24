@@ -12,7 +12,10 @@ export const setTimestampOnPaymentCreation = functions.firestore
     })
 
 export const getReceiptDataTest = functions
-    .runWith({ timeoutSeconds: 300 })
+    .runWith({ 
+      timeoutSeconds: 300,
+      memory: "1GB"
+    })
     .https.onRequest(async (request, response) => {
       const { receiptUrl, isWalmart, withNameImprovement } = request.query
 
