@@ -47,7 +47,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Install functions dependencies
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '12'
+
+      - name: Install dependencies
         run: npm i
       
       - name: Run functions tests
