@@ -9,7 +9,6 @@ import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:statera/ui/widgets/protected_elevated_button.dart';
 import 'package:statera/utils/utils.dart';
 import 'dart:developer' as developer;
 
@@ -23,8 +22,6 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  TextEditingController joinGroupCodeController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -71,31 +68,6 @@ class _GroupListState extends State<GroupList> {
                 onFabPressed: () => updateOrCreateGroup(groupsCubit, user),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: joinGroupCodeController,
-                              decoration:
-                                  InputDecoration(labelText: "Group code"),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          ProtectedElevatedButton(
-                            onPressed: () {
-                              snackbarCatch(context, () {
-                                groupsCubit.joinGroup(
-                                    joinGroupCodeController.text, user);
-                                joinGroupCodeController.clear();
-                              });
-                            },
-                            child: Text("Join"),
-                          ),
-                        ],
-                      ),
-                    ),
                     SizedBox.square(
                       dimension: 16,
                       child: Visibility(
