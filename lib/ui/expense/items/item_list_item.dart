@@ -36,6 +36,7 @@ class ItemListItem extends StatelessWidget {
                     child: Text(item.name),
                   ),
                 ),
+                SizedBox(width: 10),
                 PriceText(value: item.value),
               ],
             ),
@@ -72,7 +73,8 @@ class ItemListItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                        "${item.isMarkedBy(user.uid) ? item.getAssigneeParts(user.uid) : '-'}/${item.partition}"),
+                      "${item.isMarkedBy(user.uid) ? item.getAssigneeParts(user.uid) : '-'}/${item.partition}",
+                    ),
                     ElevatedButton(
                       onPressed: () => this.onChangePartition(
                           item.getAssigneeParts(user.uid) + 1),

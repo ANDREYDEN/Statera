@@ -9,17 +9,18 @@ import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/payments/payment_list.dart';
-import 'package:statera/ui/routing/404.dart';
 import 'package:statera/ui/routing/page_path.dart';
 
-final List<PagePath> _paths = [
-  PagePath(
-    pattern: '^${GroupList.route}\$',
-    builder: (context, _) => BlocProvider<GroupsCubit>(
-      create: (_) => GroupsCubit(),
-      child: GroupList(),
-    ),
+final _homePath = PagePath(
+  pattern: '^${GroupList.route}\$',
+  builder: (context, _) => BlocProvider<GroupsCubit>(
+    create: (_) => GroupsCubit(),
+    child: GroupList(),
   ),
+);
+
+final List<PagePath> _paths = [
+  _homePath,
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
@@ -51,28 +52,52 @@ final List<PagePath> _paths = [
 ];
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  var route = settings.name ?? '/404';
+  var builder;
+
+  // try to match route to page
+  for (PagePath path in _paths) {
+    final regExpPattern = RegExp(path.pattern);
+    if (regExpPattern.hasMatch(route)) {
+      final firstMatch = regExpPattern.firstMatch(route);
+      builder = (context) => _renderPage(
+            path,
+            context,
+            match: firstMatch,
+            originalRoute: route,
+          );
+      break;
+    }
+  }
+
+  // navigate home if nothing matched
+  if (builder == null) {
+    builder = (context) =>
+        _renderPage(_homePath, context, originalRoute: GroupList.route);
+    route = GroupList.route;
+  }
+
   return MaterialPageRoute(
-    settings: settings,
-    builder: (context) {
-      var route = settings.name ?? '/404';
-      for (PagePath path in _paths) {
-        final regExpPattern = RegExp(path.pattern);
-        if (regExpPattern.hasMatch(route)) {
-          final firstMatch = regExpPattern.firstMatch(route);
-          final matches = firstMatch?.groups(
-            List.generate(firstMatch.groupCount, (index) => index + 1),
-          );
-          return SafeArea(
-            child: path.isPublic
-                ? path.builder(context, matches)
-                : AuthGuard(
-                    originalRoute: route,
-                    builder: () => path.builder(context, matches),
-                  ),
-          );
-        }
-      }
-      return PageNotFound();
-    },
+    settings: settings.copyWith(name: route),
+    builder: builder,
+  );
+}
+
+Widget _renderPage(
+  PagePath path,
+  BuildContext context, {
+  RegExpMatch? match,
+  required String originalRoute,
+}) {
+  final matches = match?.groups(
+    List.generate(match.groupCount, (index) => index + 1),
+  );
+  return SafeArea(
+    child: path.isPublic
+        ? path.builder(context, matches)
+        : AuthGuard(
+            originalRoute: originalRoute,
+            builder: () => path.builder(context, matches),
+          ),
   );
 }

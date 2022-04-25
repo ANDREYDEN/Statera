@@ -11,25 +11,11 @@ export const setTimestampOnPaymentCreation = functions.firestore
       await snap.ref.update({ timeCreated: snap.createTime })
     })
 
-export const getReceiptDataTest = functions
-    .runWith({ timeoutSeconds: 300 })
-    .https.onRequest(async (request, response) => {
-      const { receiptUrl, isWalmart, withNameImprovement } = request.query
-
-      if (!receiptUrl) {
-        response.status(400).send('Parameter receiptUrl is required')
-      }
-
-      const result = await analyzeReceipt(
-        receiptUrl as string,
-        isWalmart === 'true',
-        withNameImprovement === 'true'
-      )
-      response.send(result)
-    })
-
 export const getReceiptData = functions
-    .runWith({ timeoutSeconds: 300 })
+    .runWith({ 
+      timeoutSeconds: 300,
+      memory: "4GB"
+    })
     .https.onCall(async (data, _) => {
       if (!data.receiptUrl) {
         throw Error('The parameter receiptUrl is required.')
