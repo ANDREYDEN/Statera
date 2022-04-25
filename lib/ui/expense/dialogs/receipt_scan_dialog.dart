@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/helpers.dart';
 
 enum Store { Walmart, Other }
@@ -36,7 +35,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     return AlertDialog(
       title: Text('Scan a receipt'),
       content: _status != null
-          ? Center(child: Text(_status!))
+          ? Text(_status!)
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [

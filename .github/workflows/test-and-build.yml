@@ -36,9 +36,6 @@ jobs:
 
       - name: Run tests
         run: flutter test
-
-      - name: Build project (Web + Android)
-        run: flutter build web && flutter build apk
   
   build_and_test_functions:
     name: Run tests and build Firebase Functions
