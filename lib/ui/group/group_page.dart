@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/expense/dialogs/qr_dialog.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/home/group_home.dart';
@@ -48,6 +49,14 @@ class _GroupPageState extends State<GroupPage> {
           return PageScaffold(
             key: GroupPage.scaffoldKey,
             title: groupState.group.name,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  showDialog(context: context, builder: (_) => QRDialog(data: groupState.group.code));
+                },
+                icon: Icon(Icons.qr_code_rounded),
+              )
+            ],
             onFabPressed: _selectedNavBarItemIndex == 0
                 ? null
                 : () => _handleNewExpenseClick(user),
@@ -56,16 +65,16 @@ class _GroupPageState extends State<GroupPage> {
               items: [
                 BottomNavigationBarItem(
                   label: "Home",
-                  icon: Icon(Icons.home),
-                  activeIcon: Icon(Icons.home),
+                  icon: Icon(Icons.home_rounded),
+                  activeIcon: Icon(Icons.home_rounded),
                 ),
                 BottomNavigationBarItem(
                   label: "Expenses",
                   icon: UnmarkedExpensesBadge(
                     groupId: groupState.group.id,
-                    child: Icon(Icons.receipt_long),
+                    child: Icon(Icons.receipt_long_rounded),
                   ),
-                  activeIcon: Icon(Icons.receipt_long),
+                  activeIcon: Icon(Icons.receipt_long_rounded),
                 ),
               ],
               currentIndex: this._selectedNavBarItemIndex,
