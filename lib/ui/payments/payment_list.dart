@@ -27,7 +27,7 @@ class PaymentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (groupId == null || otherMemberId == null) {
-      return PageScaffold(child: Text("Something went wrong"));
+      return PageScaffold(child: Text("Invalid reference to group or group member"));
     }
 
     var user = context.select((AuthBloc authBloc) => authBloc.state.user);
