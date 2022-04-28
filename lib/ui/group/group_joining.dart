@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
+import 'group_builder.dart';
+
 class GroupJoining extends StatelessWidget {
   static String route = '/join';
 
@@ -19,42 +21,53 @@ class GroupJoining extends StatelessWidget {
       child: Center(
         child: Container(
           width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'You are about to join <Some Group>',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              SizedBox(height: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text('Join'),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor,
-                        ),
-                      ),
+          child: Card(
+            color: Colors.grey[200],
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: GroupBuilder(builder: (context, group) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'You are about to join',
+                      style: Theme.of(context).textTheme.headline6,
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text('Cancel'),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).errorColor,
-                        ),
-                      ),
+                    Text(
+                      group.name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline6!
+                          .copyWith(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
-              )
-            ],
+                    SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Text('Join'),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Text('Cancel'),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).errorColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                );
+              }),
+            ),
           ),
         ),
       ),
