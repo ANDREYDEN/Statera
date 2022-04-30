@@ -5,8 +5,6 @@ abstract class GroupJoiningState extends Equatable {
 }
 
 class GroupJoiningLoading extends GroupJoiningState {
-  GroupJoiningLoading() : super();
-  
   @override
   List<Object?> get props => [];
 }
@@ -17,12 +15,10 @@ class GroupJoiningLoaded extends GroupJoiningState {
   GroupJoiningLoaded({required this.group}) : super();
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [group];
 }
 
 class GroupJoiningSuccess extends GroupJoiningState {
-  GroupJoiningSuccess() : super();
-  
   @override
   List<Object?> get props => [];
 }
@@ -33,5 +29,5 @@ class GroupJoiningError extends GroupJoiningState {
   GroupJoiningError({required this.error}) : super();
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [error];
 }
