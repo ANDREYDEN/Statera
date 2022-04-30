@@ -6,7 +6,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
-import 'package:statera/ui/group/group_joining.dart';
+import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/payments/payment_list.dart';
