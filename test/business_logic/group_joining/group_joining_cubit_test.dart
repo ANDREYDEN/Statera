@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:statera/business_logic/group_joining/group_joining_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/auth_repository.dart';
 import 'package:statera/data/services/services.dart';
 
 class MockGroupService extends Mock implements GroupService {}
@@ -52,6 +51,20 @@ void main() {
       build: () => groupJoiningCubit,
       act: (GroupJoiningCubit cubit) => cubit.join('some other code', testUser),
       expect: () => [GroupJoiningError(error: 'Invalid invitation. Make sure you have copied the link correctly.')],
+      verify: (_) {
+        verifyNever(() => groupService.joinGroup(any(), any()));
+      },
+    );
+
+    blocTest(
+      'emmits error state if the user is already a member of the group',
+      build: () {
+        Group testGroup = Group.fake(code: 'qwe123');
+        testGroup.addUser(testUser);
+        return GroupJoiningCubit(testGroup, groupService);
+      },
+      act: (GroupJoiningCubit cubit) => cubit.join('qwe123', testUser),
+      expect: () => [GroupJoiningError(error: 'You are already a member of this group')],
       verify: (_) {
         verifyNever(() => groupService.joinGroup(any(), any()));
       },

@@ -18,8 +18,15 @@ class GroupJoiningCubit extends Cubit<GroupJoiningState> {
       return;
     }
 
-    if (code != (state as GroupJoiningLoaded).group.code) {
+    GroupJoiningLoaded loadedState = state as GroupJoiningLoaded;
+
+    if (code != loadedState.group.code) {
       emit(GroupJoiningError(error: 'Invalid invitation. Make sure you have copied the link correctly.'));
+      return;
+    }
+
+    if (loadedState.group.userExists(user.uid)) {
+      emit(GroupJoiningError(error: 'You are already a member of this group'));
       return;
     }
 
