@@ -54,7 +54,7 @@ final List<PagePath> _paths = [
     pattern: '^${GroupPage.route}/([\\w-]+)${GroupJoining.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit()..load(matches?[0]),
-      child: GroupJoining(groupId: matches?[0], code: matches?[1]),
+      child: GroupJoining(code: matches?[1]),
     ),
   )
 ];
