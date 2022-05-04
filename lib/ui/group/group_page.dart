@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -51,8 +52,23 @@ class _GroupPageState extends State<GroupPage> {
             title: groupState.group.name,
             actions: [
               IconButton(
-                onPressed: () {
-                  showDialog(context: context, builder: (_) => QRDialog(data: groupState.group.code));
+                onPressed: () async {
+                  final dynamicLinkParams = DynamicLinkParameters(
+                    link: Uri.parse(
+                        "https://statera-0.web.app/group/${groupState.group.id}/join/${groupState.group.code}"),
+                    uriPrefix: "https://statera.page.link",
+                    androidParameters: const AndroidParameters(
+                        packageName: "com.statera.statera"),
+                    iosParameters:
+                        const IOSParameters(bundleId: "com.statera.statera"),
+                  );
+                  final dynamicLink = await FirebaseDynamicLinks.instance
+                      .buildLink(dynamicLinkParams);
+
+                  showDialog(
+                    context: context,
+                    builder: (_) => QRDialog(data: dynamicLink.toString()),
+                  );
                 },
                 icon: Icon(Icons.qr_code_rounded),
               )
