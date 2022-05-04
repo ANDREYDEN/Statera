@@ -7,8 +7,10 @@ import 'package:statera/utils/utils.dart';
 
 class GroupBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Group) builder;
+  final Widget Function(BuildContext, GroupError)? errorBuilder;
 
-  const GroupBuilder({Key? key, required this.builder}) : super(key: key);
+  const GroupBuilder({Key? key, required this.builder, this.errorBuilder})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +22,18 @@ class GroupBuilder extends StatelessWidget {
               ? state.error.toString()
               : 'Something went wrong while loading the group',
           color: Colors.red,
-          duration: Duration.zero,
         );
       },
       listenWhen: (before, after) => after is GroupError,
       builder: (groupContext, state) {
         if (state is GroupLoading) {
           return Center(child: Loader());
+        }
+
+        if (state is GroupError) {
+          return errorBuilder == null
+              ? Center(child: Text(state.error.toString()))
+              : errorBuilder!(groupContext, state);
         }
 
         if (state is GroupLoaded) {

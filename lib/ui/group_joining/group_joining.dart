@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/src/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group_joining/error_state.dart';
 import 'package:statera/ui/group_joining/group_joining_actions.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
@@ -30,7 +31,6 @@ class GroupJoining extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: GroupBuilder(
-                // TODO: handle custom error state
                 builder: (context, group) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -52,6 +52,8 @@ class GroupJoining extends StatelessWidget {
                     ],
                   );
                 },
+                errorBuilder: (context, errorState) =>
+                    GroupJoiningErrorState(error: errorState.error.toString()),
               ),
             ),
           ),
