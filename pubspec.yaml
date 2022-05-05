@@ -44,6 +44,7 @@ dependencies:
   mocktail: ^0.2.0
   qr_flutter: ^4.0.0
   firebase_dynamic_links: ^4.0.7
+  url_strategy: ^0.2.0
   
 dev_dependencies:
   flutter_test:

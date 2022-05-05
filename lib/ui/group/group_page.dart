@@ -53,17 +53,15 @@ class _GroupPageState extends State<GroupPage> {
             actions: [
               IconButton(
                 onPressed: () async {
-                  final dynamicLinkParams = DynamicLinkParameters(
-                    link: Uri.parse(
-                        "https://statera-0.web.app/group/${groupState.group.id}/join/${groupState.group.code}"),
-                    uriPrefix: "https://statera.page.link",
-                    androidParameters: const AndroidParameters(
-                        packageName: "com.statera.statera"),
-                    iosParameters:
-                        const IOSParameters(bundleId: "com.statera.statera"),
+                  final dynamicLink = Uri.https(
+                    'statera.page.link',
+                    '',
+                    {
+                      'apn': 'com.statera.statera',
+                      'ibi': 'com.statera.statera',
+                      'link': "https://statera-0.web.app/group/${groupState.group.id}/join/${groupState.group.code}",
+                    },
                   );
-                  final dynamicLink = await FirebaseDynamicLinks.instance
-                      .buildLink(dynamicLinkParams);
 
                   showDialog(
                     context: context,
