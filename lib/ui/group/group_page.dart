@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/deep_link_service.dart';
 import 'package:statera/ui/expense/dialogs/qr_dialog.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -52,14 +53,9 @@ class _GroupPageState extends State<GroupPage> {
             actions: [
               IconButton(
                 onPressed: () async {
-                  final dynamicLink = Uri.https(
-                    'statera.page.link',
-                    '',
-                    {
-                      'apn': 'com.statera.statera',
-                      'ibi': 'com.statera.statera',
-                      'link': "https://statera-0.web.app/group/${groupState.group.id}/join/${groupState.group.code}",
-                    },
+                  final dynamicLink = DynamicLinkService.generateDynamicLink(
+                    path:
+                        "group/${groupState.group.id}/join/${groupState.group.code}",
                   );
 
                   showDialog(
