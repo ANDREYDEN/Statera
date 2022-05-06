@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:statera/ui/widgets/cancel_button.dart';
 
 class OKCancelDialog extends StatelessWidget {
   final String text;
@@ -10,17 +11,7 @@ class OKCancelDialog extends StatelessWidget {
     return AlertDialog(
       content: Text(this.text),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, false);
-          },
-          child: Text(
-            "Cancel",
-            style: TextStyle(
-              color: Theme.of(context).errorColor,
-            ),
-          ),
-        ),
+        CancelButton(),
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context, true);

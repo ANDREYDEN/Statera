@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/widgets/cancel_button.dart';
 import 'package:statera/ui/widgets/protected_elevated_button.dart';
 
 class GroupJoiningActions extends StatelessWidget {
@@ -28,16 +29,10 @@ class GroupJoiningActions extends StatelessWidget {
         ),
         SizedBox(width: 10),
         Expanded(
-          child: ElevatedButton(
+          child: CancelButton(
             onPressed: () {
               Navigator.pushReplacementNamed(context, GroupList.route);
             },
-            child: Text('Cancel'),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                Theme.of(context).errorColor,
-              ),
-            ),
           ),
         ),
       ],
