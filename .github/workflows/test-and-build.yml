@@ -1,13 +1,17 @@
+name: Test and build
+
 on:
   pull_request:
     branches: 
     - master 
-name: Test and build
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  test_and_build:
+  test_flutter:
+    name: Run Flutter tests
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -32,6 +36,80 @@ jobs:
 
       - name: Run tests
         run: flutter test
+  
+  build_and_test_functions:
+    name: Run tests and build Firebase Functions
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
-      - name: Build project (Web + Android)
-        run: flutter build web && flutter build apk
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '12'
+
+      - name: Install dependencies
+        run: npm i
+      
+      - name: Run functions tests
+        run: npm test
+
+  build_android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Download Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Download Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+
+      - name: Copy google-services.json
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Android app
+        run: flutter build apk
+
+  build_web:
+    name: Build Web App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Download Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Download Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+
+      - name: Copy google-services.json
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Android app
+        run: flutter build web

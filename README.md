@@ -24,4 +24,5 @@ An expense tracking app with granular price distribution.
 - `flutter run` - runs the project
 - `derry build` - builds the app and generates mocks for tests
 - `derry test` - runs the tests
-- `derry test-coverage` - generate a coverage report
+
+Full list of commands can be found in the `pubspec.yaml` file

@@ -174,15 +174,12 @@ class ExpensePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (expense.hasNoItems)
+                if (expense.hasNoItems && expenseCanBeUpdated)
                   ElevatedButton.icon(
-                    onPressed: expenseCanBeUpdated
-                        ? () => showDialog(
-                              context: context,
-                              builder: (_) =>
-                                  ReceiptScanDialog(expense: expense),
-                            )
-                        : null,
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => ReceiptScanDialog(expense: expense),
+                    ),
                     label: Text('Upload receipt'),
                     icon: Icon(Icons.photo_camera),
                   ),

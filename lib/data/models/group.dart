@@ -32,10 +32,11 @@ class Group {
     _currencySign = currencySign;
   }
 
-  Group.fake({List<Author>? members}) {
+  Group.fake({List<Author>? members, String? code}) {
     this.name = "Empty";
     this.members = [];
     this.balance = {};
+    this.code = code;
     if (members != null) {
       this.members = members;
       this.balance = createBalanceFromMembers(members);

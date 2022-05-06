@@ -3,6 +3,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/cancel_button.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
   final Expense expense;
@@ -60,10 +61,7 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
         ),
       ),
       actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
-        ),
+        CancelButton(),
         ElevatedButton(
           onPressed: () async {
             widget.expense.updateAssignees(this._selectedUids);

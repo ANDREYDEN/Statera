@@ -42,6 +42,9 @@ dependencies:
   equatable: ^2.0.3
   bloc_test: ^8.5.0
   mocktail: ^0.2.0
+  qr_flutter: ^4.0.0
+  url_strategy: ^0.2.0
+  share_plus: ^4.0.4
   
 dev_dependencies:
   flutter_test:
