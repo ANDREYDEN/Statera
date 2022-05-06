@@ -21,54 +21,6 @@ class GroupHome extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Invite people with the code:",
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-              BlocBuilder<GroupCubit, GroupState>(
-                builder: (context, groupState) {
-                  if (groupState is GroupLoading) {
-                    return Center(child: Loader());
-                  }
-
-                  if (groupState is GroupError) {
-                    return Text(groupState.error.toString());
-                  }
-
-                  if (groupState is GroupLoaded) {
-                    return TextButton(
-                      onPressed: () async {
-                        ClipboardData data = ClipboardData(
-                          text: groupState.group.code.toString(),
-                        );
-                        await Clipboard.setData(data);
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            groupState.group.code.toString(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Icon(Icons.copy),
-                        ],
-                      ),
-                    );
-                  }
-                  return Text('Something went wrong');
-                },
-              )
-            ],
-          ),
-        ),
-        Divider(thickness: 1),
         SizedBox(height: 20),
         Text(
           'Your Owings',

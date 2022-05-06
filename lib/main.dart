@@ -7,10 +7,16 @@ import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/routing/pages.dart';
 import 'package:statera/utils/utils.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 Future<void> main() async {
+  setPathUrlStrategy();
+
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  }
 
   configureEmulators();
 

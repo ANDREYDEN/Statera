@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/payments/payment_list.dart';
@@ -24,7 +26,10 @@ final List<PagePath> _paths = [
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
-      create: (context) => GroupCubit()..load(matches?[0]),
+      create: (context) => GroupCubit(
+        GroupService.instance,
+        ExpenseService.instance,
+      )..load(matches?[0]),
       child: GroupPage(groupId: matches?[0]),
     ),
   ),
@@ -36,7 +41,10 @@ final List<PagePath> _paths = [
           create: (_) => ExpenseBloc()..load(matches?[0]),
         ),
         BlocProvider<GroupCubit>(
-          create: (_) => GroupCubit()..loadFromExpense(matches?[0]),
+          create: (_) => GroupCubit(
+            GroupService.instance,
+            ExpenseService.instance,
+          )..loadFromExpense(matches?[0]),
         )
       ],
       child: ExpensePage(expenseId: matches?[0]),
@@ -45,8 +53,21 @@ final List<PagePath> _paths = [
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
-      create: (context) => GroupCubit()..load(matches?[0]),
+      create: (context) => GroupCubit(
+        GroupService.instance,
+        ExpenseService.instance,
+      )..load(matches?[0]),
       child: PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+    ),
+  ),
+  PagePath(
+    pattern: '^${GroupPage.route}/([\\w-]+)${GroupJoining.route}/([\\w-]+)\$',
+    builder: (context, matches) => BlocProvider<GroupCubit>(
+      create: (context) => GroupCubit(
+        GroupService.instance,
+        ExpenseService.instance,
+      )..load(matches?[0]),
+      child: GroupJoining(code: matches?[1]),
     ),
   )
 ];

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,16 +9,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'group_state.dart';
 
 class GroupCubit extends Cubit<GroupState> {
-  GroupCubit() : super(GroupLoading());
+  GroupCubit(this._groupService, this._expenseService) : super(GroupLoading());
 
   StreamSubscription? _groupSubscription;
+  GroupService _groupService;
+  ExpenseService _expenseService;
 
   // TODO: error handling
   GroupLoaded get loadedState => state as GroupLoaded;
 
   void load(String? groupId) {
     _groupSubscription?.cancel();
-    _groupSubscription = GroupService.instance
+    _groupSubscription = _groupService
         .groupStream(groupId)
         .map((group) => group == null
             ? GroupError(error: 'Group does not exist')
@@ -25,7 +29,7 @@ class GroupCubit extends Cubit<GroupState> {
   }
 
   loadFromExpense(String? expenseId) async {
-    final expense = await ExpenseService.instance.getExpense(expenseId);
+    final expense = await _expenseService.getExpense(expenseId);
     load(expense.groupId);
   }
 
@@ -35,20 +39,36 @@ class GroupCubit extends Cubit<GroupState> {
 
     group.removeUser(uid);
     if (group.members.isEmpty) {
-      GroupService.instance.deleteGroup(group.id);
+      _groupService.deleteGroup(group.id);
     } else {
-      GroupService.instance.saveGroup(group);
+      _groupService.saveGroup(group);
     }
   }
 
   Future<String> addExpense(Expense expense) {
-    return GroupService.instance.addExpense(expense, loadedState.group);
+    return _groupService.addExpense(expense, loadedState.group);
   }
 
   updateBalance(Expense expense) async {
     final group = loadedState.group;
     group.updateBalance(expense);
-    await GroupService.instance.saveGroup(group);
+    await _groupService.saveGroup(group);
+  }
+
+  void join(String? code, User user) async {
+    if (code != loadedState.group.code) {
+      emit(GroupError(error: 'Invalid invitation. Make sure you have copied the link correctly.'));
+      return;
+    }
+
+    if (loadedState.group.userExists(user.uid)) {
+      emit(GroupError(error: 'You are already a member of this group'));
+      return;
+    }
+
+    emit(GroupLoading());
+    await _groupService.joinGroup(code!, user);
+    emit(GroupJoinSuccess());
   }
 
   @override
