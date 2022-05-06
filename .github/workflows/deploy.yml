@@ -1,10 +1,55 @@
+name: Bump version, build, deploy web and release apk
+
 on:
   push:
-    branches: 
-    - master 
-name: Bump version, build, deploy web and release apk
+    branches: [master]
+     
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  deploy:
+  deploy-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version bump from PR label
+        id: bump
+        uses: rymndhng/release-on-push-action@master
+        with:
+          # gets overriden by PR label
+          bump_version_scheme: minor
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Download Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+
+      - name: Download Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+
+      - name: Copy google-services.json
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build project
+        run: flutter build web
+
+      - name: Deploy to Firebase hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
+          projectId: statera-0
+          channelId: live
+  
+  deploy-android:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,28 +81,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test
-
-      - name: Install functions dependencies
-        run: cd functions && npm i
-      
-      - name: Run functions tests
-        run: npm test
-      
-      - name: Build functions
-        run: npm run build
-
-      - name: Build project (Web + Android)
-        run: flutter build web && flutter build apk
-
-      - name: Deploy to Firebase hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
-          projectId: statera-0
-          channelId: live
+      - name: Build project
+        run: flutter build apk
 
       - name: Attach release APK
         uses: ncipollo/release-action@v1
