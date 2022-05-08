@@ -1,1 +1,1 @@
-
+Statera is an easy to use application to manage shared expenses in groups.
