@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/ui/widgets/cancel_button.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class OKCancelDialog extends StatelessWidget {
   final String text;

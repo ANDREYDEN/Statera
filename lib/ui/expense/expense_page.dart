@@ -5,8 +5,10 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/deep_link_service.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/buttons/share_button.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -66,6 +68,12 @@ class ExpensePage extends StatelessWidget {
                 ? () => _handleNewItemClick(context, expenseBloc, authBloc)
                 : null,
             actions: [
+              ShareButton(
+                data: DynamicLinkService.generateDynamicLink(
+                  path: ModalRoute.of(context)!.settings.name,
+                ),
+                webIcon: Icons.share,
+              ),
               if (expense.canBeUpdatedBy(authBloc.state.user!.uid))
                 IconButton(
                   icon: Icon(Icons.settings),

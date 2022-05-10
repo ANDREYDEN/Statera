@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:statera/ui/widgets/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
 
 class FieldData {
   String id;

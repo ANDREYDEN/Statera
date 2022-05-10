@@ -3,7 +3,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/cancel_button.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
   final Expense expense;

@@ -4,7 +4,7 @@ import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/payment_service.dart';
-import 'package:statera/ui/widgets/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentDialog extends StatefulWidget {
