@@ -22,7 +22,13 @@ class SupportPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Questions about the app?'),
+                  Text(
+                    'Questions about the app?',
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.headline5!.fontSize,
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   TextLink(
                     text: 'Submit an issue report',
                     url: 'https://github.com/ANDREYDEN/Statera/issues',
@@ -35,7 +41,8 @@ class SupportPage extends StatelessWidget {
                     text: 'Contribute to the app',
                     url: 'https://github.com/ANDREYDEN/Statera',
                   ),
-                  Text('Andrii Denysenko, 2022'),
+                  SizedBox(height: 30),
+                  Text('Andrii Denysenko, ${DateTime.now().year}'),
                 ],
               ),
             ),
