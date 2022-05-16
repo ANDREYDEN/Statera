@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/deep_link_service.dart';
+import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/dialogs/qr_dialog.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/expense/expense_page.dart';
