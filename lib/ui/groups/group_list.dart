@@ -5,6 +5,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
@@ -56,6 +57,11 @@ class _GroupListState extends State<GroupList> {
               return PageScaffold(
                 title: kAppName,
                 actions: [
+                  IconButton(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, SupportPage.route),
+                    icon: Icon(Icons.info_outline_rounded),
+                  ),
                   IconButton(
                     onPressed: () {
                       snackbarCatch(context, () {
