@@ -5,7 +5,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/deep_link_service.dart';
+import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/buttons/share_button.dart';

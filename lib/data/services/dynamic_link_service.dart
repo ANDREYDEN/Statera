@@ -1,5 +1,11 @@
 class DynamicLinkService {
-  static String generateDynamicLink({String? path = '/'}) {
+  static String generateDynamicLink({String? path}) {
+    path ??= '/';
+    
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    
     return Uri.https(
       'statera.page.link',
       '',
