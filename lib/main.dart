@@ -41,6 +41,7 @@ class Statera extends StatelessWidget {
           themeMode: ThemeMode.system,
           onGenerateRoute: onGenerateRoute,
           initialRoute: GroupList.route,
+          debugShowCheckedModeBanner: false,
         ),
       ),
     );

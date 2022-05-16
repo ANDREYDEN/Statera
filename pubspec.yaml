@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
@@ -23,7 +23,6 @@ scripts:
 dependencies:
   flutter:
     sdk: flutter
-
 
   cupertino_icons: ^1.0.2
   provider: ^5.0.0
@@ -45,9 +44,11 @@ dependencies:
   qr_flutter: ^4.0.0
   url_strategy: ^0.2.0
   share_plus: ^4.0.4
-  
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
 # For information on the generic Dart part of this file, see the
