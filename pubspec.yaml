@@ -18,6 +18,7 @@ scripts:
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
   emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data
+  emulate-mac: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data_mac
   export-emulators: firebase emulators:export ./emulator_data
 
 dependencies:
