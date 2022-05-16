@@ -12,6 +12,7 @@ import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/ui/routing/page_path.dart';
+import 'package:statera/ui/support/support.dart';
 
 final _homePath = PagePath(
   pattern: '^${GroupList.route}\$',
@@ -23,6 +24,11 @@ final _homePath = PagePath(
 
 final List<PagePath> _paths = [
   _homePath,
+  PagePath(
+    pattern: '^${SupportPage.route}\$',
+    isPublic: true,
+    builder: (context, matches) => SupportPage(),
+  ),
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(

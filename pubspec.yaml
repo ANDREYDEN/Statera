@@ -45,6 +45,7 @@ dependencies:
   qr_flutter: ^4.0.0
   url_strategy: ^0.2.0
   share_plus: ^4.0.4
+  url_launcher: ^6.1.2
 
 dev_dependencies:
   flutter_test:
