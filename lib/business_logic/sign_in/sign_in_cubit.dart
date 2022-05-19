@@ -61,4 +61,21 @@ class SignInCubit extends Cubit<SignInState> {
       );
     }
   }
+
+  signInWithApple() async {
+    try {
+      emit(SignInLoading());
+      await _authRepository.signInWithApple();
+      emit(SignInLoaded());
+    } on FirebaseAuthException catch (firebaseError) {
+      final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
+          ? kSignInWithGoogleMessages[firebaseError.code]!
+          : 'Error while authenticating: ${firebaseError.message}';
+      emit(SignInError(error: message));
+    } catch (genericError) {
+      emit(
+        SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+      );
+    }
+  }
 }

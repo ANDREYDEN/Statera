@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthRepository {
   late FirebaseAuth _auth;
@@ -20,11 +21,13 @@ class AuthRepository {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  Future<UserCredential> signUp(String email, String password, String confirmPassword) {
+  Future<UserCredential> signUp(
+      String email, String password, String confirmPassword) {
     if (password != confirmPassword) {
       throw FirebaseAuthException(code: 'password-mismatch');
     }
-    return _auth.createUserWithEmailAndPassword(email: email, password: password);
+    return _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
   }
 
   Future<UserCredential?> signInWithGoogle() async {
@@ -50,8 +53,29 @@ class AuthRepository {
       idToken: googleAuth.idToken,
     );
 
-    final userCredential = await _auth.signInWithCredential(credential);
+    return await _auth.signInWithCredential(credential);
+  }
 
-    return userCredential;
+  Future<void> signInWithApple() async {
+    await (kIsWeb ? signInWithAppleOnWeb() : signInWithAppleOnMobile());
+  }
+
+  Future<UserCredential?> signInWithAppleOnWeb() async {
+    final provider = OAuthProvider('apple.com');
+    provider.addScope('email');
+    provider.addScope('name');
+
+    return await _auth.signInWithPopup(provider);
+  }
+
+  Future<AuthorizationCredentialAppleID?> signInWithAppleOnMobile() async {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+
+    return credential;
   }
 }
