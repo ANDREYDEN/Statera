@@ -130,6 +130,22 @@ class _SignInState extends State<SignIn> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: signInState is SignInLoading
+                          ? null
+                          : () => signInCubit.signInWithApple(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Center(
+                          child: signInState is SignInLoading
+                              ? Loader()
+                              : Text(_isSignIn
+                                  ? 'Sign in with Apple'
+                                  : 'Sign up with Apple'),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 20),
                     TextButton(
                       onPressed: () {

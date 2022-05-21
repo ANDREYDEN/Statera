@@ -15,7 +15,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
 
   configureEmulators();
@@ -41,6 +42,7 @@ class Statera extends StatelessWidget {
           themeMode: ThemeMode.system,
           onGenerateRoute: onGenerateRoute,
           initialRoute: GroupList.route,
+          debugShowCheckedModeBanner: false,
         ),
       ),
     );

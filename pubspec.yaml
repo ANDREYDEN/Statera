@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
@@ -18,12 +18,12 @@ scripts:
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
   emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data
+  emulate-mac: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data_mac
   export-emulators: firebase emulators:export ./emulator_data
 
 dependencies:
   flutter:
     sdk: flutter
-
 
   cupertino_icons: ^1.0.2
   provider: ^5.0.0
@@ -45,9 +45,13 @@ dependencies:
   qr_flutter: ^4.0.0
   url_strategy: ^0.2.0
   share_plus: ^4.0.4
-  
+  url_launcher: ^6.1.2
+  sign_in_with_apple: ^4.0.0
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
 # For information on the generic Dart part of this file, see the
