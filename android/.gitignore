@@ -8,3 +8,4 @@ GeneratedPluginRegistrant.java
 
 key.properties
 upload-keystore.jks
+fastlane-service-account.json
