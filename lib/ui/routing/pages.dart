@@ -10,7 +10,7 @@ import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/group_list.dart';
-import 'package:statera/ui/payments/payment_list.dart';
+import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
 
@@ -53,17 +53,17 @@ final List<PagePath> _paths = [
           )..loadFromExpense(matches?[0]),
         )
       ],
-      child: ExpensePage(expenseId: matches?[0]),
+      child: ExpensePage(),
     ),
   ),
   PagePath(
-    pattern: '^${GroupPage.route}/([\\w-]+)${PaymentList.route}/([\\w-]+)\$',
+    pattern: '^${GroupPage.route}/([\\w-]+)${PaymentListPage.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit(
         GroupService.instance,
         ExpenseService.instance,
       )..load(matches?[0]),
-      child: PaymentList(groupId: matches?[0], otherMemberId: matches?[1]),
+      child: PaymentListPage(groupId: matches?[0], otherMemberId: matches?[1]),
     ),
   ),
   PagePath(

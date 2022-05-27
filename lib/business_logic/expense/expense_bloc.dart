@@ -11,7 +11,10 @@ part 'expense_state.dart';
 part 'expense_event.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
-  ExpenseBloc() : super(ExpenseLoading());
+  ExpenseBloc() : super(ExpenseLoading()) {
+    on<UpdateRequested>(_handleUpdate);
+    on<ExpenseChanged>(_handleExpenseChanged);
+  }
 
   StreamSubscription? _expenseSubscription;
 
@@ -20,14 +23,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     _expenseSubscription = ExpenseService.instance
         .expenseStream(expenseId)
         .listen((expense) => add(ExpenseChanged(expense)));
-    on<UpdateRequested>(_handleUpdate);
-    on<ExpenseChanged>(_handleExpenseChanged);
   }
 
   _handleUpdate(UpdateRequested event, Emitter<ExpenseState> emit) async {
     if (state is ExpenseLoaded) {
       final expense = (state as ExpenseLoaded).expense;
-      
+
       await event.update.call(expense);
       ExpenseService.instance.updateExpense(expense);
     }
