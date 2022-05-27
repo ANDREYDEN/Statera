@@ -80,6 +80,16 @@ jobs:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: echo $FIREBASE_CONFIG > android/app/google-services.json
 
+      - name: Copy keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo $KEYSTORE_BASE64 | base64 -d > android/app/upload-keystore.jks
+
+      - name: Copy keystore properties
+        env:
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+        run: echo $KEY_PROPERTIES > android/key.properties
+
       - name: Get dependencies
         run: flutter pub get
 
