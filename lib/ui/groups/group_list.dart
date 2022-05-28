@@ -36,43 +36,43 @@ class _GroupListState extends State<GroupList> {
         var groupsCubit = context.read<GroupsCubit>();
         groupsCubit.load(authState.user!.uid);
 
-        return BlocBuilder<GroupsCubit, GroupsState>(
-          builder: (context, groupsState) {
-            if (groupsState is GroupsLoading) {
-              return PageScaffold(child: Center(child: Loader()));
-            }
+        return PageScaffold(
+          title: kAppName,
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.pushNamed(context, SupportPage.route),
+              icon: Icon(Icons.info_outline_rounded),
+            ),
+            IconButton(
+              onPressed: () {
+                snackbarCatch(context, () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                });
+              },
+              icon: Icon(Icons.logout),
+            ),
+          ],
+          onFabPressed: () => updateOrCreateGroup(groupsCubit, user),
+          child: BlocBuilder<GroupsCubit, GroupsState>(
+            builder: (context, groupsState) {
+              if (groupsState is GroupsLoading) {
+                return Center(child: Loader());
+              }
 
-            if (groupsState is GroupsError) {
-              developer.log('Failed loading groups', error: groupsState.error);
+              if (groupsState is GroupsError) {
+                developer.log(
+                  'Failed loading groups',
+                  error: groupsState.error,
+                );
 
-              return PageScaffold(
-                child: Center(child: Text(groupsState.error.toString())),
-              );
-            }
+                return Center(child: Text(groupsState.error.toString()));
+              }
 
-            if (groupsState is GroupsLoaded) {
-              final groups = groupsState.groups;
-              final groupsCubit = context.read<GroupsCubit>();
+              if (groupsState is GroupsLoaded) {
+                final groups = groupsState.groups;
+                final groupsCubit = context.read<GroupsCubit>();
 
-              return PageScaffold(
-                title: kAppName,
-                actions: [
-                  IconButton(
-                    onPressed: () =>
-                        Navigator.pushNamed(context, SupportPage.route),
-                    icon: Icon(Icons.info_outline_rounded),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      snackbarCatch(context, () {
-                        context.read<AuthBloc>().add(LogoutRequested());
-                      });
-                    },
-                    icon: Icon(Icons.logout),
-                  ),
-                ],
-                onFabPressed: () => updateOrCreateGroup(groupsCubit, user),
-                child: Column(
+                return Column(
                   children: [
                     SizedBox.square(
                       dimension: 16,
@@ -100,12 +100,12 @@ class _GroupListState extends State<GroupList> {
                             ),
                     ),
                   ],
-                ),
-              );
-            }
+                );
+              }
 
-            return Container();
-          },
+              return Container();
+            },
+          ),
         );
       },
     );

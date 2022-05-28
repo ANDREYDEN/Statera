@@ -15,42 +15,13 @@ class ExpenseService extends Firestore {
     return _instance!;
   }
 
-  Query _expensesQuery({
-    String? groupId,
-    String? assigneeId,
-    String? authorId,
-  }) {
-    var query = expensesCollection.where("groupId", isEqualTo: groupId);
-
-    if (assigneeId != null) {
-      query = query.where("assigneeIds", arrayContains: assigneeId);
-    }
-
-    if (authorId != null) {
-      query = query.where("author.uid", isEqualTo: authorId);
-    }
-
-    return query;
-  }
-
-  Stream<List<Expense>> _queryToExpensesStream(Query query) {
-    return query.snapshots().map<List<Expense>>(
-        (snap) => snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
-  }
-
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
-    return _queryToExpensesStream(
+    return queryToExpensesStream(
             expensesCollection.where("groupId", isEqualTo: groupId))
         .map((expenses) => expenses
             .where((expense) =>
                 expense.hasAssignee(uid) || expense.isAuthoredBy(uid))
             .toList());
-  }
-
-  Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
-    return _queryToExpensesStream(expensesCollection
-        .where("groupId", isEqualTo: groupId)
-        .where("unmarkedAssigneeIds", arrayContains: uid));
   }
 
   Future<Expense> getExpense(String? expenseId) async {
@@ -72,7 +43,7 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> addUserToOutstandingExpenses(String uid, String? groupId) async {
-    var expensesSnap = await _expensesQuery(groupId: groupId).get();
+    var expensesSnap = await expensesQuery(groupId: groupId).get();
     final expenses =
         expensesSnap.docs.map((doc) => Expense.fromSnapshot(doc)).toList();
 

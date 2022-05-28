@@ -124,4 +124,11 @@ class GroupService extends Firestore {
   Stream<Group?> getExpenseGroupStream(Expense expense) {
     return groupStream(expense.groupId);
   }
+
+  Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
+    return queryToExpensesStream(expensesQuery(
+      groupId: groupId,
+      unmarkedAssigneeId: uid,
+    ));
+  }
 }
