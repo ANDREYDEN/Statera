@@ -7,7 +7,7 @@ class PageScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final void Function()? onFabPressed;
 
-  final BottomNavigationBar? bottomNavBar;
+  final Widget? bottomNavBar;
 
   const PageScaffold({
     Key? key,

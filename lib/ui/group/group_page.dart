@@ -41,64 +41,80 @@ class _GroupPageState extends State<GroupPage> {
     }
 
     return CustomLayoutBuilder(
-      builder: (context, isWide) => PageScaffold(
-        key: GroupPage.scaffoldKey,
-        titleWidget: GroupTitle(),
-        actions: [GroupQRButton()],
-        onFabPressed: _selectedNavBarItemIndex == 0
-            ? null
-            : () => _handleNewExpenseClick(user),
-        bottomNavBar: isWide
-            ? null
-            : GroupBottomNavBar(
-                currentIndex: this._selectedNavBarItemIndex,
-                onTap: (index) {
-                  setState(() {
-                    this._selectedNavBarItemIndex = index;
-                  });
-                  _pageController.animateToPage(
-                    index,
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.ease,
-                  );
-                },
-              ) as BottomNavigationBar,
-        child: GroupBuilder(
-          builder: (context, group) => isWide
-              ? BlocProvider(
-                  create: (context) => ExpenseBloc(),
-                  child: Row(
-                    children: [
-                      GroupSideNavBar(
-                        onItemSelected: (index) {
-                          setState(() {
-                            _selectedNavBarItemIndex = index;
-                          });
-                        },
-                      ),
-                      ...(_selectedNavBarItemIndex == 0
-                          ? [
-                              Flexible(flex: 1, child: OwingsList()),
-                              Flexible(flex: 2, child: Placeholder())
-                            ]
-                          : [
-                              Flexible(flex: 1, child: ExpenseList()),
-                              Flexible(flex: 2, child: ExpenseDetails())
-                            ])
-                    ],
-                  ),
-                )
-              : PageView(
-                  controller: this._pageController,
-                  onPageChanged: (index) {
+      builder: (context, isWide) {
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(
+            _selectedNavBarItemIndex,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.ease,
+          );
+        }
+
+        return PageScaffold(
+          key: GroupPage.scaffoldKey,
+          titleWidget: GroupTitle(),
+          actions: [GroupQRButton()],
+          onFabPressed: _selectedNavBarItemIndex == 0
+              ? null
+              : () => _handleNewExpenseClick(user),
+          bottomNavBar: isWide
+              ? null
+              : GroupBottomNavBar(
+                  currentIndex: this._selectedNavBarItemIndex,
+                  onTap: (index) {
                     setState(() {
                       this._selectedNavBarItemIndex = index;
                     });
+                    _pageController.animateToPage(
+                      index,
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.ease,
+                    );
                   },
-                  children: [OwingsList(), ExpenseList()],
                 ),
-        ),
-      ),
+          child: GroupBuilder(
+            builder: (context, group) => isWide
+                ? BlocProvider(
+                    create: (context) => ExpenseBloc(),
+                    child: Row(
+                      children: [
+                        GroupSideNavBar(
+                          onItemSelected: (index) {
+                            setState(() {
+                              _selectedNavBarItemIndex = index;
+                            });
+                          },
+                        ),
+                        ...(_selectedNavBarItemIndex == 0
+                            ? [
+                                Flexible(flex: 1, child: OwingsList()),
+                                Flexible(flex: 2, child: Placeholder())
+                              ]
+                            : [
+                                Flexible(flex: 1, child: ExpenseList()),
+                                Flexible(flex: 2, child: ExpenseDetails())
+                              ])
+                      ],
+                    ),
+                  )
+                : PageView(
+                    controller: this._pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        this._selectedNavBarItemIndex = index;
+                      });
+                    },
+                    children: [
+                      OwingsList(),
+                      BlocProvider(
+                        create: (context) => ExpenseBloc(),
+                        child: ExpenseList(),
+                      )
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 
