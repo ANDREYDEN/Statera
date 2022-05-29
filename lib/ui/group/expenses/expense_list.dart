@@ -1,17 +1,20 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/widgets/custom_filter_chip.dart';
-import 'package:statera/ui/widgets/custom_stream_builder.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/group/expenses/expense_list_item.dart';
+import 'package:statera/ui/widgets/custom_filter_chip.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
+import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
-import 'package:statera/utils/helpers.dart';
 
 class ExpenseList extends StatefulWidget {
   const ExpenseList({Key? key}) : super(key: key);
@@ -25,13 +28,17 @@ class _ExpenseListState extends State<ExpenseList> {
   List<String> _filters = [];
 
   AuthBloc get authBloc => context.read<AuthBloc>();
-
   GroupCubit get groupCubit => context.read<GroupCubit>();
+  ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
 
   @override
   void initState() {
     super.initState();
-    _filters = authBloc.expenseStages.map((stage) => stage.name).toList();
+    _filters = authBloc.state.user == null
+        ? []
+        : Expense.expenseStages(authBloc.state.user!.uid)
+            .map((stage) => stage.name)
+            .toList();
     _expenseStream = authBloc.state.user == null
         ? Stream.empty()
         : ExpenseService.instance.listenForRelatedExpenses(
@@ -42,81 +49,98 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
+    if (authBloc.state.user == null) return Text('Unauthorized');
+    final uid = authBloc.state.user!.uid;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (kIsWeb) SizedBox(height: 8),
         Row(
           children: [
-            for (var stage in authBloc.expenseStages)
+            for (var stage in Expense.expenseStages(uid))
               Flexible(
                 child: CustomFilterChip(
                   label: stage.name,
                   color: stage.color,
                   filtersList: _filters,
-                  // TODO: this is bad
-                  onSelected: (selected) => setState(() => {}),
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _filters.add(stage.name);
+                      } else {
+                        _filters.remove(stage.name);
+                      }
+                    });
+
+                    expensesCubit.selectExpenseStages(uid, _filters);
+                  },
                 ),
               )
           ],
         ),
         if (authBloc.state.status == AuthStatus.authenticated)
-          Expanded(child: buildExpensesList()),
-      ],
-    );
-  }
+          Expanded(
+            child: BlocBuilder<ExpensesCubit, ExpensesState>(
+              builder: (context, expensesState) {
+                if (expensesState is ExpensesLoading) {
+                  return Loader();
+                }
 
-  Widget buildExpensesList() {
-    return CustomStreamBuilder<List<Expense>>(
-      stream: this._expenseStream,
-      builder: (context, expenses) {
-        snackbarCatch(context, () {
-          expenses.sort((firstExpense, secondExpense) {
-            for (var stage in authBloc.expenseStages) {
-              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-              }
-              if (firstExpense.isIn(stage)) return -1;
-              if (secondExpense.isIn(stage)) return 1;
-            }
-
-            return 0;
-          });
-
-          expenses = expenses
-              .where(
-                (expense) => authBloc.expenseStages.any(
-                  (stage) =>
-                      _filters.contains(stage.name) && expense.isIn(stage),
-                ),
-              )
-              .toList();
-        });
-
-        return expenses.isEmpty
-            ? ListEmpty(text: "Start by adding an expense")
-            : ListView.builder(
-                itemCount: expenses.length,
-                itemBuilder: (context, index) {
-                  var expense = expenses[index];
-
-                  return OptionallyDismissible(
-                    key: Key(expense.id!),
-                    isDismissible:
-                        expense.canBeUpdatedBy(authBloc.state.user!.uid),
-                    confirmation:
-                        "Are you sure you want to delete this expense and all of its items?",
-                    onDismissed: (_) {
-                      ExpenseService.instance.deleteExpense(expense);
-                    },
-                    child: GestureDetector(
-                      onLongPress: () => handleEditExpense(expense),
-                      child: ExpenseListItem(expense: expense),
-                    ),
+                if (expensesState is ExpensesError) {
+                  developer.log(
+                    'Failed loading expenses',
+                    error: expensesState.error,
                   );
-                },
-              );
-      },
+
+                  return Center(child: Text(expensesState.error.toString()));
+                }
+
+                if (expensesState is ExpensesLoaded) {
+                  final expenses = expensesState.expenses;
+                  return Column(
+                    children: [
+                      SizedBox.square(
+                        dimension: 16,
+                        child: Visibility(
+                          visible: expensesState is ExpensesProcessing,
+                          child: Loader(),
+                        ),
+                      ),
+                      Expanded(
+                        child: expenses.isEmpty
+                            ? ListEmpty(text: "Start by adding an expense")
+                            : ListView.builder(
+                                itemCount: expenses.length,
+                                itemBuilder: (context, index) {
+                                  var expense = expenses[index];
+
+                                  return OptionallyDismissible(
+                                    key: Key(expense.id!),
+                                    isDismissible:
+                                        expense.canBeUpdatedBy(authBloc.uid),
+                                    confirmation:
+                                        "Are you sure you want to delete this expense and all of its items?",
+                                    onDismissed: (_) =>
+                                        expensesCubit.deleteExpense(expense),
+                                    child: GestureDetector(
+                                      onLongPress: () =>
+                                          handleEditExpense(expense),
+                                      child: ExpenseListItem(expense: expense),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                }
+
+                return Container();
+              },
+            ),
+          ),
+      ],
     );
   }
 

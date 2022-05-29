@@ -115,7 +115,8 @@ class GroupService extends Firestore {
     return groupsCollection.doc(group.id).set(group.toFirestore());
   }
 
-  Future<String> addExpense(Expense expense, Group group) async {
+  Future<String> addExpense(String? groupId, Expense expense) async {
+    final group = await getGroupById(groupId);
     expense.assignGroup(group);
     final docRef = await expensesCollection.add(expense.toFirestore());
     return docRef.id;

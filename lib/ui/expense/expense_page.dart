@@ -83,7 +83,6 @@ class ExpensePage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ExpenseStages(expense: expense),
                 Card(
                   clipBehavior: Clip.antiAlias,
                   margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -91,7 +90,7 @@ class ExpensePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          authBloc.getExpenseColor(expense),
+                          expense.getColor(authBloc.state.user!.uid),
                           Theme.of(context).colorScheme.surface,
                         ],
                         stops: [0, 0.8],

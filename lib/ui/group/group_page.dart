@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/expense_details_web.dart';
@@ -16,7 +17,6 @@ import 'package:statera/ui/group/group_title.dart';
 import 'package:statera/ui/group/home/owings_list.dart';
 import 'package:statera/ui/widgets/custom_layout_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
-import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class GroupPage extends StatefulWidget {
@@ -56,7 +56,7 @@ class _GroupPageState extends State<GroupPage> {
           actions: [GroupQRButton()],
           onFabPressed: _selectedNavBarItemIndex == 0
               ? null
-              : () => _handleNewExpenseClick(user),
+              : () => _handleNewExpenseClick(user, isWide),
           bottomNavBar: isWide
               ? null
               : GroupBottomNavBar(
@@ -118,8 +118,11 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  void _handleNewExpenseClick(User user) {
+  void _handleNewExpenseClick(User user, bool isWide) {
     final groupCubit = context.read<GroupCubit>();
+    final groupId = groupCubit.loadedState.group.id;
+    final expensesCubit = context.read<ExpensesCubit>();
+
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
@@ -136,11 +139,15 @@ class _GroupPageState extends State<GroupPage> {
           var newExpense = Expense(
             author: Author.fromUser(user),
             name: values["expense_name"]!,
-            groupId: groupCubit.loadedState.group.id,
+            groupId: groupId,
           );
-          final expenseId = await groupCubit.addExpense(newExpense);
-          Navigator.of(context)
-              .popAndPushNamed('${ExpensePage.route}/$expenseId');
+          final expenseId = await expensesCubit.addExpense(newExpense, groupId);
+          if (isWide) {
+            Navigator.of(context).pop();
+          } else {
+            Navigator.of(context)
+                .popAndPushNamed('${ExpensePage.route}/$expenseId');
+          }
         },
       ),
     );

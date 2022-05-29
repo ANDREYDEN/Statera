@@ -5,12 +5,10 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/buttons/share_button.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
+import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -60,7 +58,6 @@ class ExpenseDetails extends StatelessWidget {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ExpenseStages(expense: expense),
               Card(
                 clipBehavior: Clip.antiAlias,
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -68,7 +65,7 @@ class ExpenseDetails extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        authBloc.getExpenseColor(expense),
+                        expense.getColor(authBloc.state.user!.uid),
                         Theme.of(context).colorScheme.surface,
                       ],
                       stops: [0, 0.8],

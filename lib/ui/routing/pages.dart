@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/services/services.dart';
@@ -17,7 +19,8 @@ import 'package:statera/ui/support/support.dart';
 final _homePath = PagePath(
   pattern: '^${GroupList.route}\$',
   builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (_) => GroupsCubit(),
+    create: (_) =>
+        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
 );
@@ -31,11 +34,21 @@ final List<PagePath> _paths = [
   ),
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
-    builder: (context, matches) => BlocProvider<GroupCubit>(
-      create: (context) => GroupCubit(
-        GroupService.instance,
-        ExpenseService.instance,
-      )..load(matches?[0]),
+    builder: (context, matches) => MultiProvider(
+      providers: [
+        BlocProvider<GroupCubit>(
+          create: (context) => GroupCubit(
+            GroupService.instance,
+            ExpenseService.instance,
+          )..load(matches?[0]),
+        ),
+        BlocProvider(
+          create: (context) => ExpensesCubit(
+            ExpenseService.instance,
+            GroupService.instance,
+          )..load(context.read<AuthBloc>().uid, matches?[0]),
+        )
+      ],
       child: GroupPage(groupId: matches?[0]),
     ),
   ),
@@ -57,7 +70,8 @@ final List<PagePath> _paths = [
     ),
   ),
   PagePath(
-    pattern: '^${GroupPage.route}/([\\w-]+)${PaymentListPage.route}/([\\w-]+)\$',
+    pattern:
+        '^${GroupPage.route}/([\\w-]+)${PaymentListPage.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit(
         GroupService.instance,
