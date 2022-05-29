@@ -21,11 +21,8 @@ class _ExpenseListFiltersState extends State<ExpenseListFilters> {
   @override
   void initState() {
     super.initState();
-    _filters = authBloc.state.user == null
-        ? []
-        : Expense.expenseStages(authBloc.state.user!.uid)
-            .map((stage) => stage.name)
-            .toList();
+    _filters =
+        Expense.expenseStages(authBloc.uid).map((stage) => stage.name).toList();
   }
 
   @override
