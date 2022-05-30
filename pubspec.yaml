@@ -47,6 +47,7 @@ dependencies:
   share_plus: ^4.0.4
   url_launcher: ^6.1.2
   sign_in_with_apple: ^4.0.0
+  crypto: ^3.0.1
 
 dev_dependencies:
   flutter_test:
