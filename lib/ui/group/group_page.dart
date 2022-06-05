@@ -79,6 +79,7 @@ class _GroupPageState extends State<GroupPage> {
                     child: Row(
                       children: [
                         GroupSideNavBar(
+                          selectedItem: _selectedNavBarItemIndex,
                           onItemSelected: (index) {
                             setState(() {
                               _selectedNavBarItemIndex = index;

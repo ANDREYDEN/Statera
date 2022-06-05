@@ -22,7 +22,7 @@ class ExpenseList extends StatelessWidget {
           child: BlocBuilder<ExpensesCubit, ExpensesState>(
             builder: (context, expensesState) {
               if (expensesState is ExpensesLoading) {
-                return Loader();
+                return Center(child: Loader());
               }
 
               if (expensesState is ExpensesError) {
