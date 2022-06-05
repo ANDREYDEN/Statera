@@ -5,6 +5,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/group_service.dart';
+import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/home/owing_list_item.dart';
 import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -15,7 +16,7 @@ class OwingsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var groupCubit = context.read<GroupCubit>();
-    var user = context.select((AuthBloc authBloc) => authBloc.state.user);
+    var authBloc = context.read<AuthBloc>();
 
     return Column(
       children: [
@@ -24,53 +25,44 @@ class OwingsList extends StatelessWidget {
           'Your Owings',
           style: Theme.of(context).textTheme.headline6,
         ),
-        if (user != null)
-          Flexible(
-            child: StreamProvider<Map<Author, double>>(
-              initialData: {},
-              create: (context) =>
-                  GroupService.instance.getOwingsForUserInGroup(
-                user.uid,
-                groupCubit.loadedState.group.id,
+        Flexible(
+          child: GroupBuilder(builder: (context, group) {
+            final owings = group.extendedBalance(authBloc.uid);
+            return owings.isEmpty
+                ? ListEmpty(text: 'Start by inviting people to your group...')
+                : ListView.builder(
+                    itemCount: owings.length,
+                    itemBuilder: (context, index) {
+                      var payer = owings.keys.elementAt(index);
+                      return OwingListItem(
+                        member: payer,
+                        owing: owings[payer]!,
+                      );
+                    },
+                  );
+          }),
+        ),
+        TextButton(
+          onPressed: () async {
+            var decision = await showDialog<bool>(
+              context: context,
+              builder: (context) => OKCancelDialog(
+                text: "Are you sure you want to leave the group?",
               ),
-              child: Consumer<Map<Author, double>>(
-                builder: (_, owings, __) => owings.isEmpty
-                    ? ListEmpty(text: 'Nobody here except you...')
-                    : ListView.builder(
-                        itemCount: owings.length,
-                        itemBuilder: (context, index) {
-                          var payer = owings.keys.elementAt(index);
-                          return OwingListItem(
-                            member: payer,
-                            owing: owings[payer]!,
-                          );
-                        },
-                      ),
-              ),
+            );
+            if (decision!) {
+              groupCubit.removeUser(authBloc.uid);
+              Navigator.pop(context);
+            }
+          },
+          child: Text(
+            "Leave group",
+            style: TextStyle(
+              color: Theme.of(context).errorColor,
+              decoration: TextDecoration.underline,
             ),
           ),
-        if (user != null)
-          TextButton(
-            onPressed: () async {
-              var decision = await showDialog<bool>(
-                context: context,
-                builder: (context) => OKCancelDialog(
-                  text: "Are you sure you want to leave the group?",
-                ),
-              );
-              if (decision!) {
-                groupCubit.removeUser(user.uid);
-                Navigator.pop(context);
-              }
-            },
-            child: Text(
-              "Leave group",
-              style: TextStyle(
-                color: Theme.of(context).errorColor,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          )
+        )
       ],
     );
   }

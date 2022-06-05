@@ -69,17 +69,6 @@ class GroupService extends Firestore {
     });
   }
 
-  Stream<Map<Author, double>> getOwingsForUserInGroup(
-    String consumerUid,
-    String? groupId,
-  ) {
-    return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
-      var group = Group.fromFirestore(groupSnap.data() as Map<String, dynamic>,
-          id: groupSnap.id);
-      return group.extendedBalance(consumerUid);
-    });
-  }
-
   Stream<List<Group>> userGroupsStream(String? uid) {
     return groupsCollection
         .where('memberIds', arrayContains: uid)

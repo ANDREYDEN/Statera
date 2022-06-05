@@ -21,20 +21,20 @@ class OwingListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var groupCubit = context.read<GroupCubit>();
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(child: AuthorAvatar(author: this.member, withName: true)),
-          PriceText(value: this.owing, textStyle: TextStyle(fontSize: 18)),
-          SizedBox(width: 10),
-          IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(
-              "${GroupPage.route}/${groupCubit.loadedState.group.id}${PaymentListPage.route}/${member.uid}",
-            ),
-            icon: Icon(Icons.analytics_outlined),
-          )
-        ],
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamed(
+        "${GroupPage.route}/${groupCubit.loadedState.group.id}${PaymentListPage.route}/${member.uid}",
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration:
+            BoxDecoration(border: Border(bottom: BorderSide(color: Color.fromARGB(255, 204, 204, 204)))),
+        child: Row(
+          children: [
+            Expanded(child: AuthorAvatar(author: this.member, withName: true)),
+            PriceText(value: this.owing, textStyle: TextStyle(fontSize: 18)),
+          ],
+        ),
       ),
     );
   }
