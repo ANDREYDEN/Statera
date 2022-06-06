@@ -10,12 +10,12 @@ abstract class OwingState extends Equatable {
 class OwingLoading extends OwingState {}
 
 class OwingLoaded extends OwingState {
-  final Owing expenses;
+  final String memberId;
 
-  const OwingLoaded({required this.expenses});
+  const OwingLoaded({required this.memberId});
 
   @override
-  List<Object> get props => [expenses];
+  List<Object> get props => [memberId];
 }
 
 class OwingError extends OwingState {

@@ -6,6 +6,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -72,12 +73,19 @@ final List<PagePath> _paths = [
   PagePath(
     pattern:
         '^${GroupPage.route}/([\\w-]+)${PaymentListPage.route}/([\\w-]+)\$',
-    builder: (context, matches) => BlocProvider<GroupCubit>(
-      create: (context) => GroupCubit(
-        GroupService.instance,
-        ExpenseService.instance,
-      )..load(matches?[0]),
-      child: PaymentListPage(groupId: matches?[0], otherMemberId: matches?[1]),
+    builder: (context, matches) => MultiBlocProvider(
+      providers: [
+        BlocProvider<GroupCubit>(
+          create: (context) => GroupCubit(
+            GroupService.instance,
+            ExpenseService.instance,
+          )..load(matches?[0]),
+        ),
+        BlocProvider<OwingCubit>(
+          create: (context) => OwingCubit()..load(matches?[1] ?? ''),
+        ),
+      ],
+      child: PaymentListPage(),
     ),
   ),
   PagePath(

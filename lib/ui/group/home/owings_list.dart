@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/models/author.dart';
-import 'package:statera/data/services/group_service.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/home/owing_list_item.dart';
 import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
@@ -26,21 +24,23 @@ class OwingsList extends StatelessWidget {
           style: Theme.of(context).textTheme.headline6,
         ),
         Flexible(
-          child: GroupBuilder(builder: (context, group) {
-            final owings = group.extendedBalance(authBloc.uid);
-            return owings.isEmpty
-                ? ListEmpty(text: 'Start by inviting people to your group...')
-                : ListView.builder(
-                    itemCount: owings.length,
-                    itemBuilder: (context, index) {
-                      var payer = owings.keys.elementAt(index);
-                      return OwingListItem(
-                        member: payer,
-                        owing: owings[payer]!,
-                      );
-                    },
-                  );
-          }),
+          child: GroupBuilder(
+            builder: (context, group) {
+              final owings = group.extendedBalance(authBloc.uid);
+              return owings.isEmpty
+                  ? ListEmpty(text: 'Start by inviting people to your group...')
+                  : ListView.builder(
+                      itemCount: owings.length,
+                      itemBuilder: (context, index) {
+                        var payer = owings.keys.elementAt(index);
+                        return OwingListItem(
+                          member: payer,
+                          owing: owings[payer]!,
+                        );
+                      },
+                    );
+            },
+          ),
         ),
         TextButton(
           onPressed: () async {
