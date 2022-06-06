@@ -6,19 +6,17 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
+import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
-import 'package:statera/ui/widgets/loader.dart';
-import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/utils.dart';
 
 import 'dialogs/expense_dialogs.dart';
 
 class ExpenseDetails extends StatelessWidget {
-
   const ExpenseDetails({Key? key}) : super(key: key);
 
   @override
@@ -26,154 +24,128 @@ class ExpenseDetails extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
-    return BlocConsumer<ExpenseBloc, ExpenseState>(
-      listener: (expenseContext, state) {
-        if (state is ExpenseError) {
-          showSnackBar(
-            context,
-            state.error.toString(),
-            duration: Duration.zero,
-          );
-        }
-      },
-      listenWhen: (before, after) => after is ExpenseError,
-      builder: (context, expenseState) {
-        if (authBloc.state.status == AuthStatus.unauthenticated) {
-          return Text('Unauthorized');
-        }
+    return ExpenseBuilder(
+      loadingWidget: ListEmpty(text: 'Pick an expense first'),
+      builder: (context, expense) {
+        final expenseCanBeUpdated =
+            expense.canBeUpdatedBy(authBloc.state.user!.uid);
 
-        if (expenseState is ExpenseLoading) {
-          return Center(child: Loader());
-        }
-
-        if (expenseState is ExpenseError) {
-          return Center(child: Text(expenseState.error.toString()));
-        }
-
-        if (expenseState is ExpenseLoaded) {
-          final expense = expenseState.expense;
-          final expenseCanBeUpdated =
-              expense.canBeUpdatedBy(authBloc.state.user!.uid);
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Card(
-                clipBehavior: Clip.antiAlias,
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        expense.getColor(authBloc.state.user!.uid),
-                        Theme.of(context).colorScheme.surface,
-                      ],
-                      stops: [0, 0.8],
-                    ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Card(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      expense.getColor(authBloc.state.user!.uid),
+                      Theme.of(context).colorScheme.surface,
+                    ],
+                    stops: [0, 0.8],
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      children: [
-                        // Name
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                expense.name,
-                                softWrap: false,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 32,
-                                ),
-                                overflow: TextOverflow.fade,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      // Name
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              expense.name,
+                              softWrap: false,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 32,
+                              ),
+                              overflow: TextOverflow.fade,
+                            ),
+                          ),
+                          Card(
+                            color: Colors.grey[600],
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 5,
+                              ),
+                              child: PriceText(
+                                value: expense.total,
+                                textStyle: TextStyle(color: Colors.white),
                               ),
                             ),
-                            Card(
-                              color: Colors.grey[600],
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 5,
-                                ),
-                                child: PriceText(
-                                  value: expense.total,
-                                  textStyle: TextStyle(color: Colors.white),
-                                ),
-                              ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.schedule, size: 20),
+                          TextButton(
+                            onPressed: expenseCanBeUpdated
+                                ? () => _handleDateClick(
+                                      context,
+                                      expenseBloc,
+                                      authBloc,
+                                    )
+                                : null,
+                            child: Text(
+                              toStringDate(expense.date) ?? 'Not set',
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.schedule, size: 20),
-                            TextButton(
-                              onPressed: expenseCanBeUpdated
-                                  ? () => _handleDateClick(
-                                        context,
-                                        expenseBloc,
-                                        authBloc,
-                                      )
-                                  : null,
-                              child: Text(
-                                toStringDate(expense.date) ?? 'Not set',
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            AuthorAvatar(
-                              author: expense.author,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AuthorAvatar(
+                            author: expense.author,
+                            onTap: expenseCanBeUpdated
+                                ? () => _handleAuthorClick(
+                                      context,
+                                      expenseBloc,
+                                      authBloc,
+                                    )
+                                : null,
+                          ),
+                          Icon(Icons.arrow_forward),
+                          Expanded(
+                            child: GestureDetector(
                               onTap: expenseCanBeUpdated
-                                  ? () => _handleAuthorClick(
+                                  ? () => _handleAssigneesClick(
                                         context,
                                         expenseBloc,
                                         authBloc,
                                       )
                                   : null,
+                              child: AssigneeList(),
                             ),
-                            Icon(Icons.arrow_forward),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: expenseCanBeUpdated
-                                    ? () => _handleAssigneesClick(
-                                          context,
-                                          expenseBloc,
-                                          authBloc,
-                                        )
-                                    : null,
-                                child: AssigneeList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-              if (expense.hasNoItems && expenseCanBeUpdated)
-                ElevatedButton.icon(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => ReceiptScanDialog(expense: expense),
-                  ),
-                  label: Text('Upload receipt'),
-                  icon: Icon(Icons.photo_camera),
+            ),
+            if (expense.hasNoItems && expenseCanBeUpdated)
+              ElevatedButton.icon(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => ReceiptScanDialog(expense: expense),
                 ),
-              Flexible(
-                child: expense.hasNoItems
-                    ? ListEmpty(text: 'Add items to this expense')
-                    : ItemsList(),
+                label: Text('Upload receipt'),
+                icon: Icon(Icons.photo_camera),
               ),
-            ],
-          );
-        }
-
-        return PageScaffold(child: Container());
+            Flexible(
+              child: expense.hasNoItems
+                  ? ListEmpty(text: 'Add items to this expense')
+                  : ItemsList(),
+            ),
+          ],
+        );
       },
     );
   }

@@ -21,6 +21,7 @@ class PaymentListBody extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
 
     return OwingBuilder(
+      loadingWidget: ListEmpty(text: 'Pick a group member first'),
       builder: (context, otherMemberId) {
         return GroupBuilder(
           builder: (context, group) {
