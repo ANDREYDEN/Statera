@@ -124,7 +124,7 @@ class _GroupPageState extends State<GroupPage> {
           Flexible(flex: 2, child: ExpenseDetails())
         ];
       case 2:
-        return [GroupSettings()];
+        return [Flexible(child: GroupSettings())];
       default:
         return [];
     }

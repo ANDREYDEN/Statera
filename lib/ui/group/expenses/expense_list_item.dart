@@ -105,7 +105,9 @@ class ExpenseListItem extends StatelessWidget {
                           // TODO: use transaction
                           await ExpenseService.instance
                               .finalizeExpense(expense);
-                          groupCubit.updateBalance(expense);
+                          groupCubit.update((group) {
+                            group.updateBalance(expense);
+                          });
                         },
                         successMessage:
                             "The expense is now finalized. Participants' balances updated.",
