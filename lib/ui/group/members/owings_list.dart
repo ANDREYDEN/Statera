@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/home/owing_list_item.dart';
-import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
+import 'package:statera/ui/group/members/owing_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 
 class OwingsList extends StatelessWidget {
@@ -13,7 +11,6 @@ class OwingsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var groupCubit = context.read<GroupCubit>();
     var authBloc = context.read<AuthBloc>();
 
     return Column(
@@ -42,27 +39,6 @@ class OwingsList extends StatelessWidget {
             },
           ),
         ),
-        TextButton(
-          onPressed: () async {
-            var decision = await showDialog<bool>(
-              context: context,
-              builder: (context) => OKCancelDialog(
-                text: "Are you sure you want to leave the group?",
-              ),
-            );
-            if (decision!) {
-              groupCubit.removeUser(authBloc.uid);
-              Navigator.pop(context);
-            }
-          },
-          child: Text(
-            "Leave group",
-            style: TextStyle(
-              color: Theme.of(context).errorColor,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        )
       ],
     );
   }

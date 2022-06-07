@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/home/owing_builder.dart';
+import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';

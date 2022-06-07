@@ -31,6 +31,14 @@ class GroupSideNavBar extends StatelessWidget {
                   : Icons.receipt_long_outlined),
             ),
           ),
+          IconButton(
+            onPressed: () => onItemSelected(2),
+            icon: Icon(
+              selectedItem == 2
+                  ? Icons.settings_rounded
+                  : Icons.settings_outlined,
+            ),
+          ),
         ],
       ),
     );

@@ -34,6 +34,7 @@ class GroupCubit extends Cubit<GroupState> {
   }
 
   void removeUser(String uid) {
+    emit(GroupLoading());
     final group = loadedState.group;
     if (group.members.every((member) => member.uid != uid)) return;
 
@@ -45,10 +46,18 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
-  void updateBalance(Expense expense) async {
+  void updateBalance(Expense expense) {
+    emit(GroupLoading());
     final group = loadedState.group;
     group.updateBalance(expense);
-    await _groupService.saveGroup(group);
+    _groupService.saveGroup(group);
+  }
+
+  void updateCurrencySign(String currencySign) {
+    emit(GroupLoading());
+    final group = loadedState.group;
+    group.currencySign = currencySign;
+    _groupService.saveGroup(group);
   }
 
   void join(String? code, User user) async {

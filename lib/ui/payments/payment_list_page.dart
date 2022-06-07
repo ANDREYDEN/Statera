@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/home/owing_builder.dart';
+import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list_body.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 

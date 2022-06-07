@@ -16,7 +16,8 @@ import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/group_side_nav_bar.dart';
 import 'package:statera/ui/group/group_title.dart';
-import 'package:statera/ui/group/home/owings_list.dart';
+import 'package:statera/ui/group/members/owings_list.dart';
+import 'package:statera/ui/group/settings/group_settings.dart';
 import 'package:statera/ui/payments/payment_list_body.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -33,7 +34,7 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
-  int _selectedNavBarItemIndex = 0;
+  int _selectedNavBarItemIndex = 2;
   PageController _pageController = PageController();
 
   Widget build(BuildContext context) {
@@ -87,15 +88,7 @@ class _GroupPageState extends State<GroupPage> {
                         });
                       },
                     ),
-                    ...(_selectedNavBarItemIndex == 0
-                        ? [
-                            Flexible(flex: 1, child: OwingsList()),
-                            Flexible(flex: 2, child: PaymentListBody())
-                          ]
-                        : [
-                            Flexible(flex: 1, child: ExpenseList()),
-                            Flexible(flex: 2, child: ExpenseDetails())
-                          ])
+                    ..._renderContent()
                   ],
                 )
               : PageView(
@@ -116,6 +109,25 @@ class _GroupPageState extends State<GroupPage> {
         ),
       ),
     );
+  }
+
+  List<Widget> _renderContent() {
+    switch (_selectedNavBarItemIndex) {
+      case 0:
+        return [
+          Flexible(flex: 1, child: OwingsList()),
+          Flexible(flex: 2, child: PaymentListBody())
+        ];
+      case 1:
+        return [
+          Flexible(flex: 1, child: ExpenseList()),
+          Flexible(flex: 2, child: ExpenseDetails())
+        ];
+      case 2:
+        return [GroupSettings()];
+      default:
+        return [];
+    }
   }
 
   void _handleNewExpenseClick(User user, bool isWide) {
