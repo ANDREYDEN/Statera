@@ -19,12 +19,17 @@ class GroupBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           label: "Home",
           icon: Icon(Icons.group_outlined),
-          activeIcon: Icon(Icons.group),
+          activeIcon: Icon(Icons.group_rounded),
         ),
         BottomNavigationBarItem(
           label: "Expenses",
           icon: UnmarkedExpensesBadge(child: Icon(Icons.receipt_long_outlined)),
-          activeIcon: Icon(Icons.receipt_long),
+          activeIcon: Icon(Icons.receipt_long_rounded),
+        ),
+        BottomNavigationBarItem(
+          label: "Settings",
+          icon: Icon(Icons.settings_outlined),
+          activeIcon: Icon(Icons.settings_rounded),
         ),
       ],
       currentIndex: currentIndex,

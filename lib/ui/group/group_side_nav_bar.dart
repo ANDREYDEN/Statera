@@ -4,11 +4,13 @@ import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 class GroupSideNavBar extends StatelessWidget {
   final int selectedItem;
   final Function(int) onItemSelected;
+  final List<Widget Function(bool isActive)> iconBuilders;
 
   const GroupSideNavBar({
     Key? key,
     required this.onItemSelected,
     required this.selectedItem,
+    required this.iconBuilders,
   }) : super(key: key);
 
   @override
@@ -17,27 +19,10 @@ class GroupSideNavBar extends StatelessWidget {
       width: 50,
       child: ListView(
         children: [
+          for(var i = 0; i < iconBuilders.length; i++)
           IconButton(
-            onPressed: () => onItemSelected(0),
-            icon: Icon(
-              selectedItem == 0 ? Icons.group_rounded : Icons.group_outlined,
-            ),
-          ),
-          IconButton(
-            onPressed: () => onItemSelected(1),
-            icon: UnmarkedExpensesBadge(
-              child: Icon(selectedItem == 1
-                  ? Icons.receipt_long_rounded
-                  : Icons.receipt_long_outlined),
-            ),
-          ),
-          IconButton(
-            onPressed: () => onItemSelected(2),
-            icon: Icon(
-              selectedItem == 2
-                  ? Icons.settings_rounded
-                  : Icons.settings_outlined,
-            ),
+            onPressed: () => onItemSelected(i),
+            icon: iconBuilders[i](i == selectedItem),
           ),
         ],
       ),

@@ -21,6 +21,7 @@ import 'package:statera/ui/group/settings/group_settings.dart';
 import 'package:statera/ui/payments/payment_list_body.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
+import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
   static const String route = "/group";
@@ -34,7 +35,7 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
-  int _selectedNavBarItemIndex = 2;
+  int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
   Widget build(BuildContext context) {
@@ -60,53 +61,74 @@ class _GroupPageState extends State<GroupPage> {
           ? null
           : GroupBottomNavBar(
               currentIndex: this._selectedNavBarItemIndex,
-              onTap: (index) {
-                setState(() {
-                  this._selectedNavBarItemIndex = index;
-                });
-                _pageController.animateToPage(
+              onTap: (index) async {
+                await _pageController.animateToPage(
                   index,
                   duration: Duration(milliseconds: 500),
                   curve: Curves.ease,
                 );
+                setState(() {
+                  this._selectedNavBarItemIndex = index;
+                });
               },
             ),
-      child: GroupBuilder(
-        builder: (context, group) => MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => ExpenseBloc()),
-            BlocProvider(create: (context) => OwingCubit()),
-          ],
-          child: isWide
-              ? Row(
-                  children: [
-                    GroupSideNavBar(
-                      selectedItem: _selectedNavBarItemIndex,
-                      onItemSelected: (index) {
-                        setState(() {
-                          _selectedNavBarItemIndex = index;
-                        });
-                      },
-                    ),
-                    ..._renderContent()
-                  ],
-                )
-              : PageView(
-                  controller: this._pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      this._selectedNavBarItemIndex = index;
-                    });
-                  },
-                  children: [
-                    OwingsList(),
-                    BlocProvider(
-                      create: (context) => ExpenseBloc(),
-                      child: ExpenseList(),
-                    )
-                  ],
-                ),
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => ExpenseBloc()),
+          BlocProvider(create: (context) => OwingCubit()),
+        ],
+        child: isWide
+            ? Row(
+                children: [
+                  GroupSideNavBar(
+                    selectedItem: _selectedNavBarItemIndex,
+                    onItemSelected: (index) {
+                      setState(() {
+                        _selectedNavBarItemIndex = index;
+                      });
+                    },
+                    iconBuilders: [
+                      (isActive) => Icon(
+                            isActive
+                                ? Icons.group_rounded
+                                : Icons.group_outlined,
+                            color: isActive ? Colors.black : Colors.grey[600],
+                          ),
+                      (isActive) => UnmarkedExpensesBadge(
+                            child: Icon(
+                              isActive
+                                  ? Icons.receipt_long_rounded
+                                  : Icons.receipt_long_outlined,
+                              color: isActive ? Colors.black : Colors.grey[600],
+                            ),
+                          ),
+                      (isActive) => Icon(
+                            isActive
+                                ? Icons.settings_rounded
+                                : Icons.settings_outlined,
+                            color: isActive ? Colors.black : Colors.grey[600],
+                          )
+                    ],
+                  ),
+                  ..._renderContent()
+                ],
+              )
+            : PageView(
+                controller: this._pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    this._selectedNavBarItemIndex = index;
+                  });
+                },
+                children: [
+                  OwingsList(),
+                  BlocProvider(
+                    create: (context) => ExpenseBloc(),
+                    child: ExpenseList(),
+                  ),
+                  GroupSettings()
+                ],
+              ),
       ),
     );
   }
