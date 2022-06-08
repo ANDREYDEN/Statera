@@ -33,13 +33,11 @@ class ExpensesBuilder extends StatelessWidget {
         if (state is ExpensesLoaded) {
           return Column(
             children: [
-              SizedBox.square(
-                dimension: 16,
-                child: Visibility(
-                  visible: state is ExpensesProcessing,
+              if (state is ExpensesProcessing)
+                SizedBox.square(
+                  dimension: 16,
                   child: Loader(),
                 ),
-              ),
               Expanded(child: builder(groupContext, state.expenses))
             ],
           );

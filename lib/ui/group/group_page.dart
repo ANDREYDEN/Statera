@@ -1,26 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/expenses/expenses_cubit.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/expense_details_web.dart';
-import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
-import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
-import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/expenses/new_expense_handler.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
-import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/group_title.dart';
 import 'package:statera/ui/group/members/owings_list.dart';
+import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
+import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
 import 'package:statera/ui/payments/payment_list_body.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
@@ -59,8 +52,7 @@ class _GroupPageState extends State<GroupPage> {
   ];
 
   Widget build(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
-    final isWide = context.read<LayoutState>().isWide;
+    final isWide = context.select((LayoutState state) => state.isWide);
 
     if (_pageController.hasClients) {
       _pageController.animateToPage(
@@ -74,9 +66,11 @@ class _GroupPageState extends State<GroupPage> {
       key: GroupPage.scaffoldKey,
       titleWidget: GroupTitle(),
       actions: [GroupQRButton()],
-      onFabPressed: _selectedNavBarItemIndex == 0
+      onFabPressed: isWide
           ? null
-          : () => _handleNewExpenseClick(authBloc.user, isWide),
+          : _selectedNavBarItemIndex == 0
+              ? null
+              : () => handleNewExpenseClick(context),
       bottomNavBar: isWide
           ? null
           : GroupBottomNavBar(
@@ -153,40 +147,5 @@ class _GroupPageState extends State<GroupPage> {
       default:
         return [];
     }
-  }
-
-  void _handleNewExpenseClick(User user, bool isWide) {
-    final groupCubit = context.read<GroupCubit>();
-    final groupId = groupCubit.loadedState.group.id;
-    final expensesCubit = context.read<ExpensesCubit>();
-
-    showDialog(
-      context: context,
-      builder: (context) => CRUDDialog(
-        title: "New Expense",
-        fields: [
-          FieldData(
-            id: "expense_name",
-            label: "Expense Name",
-            validators: [FieldData.requiredValidator],
-          )
-        ],
-        closeAfterSubmit: false,
-        onSubmit: (values) async {
-          var newExpense = Expense(
-            author: Author.fromUser(user),
-            name: values["expense_name"]!,
-            groupId: groupId,
-          );
-          final expenseId = await expensesCubit.addExpense(newExpense, groupId);
-          if (isWide) {
-            Navigator.of(context).pop();
-          } else {
-            Navigator.of(context)
-                .popAndPushNamed('${ExpensePage.route}/$expenseId');
-          }
-        },
-      ),
-    );
   }
 }
