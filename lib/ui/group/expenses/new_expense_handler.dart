@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
@@ -14,6 +15,7 @@ void handleNewExpenseClick(BuildContext context) {
     final groupCubit = context.read<GroupCubit>();
     final groupId = groupCubit.loadedState.group.id;
     final expensesCubit = context.read<ExpensesCubit>();
+    final expenseBloc = context.read<ExpenseBloc>();
 
     showDialog(
       context: context,
@@ -36,6 +38,7 @@ void handleNewExpenseClick(BuildContext context) {
           final expenseId = await expensesCubit.addExpense(newExpense, groupId);
           if (isWide) {
             Navigator.of(context).pop();
+            expenseBloc.load(expenseId);
           } else {
             Navigator.of(context)
                 .popAndPushNamed('${ExpensePage.route}/$expenseId');

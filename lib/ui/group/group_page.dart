@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
-import 'package:statera/ui/expense/expense_details_web.dart';
+import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/group/expenses/new_expense_handler.dart';
 import 'package:statera/ui/group/group_qr_button.dart';

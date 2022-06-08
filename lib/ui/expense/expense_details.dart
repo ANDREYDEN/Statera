@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
+import 'package:statera/ui/expense/expense_action_handlers.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/buttons/share_button.dart';
+import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/utils.dart';
@@ -22,17 +26,54 @@ class ExpenseDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
-    final expenseBloc = context.read<ExpenseBloc>();
+    final expensesCubit = context.read<ExpensesCubit>();
+    final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
       loadingWidget: ListEmpty(text: 'Pick an expense first'),
       builder: (context, expense) {
-        final expenseCanBeUpdated =
-            expense.canBeUpdatedBy(authBloc.state.user!.uid);
+        final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (isWide)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    ShareButton(
+                      data: DynamicLinkService.generateDynamicLink(
+                        path: ModalRoute.of(context)!.settings.name,
+                      ),
+                      webIcon: Icons.share,
+                    ),
+                    if (expense.canBeUpdatedBy(authBloc.uid)) ...[
+                      IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () => handleSettingsClick(context),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => OKCancelDialog(
+                              text:
+                                  'Are you sure you want to delete this expense and all of its items?',
+                            ),
+                          );
+                          if (confirmed == true)
+                            expensesCubit.deleteExpense(expense);
+                        },
+                      ),
+                    ]
+                  ],
+                ),
+              ),
             Card(
               clipBehavior: Clip.antiAlias,
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -85,11 +126,7 @@ class ExpenseDetails extends StatelessWidget {
                           Icon(Icons.schedule, size: 20),
                           TextButton(
                             onPressed: expenseCanBeUpdated
-                                ? () => _handleDateClick(
-                                      context,
-                                      expenseBloc,
-                                      authBloc,
-                                    )
+                                ? () => _handleDateClick(context)
                                 : null,
                             child: Text(
                               toStringDate(expense.date) ?? 'Not set',
@@ -103,22 +140,14 @@ class ExpenseDetails extends StatelessWidget {
                           AuthorAvatar(
                             author: expense.author,
                             onTap: expenseCanBeUpdated
-                                ? () => _handleAuthorClick(
-                                      context,
-                                      expenseBloc,
-                                      authBloc,
-                                    )
+                                ? () => _handleAuthorClick(context)
                                 : null,
                           ),
                           Icon(Icons.arrow_forward),
                           Expanded(
                             child: GestureDetector(
                               onTap: expenseCanBeUpdated
-                                  ? () => _handleAssigneesClick(
-                                        context,
-                                        expenseBloc,
-                                        authBloc,
-                                      )
+                                  ? () => _handleAssigneesClick(context)
                                   : null,
                               child: AssigneeList(),
                             ),
@@ -139,40 +168,17 @@ class ExpenseDetails extends StatelessWidget {
                 label: Text('Upload receipt'),
                 icon: Icon(Icons.photo_camera),
               ),
-            Flexible(
-              child: expense.hasNoItems
-                  ? ListEmpty(text: 'Add items to this expense')
-                  : ItemsList(),
-            ),
+            Flexible(child: ItemsList()),
           ],
         );
       },
     );
   }
 
-  _handleSettingsClick(
-    BuildContext context,
-    ExpenseBloc expenseBloc,
-    AuthBloc authBloc,
-  ) {
-    expenseBloc.add(
-      UpdateRequested(
-        issuer: authBloc.state.user!,
-        update: (expense) async {
-          await showDialog(
-            context: context,
-            builder: (_) => ExpenseSettingsDialog(expense: expense),
-          );
-        },
-      ),
-    );
-  }
+  _handleDateClick(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    final expenseBloc = context.read<ExpenseBloc>();
 
-  _handleDateClick(
-    BuildContext context,
-    ExpenseBloc expenseBloc,
-    AuthBloc authBloc,
-  ) {
     expenseBloc.add(
       UpdateRequested(
         issuer: authBloc.state.user!,
@@ -191,11 +197,10 @@ class ExpenseDetails extends StatelessWidget {
     );
   }
 
-  _handleAuthorClick(
-    BuildContext context,
-    ExpenseBloc expenseBloc,
-    AuthBloc authBloc,
-  ) {
+  _handleAuthorClick(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    final expenseBloc = context.read<ExpenseBloc>();
+
     expenseBloc.add(
       UpdateRequested(
         issuer: authBloc.state.user!,
@@ -215,11 +220,10 @@ class ExpenseDetails extends StatelessWidget {
     );
   }
 
-  _handleAssigneesClick(
-    BuildContext context,
-    ExpenseBloc expenseBloc,
-    AuthBloc authBloc,
-  ) {
+  _handleAssigneesClick(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    final expenseBloc = context.read<ExpenseBloc>();
+
     expenseBloc.add(
       UpdateRequested(
         issuer: authBloc.state.user!,
@@ -235,60 +239,6 @@ class ExpenseDetails extends StatelessWidget {
 
           expense.assignees = newAssignees;
         },
-      ),
-    );
-  }
-
-  _handleNewItemClick(
-    BuildContext context,
-    ExpenseBloc expenseBloc,
-    AuthBloc authBloc,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => CRUDDialog(
-        title: "New Item",
-        fields: [
-          FieldData(
-            id: "item_name",
-            label: "Item Name",
-            validators: [FieldData.requiredValidator],
-          ),
-          FieldData(
-            id: "item_value",
-            label: "Item Value",
-            inputType: TextInputType.numberWithOptions(decimal: true),
-            validators: [
-              FieldData.requiredValidator,
-              FieldData.doubleValidator
-            ],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData(
-            id: "item_partition",
-            label: "Item Parts",
-            inputType: TextInputType.number,
-            initialData: 1,
-            validators: [FieldData.requiredValidator, FieldData.intValidator],
-            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
-            isAdvanced: true,
-          ),
-        ],
-        onSubmit: (values) {
-          expenseBloc.add(
-            UpdateRequested(
-              issuer: authBloc.state.user!,
-              update: (expense) {
-                expense.addItem(Item(
-                  name: values["item_name"]!,
-                  value: double.parse(values["item_value"]!),
-                  partition: int.parse(values["item_partition"]!),
-                ));
-              },
-            ),
-          );
-        },
-        allowAddAnother: true,
       ),
     );
   }

@@ -27,12 +27,7 @@ class ExpenseList extends StatelessWidget {
               child: Icon(Icons.add),
             ),
           ),
-        Expanded(
-          child: ExpensesBuilder(
-            builder: (context, expenses) =>
-                ExpensesListBody(expenses: expenses),
-          ),
-        ),
+        Expanded(child: ExpensesListBody()),
       ],
     );
   }
