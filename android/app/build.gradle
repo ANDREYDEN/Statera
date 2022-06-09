@@ -11,6 +11,7 @@ def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
+println keystoreProperties
 
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
