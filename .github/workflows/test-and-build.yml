@@ -89,11 +89,14 @@ jobs:
           KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: echo $KEY_PROPERTIES > android/key.properties
 
+      - name: Print files
+        run: cd android && ls -R
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build Android app
-        run: flutter build apk
+        run: flutter build apk -v
 
   build_web:
     name: Build Web App
