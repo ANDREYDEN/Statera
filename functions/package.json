@@ -21,7 +21,7 @@
     "@google-cloud/vision": "^2.3.7",
     "@types/jest": "^27.4.1",
     "firebase-admin": "^9.11.1",
-    "firebase-functions": "^3.20.1",
+    "firebase-functions": "^3.21.2",
     "jest": "^27.5.1",
     "node-html-parser": "^5.3.3",
     "puppeteer": "^13.5.2",
