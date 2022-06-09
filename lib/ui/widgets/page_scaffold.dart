@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 class PageScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
+  final Widget? titleWidget;
   final List<Widget>? actions;
   final void Function()? onFabPressed;
 
-  final BottomNavigationBar? bottomNavBar;
+  final Widget? bottomNavBar;
 
   const PageScaffold({
     Key? key,
     required this.child,
     this.title,
+    this.titleWidget,
     this.onFabPressed,
     this.actions,
     this.bottomNavBar,
@@ -22,10 +24,11 @@ class PageScaffold extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: this.bottomNavBar,
       appBar: AppBar(
-        title: Text(
-          this.title ?? "",
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: titleWidget ??
+            Text(
+              this.title ?? "",
+              overflow: TextOverflow.ellipsis,
+            ),
         actions: this.actions,
       ),
       floatingActionButton: this.onFabPressed == null

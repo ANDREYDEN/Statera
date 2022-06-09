@@ -23,91 +23,81 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
+  AuthBloc get authBloc => context.read<AuthBloc>();
+  GroupsCubit get groupsCubit => context.read<GroupsCubit>();
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, authState) {
-        if (authState.status == AuthStatus.unauthenticated) {
-          return PageScaffold(child: Center(child: Text('Unauthorized')));
-        }
-
-        final user = authState.user!;
-
-        var groupsCubit = context.read<GroupsCubit>();
-        groupsCubit.load(authState.user!.uid);
-
-        return BlocBuilder<GroupsCubit, GroupsState>(
-          builder: (context, groupsState) {
-            if (groupsState is GroupsLoading) {
-              return PageScaffold(child: Center(child: Loader()));
-            }
-
-            if (groupsState is GroupsError) {
-              developer.log('Failed loading groups', error: groupsState.error);
-
-              return PageScaffold(
-                child: Center(child: Text(groupsState.error.toString())),
-              );
-            }
-
-            if (groupsState is GroupsLoaded) {
-              final groups = groupsState.groups;
-              final groupsCubit = context.read<GroupsCubit>();
-
-              return PageScaffold(
-                title: kAppName,
-                actions: [
-                  IconButton(
-                    onPressed: () =>
-                        Navigator.pushNamed(context, SupportPage.route),
-                    icon: Icon(Icons.info_outline_rounded),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      snackbarCatch(context, () {
-                        context.read<AuthBloc>().add(LogoutRequested());
-                      });
-                    },
-                    icon: Icon(Icons.logout),
-                  ),
-                ],
-                onFabPressed: () => updateOrCreateGroup(groupsCubit, user),
-                child: Column(
-                  children: [
-                    SizedBox.square(
-                      dimension: 16,
-                      child: Visibility(
-                        visible: groupsState is GroupsProcessing,
-                        child: Loader(),
-                      ),
-                    ),
-                    Expanded(
-                      child: groups.isEmpty
-                          ? ListEmpty(text: "Join or create a group!")
-                          : ListView.builder(
-                              itemCount: groups.length,
-                              itemBuilder: (context, index) {
-                                var group = groups[index];
-                                return GestureDetector(
-                                  onLongPress: () => updateOrCreateGroup(
-                                    groupsCubit,
-                                    user,
-                                    group: group,
-                                  ),
-                                  child: GroupListItem(group: group),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return Container();
+    return PageScaffold(
+      title: kAppName,
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.pushNamed(context, SupportPage.route),
+          icon: Icon(Icons.info_outline_rounded),
+        ),
+        IconButton(
+          onPressed: () {
+            snackbarCatch(context, () {
+              context.read<AuthBloc>().add(LogoutRequested());
+            });
           },
-        );
-      },
+          icon: Icon(Icons.logout),
+        ),
+      ],
+      onFabPressed: () => updateOrCreateGroup(groupsCubit, authBloc.user),
+      child: BlocBuilder<GroupsCubit, GroupsState>(
+        builder: (context, groupsState) {
+          if (groupsState is GroupsLoading) {
+            return Center(child: Loader());
+          }
+
+          if (groupsState is GroupsError) {
+            developer.log(
+              'Failed loading groups',
+              error: groupsState.error,
+            );
+
+            return Center(child: Text(groupsState.error.toString()));
+          }
+
+          if (groupsState is GroupsLoaded) {
+            final groups = groupsState.groups;
+            final groupsCubit = context.read<GroupsCubit>();
+
+            return Column(
+              children: [
+                SizedBox.square(
+                  dimension: 16,
+                  child: Visibility(
+                    visible: groupsState is GroupsProcessing,
+                    child: Loader(),
+                  ),
+                ),
+                Expanded(
+                  child: groups.isEmpty
+                      ? ListEmpty(text: "Join or create a group!")
+                      : ListView.builder(
+                          itemCount: groups.length,
+                          itemBuilder: (context, index) {
+                            var group = groups[index];
+                            return GestureDetector(
+                              onLongPress: () => updateOrCreateGroup(
+                                groupsCubit,
+                                authBloc.user,
+                                group: group,
+                              ),
+                              child: GroupListItem(group: group),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            );
+          }
+
+          return Container();
+        },
+      ),
     );
   }
 

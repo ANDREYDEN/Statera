@@ -9,13 +9,16 @@ import 'package:statera/data/services/group_service.dart';
 part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
-  GroupsCubit() : super(GroupsLoading());
-
+  late final GroupService _groupService;
   StreamSubscription? _groupsSubscription;
+
+  GroupsCubit(GroupService groupService) : super(GroupsLoading()) {
+    _groupService = groupService;
+  }
 
   void load(String? userId) {
     _groupsSubscription?.cancel();
-    _groupsSubscription = GroupService.instance
+    _groupsSubscription = _groupService
         .userGroupsStream(userId)
         .map((groups) => GroupsLoaded(groups: groups))
         .listen(
@@ -29,21 +32,21 @@ class GroupsCubit extends Cubit<GroupsState> {
   updateGroup(Group group) async {
     if (state is GroupsLoaded) {
       emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await GroupService.instance.saveGroup(group);
+      await _groupService.saveGroup(group);
     }
   }
 
   addGroup(Group group, User creator) async {
     if (state is GroupsLoaded) {
       emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await GroupService.instance.createGroup(group, creator);
+      await _groupService.createGroup(group, creator);
     }
   }
 
   joinGroup(String groupCode, User newMember) async {
     if (state is GroupsLoaded) {
       emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await GroupService.instance.joinGroup(groupCode, newMember);
+      await _groupService.joinGroup(groupCode, newMember);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:statera/data/models/models.dart';
 
 class Firestore {
   late FirebaseFirestore _firestore;
@@ -15,4 +16,32 @@ class Firestore {
 
   CollectionReference get paymentsCollection =>
       _firestore.collection("payments");
+
+  Query expensesQuery({
+    String? groupId,
+    String? assigneeId,
+    String? unmarkedAssigneeId,
+    String? authorId,
+  }) {
+    var query = expensesCollection.where("groupId", isEqualTo: groupId);
+
+    if (assigneeId != null) {
+      query = query.where("assigneeIds", arrayContains: assigneeId);
+    }
+
+    if (authorId != null) {
+      query = query.where("author.uid", isEqualTo: authorId);
+    }
+
+    if (unmarkedAssigneeId != null) {
+      query = query.where("unmarkedAssigneeIds", arrayContains: unmarkedAssigneeId);
+    }
+
+    return query;
+  }
+
+  Stream<List<Expense>> queryToExpensesStream(Query query) {
+    return query.snapshots().map<List<Expense>>(
+        (snap) => snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
+  }
 }
