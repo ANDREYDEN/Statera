@@ -56,6 +56,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
     return AlertDialog(
       title: Text(actionWord),
       content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _balanceController,

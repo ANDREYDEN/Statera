@@ -26,6 +26,7 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SwitchListTile(
             value: _automaticallyAddNewMembers,

@@ -1,8 +1,6 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/ui/widgets/buttons/text_link.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SupportPage extends StatelessWidget {
   static final String route = '/support';

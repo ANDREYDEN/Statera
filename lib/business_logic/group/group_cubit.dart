@@ -28,13 +28,14 @@ class GroupCubit extends Cubit<GroupState> {
         .listen(emit);
   }
 
-  loadFromExpense(String? expenseId) async {
+  void loadFromExpense(String? expenseId) async {
     final expense = await _expenseService.getExpense(expenseId);
     load(expense.groupId);
   }
 
-  removeUser(String uid) {
+  void removeUser(String uid) {
     final group = loadedState.group;
+    emit(GroupLoading());
     if (group.members.every((member) => member.uid != uid)) return;
 
     group.removeUser(uid);
@@ -45,14 +46,11 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
-  Future<String> addExpense(Expense expense) {
-    return _groupService.addExpense(expense, loadedState.group);
-  }
-
-  updateBalance(Expense expense) async {
+  void update(Function(Group) updater) {
     final group = loadedState.group;
-    group.updateBalance(expense);
-    await _groupService.saveGroup(group);
+    emit(GroupLoading());
+    updater(group);
+    _groupService.saveGroup(group);
   }
 
   void join(String? code, User user) async {

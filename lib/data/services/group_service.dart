@@ -69,17 +69,6 @@ class GroupService extends Firestore {
     });
   }
 
-  Stream<Map<Author, double>> getOwingsForUserInGroup(
-    String consumerUid,
-    String? groupId,
-  ) {
-    return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
-      var group = Group.fromFirestore(groupSnap.data() as Map<String, dynamic>,
-          id: groupSnap.id);
-      return group.extendedBalance(consumerUid);
-    });
-  }
-
   Stream<List<Group>> userGroupsStream(String? uid) {
     return groupsCollection
         .where('memberIds', arrayContains: uid)
@@ -115,7 +104,8 @@ class GroupService extends Firestore {
     return groupsCollection.doc(group.id).set(group.toFirestore());
   }
 
-  Future<String> addExpense(Expense expense, Group group) async {
+  Future<String> addExpense(String? groupId, Expense expense) async {
+    final group = await getGroupById(groupId);
     expense.assignGroup(group);
     final docRef = await expensesCollection.add(expense.toFirestore());
     return docRef.id;
@@ -123,5 +113,12 @@ class GroupService extends Firestore {
 
   Stream<Group?> getExpenseGroupStream(Expense expense) {
     return groupStream(expense.groupId);
+  }
+
+  Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
+    return queryToExpensesStream(expensesQuery(
+      groupId: groupId,
+      unmarkedAssigneeId: uid,
+    ));
   }
 }
