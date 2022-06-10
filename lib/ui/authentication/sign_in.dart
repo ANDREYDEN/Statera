@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
@@ -117,23 +116,27 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                     // TODO: Add Google icon
-                    ElevatedButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : () => signInCubit.signInWithGoogle(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Center(
-                          child: signInState is SignInLoading
-                              ? Loader()
-                              : Text(_isSignIn
-                                  ? 'Sign in with Google'
-                                  : 'Sign up with Google'),
+                    if (kIsWeb ||
+                        defaultTargetPlatform == TargetPlatform.iOS ||
+                        defaultTargetPlatform == TargetPlatform.android)
+                      ElevatedButton(
+                        onPressed: signInState is SignInLoading
+                            ? null
+                            : () => signInCubit.signInWithGoogle(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 9.0),
+                          child: Center(
+                            child: signInState is SignInLoading
+                                ? Loader()
+                                : Text(_isSignIn
+                                    ? 'Sign in with Google'
+                                    : 'Sign up with Google'),
+                          ),
                         ),
                       ),
-                    ),
                     SizedBox(height: 8),
-                    if (Platform.isIOS)
+                    if (defaultTargetPlatform == TargetPlatform.iOS ||
+                        defaultTargetPlatform == TargetPlatform.macOS)
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null

@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
-import 'package:statera/ui/expense/expense_action_handlers.dart';
+import 'package:statera/ui/expense/expense_actions_wide.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/buttons/share_button.dart';
-import 'package:statera/ui/widgets/dialogs/ok_cancel_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/utils.dart';
@@ -26,7 +22,6 @@ class ExpenseDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
-    final expensesCubit = context.read<ExpensesCubit>();
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
@@ -37,43 +32,7 @@ class ExpenseDetails extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isWide)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    ShareButton(
-                      data: DynamicLinkService.generateDynamicLink(
-                        path: ModalRoute.of(context)!.settings.name,
-                      ),
-                      webIcon: Icons.share,
-                    ),
-                    if (expense.canBeUpdatedBy(authBloc.uid)) ...[
-                      IconButton(
-                        icon: Icon(Icons.settings),
-                        onPressed: () => handleSettingsClick(context),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        onPressed: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (_) => OKCancelDialog(
-                              text:
-                                  'Are you sure you want to delete this expense and all of its items?',
-                            ),
-                          );
-                          if (confirmed == true)
-                            expensesCubit.deleteExpense(expense);
-                        },
-                      ),
-                    ]
-                  ],
-                ),
-              ),
+            if (isWide) ExpenseActionsWide(expense: expense),
             Card(
               clipBehavior: Clip.antiAlias,
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),

@@ -4,6 +4,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/ui/expense/expense_details.dart';
+import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/group/expenses/new_expense_handler.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
@@ -70,7 +71,10 @@ class _GroupPageState extends State<GroupPage> {
           ? null
           : _selectedNavBarItemIndex == 0
               ? null
-              : () => handleNewExpenseClick(context),
+              : () => handleNewExpenseClick(context, (expenseId) {
+                    Navigator.of(context)
+                        .popAndPushNamed('${ExpensePage.route}/$expenseId');
+                  }),
       bottomNavBar: isWide
           ? null
           : GroupBottomNavBar(

@@ -11,14 +11,16 @@ class ListEmpty extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            this.text,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 24,
+          Flexible(
+            child: Text(
+              this.text,
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 24,
+              ),
             ),
           ),
-          this.icon != null ? this.icon! : Container(), 
+          this.icon != null ? this.icon! : Container(),
         ],
       ),
     );
