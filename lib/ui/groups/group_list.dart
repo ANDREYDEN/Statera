@@ -38,7 +38,7 @@ class _GroupListState extends State<GroupList> {
         IconButton(
           onPressed: () {
             snackbarCatch(context, () {
-              context.read<AuthBloc>().add(LogoutRequested());
+              authBloc.add(LogoutRequested());
             });
           },
           icon: Icon(Icons.logout),
