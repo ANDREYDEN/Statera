@@ -5,4 +5,4 @@ describe('Utils', () => {
     const cleanSku = stripSku('00012340123')
     expect(cleanSku).toEqual('12340123')
   })
-}) 
+})

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
@@ -133,7 +134,7 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    if (Platform.isIOS)
+                    if (defaultTargetPlatform == TargetPlatform.iOS)
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null
