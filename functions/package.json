@@ -14,7 +14,7 @@
     "listen-emulate": "npm run listen & npm run emulate"
   },
   "engines": {
-    "node": "14"
+    "node": "16"
   },
   "main": "lib/index.js",
   "dependencies": {
