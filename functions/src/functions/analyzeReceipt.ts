@@ -8,17 +8,17 @@ export async function analyzeReceipt(
     isWalmart: boolean,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
-  console.log(`Analyzing receipt at ${receiptUrl}`);
+  console.log(`Analyzing receipt at ${receiptUrl}`)
   const client = new vision.ImageAnnotatorClient()
 
-  console.log('Reading text from the image...');
+  console.log('Reading text from the image...')
   const [result] = await client.textDetection(receiptUrl)
 
   // first element contains information about all lines
   const labels = result.textAnnotations?.slice(1) ?? []
-  console.log(labels.length > 0 
-    ? `This image has some text: ${labels.length}`
-    : 'This image has no text')
+  console.log(labels.length > 0 ?
+    `This image has some text: ${labels.length}` :
+    'This image has no text')
 
   type LabelBox = { p1: number; p2: number; description: string }
   const lines: LabelBox[][] = []
@@ -48,7 +48,7 @@ export async function analyzeReceipt(
   products = store.merge(products)
 
   if (withNameImprovement) {
-    console.log('Applying name improvements...');
+    console.log('Applying name improvements...')
     products = await store.improveNaming(products)
   }
 

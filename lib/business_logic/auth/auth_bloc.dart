@@ -21,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _authRepository = authRepository;
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
+    on<AccountDeletionRequested>(_onAccountDeletionRequested);
     _userSubscription = authRepository.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
@@ -37,6 +38,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
     unawaited(_authRepository.signOut());
+  }
+
+  void _onAccountDeletionRequested(
+    AccountDeletionRequested event,
+    Emitter<AuthState> emit,
+  ) {
+    var currentUser = _authRepository.currentUser;
+    if (currentUser != null) currentUser.delete();
   }
 
   @override

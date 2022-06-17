@@ -26,6 +26,9 @@ module.exports = {
     'object-curly-spacing': ['warn', 'always'],
     'require-jsdoc': 'off',
     'semi': ['error', 'never'],
-    'no-unused-vars': ['warn', { 'argsIgnorePattern': '_' }],
+    'no-unused-vars': ['warn', { 'varsIgnorePattern': '^_', 'argsIgnorePattern': '^_' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { 'varsIgnorePattern': '^_', 'argsIgnorePattern': '^_' }],
+    'max-len': ['warn', { 'code': 100 }],
+    'import/no-unresolved': ['warn']
   },
 }
