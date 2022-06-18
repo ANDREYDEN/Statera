@@ -9,6 +9,7 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/settings/settings.dart';
+import 'package:statera/ui/about/about_page.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
@@ -33,6 +34,11 @@ final List<PagePath> _paths = [
     pattern: '^${SupportPage.route}\$',
     isPublic: true,
     builder: (context, matches) => SupportPage(),
+  ),
+  PagePath(
+    pattern: '^${AboutPage.route}\$',
+    isPublic: true,
+    builder: (context, matches) => AboutPage(),
   ),
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
