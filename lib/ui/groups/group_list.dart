@@ -15,7 +15,7 @@ import 'package:statera/utils/utils.dart';
 import 'dart:developer' as developer;
 
 class GroupList extends StatefulWidget {
-  static const String route = '/';
+  static const String route = '/groups';
 
   const GroupList({Key? key}) : super(key: key);
 

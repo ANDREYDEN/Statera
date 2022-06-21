@@ -12,7 +12,7 @@ void main(List<String> args) {
     themeMode: ThemeMode.system,
     initialRoute: GroupList.route,
     debugShowCheckedModeBanner: false,
-    home: AboutPage(),
+    home: LandingPage(),
   ));
 }
 
@@ -22,23 +22,25 @@ class PlatformOption {
   TargetPlatform? platform;
   String? url;
 
-  PlatformOption(
-      {required this.name,
-      required this.icon,
-      required this.platform,
-      this.url});
+  PlatformOption({
+    required this.name,
+    required this.icon,
+    required this.platform,
+    this.url,
+  });
 }
 
-class AboutPage extends StatefulWidget {
-  static const String route = '/about';
+class LandingPage extends StatefulWidget {
+  static const String route = '/';
 
-  const AboutPage({Key? key}) : super(key: key);
+  const LandingPage({Key? key}) : super(key: key);
 
   @override
-  State<AboutPage> createState() => _AboutPageState();
+  State<LandingPage> createState() => _LandingPageState();
 }
 
-class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
+class _LandingPageState extends State<LandingPage>
+    with TickerProviderStateMixin {
   List<PlatformOption> _platformOptions = [
     PlatformOption(
       name: 'iOS',

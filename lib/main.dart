@@ -7,6 +7,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
 import 'package:statera/utils/utils.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -47,7 +48,7 @@ class Statera extends StatelessWidget {
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
                 onGenerateRoute: onGenerateRoute,
-                initialRoute: GroupList.route,
+                initialRoute: LandingPage.route,
                 debugShowCheckedModeBanner: false,
               ),
             );
