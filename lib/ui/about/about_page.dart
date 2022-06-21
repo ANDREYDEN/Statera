@@ -106,7 +106,7 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 40),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -130,7 +130,7 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                       .toList(),
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
                   visualDensity: VisualDensity(
@@ -142,7 +142,7 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                       return Colors.grey;
                     }
 
-                    return Theme.of(context).primaryColor;
+                    return Theme.of(context).colorScheme.onSecondary;
                   }),
                   textStyle: MaterialStateProperty.all(Theme.of(context)
                       .textTheme
