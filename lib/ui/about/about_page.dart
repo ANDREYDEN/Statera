@@ -137,6 +137,17 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                     horizontal: VisualDensity.maximumDensity,
                     vertical: VisualDensity.maximumDensity,
                   ),
+                  foregroundColor: MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialState.disabled)) {
+                      return Colors.grey;
+                    }
+
+                    return Theme.of(context).primaryColor;
+                  }),
+                  textStyle: MaterialStateProperty.all(Theme.of(context)
+                      .textTheme
+                      .button!
+                      .copyWith(fontSize: 20)),
                 ),
                 onPressed: _selectedOption.url == null &&
                         _selectedOption.platform != null
@@ -147,25 +158,24 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
                           return;
                         }
                       },
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(
-                    _selectedOption.platform != null
-                        ? _selectedOption.url == null
-                            ? 'Coming Soon'
-                            : 'Install'
-                        : 'Enter',
-                    style: Theme.of(context)
-                        .textTheme
-                        .button!
-                        .copyWith(fontSize: 20),
-                  ),
-                  Icon(
-                    _selectedOption.platform != null
-                        ? Icons.download
-                        : Icons.login,
-                    size: 35,
-                  )
-                ]),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _selectedOption.platform != null
+                          ? _selectedOption.url == null
+                              ? 'Coming Soon'
+                              : 'Install'
+                          : 'Enter',
+                    ),
+                    Icon(
+                      _selectedOption.platform != null
+                          ? Icons.download
+                          : Icons.login,
+                      size: 35,
+                    )
+                  ],
+                ),
               ),
             ],
           ),
