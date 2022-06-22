@@ -9,6 +9,7 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/settings/settings.dart';
+import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
@@ -19,12 +20,9 @@ import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
 
 final _homePath = PagePath(
-  pattern: '^${GroupList.route}\$',
-  builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (_) =>
-        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
-    child: GroupList(),
-  ),
+  pattern: '^${LandingPage.route}\$',
+  isPublic: true,
+  builder: (context, matches) => LandingPage(),
 );
 
 final List<PagePath> _paths = [
@@ -33,6 +31,14 @@ final List<PagePath> _paths = [
     pattern: '^${SupportPage.route}\$',
     isPublic: true,
     builder: (context, matches) => SupportPage(),
+  ),
+  PagePath(
+    pattern: '^${GroupList.route}\$',
+    builder: (context, _) => BlocProvider<GroupsCubit>(
+      create: (_) => GroupsCubit(GroupService.instance)
+        ..load(context.read<AuthBloc>().uid),
+      child: GroupList(),
+    ),
   ),
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
