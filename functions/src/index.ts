@@ -2,6 +2,8 @@ import 'firebase-functions'
 import * as functions from 'firebase-functions'
 import { firestoreBackup } from './admin'
 import { analyzeReceipt } from './functions/analyzeReceipt'
+import { handleTokenUpdate } from './functions/notifications/handleTokenUpdate'
+import { notifyAboutExpenseCreation } from './functions/notifications/notifyAboutExpenseCreation'
 import { removeUserFromGroups } from './functions/removeUserFromGroups'
 
 export const scheduledBackup = firestoreBackup
@@ -34,3 +36,17 @@ export const cleanUpOnAccountDeletion = functions.auth
     .onDelete(async (user, _) => {
       removeUserFromGroups(user.uid)
     })
+
+export const notifyOnExpenceCreation = functions.firestore
+  .document('expenses/{expeseId}')
+  .onCreate((snap, _) => {
+    return notifyAboutExpenseCreation(snap)
+  })
+
+export const updateUserNotificationToken = functions.https
+  .onCall((data, _) => {
+    if (!data.uid) throw new Error('parameter uid is required')
+    if (!data.token) throw new Error('parameter token is required')
+
+    return handleTokenUpdate(data.uid, data.token)
+  })
