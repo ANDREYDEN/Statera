@@ -7,6 +7,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
+import 'package:statera/notifications/notifications_handler.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
 import 'package:statera/utils/utils.dart';
@@ -34,25 +35,27 @@ class Statera extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: authRepository,
-      child: BlocProvider(
-        create: (context) => AuthBloc(authRepository),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Provider<LayoutState>.value(
-              value: LayoutState(constraints),
-              child: MaterialApp(
-                title: kAppName,
-                theme: theme,
-                darkTheme: darkTheme,
-                themeMode: ThemeMode.system,
-                onGenerateRoute: onGenerateRoute,
-                initialRoute: kIsWeb ? LandingPage.route : GroupList.route,
-                debugShowCheckedModeBanner: false,
-              ),
-            );
-          },
+    return NotificationsHandler(
+      child: RepositoryProvider.value(
+        value: authRepository,
+        child: BlocProvider(
+          create: (context) => AuthBloc(authRepository),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Provider<LayoutState>.value(
+                value: LayoutState(constraints),
+                child: MaterialApp(
+                  title: kAppName,
+                  theme: theme,
+                  darkTheme: darkTheme,
+                  themeMode: ThemeMode.system,
+                  onGenerateRoute: onGenerateRoute,
+                  initialRoute: LandingPage.route,
+                  debugShowCheckedModeBanner: false,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
