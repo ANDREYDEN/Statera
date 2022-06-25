@@ -9,7 +9,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/settings/settings.dart';
+import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
