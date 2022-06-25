@@ -14,6 +14,10 @@ export async function notifyAboutExpenseCreation(expenseSnap: QueryDocumentSnaps
         notification: {
             title: 'New Expense',
             body: `New expense "${expenseSnap.data().name}" in group ${group?.data()?.name}`
+        },
+        data: {
+            type: 'new_expense',
+            expenseId: expenseSnap.id
         }
     })
 }
