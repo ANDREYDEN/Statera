@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,7 @@ class Statera extends StatelessWidget {
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
                 onGenerateRoute: onGenerateRoute,
-                initialRoute: LandingPage.route,
+                initialRoute: kIsWeb ? LandingPage.route : GroupList.route,
                 debugShowCheckedModeBanner: false,
               ),
             );
