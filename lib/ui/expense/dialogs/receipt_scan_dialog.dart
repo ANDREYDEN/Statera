@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
+import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -126,29 +126,16 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
       setStatus('Analyzing receipt (this might take up to a minute)...');
 
-      var getItemsFromImage =
-          FirebaseFunctions.instance.httpsCallable('getReceiptData');
       var scanSuccessful = await snackbarCatch(
         context,
         () async {
-          var response = await getItemsFromImage({
-            'receiptUrl': url,
-            'isWalmart': _selectedStore == Store.Walmart,
-            'withNameImprovement': _withNameImprovement
-          });
-          List<dynamic> items = response.data;
+          List<Item> items = await Callables.getReceiptData(
+            receiptUrl: url,
+            isWalmart: _selectedStore == Store.Walmart,
+            withNameImprovement: _withNameImprovement,
+          );
 
-          items.forEach((itemData) {
-            try {
-              var item = Item(
-                name: itemData["name"] ?? "",
-                value: double.tryParse(itemData["value"].toString()) ?? 0,
-              );
-              widget.expense.addItem(item);
-            } catch (e) {
-              print("Could not parse item $itemData: $e");
-            }
-          });
+          items.forEach(widget.expense.addItem);
         },
         errorMessage: 'Something went wrong while processing your photo',
       );

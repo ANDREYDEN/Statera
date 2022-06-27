@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsHandler extends StatefulWidget {
@@ -29,7 +30,7 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
 
   @override
   void initState() {
-    
+    setupInteractedMessage();
     super.initState();
   }
 
