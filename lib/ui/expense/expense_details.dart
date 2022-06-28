@@ -121,7 +121,7 @@ class ExpenseDetails extends StatelessWidget {
                 ),
               ),
             ),
-            if (expense.hasNoItems && expenseCanBeUpdated && defaultTargetPlatform != Platform.isMacOS)
+            if (expense.hasNoItems && expenseCanBeUpdated && defaultTargetPlatform != TargetPlatform.macOS)
               ElevatedButton.icon(
                 onPressed: () => showDialog(
                   context: context,
