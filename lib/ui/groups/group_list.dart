@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -12,7 +15,6 @@ import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
-import 'dart:developer' as developer;
 
 class GroupList extends StatefulWidget {
   static const String route = '/groups';
@@ -41,60 +43,67 @@ class _GroupListState extends State<GroupList> {
           icon: Icon(Icons.settings_outlined),
         ),
       ],
-      onFabPressed: () => updateOrCreateGroup(groupsCubit, authBloc.user),
-      child: BlocBuilder<GroupsCubit, GroupsState>(
-        builder: (context, groupsState) {
-          if (groupsState is GroupsLoading) {
-            return Center(child: Loader());
-          }
+      onFabPressed: defaultTargetPlatform == TargetPlatform.windows
+          ? null
+          : () => updateOrCreateGroup(groupsCubit, authBloc.user),
+      child: defaultTargetPlatform == TargetPlatform.windows
+          ? Center(
+              child:
+                  Text('Main app functionality is currently in development...'),
+            )
+          : BlocBuilder<GroupsCubit, GroupsState>(
+              builder: (context, groupsState) {
+                if (groupsState is GroupsLoading) {
+                  return Center(child: Loader());
+                }
 
-          if (groupsState is GroupsError) {
-            developer.log(
-              'Failed loading groups',
-              error: groupsState.error,
-            );
+                if (groupsState is GroupsError) {
+                  developer.log(
+                    'Failed loading groups',
+                    error: groupsState.error,
+                  );
 
-            return Center(child: Text(groupsState.error.toString()));
-          }
+                  return Center(child: Text(groupsState.error.toString()));
+                }
 
-          if (groupsState is GroupsLoaded) {
-            final groups = groupsState.groups;
-            final groupsCubit = context.read<GroupsCubit>();
+                if (groupsState is GroupsLoaded) {
+                  final groups = groupsState.groups;
+                  final groupsCubit = context.read<GroupsCubit>();
 
-            return Column(
-              children: [
-                SizedBox.square(
-                  dimension: 16,
-                  child: Visibility(
-                    visible: groupsState is GroupsProcessing,
-                    child: Loader(),
-                  ),
-                ),
-                Expanded(
-                  child: groups.isEmpty
-                      ? ListEmpty(text: "Join or create a group!")
-                      : ListView.builder(
-                          itemCount: groups.length,
-                          itemBuilder: (context, index) {
-                            var group = groups[index];
-                            return GestureDetector(
-                              onLongPress: () => updateOrCreateGroup(
-                                groupsCubit,
-                                authBloc.user,
-                                group: group,
-                              ),
-                              child: GroupListItem(group: group),
-                            );
-                          },
+                  return Column(
+                    children: [
+                      SizedBox.square(
+                        dimension: 16,
+                        child: Visibility(
+                          visible: groupsState is GroupsProcessing,
+                          child: Loader(),
                         ),
-                ),
-              ],
-            );
-          }
+                      ),
+                      Expanded(
+                        child: groups.isEmpty
+                            ? ListEmpty(text: "Join or create a group!")
+                            : ListView.builder(
+                                itemCount: groups.length,
+                                itemBuilder: (context, index) {
+                                  var group = groups[index];
+                                  return GestureDetector(
+                                    onLongPress: () => updateOrCreateGroup(
+                                      groupsCubit,
+                                      authBloc.user,
+                                      group: group,
+                                    ),
+                                    child: GroupListItem(group: group),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                }
 
-          return Container();
-        },
-      ),
+                return Container();
+              },
+            ),
     );
   }
 

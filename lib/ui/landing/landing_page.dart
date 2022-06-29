@@ -1,8 +1,10 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main(List<String> args) {
   runApp(MaterialApp(
@@ -41,6 +43,8 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage>
     with TickerProviderStateMixin {
+  String? _windowsDownloadUrl;
+
   List<PlatformOption> _platformOptions = [
     PlatformOption(
       name: 'iOS',
@@ -61,15 +65,15 @@ class _LandingPageState extends State<LandingPage>
       url: 'https://statera-0.web.app',
     ),
     PlatformOption(
-      name: 'MacOS',
-      platform: TargetPlatform.macOS,
-      icon: Icons.desktop_mac,
-      url: 'https://apps.apple.com/ca/app/statera/id1609503817'
-    ),
+        name: 'MacOS',
+        platform: TargetPlatform.macOS,
+        icon: Icons.desktop_mac,
+        url: 'https://apps.apple.com/ca/app/statera/id1609503817'),
     PlatformOption(
       name: 'Windows',
       platform: TargetPlatform.windows,
       icon: Icons.desktop_windows,
+      // url gets assigned later
     ),
     PlatformOption(
       name: 'Linux',
@@ -134,51 +138,71 @@ class _LandingPageState extends State<LandingPage>
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                style: ButtonStyle(
-                  visualDensity: VisualDensity(
-                    horizontal: VisualDensity.maximumDensity,
-                    vertical: VisualDensity.maximumDensity,
-                  ),
-                  foregroundColor: MaterialStateProperty.resolveWith((states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Colors.grey;
-                    }
+              FutureBuilder<String>(
+                future: FirebaseStorage.instance
+                    .ref('statera.msix')
+                    .getDownloadURL(),
+                builder: (context, snap) {
+                  if (_windowsDownloadUrl == null && snap.data != null) {
+                    _windowsDownloadUrl = snap.data;
+                    final windowsOption = _platformOptions.firstWhere(
+                        (p) => p.platform == TargetPlatform.windows);
+                    windowsOption.url = _windowsDownloadUrl;
+                  }
 
-                    return Theme.of(context).colorScheme.onSecondary;
-                  }),
-                  textStyle: MaterialStateProperty.all(Theme.of(context)
-                      .textTheme
-                      .button!
-                      .copyWith(fontSize: 20)),
-                ),
-                onPressed: _selectedOption.url == null &&
-                        _selectedOption.platform != null
-                    ? null
-                    : () {
-                        if (_selectedOption.platform == null) {
-                          Navigator.pushNamed(context, GroupList.route);
-                          return;
+                  return ElevatedButton(
+                    style: ButtonStyle(
+                      visualDensity: VisualDensity(
+                        horizontal: VisualDensity.maximumDensity,
+                        vertical: VisualDensity.maximumDensity,
+                      ),
+                      foregroundColor:
+                          MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return Colors.grey;
                         }
-                      },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _selectedOption.platform != null
-                          ? _selectedOption.url == null
-                              ? 'Coming Soon'
-                              : 'Install'
-                          : 'Enter',
+
+                        return Theme.of(context).colorScheme.onSecondary;
+                      }),
+                      textStyle: MaterialStateProperty.all(Theme.of(context)
+                          .textTheme
+                          .button!
+                          .copyWith(fontSize: 20)),
                     ),
-                    Icon(
-                      _selectedOption.platform != null
-                          ? Icons.download
-                          : Icons.login,
-                      size: 35,
-                    )
-                  ],
-                ),
+                    onPressed: _selectedOption.url == null &&
+                            _selectedOption.platform != null
+                        ? null
+                        : () {
+                            if (_selectedOption.platform == null) {
+                              Navigator.pushNamed(context, GroupList.route);
+                              return;
+                            }
+
+                            final url = _selectedOption.url;
+                            if (url != null) {
+                              launchUrl(Uri.parse(url));
+                            }
+                          },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _selectedOption.platform != null
+                              ? _selectedOption.url == null
+                                  ? 'Coming Soon'
+                                  : 'Install'
+                              : 'Enter',
+                        ),
+                        Icon(
+                          _selectedOption.platform != null
+                              ? Icons.download
+                              : Icons.login,
+                          size: 35,
+                        )
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),

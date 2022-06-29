@@ -118,7 +118,8 @@ class _SignInState extends State<SignIn> {
                     // TODO: Add Google icon
                     if (kIsWeb ||
                         defaultTargetPlatform == TargetPlatform.iOS ||
-                        defaultTargetPlatform == TargetPlatform.android)
+                        defaultTargetPlatform == TargetPlatform.android ||
+                        defaultTargetPlatform == TargetPlatform.windows)
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null

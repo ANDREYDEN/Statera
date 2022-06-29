@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
+import 'package:desktop_webview_auth/desktop_webview_auth.dart';
+import 'package:desktop_webview_auth/google.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -35,9 +37,16 @@ class AuthRepository {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    return kIsWeb
-        ? _auth.signInWithPopup(GoogleAuthProvider())
-        : this.signInWithGoogleOnMobile();
+    if (defaultTargetPlatform == TargetPlatform.windows) {
+      return signInWIthGoogleOnDesktop();
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      return signInWithGoogleOnMobile();
+    }
+
+    return _auth.signInWithPopup(GoogleAuthProvider());
   }
 
   Future<void> signOut() async {
@@ -58,6 +67,21 @@ class AuthRepository {
     );
 
     return await _auth.signInWithCredential(credential);
+  }
+
+  Future<UserCredential?> signInWIthGoogleOnDesktop() async {
+    final authResult = await DesktopWebviewAuth.signIn(GoogleSignInArgs(
+      clientId:
+          '630064020417-tliaequ1oet6b96b04p5q19jffal4orh.apps.googleusercontent.com',
+      redirectUri: 'https://statera-0.firebaseapp.com/__/auth/handler',
+    ));
+    if (authResult == null) throw Exception('Failed to sign in with Google');
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: authResult.accessToken,
+      idToken: authResult.idToken,
+    );
+    return _auth.signInWithCredential(credential);
   }
 
   Future<void> signInWithApple() async {

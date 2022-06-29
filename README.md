@@ -11,7 +11,8 @@ An expense tracking app with granular price distribution.
 ### Requirements
 - Flutter
 - Dart
-- `derry` [dart package](https://pub.dev/packages/derry) globally installed
+- `derry` [dart package](https://pub.dev/packages/derry) globally installed - for running custom commands
+- [FlutterFire CLI](https://firebase.flutter.dev/docs/cli/) globally installed - for configuring Firebase
 - Android and/or iOS emulator and/or Web for testing
 - lcov - for testing with coverage
 
@@ -22,7 +23,8 @@ An expense tracking app with granular price distribution.
 
 ### Commands
 - `flutter run` - runs the project
-- `derry build` - builds the app and generates mocks for tests
+- `flutterfire configure` - initializes the connection between you Firebase project and this Flutter project
+- `derry emulate` - runs Firebase emulators fr local development
 - `derry test` - runs the tests
 
 Full list of commands can be found in the `pubspec.yaml` file
