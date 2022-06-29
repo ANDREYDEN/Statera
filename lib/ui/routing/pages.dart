@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -19,27 +20,29 @@ import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
 
-final _homePath = PagePath(
+final _landingPagePath = PagePath(
   pattern: '^${LandingPage.route}\$',
   isPublic: true,
   builder: (context, matches) => LandingPage(),
 );
 
+final _groupsPagePath = PagePath(
+  pattern: '^${GroupList.route}\$',
+  builder: (context, _) => BlocProvider<GroupsCubit>(
+    create: (_) =>
+        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
+    child: GroupList(),
+  ),
+);
+
 final List<PagePath> _paths = [
-  _homePath,
+  _landingPagePath,
   PagePath(
     pattern: '^${SupportPage.route}\$',
     isPublic: true,
     builder: (context, matches) => SupportPage(),
   ),
-  PagePath(
-    pattern: '^${GroupList.route}\$',
-    builder: (context, _) => BlocProvider<GroupsCubit>(
-      create: (_) => GroupsCubit(GroupService.instance)
-        ..load(context.read<AuthBloc>().uid),
-      child: GroupList(),
-    ),
-  ),
+  _groupsPagePath,
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
     builder: (context, matches) => MultiProvider(
@@ -132,8 +135,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
   // navigate home if nothing matched
   if (builder == null) {
-    builder = (context) =>
-        _renderPage(_homePath, context, originalRoute: GroupList.route);
+    builder = (context) => kIsWeb
+        ? _renderPage(_landingPagePath, context, originalRoute: GroupList.route)
+        : _renderPage(_groupsPagePath, context, originalRoute: GroupList.route);
     route = GroupList.route;
   }
 

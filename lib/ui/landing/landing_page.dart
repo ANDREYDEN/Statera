@@ -64,6 +64,7 @@ class _LandingPageState extends State<LandingPage>
       name: 'MacOS',
       platform: TargetPlatform.macOS,
       icon: Icons.desktop_mac,
+      url: 'https://apps.apple.com/ca/app/statera/id1609503817'
     ),
     PlatformOption(
       name: 'Windows',
