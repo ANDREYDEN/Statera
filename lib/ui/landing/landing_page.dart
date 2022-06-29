@@ -70,6 +70,7 @@ class _LandingPageState extends State<LandingPage>
       name: 'Windows',
       platform: TargetPlatform.windows,
       icon: Icons.desktop_windows,
+      url: 'https://firebasestorage.googleapis.com/v0/b/statera-0.appspot.com/o/statera.msix?alt=media&token=f51abf4e-b72a-4df3-a90d-e3f4a094c9a8'
     ),
     PlatformOption(
       name: 'Linux',

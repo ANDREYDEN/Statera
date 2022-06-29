@@ -53,6 +53,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  msix: ^3.6.2
 
 flutter:
   uses-material-design: true
@@ -70,3 +71,11 @@ flutter:
           weight: 600
         - asset: fonts/Nunito/Nunito-Bold.ttf
           weight: 700
+
+msix_config:
+  display_name: Statera
+  publisher_display_name: Andrii Denysenko
+  identity_name: com.statera.statera
+  msix_version: 1.0.0.0
+  logo_path: .\images\logo.png
+  capabilities: internetClient
