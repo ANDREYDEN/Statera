@@ -23,7 +23,7 @@ class ShareButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return IconButton(
       onPressed: () {
         if (kIsWeb) {
           _webShare(context);
@@ -33,10 +33,7 @@ class ShareButton extends StatelessWidget {
 
         afterShare?.call();
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(kIsWeb ? webIcon : mobileIcon, size: iconSize),
-      ),
+      icon: Icon(kIsWeb ? webIcon : mobileIcon, size: iconSize),
     );
   }
 

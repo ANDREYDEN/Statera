@@ -37,7 +37,7 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
               itemCount: group.members.length,
               itemBuilder: (context, index) {
                 final member = group.members[index];
-
+            
                 return AuthorAvatar(
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   author: member,

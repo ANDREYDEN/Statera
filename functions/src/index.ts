@@ -2,6 +2,7 @@ import 'firebase-functions'
 import * as functions from 'firebase-functions'
 import { firestoreBackup } from './admin'
 import { analyzeReceipt } from './functions/analyzeReceipt'
+import { removeUserFromGroups } from './functions/removeUserFromGroups'
 
 export const scheduledBackup = firestoreBackup
 
@@ -12,9 +13,9 @@ export const setTimestampOnPaymentCreation = functions.firestore
     })
 
 export const getReceiptData = functions
-    .runWith({ 
+    .runWith({
       timeoutSeconds: 300,
-      memory: "4GB"
+      memory: '4GB',
     })
     .https.onCall(async (data, _) => {
       if (!data.receiptUrl) {
@@ -26,4 +27,10 @@ export const getReceiptData = functions
           data.isWalmart,
           data.withNameImprovement
       )
+    })
+
+export const cleanUpOnAccountDeletion = functions.auth
+    .user()
+    .onDelete(async (user, _) => {
+      removeUserFromGroups(user.uid)
     })

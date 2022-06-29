@@ -92,6 +92,35 @@ class Expense {
             previousValue + (isMarkedBy(assignee.uid) ? 1 : 0),
       );
 
+  static List<ExpenseStage> expenseStages(String uid) {
+    return [
+      ExpenseStage(
+        name: "Not Marked",
+        color: Colors.red[200]!,
+        test: (expense) => expense.hasAssignee(uid) && !expense.isMarkedBy(uid),
+      ),
+      ExpenseStage(
+        name: "Pending",
+        color: Colors.yellow[300]!,
+        test: (expense) =>
+            (expense.isMarkedBy(uid) || !expense.hasAssignee(uid)) &&
+            !expense.finalized,
+      ),
+      ExpenseStage(
+        name: "Finalized",
+        color: Colors.grey[400]!,
+        test: (expense) => expense.finalized,
+      ),
+    ];
+  }
+
+  Color getColor(String uid) {
+    for (var stage in expenseStages(uid)) {
+      if (isIn(stage)) return stage.color;
+    }
+    return Colors.blue[200]!;
+  }
+
   addItem(Item newItem) {
     newItem.assignees = this
         .assignees

@@ -2,8 +2,7 @@ name: Test and build
 
 on:
   pull_request:
-    branches: 
-    - master 
+    branches: [development, master]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,41 +49,57 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: '16'
 
       - name: Install dependencies
         run: npm i
+
+      - name: Run linter
+        run: npm run lint
       
       - name: Run functions tests
         run: npm test
 
-  build_android:
-    name: Build Android App
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+  # build_android:
+  #   name: Build Android App
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
 
-      - name: Download Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
+  #     - name: Download Java
+  #       uses: actions/setup-java@v1
+  #       with:
+  #         java-version: '12.x'
 
-      - name: Download Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
+  #     - name: Download Flutter
+  #       uses: subosito/flutter-action@v1
+  #       with:
+  #         channel: 'stable'
 
-      - name: Copy google-services.json
-        env:
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+  #     - name: Copy google-services.json
+  #       env:
+  #         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+  #       run: echo $FIREBASE_CONFIG > android/app/google-services.json
 
-      - name: Get dependencies
-        run: flutter pub get
+  #     - name: Copy keystore
+  #       env: 
+  #         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+  #       run: echo $KEYSTORE_BASE64 | base64 -d > android/app/upload-keystore.jks
 
-      - name: Build Android app
-        run: flutter build apk
+  #     - name: Copy keystore properties
+  #       env:
+  #         KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+  #       run: echo $KEY_PROPERTIES > android/key.properties
+
+  #     - name: Print files
+  #       run: cd android && ls -R
+
+  #     - name: Get dependencies
+  #       run: flutter pub get
+
+  #     - name: Build Android app
+  #       run: flutter build apk -v
 
   build_web:
     name: Build Web App

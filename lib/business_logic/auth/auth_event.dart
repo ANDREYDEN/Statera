@@ -9,6 +9,8 @@ abstract class AuthEvent extends Equatable {
 
 class LogoutRequested extends AuthEvent {}
 
+class AccountDeletionRequested extends AuthEvent {}
+
 class UserChanged extends AuthEvent {
   const UserChanged(this.user);
 

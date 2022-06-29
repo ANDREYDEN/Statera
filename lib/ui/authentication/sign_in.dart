@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
@@ -115,37 +116,43 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                     // TODO: Add Google icon
-                    ElevatedButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : () => signInCubit.signInWithGoogle(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Center(
-                          child: signInState is SignInLoading
-                              ? Loader()
-                              : Text(_isSignIn
-                                  ? 'Sign in with Google'
-                                  : 'Sign up with Google'),
+                    if (kIsWeb ||
+                        defaultTargetPlatform == TargetPlatform.iOS ||
+                        defaultTargetPlatform == TargetPlatform.android ||
+                        defaultTargetPlatform == TargetPlatform.windows)
+                      ElevatedButton(
+                        onPressed: signInState is SignInLoading
+                            ? null
+                            : () => signInCubit.signInWithGoogle(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 9.0),
+                          child: Center(
+                            child: signInState is SignInLoading
+                                ? Loader()
+                                : Text(_isSignIn
+                                    ? 'Sign in with Google'
+                                    : 'Sign up with Google'),
+                          ),
                         ),
                       ),
-                    ),
                     SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : () => signInCubit.signInWithApple(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Center(
-                          child: signInState is SignInLoading
-                              ? Loader()
-                              : Text(_isSignIn
-                                  ? 'Sign in with Apple'
-                                  : 'Sign up with Apple'),
+                    if (defaultTargetPlatform == TargetPlatform.iOS ||
+                        defaultTargetPlatform == TargetPlatform.macOS)
+                      ElevatedButton(
+                        onPressed: signInState is SignInLoading
+                            ? null
+                            : () => signInCubit.signInWithApple(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 9.0),
+                          child: Center(
+                            child: signInState is SignInLoading
+                                ? Loader()
+                                : Text(_isSignIn
+                                    ? 'Sign in with Apple'
+                                    : 'Sign up with Apple'),
+                          ),
                         ),
                       ),
-                    ),
                     SizedBox(height: 20),
                     TextButton(
                       onPressed: () {

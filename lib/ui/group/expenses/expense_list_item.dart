@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/helpers.dart';
 
 class ExpenseListItem extends StatelessWidget {
@@ -19,11 +21,14 @@ class ExpenseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     AuthBloc authBloc = context.read<AuthBloc>();
     final groupCubit = context.read<GroupCubit>();
+    final expenseBloc = context.read<ExpenseBloc>();
+    final isWide = context.read<LayoutState>().isWide;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed(ExpensePage.route + '/${expense.id}');
-      },
+      onTap: () => isWide
+          ? expenseBloc.load(expense.id)
+          : Navigator.of(context)
+              .pushNamed(ExpensePage.route + '/${expense.id}'),
       child: Card(
         clipBehavior: Clip.antiAlias,
         margin: EdgeInsets.all(5),
@@ -31,7 +36,7 @@ class ExpenseListItem extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                authBloc.getExpenseColor(this.expense),
+                expense.getColor(authBloc.state.user!.uid),
                 Theme.of(context).colorScheme.surface,
               ],
               stops: [0, 0.8],
@@ -100,7 +105,9 @@ class ExpenseListItem extends StatelessWidget {
                           // TODO: use transaction
                           await ExpenseService.instance
                               .finalizeExpense(expense);
-                          groupCubit.updateBalance(expense);
+                          groupCubit.update((group) {
+                            group.updateBalance(expense);
+                          });
                         },
                         successMessage:
                             "The expense is now finalized. Participants' balances updated.",

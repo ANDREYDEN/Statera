@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 
 part 'auth_event.dart';
@@ -23,37 +21,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _authRepository = authRepository;
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
+    on<AccountDeletionRequested>(_onAccountDeletionRequested);
     _userSubscription = authRepository.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
   }
 
-  List<ExpenseStage> get expenseStages {
-    return [
-      ExpenseStage(
-        name: "Not Marked",
-        color: Colors.red[200]!,
-        test: (expense) =>
-            state.user != null &&
-            expense.hasAssignee(state.user!.uid) &&
-            !expense.isMarkedBy(state.user!.uid),
-      ),
-      ExpenseStage(
-        name: "Pending",
-        color: Colors.yellow[300]!,
-        test: (expense) =>
-            state.user != null &&
-            (expense.isMarkedBy(state.user!.uid) ||
-                !expense.hasAssignee(state.user!.uid)) &&
-            !expense.finalized,
-      ),
-      ExpenseStage(
-        name: "Finalized",
-        color: Colors.grey[400]!,
-        test: (expense) => expense.finalized,
-      ),
-    ];
-  }
+  User get user => state.user!;
+  String get uid => state.user!.uid;
 
   void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
     emit(event.user != null
@@ -65,13 +40,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     unawaited(_authRepository.signOut());
   }
 
-  Color getExpenseColor(Expense expense) {
-    for (var stage in expenseStages) {
-      if (expense.isIn(stage)) {
-        return stage.color;
-      }
-    }
-    return Colors.blue[200]!;
+  void _onAccountDeletionRequested(
+    AccountDeletionRequested event,
+    Emitter<AuthState> emit,
+  ) {
+    var currentUser = _authRepository.currentUser;
+    if (currentUser != null) currentUser.delete();
   }
 
   @override
