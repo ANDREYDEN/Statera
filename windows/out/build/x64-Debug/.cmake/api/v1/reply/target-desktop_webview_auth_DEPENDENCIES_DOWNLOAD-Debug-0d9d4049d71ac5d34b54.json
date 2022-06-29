@@ -1,0 +1,35 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target"
+		],
+		"files" : 
+		[
+			"flutter/ephemeral/.plugin_symlinks/desktop_webview_auth/windows/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 32,
+				"parent" : 0
+			}
+		]
+	},
+	"id" : "desktop_webview_auth_DEPENDENCIES_DOWNLOAD::@0509e840bb5940ecccd3",
+	"name" : "desktop_webview_auth_DEPENDENCIES_DOWNLOAD",
+	"paths" : 
+	{
+		"build" : "plugins/desktop_webview_auth",
+		"source" : "flutter/ephemeral/.plugin_symlinks/desktop_webview_auth/windows"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}
