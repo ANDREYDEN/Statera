@@ -247,7 +247,7 @@ packages:
     source: hosted
     version: "2.2.3"
   desktop_webview_auth:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: desktop_webview_auth
       url: "https://pub.dartlang.org"
