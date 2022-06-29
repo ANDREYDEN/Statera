@@ -46,6 +46,8 @@ dependencies:
   url_launcher: ^6.1.2
   sign_in_with_apple: ^4.0.0
   crypto: ^3.0.1
+  firebase_core_desktop: ^1.0.0
+  firebase_auth_desktop: ^1.0.0
 
 dev_dependencies:
   flutter_test:

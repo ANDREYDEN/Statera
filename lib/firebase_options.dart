@@ -27,15 +27,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return linux;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -80,5 +74,23 @@ class DefaultFirebaseOptions {
     androidClientId: '630064020417-8uv3u5p6kg4ja8req6svs5edfmv15htq.apps.googleusercontent.com',
     iosClientId: '630064020417-kp591unonuf8jvctsjngk2r1d70p4b1p.apps.googleusercontent.com',
     iosBundleId: 'com.statera.statera',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA',
+    appId: '1:630064020417:web:11ce8a1fabe6136cc3cd40',
+    messagingSenderId: '630064020417',
+    projectId: 'statera-0',
+    authDomain: 'statera-0.firebaseapp.com',
+    storageBucket: 'statera-0.appspot.com',
+  );
+
+  static const FirebaseOptions linux = FirebaseOptions(
+    apiKey: 'AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA',
+    appId: '1:630064020417:web:63c1accb48fd54d2c3cd40',
+    messagingSenderId: '630064020417',
+    projectId: 'statera-0',
+    authDomain: 'statera-0.firebaseapp.com',
+    storageBucket: 'statera-0.appspot.com',
   );
 }
