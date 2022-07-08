@@ -1,9 +1,8 @@
 import * as admin from 'firebase-admin'
 import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
 
-const app = admin.initializeApp()
-
 export async function removeUserFromGroups(uid: string) {
+  const app = admin.app()
   const groupsSnaps = await admin
       .firestore(app)
       .collection('groups')
@@ -20,6 +19,7 @@ export async function removeUserFromGroups(uid: string) {
 }
 
 async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot) {
+  const app = admin.app()
   const memberIds = groupDoc.data()['memberIds']
   const members = groupDoc.data()['members']
   const balance = groupDoc.data()['balance']
@@ -45,6 +45,7 @@ async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot)
 }
 
 async function deleteGroup(groupDoc: QueryDocumentSnapshot) {
+  const app = admin.app()
   const expenses = await admin
       .firestore(app)
       .collection('expenses')

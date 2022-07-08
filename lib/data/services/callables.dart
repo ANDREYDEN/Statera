@@ -5,7 +5,7 @@ class Callables {
   static HttpsCallable _getReceiptData =
       FirebaseFunctions.instance.httpsCallable('getReceiptData');
 
-  HttpsCallable _updateUserNotificationToken =
+  static HttpsCallable _updateUserNotificationToken =
       FirebaseFunctions.instance.httpsCallable('updateUserNotificationToken');
 
   static Future<List<Item>> getReceiptData({
@@ -25,5 +25,15 @@ class Callables {
         value: double.tryParse(itemData["value"].toString()) ?? 0,
       );
     }).toList();
+  }
+
+  static Future<void> updateUserNotificationToken({
+    required String uid,
+    required String token,
+  }) async {
+    await _updateUserNotificationToken({
+      'uid': uid,
+      'token': token
+    });
   }
 }

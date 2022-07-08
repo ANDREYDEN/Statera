@@ -1,13 +1,12 @@
 import * as admin from 'firebase-admin'
 import { firestore, messaging } from 'firebase-admin';
-import { QueryDocumentSnapshot } from "firebase-functions/v1/firestore";
 
-const app = admin.initializeApp()
-
-export async function notifyAboutExpenseCreation(expenseSnap: QueryDocumentSnapshot) {
+export async function notifyAboutExpenseCreation(expenseSnap: firestore.QueryDocumentSnapshot) {
+    const app = admin.app()
     const groupId = expenseSnap.data().groupId
     const group = await firestore(app).collection('groups').doc(groupId).get()
     const userTokens = await getGroupNotificationTokens(group)
+    console.log('Retrieved tokens:', userTokens);
 
     return messaging(app).sendMulticast({
         tokens: userTokens as string[],
@@ -22,8 +21,11 @@ export async function notifyAboutExpenseCreation(expenseSnap: QueryDocumentSnaps
     })
 }
 
-async function getGroupNotificationTokens(group: any) {
+async function getGroupNotificationTokens(group: firestore.DocumentSnapshot<firestore.DocumentData>) {
+    const app = admin.app()
     const userIds = (group?.data()?.memberIds ?? []) as string[];
+    console.log(`Sending notifications to ${userIds.join(', ')}`);
+    
     const userDocs = await Promise.all(userIds.map(uid => firestore(app).collection('users').doc(uid).get()))
-    return userDocs.map(doc => doc.data()?.notification.token)
+    return userDocs.flatMap(doc => Object.keys(doc.data()?.notifications ?? {}))
 }

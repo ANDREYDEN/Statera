@@ -1,10 +1,13 @@
 import 'firebase-functions'
 import * as functions from 'firebase-functions'
-import { firestoreBackup } from './admin'
-import { analyzeReceipt } from './functions/analyzeReceipt'
-import { handleTokenUpdate } from './functions/notifications/handleTokenUpdate'
-import { notifyAboutExpenseCreation } from './functions/notifications/notifyAboutExpenseCreation'
-import { removeUserFromGroups } from './functions/removeUserFromGroups'
+import * as admin from 'firebase-admin'
+import { firestoreBackup } from './src/admin'
+import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpdate'
+import { notifyAboutExpenseCreation } from './src/functions/notifications/notifyAboutExpenseCreation'
+import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
+
+admin.initializeApp()
 
 export const scheduledBackup = firestoreBackup
 

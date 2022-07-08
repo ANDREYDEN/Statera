@@ -39,7 +39,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAwjBDDegCJ5PbFGKasjcZm13DZrnuCNFA',
-    appId: '1:630064020417:web:48fb8194a91bf70ec3cd40',
+    appId: '1:630064020417:web:11ce8a1fabe6136cc3cd40',
     messagingSenderId: '630064020417',
     projectId: 'statera-0',
     authDomain: 'statera-0.firebaseapp.com',

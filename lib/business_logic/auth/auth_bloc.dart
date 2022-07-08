@@ -30,7 +30,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   User get user => state.user!;
   String get uid => state.user!.uid;
 
-  void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
+  void _onUserChanged(UserChanged event, Emitter<AuthState> emit) async {
+    
     emit(event.user != null
         ? AuthState.authenticated(event.user)
         : const AuthState.unauthenticated());
