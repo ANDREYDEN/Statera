@@ -29,18 +29,29 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
       sound: true,
     );
 
+    print('Got permissions: ${settings.authorizationStatus}');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       final fcmToken = await FirebaseMessaging.instance.getToken(
           vapidKey: kIsWeb
               ? 'BHoZVDZZVKABVk2HzVWdgwqYy3RX2bshNn_dFXq51Sa9qsIssT-gOYTiHiQZ9boNuUQMJ57fqT1sGdjzVB0mruI'
               : null);
       if (fcmToken == null) throw Exception("Could not get FCM token");
-      
-      await Callables.updateUserNotificationToken(uid: authBloc.uid, token: fcmToken);
+
+      await Callables.updateUserNotificationToken(
+        uid: authBloc.uid,
+        token: fcmToken,
+      );
+
+      FirebaseMessaging.instance.onTokenRefresh
+          .listen((token) => Callables.updateUserNotificationToken(
+                uid: authBloc.uid,
+                token: token,
+              ));
 
       RemoteMessage? initialMessage =
           await FirebaseMessaging.instance.getInitialMessage();
 
+      print('Got initial message $initialMessage');
       if (initialMessage != null) {
         _handleMessage(initialMessage);
       }
@@ -51,6 +62,7 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
   }
 
   void _handleMessage(RemoteMessage message) {
+    print('handling message $message');
     if (message.data['type'] == 'new_expense' &&
         message.data['expenseId'] != null) {
       Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
