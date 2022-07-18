@@ -51,6 +51,7 @@ dependencies:
   desktop_webview_auth: ^0.0.9
   firebase_messaging: ^11.4.2
   firebase_analytics: ^9.1.12
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,7 @@ flutter:
 
   assets:
     - images/logo.png
+    - .env
 
   fonts:
     - family: Nunito

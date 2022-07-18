@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/services/callables.dart';
 
@@ -15,6 +18,9 @@ class NotificationsHandler extends StatefulWidget {
 }
 
 class _NotificationsHandlerState extends State<NotificationsHandler> {
+  late final StreamSubscription _tokenRefreshSubscription;
+  late final StreamSubscription _notificationSubscription;
+
   Future<void> setupInteractedMessage() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     var authBloc = context.read<AuthBloc>();
@@ -31,18 +37,16 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
 
     print('Got permissions: ${settings.authorizationStatus}');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      final fcmToken = await FirebaseMessaging.instance.getToken(
-          vapidKey: kIsWeb
-              ? 'BHoZVDZZVKABVk2HzVWdgwqYy3RX2bshNn_dFXq51Sa9qsIssT-gOYTiHiQZ9boNuUQMJ57fqT1sGdjzVB0mruI'
-              : null);
-      if (fcmToken == null) throw Exception("Could not get FCM token");
+      final fcmToken = await FirebaseMessaging.instance
+          .getToken(vapidKey: kIsWeb ? dotenv.env['WEB_PUSH_VAPID_KEY'] : null);
+      if (fcmToken == null) throw Exception('Could not get FCM token');
 
       await Callables.updateUserNotificationToken(
         uid: authBloc.uid,
         token: fcmToken,
       );
 
-      FirebaseMessaging.instance.onTokenRefresh
+      _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
           .listen((token) => Callables.updateUserNotificationToken(
                 uid: authBloc.uid,
                 token: token,
@@ -56,7 +60,9 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
         _handleMessage(initialMessage);
       }
 
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+      // TODO: listen only once
+      _notificationSubscription =
+          FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
       // FirebaseMessaging.onMessage.listen(_handleMessage); // foreground
     }
   }
@@ -73,6 +79,13 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
   void initState() {
     setupInteractedMessage();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notificationSubscription.cancel();
+    _tokenRefreshSubscription.cancel();
+    super.dispose();
   }
 
   @override

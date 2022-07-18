@@ -118,6 +118,11 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Copy .env
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
+
       - name: Copy google-services.json
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}

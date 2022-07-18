@@ -53,6 +53,7 @@ serviceAccount.json
 *.cache
 /admin
 photos
+.env
 
 # fastlane specific
 **/fastlane/report.xml
