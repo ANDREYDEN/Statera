@@ -50,13 +50,16 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    if (_googleSignIn.clientId != null) {
+      await _googleSignIn.disconnect();
+    }
     await _auth.signOut();
   }
 
   Future<UserCredential?> signInWithGoogleOnMobile() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-    if (googleUser == null) throw new Exception("Failed to log in with Google");
+    if (googleUser == null) throw new Exception("Failed to sign in with Google");
 
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
