@@ -25,12 +25,15 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   provider: ^5.0.0
-  firebase_core: ^1.4.0
-  firebase_auth: ^3.0.0
+  firebase_core: ^1.20.0
+  firebase_auth: ^3.5.0
   firebase_storage: ^10.0.1
-  cloud_firestore: ^2.4.0
-  cloud_functions: ^3.0.0
+  firebase_crashlytics: ^2.8.6
+  cloud_firestore: ^3.4.0
+  cloud_functions: ^3.3.0
   google_sign_in: ^5.0.7
+  sign_in_with_apple: ^4.0.0
+  desktop_webview_auth: ^0.0.9
   multi_select_flutter: ^4.0.0
   build_runner: ^2.0.6
   badges: ^2.0.1
@@ -44,12 +47,7 @@ dependencies:
   url_strategy: ^0.2.0
   share_plus: ^4.0.4
   url_launcher: ^6.1.2
-  sign_in_with_apple: ^4.0.0
   crypto: ^3.0.1
-  firebase_core_desktop: ^1.0.0
-  firebase_auth_desktop: ^1.0.0
-  desktop_webview_auth: ^0.0.9
-  firebase_crashlytics: ^2.8.6
 
 dev_dependencies:
   flutter_test:

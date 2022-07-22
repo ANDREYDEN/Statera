@@ -165,10 +165,6 @@ class _SignInState extends State<SignIn> {
                       child: Text(_isSignIn
                           ? 'Create an account'
                           : 'Already have an account?'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => throw Exception('Test'),
-                      child: Text('Crash'),
                     )
                   ],
                 ),
