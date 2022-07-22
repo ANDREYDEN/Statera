@@ -51,7 +51,9 @@ class SignInCubit extends Cubit<SignInState> {
       emit(SignInLoading());
       final signInTask = _authRepository.signInWithGoogle();
       final timeout = Future.delayed(
-          Duration(minutes: 1), () => throw Exception('Timeout'));
+        Duration(seconds: 20),
+        () => throw Exception('Timeout'),
+      );
       await Future.any([timeout, signInTask]);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
