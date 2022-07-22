@@ -65,3 +65,5 @@ photos
 
 # scan temporary files
 **/fastlane/test_output
+
+.env
