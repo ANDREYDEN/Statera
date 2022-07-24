@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -8,16 +7,30 @@ import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
-class Settings extends StatelessWidget {
+class Settings extends StatefulWidget {
   static const String route = '/settings';
 
   const Settings({Key? key}) : super(key: key);
 
   @override
+  State<Settings> createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
+  final _displayNameController = TextEditingController();
+  String? _displayNameErrorText = null;
+
+  AuthBloc get authBloc => context.read<AuthBloc>();
+
+  @override
+  void initState() {
+    _displayNameController.text = authBloc.user.displayName ?? 'anonymous';
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authBloc = context.watch<AuthBloc>();
-    final displayNameController =
-        TextEditingController(text: authBloc.user.displayName);
 
     return PageScaffold(
       title: 'Settings',
@@ -38,10 +51,23 @@ class Settings extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 TextField(
-                  inputFormatters: [],
-                  controller: displayNameController,
-                  decoration: InputDecoration(label: Text('Display Name')),
-                  onChanged: (newName) => authBloc.user.updateDisplayName(newName),
+                  controller: _displayNameController,
+                  decoration: InputDecoration(
+                    label: Text('Display Name'),
+                    errorText: _displayNameErrorText,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _displayNameErrorText =
+                          value == '' ? 'Can not be empty' : null;
+                    });
+                  },
+                  onEditingComplete: () {
+                    if (_displayNameController.text == '') return;
+
+                    authBloc.user
+                        .updateDisplayName(_displayNameController.text);
+                  },
                 ),
                 SizedBox(height: 10),
                 ElevatedButton(
