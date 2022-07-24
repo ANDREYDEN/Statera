@@ -20,7 +20,7 @@ class AuthRepository {
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> currentUserStream() {
-    return _auth.authStateChanges();
+    return _auth.userChanges();
   }
 
   Future<UserCredential> signIn(String email, String password) {
