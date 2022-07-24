@@ -65,8 +65,8 @@ class _SettingsState extends State<Settings> {
                   onEditingComplete: () {
                     if (_displayNameController.text == '') return;
 
-                    authBloc.user
-                        .updateDisplayName(_displayNameController.text);
+                    authBloc.add(
+                        UserDataUpdated(name: _displayNameController.text));
                   },
                 ),
                 SizedBox(height: 10),
