@@ -1,13 +1,16 @@
 import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/services/firebase_storage_repository.dart';
 import 'package:statera/utils/helpers.dart';
 
 enum Store { Walmart, Other }
@@ -29,6 +32,9 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   Store _selectedStore = Store.Walmart;
   bool _withNameImprovement = false;
   String? _status;
+
+  FirebaseStorageRepository get _firebaseStorageRepository =>
+      context.read<FirebaseStorageRepository>();
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +123,10 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     try {
       setStatus('Uploading...');
 
-      var ref = FirebaseStorage.instance.ref('receipts/${pickedFile.name}');
-      var task = await (kIsWeb
-          ? ref.putData(await pickedFile.readAsBytes())
-          : ref.putFile(File(pickedFile.path)));
-
-      String url = await task.ref.getDownloadURL();
+      String url = await _firebaseStorageRepository.uploadPickedFile(
+        pickedFile,
+        path: 'receipts/',
+      );
 
       setStatus('Analyzing receipt (this might take up to a minute)...');
 
@@ -156,12 +160,14 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       if (scanSuccessful) {
         await ExpenseService.instance.updateExpense(widget.expense);
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error while uploading: " + e.toString()),
-      ));
-      print(e);
-      return;
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error while uploading: $e')));
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        null,
+        reason: 'Receipt upload failed',
+      );
     } finally {
       setStatus(null);
       Navigator.of(context).pop();

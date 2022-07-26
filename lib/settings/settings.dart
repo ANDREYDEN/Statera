@@ -1,8 +1,11 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/author.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -21,6 +24,8 @@ class _SettingsState extends State<Settings> {
   String? _displayNameErrorText = null;
 
   AuthBloc get authBloc => context.read<AuthBloc>();
+  FirebaseStorageRepository get _firebaseStorageRepository =>
+      context.read<FirebaseStorageRepository>();
 
   @override
   void initState() {
@@ -31,6 +36,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     final authBloc = context.watch<AuthBloc>();
+    final ImagePicker _picker = ImagePicker();
 
     return PageScaffold(
       title: 'Settings',
@@ -44,9 +50,44 @@ class _SettingsState extends State<Settings> {
               children: [
                 Align(
                   alignment: Alignment.center,
-                  child: AuthorAvatar(
-                    author: Author.fromUser(authBloc.user),
-                    width: 200,
+                  child: Stack(
+                    children: [
+                      AuthorAvatar(
+                        author: Author.fromUser(authBloc.user),
+                        width: 200,
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: IconButton(
+                          onPressed: () async {
+                            try {
+                              final pickedFile = await _picker.pickImage(
+                                  source: ImageSource.gallery);
+                              if (pickedFile == null) return;
+                      
+                              String url = await _firebaseStorageRepository
+                                  .uploadPickedFile(
+                                pickedFile,
+                                path: 'profileUrls/',
+                              );
+                      
+                              authBloc.add(UserDataUpdated(photoURL: url));
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('Error while updating profile: $e'),
+                              ));
+                              FirebaseCrashlytics.instance.recordError(
+                                e,
+                                null,
+                                reason: 'Profile image update failed',
+                              );
+                            }
+                          },
+                          icon: Icon(Icons.add_a_photo),
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 SizedBox(height: 10),

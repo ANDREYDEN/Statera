@@ -26,20 +26,24 @@ Future<void> main() async {
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  runApp(Statera(authRepository: AuthRepository()));
+  runApp(Statera());
 }
 
 class Statera extends StatelessWidget {
-  final AuthRepository authRepository;
-
-  const Statera({Key? key, required this.authRepository}) : super(key: key);
+  const Statera({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: authRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+      ],
       child: BlocProvider(
-        create: (context) => AuthBloc(authRepository),
+        create: (context) {
+          final authRepository = context.read<AuthRepository>();
+          return AuthBloc(authRepository);
+        },
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
