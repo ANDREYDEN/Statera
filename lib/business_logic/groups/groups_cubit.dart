@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/group_service.dart';
@@ -24,6 +25,13 @@ class GroupsCubit extends Cubit<GroupsState> {
         .listen(
       emit,
       onError: (error) {
+        if (error is Exception) {
+          FirebaseCrashlytics.instance.recordError(
+            error,
+            null,
+            reason: 'Groups failed to load',
+          );
+        }
         emit(GroupsError(error: error));
       },
     );

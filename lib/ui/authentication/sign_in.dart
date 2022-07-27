@@ -155,15 +155,17 @@ class _SignInState extends State<SignIn> {
                       ),
                     SizedBox(height: 20),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignIn = !_isSignIn;
-                        });
-                      },
+                      onPressed: signInState is SignInLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isSignIn = !_isSignIn;
+                              });
+                            },
                       child: Text(_isSignIn
                           ? 'Create an account'
                           : 'Already have an account?'),
-                    ),
+                    )
                   ],
                 ),
               ),

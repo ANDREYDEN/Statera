@@ -1,4 +1,5 @@
 export 'auth_repository.dart';
+export 'firebase_storage_repository.dart';
 export 'firestore.dart';
 export 'expense_service.dart';
 export 'group_service.dart';

@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:statera/firebase_options.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -17,28 +18,32 @@ Future<void> main() async {
   setPathUrlStrategy();
 
   WidgetsFlutterBinding.ensureInitialized();
-  if (Firebase.apps.isEmpty) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   configureEmulators();
 
-  runApp(Statera(authRepository: AuthRepository()));
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  runApp(Statera());
 }
 
 class Statera extends StatelessWidget {
-  final AuthRepository authRepository;
-
-  const Statera({Key? key, required this.authRepository}) : super(key: key);
+  const Statera({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: authRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+      ],
       child: BlocProvider(
-        create: (context) => AuthBloc(authRepository),
+        create: (context) {
+          final authRepository = context.read<AuthRepository>();
+          return AuthBloc(authRepository);
+        },
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Provider<LayoutState>.value(

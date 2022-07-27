@@ -10,12 +10,14 @@ class Firestore {
   }
 
   CollectionReference get expensesCollection =>
-      _firestore.collection("expenses");
+      _firestore.collection('expenses');
 
-  CollectionReference get groupsCollection => _firestore.collection("groups");
+  CollectionReference get groupsCollection => _firestore.collection('groups');
 
   CollectionReference get paymentsCollection =>
-      _firestore.collection("payments");
+      _firestore.collection('payments');
+
+  CollectionReference get usersCollection => _firestore.collection('users');
 
   Query expensesQuery({
     String? groupId,
@@ -23,18 +25,19 @@ class Firestore {
     String? unmarkedAssigneeId,
     String? authorId,
   }) {
-    var query = expensesCollection.where("groupId", isEqualTo: groupId);
+    var query = expensesCollection.where('groupId', isEqualTo: groupId);
 
     if (assigneeId != null) {
-      query = query.where("assigneeIds", arrayContains: assigneeId);
+      query = query.where('assigneeIds', arrayContains: assigneeId);
     }
 
     if (authorId != null) {
-      query = query.where("author.uid", isEqualTo: authorId);
+      query = query.where('author.uid', isEqualTo: authorId);
     }
 
     if (unmarkedAssigneeId != null) {
-      query = query.where("unmarkedAssigneeIds", arrayContains: unmarkedAssigneeId);
+      query =
+          query.where('unmarkedAssigneeIds', arrayContains: unmarkedAssigneeId);
     }
 
     return query;
