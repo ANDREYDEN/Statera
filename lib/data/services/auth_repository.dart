@@ -8,8 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:statera/data/services/services.dart';
 
-class AuthRepository {
+class AuthRepository extends Firestore {
   late FirebaseAuth _auth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -20,7 +21,19 @@ class AuthRepository {
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> currentUserStream() {
-    return _auth.authStateChanges();
+    return _auth.userChanges();
+  }
+
+  Future<void> updateUser(String uid, String? name, String? photoURL) async {
+    if (name != null) {
+      await _auth.currentUser?.updateDisplayName(name);
+      await usersCollection.doc(uid).update({ 'name': name });
+    }
+
+    if (photoURL != null) {
+      await _auth.currentUser?.updatePhotoURL(photoURL);
+      await usersCollection.doc(uid).update({ 'photoURL': photoURL });
+    }
   }
 
   Future<UserCredential> signIn(String email, String password) {
@@ -50,13 +63,16 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    if (_googleSignIn.clientId != null) {
+      await _googleSignIn.disconnect();
+    }
     await _auth.signOut();
   }
 
   Future<UserCredential?> signInWithGoogleOnMobile() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-    if (googleUser == null) throw new Exception("Failed to log in with Google");
+    if (googleUser == null) throw new Exception('Failed to sign in with Google');
 
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;

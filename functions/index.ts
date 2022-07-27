@@ -1,8 +1,12 @@
-import 'firebase-functions'
+import * as admin from 'firebase-admin'
 import * as functions from 'firebase-functions'
-import { firestoreBackup } from './admin'
-import { analyzeReceipt } from './functions/analyzeReceipt'
-import { removeUserFromGroups } from './functions/removeUserFromGroups'
+import { firestoreBackup } from './src/admin'
+import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
+import { updateUser } from './src/functions/updateUser'
+import { UserData } from './src/types/userData'
+
+admin.initializeApp()
 
 export const scheduledBackup = firestoreBackup
 
@@ -33,4 +37,16 @@ export const cleanUpOnAccountDeletion = functions.auth
     .user()
     .onDelete(async (user, _) => {
       removeUserFromGroups(user.uid)
+    })
+
+export const changeUser = functions.firestore
+    .document('users/{userId}')
+    .onUpdate(async (change, context) => {
+      const oldUserData = change.before.data() as UserData
+      const newUserData = change.after.data() as UserData
+      if (oldUserData.name !== newUserData.name 
+        || oldUserData.photoURL !== newUserData.photoURL) {
+        await updateUser(context.params.userId, newUserData)
+      }
+      return null
     })

@@ -65,10 +65,11 @@ class _LandingPageState extends State<LandingPage>
       url: 'https://statera-0.web.app',
     ),
     PlatformOption(
-        name: 'MacOS',
-        platform: TargetPlatform.macOS,
-        icon: Icons.desktop_mac,
-        url: 'https://apps.apple.com/ca/app/statera/id1609503817'),
+      name: 'MacOS',
+      platform: TargetPlatform.macOS,
+      icon: Icons.desktop_mac,
+      url: 'https://apps.apple.com/ca/app/statera/id1609503817',
+    ),
     PlatformOption(
       name: 'Windows',
       platform: TargetPlatform.windows,
