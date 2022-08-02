@@ -59,6 +59,7 @@ class GroupsCubit extends Cubit<GroupsState> {
         socialTitle: 'Join "${group.name}"',
         socialDescription: 'This is an invite to join a new group in Statera',
       );
+      group.id = groupId;
       group.inviteLink = link;
       await _groupService.saveGroup(group);
     }
