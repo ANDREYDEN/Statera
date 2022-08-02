@@ -24,25 +24,13 @@ class GroupInviteDialog extends StatelessWidget {
                   onPressed: onGenerate,
                   child: Text('Generate invite'),
                 )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: QrImage(
-                        data: inviteLink,
-                        foregroundColor:
-                            Theme.of(context).textTheme.bodyText1!.color,
-                      ),
-                    ),
-                    Flexible(
-                      child: TextButton(
-                        onPressed: onGenerate,
-                        child: Text('Re-generate invite'),
-                      ),
-                    )
-                  ],
+              : SizedBox(
+                  width: 200,
+                  child: QrImage(
+                    data: inviteLink,
+                    foregroundColor:
+                        Theme.of(context).textTheme.bodyText1!.color,
+                  ),
                 ),
           actions: [
             Row(
@@ -54,7 +42,6 @@ class GroupInviteDialog extends StatelessWidget {
                       data: inviteLink,
                       copyMessage: 'Invite link copied to clipboard',
                       iconSize: 30,
-                      mobileIcon: Icons.copy,
                       afterShare: () => Navigator.pop(context),
                     ),
                   ),
