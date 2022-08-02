@@ -11,10 +11,15 @@ part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
   late final GroupService _groupService;
+  late final DynamicLinkRepository _dynamicLinkRepository;
   StreamSubscription? _groupsSubscription;
 
-  GroupsCubit(GroupService groupService) : super(GroupsLoading()) {
+  GroupsCubit(
+    GroupService groupService,
+    DynamicLinkRepository dynamicLinkRepository,
+  ) : super(GroupsLoading()) {
     _groupService = groupService;
+    _dynamicLinkRepository = dynamicLinkRepository;
   }
 
   void load(String? userId) {
@@ -49,7 +54,11 @@ class GroupsCubit extends Cubit<GroupsState> {
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
       final groupId = await _groupService.createGroup(group, creator);
-      await _groupService.generateInviteLink(group..id = groupId);
+      final link = await _dynamicLinkRepository.generateDynamicLink(
+        path: 'groups/$groupId/join/${group.code}',
+      );
+      group.inviteLink = link;
+      await _groupService.saveGroup(group);
     }
   }
 

@@ -1,6 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:statera/data/services/dynamic_link_repository.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -40,11 +38,7 @@ class Statera extends StatelessWidget {
       providers: [
         RepositoryProvider(create: (_) => AuthRepository()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
-        RepositoryProvider(
-          create: (_) => DynamicLinkRepository(
-            firebaseDynamicLinks: FirebaseDynamicLinks.instance,
-          ),
-        )
+        RepositoryProvider(create: (_) => DynamicLinkRepository())
       ],
       child: BlocProvider(
         create: (context) {
