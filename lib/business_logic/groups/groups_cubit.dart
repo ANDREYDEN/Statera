@@ -56,6 +56,8 @@ class GroupsCubit extends Cubit<GroupsState> {
       final groupId = await _groupService.createGroup(group, creator);
       final link = await _dynamicLinkRepository.generateDynamicLink(
         path: 'groups/$groupId/join/${group.code}',
+        socialTitle: 'Join "${group.name}"',
+        socialDescription: 'This is an invite to join a new group in Statera',
       );
       group.inviteLink = link;
       await _groupService.saveGroup(group);
