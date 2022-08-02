@@ -11,13 +11,13 @@ class QRDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data == null) {
-      return AlertDialog(content: Text("Unable to generate invite"));
+      return AlertDialog(content: Text('Unable to generate invite'));
     }
 
     return AlertDialog(
       title: Text('Invite people to this group'),
       content: SizedBox(
-        width: 400,
+        width: 200,
         child: QrImage(
           data: data!,
           foregroundColor: Theme.of(context).textTheme.bodyText1!.color,
