@@ -89,7 +89,8 @@ class GroupService extends Firestore {
     newGroup.generateCode();
     newGroup.addUser(author);
 
-    final groupReference = await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
+    final groupReference = await GroupService.instance.groupsCollection
+        .add(newGroup.toFirestore());
     return groupReference.id;
   }
 

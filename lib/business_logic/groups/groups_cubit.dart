@@ -11,15 +11,10 @@ part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
   late final GroupService _groupService;
-  late final DynamicLinkRepository _dynamicLinkRepository;
   StreamSubscription? _groupsSubscription;
 
-  GroupsCubit(
-    GroupService groupService,
-    DynamicLinkRepository dynamicLinkRepository,
-  ) : super(GroupsLoading()) {
+  GroupsCubit(GroupService groupService) : super(GroupsLoading()) {
     _groupService = groupService;
-    _dynamicLinkRepository = dynamicLinkRepository;
   }
 
   void load(String? userId) {
@@ -54,14 +49,7 @@ class GroupsCubit extends Cubit<GroupsState> {
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
       final groupId = await _groupService.createGroup(group, creator);
-      final link = await _dynamicLinkRepository.generateDynamicLink(
-        path: 'groups/$groupId/join/${group.code}',
-        socialTitle: 'Join "${group.name}"',
-        socialDescription: 'This is an invite to join a new group in Statera',
-      );
-      group.id = groupId;
-      group.inviteLink = link;
-      await _groupService.saveGroup(group);
+      await _groupService.generateInviteLink(group..id = groupId);
     }
   }
 
