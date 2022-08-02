@@ -6,8 +6,11 @@ import 'package:statera/data/services/services.dart';
 
 class GroupService extends Firestore {
   static GroupService? _instance;
+  late final DynamicLinkRepository _dynamicLinkRepository;
 
-  GroupService() : super();
+  GroupService() : super() {
+    _dynamicLinkRepository = DynamicLinkRepository();
+  }
 
   static GroupService get instance {
     if (_instance == null) {
@@ -81,10 +84,14 @@ class GroupService extends Firestore {
             .toList());
   }
 
-  Future<void> createGroup(Group newGroup, User author) async {
+  /// Creates a new group and returns its Firestore id
+  Future<String> createGroup(Group newGroup, User author) async {
     newGroup.generateCode();
     newGroup.addUser(author);
-    await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
+
+    final groupReference = await GroupService.instance.groupsCollection
+        .add(newGroup.toFirestore());
+    return groupReference.id;
   }
 
   Future<void> joinGroup(String groupCode, User user) async {
@@ -109,6 +116,22 @@ class GroupService extends Firestore {
     expense.assignGroup(group);
     final docRef = await expensesCollection.add(expense.toFirestore());
     return docRef.id;
+  }
+
+  Future<String> generateInviteLink(Group group) async {
+    if (group.id == null)
+      throw Exception('Failed to generate invite link: group does not exist');
+
+    final link = await _dynamicLinkRepository.generateDynamicLink(
+      path: 'groups/${group.id}/join/${group.code}',
+      socialTitle: 'Join "${group.name}"',
+      socialDescription: 'This is an invite to join a new group in Statera',
+    );
+
+    group.inviteLink = link;
+    await saveGroup(group);
+
+    return link;
   }
 
   Stream<Group?> getExpenseGroupStream(Expense expense) {
