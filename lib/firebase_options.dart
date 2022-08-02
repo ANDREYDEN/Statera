@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
     projectId: 'statera-0',
     storageBucket: 'statera-0.appspot.com',
     androidClientId: '630064020417-8uv3u5p6kg4ja8req6svs5edfmv15htq.apps.googleusercontent.com',
-    iosClientId: '630064020417-kp591unonuf8jvctsjngk2r1d70p4b1p.apps.googleusercontent.com',
+    iosClientId: '630064020417-3r46lh80ajgs92ovhc52rh04emg40b75.apps.googleusercontent.com',
     iosBundleId: 'com.statera.statera',
   );
 
@@ -72,7 +72,7 @@ class DefaultFirebaseOptions {
     projectId: 'statera-0',
     storageBucket: 'statera-0.appspot.com',
     androidClientId: '630064020417-8uv3u5p6kg4ja8req6svs5edfmv15htq.apps.googleusercontent.com',
-    iosClientId: '630064020417-kp591unonuf8jvctsjngk2r1d70p4b1p.apps.googleusercontent.com',
+    iosClientId: '630064020417-3r46lh80ajgs92ovhc52rh04emg40b75.apps.googleusercontent.com',
     iosBundleId: 'com.statera.statera',
   );
 

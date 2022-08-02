@@ -48,7 +48,6 @@ dependencies:
   share_plus: ^4.0.4
   url_launcher: ^6.1.2
   crypto: ^3.0.1
-  firebase_dynamic_links: ^4.3.3
 
 dev_dependencies:
   flutter_test:

@@ -81,10 +81,13 @@ class GroupService extends Firestore {
             .toList());
   }
 
-  Future<void> createGroup(Group newGroup, User author) async {
+  /// Creates a new group and returns its Firestore id
+  Future<String> createGroup(Group newGroup, User author) async {
     newGroup.generateCode();
     newGroup.addUser(author);
-    await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
+
+    final groupReference = await GroupService.instance.groupsCollection.add(newGroup.toFirestore());
+    return groupReference.id;
   }
 
   Future<void> joinGroup(String groupCode, User user) async {
