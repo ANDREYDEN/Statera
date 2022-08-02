@@ -55,7 +55,9 @@ class GroupCubit extends Cubit<GroupState> {
 
   void join(String? code, User user) async {
     if (code != loadedState.group.code) {
-      emit(GroupError(error: 'Invalid invitation. Make sure you have copied the link correctly.'));
+      emit(GroupError(
+          error:
+              'Invalid invitation. Make sure you have copied the link correctly.'));
       return;
     }
 
@@ -67,6 +69,12 @@ class GroupCubit extends Cubit<GroupState> {
     emit(GroupLoading());
     await _groupService.joinGroup(code!, user);
     emit(GroupJoinSuccess());
+  }
+
+  void generateInviteLink() async {
+    final group = loadedState.group;
+    emit(GroupLoading());
+    await _groupService.generateInviteLink(group);
   }
 
   @override

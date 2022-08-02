@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/group_service.dart';
+import 'package:statera/data/services/services.dart';
 
 part 'groups_state.dart';
 
@@ -45,9 +45,11 @@ class GroupsCubit extends Cubit<GroupsState> {
   }
 
   addGroup(Group group, User creator) async {
-    if (state is GroupsLoaded) {
-      emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await _groupService.createGroup(group, creator);
+    final groupState = state;
+    if (groupState is GroupsLoaded) {
+      emit(GroupsProcessing(groups: groupState.groups));
+      final groupId = await _groupService.createGroup(group, creator);
+      await _groupService.generateInviteLink(group..id = groupId);
     }
   }
 

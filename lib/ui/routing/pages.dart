@@ -29,7 +29,7 @@ final _landingPagePath = PagePath(
 final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
   builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (_) =>
+    create: (context) =>
         GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),

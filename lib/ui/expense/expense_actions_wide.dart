@@ -3,9 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/expense_action_handlers.dart';
-import 'package:statera/ui/widgets/buttons/share_button.dart';
+import 'package:statera/ui/expense/expense_share_button.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 
 class ExpenseActionsWide extends StatelessWidget {
@@ -22,12 +21,7 @@ class ExpenseActionsWide extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          ShareButton(
-            data: DynamicLinkService.generateDynamicLink(
-              path: ModalRoute.of(context)!.settings.name,
-            ),
-            webIcon: Icons.share,
-          ),
+          ExpenseShareButton(),
           if (expense.canBeUpdatedBy(authBloc.uid)) ...[
             IconButton(
               icon: Icon(Icons.settings),

@@ -81,7 +81,7 @@ class _GroupListState extends State<GroupList> {
                       ),
                       Expanded(
                         child: groups.isEmpty
-                            ? ListEmpty(text: "Join or create a group!")
+                            ? ListEmpty(text: 'Join or create a group!')
                             : ListView.builder(
                                 itemCount: groups.length,
                                 itemBuilder: (context, index) {

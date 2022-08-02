@@ -38,6 +38,7 @@ class Statera extends StatelessWidget {
       providers: [
         RepositoryProvider(create: (_) => AuthRepository()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+        RepositoryProvider(create: (_) => DynamicLinkRepository())
       ],
       child: BlocProvider(
         create: (context) {
