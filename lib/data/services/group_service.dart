@@ -123,7 +123,7 @@ class GroupService extends Firestore {
       throw Exception('Failed to generate invite link: group does not exist');
 
     final link = await _dynamicLinkRepository.generateDynamicLink(
-      path: 'group/${group.id}/join/${group.code}',
+      path: 'groups/${group.id}/join/${group.code}',
       socialTitle: 'Join "${group.name}"',
       socialDescription: 'This is an invite to join a new group in Statera',
     );
