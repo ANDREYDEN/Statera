@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -29,51 +30,11 @@ Future<void> main() async {
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  Uri? initialLink;
-  if (isMobilePlatform()) {
-    final dynamicLink = await FirebaseDynamicLinks.instance.getInitialLink();
-    initialLink = dynamicLink?.link;
-  }
-
-  runApp(Statera(initialLink: initialLink));
+  runApp(Statera());
 }
 
-class Statera extends StatefulWidget {
-  final Uri? initialLink;
-
-  const Statera({Key? key, this.initialLink}) : super(key: key);
-
-  @override
-  State<Statera> createState() => _StateraState();
-}
-
-class _StateraState extends State<Statera> {
-  StreamSubscription<PendingDynamicLinkData>? _dynamicLinkSubscription = null;
-
-  @override
-  void initState() {
-    final initialLink = widget.initialLink;
-    if (initialLink != null) {
-      Navigator.pushNamed(context, initialLink.path);
-    }
-
-    if (isMobilePlatform()) {
-      _dynamicLinkSubscription =
-          FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-        Navigator.pushNamed(context, dynamicLinkData.link.path);
-      })
-            ..onError((error) {
-              FirebaseCrashlytics.instance.recordFlutterError(error);
-            });
-    }
-    super.initState();
-  }
-
-  @override
-  void deactivate() {
-    _dynamicLinkSubscription?.cancel();
-    super.deactivate();
-  }
+class Statera extends StatelessWidget {
+  const Statera({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

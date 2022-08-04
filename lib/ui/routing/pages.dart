@@ -9,6 +9,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/settings/settings.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/auth_guard.dart';
@@ -156,12 +157,14 @@ Widget _renderPage(
   final matches = match?.groups(
     List.generate(match.groupCount, (index) => index + 1),
   );
-  return SafeArea(
-    child: path.isPublic
-        ? path.builder(context, matches)
-        : AuthGuard(
-            originalRoute: originalRoute,
-            builder: () => path.builder(context, matches),
-          ),
+  return DynamicLinkHandler(
+    child: SafeArea(
+      child: path.isPublic
+          ? path.builder(context, matches)
+          : AuthGuard(
+              originalRoute: originalRoute,
+              builder: () => path.builder(context, matches),
+            ),
+    ),
   );
 }

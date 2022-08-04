@@ -42,6 +42,7 @@ class GroupInviteDialog extends StatelessWidget {
                       data: inviteLink,
                       copyMessage: 'Invite link copied to clipboard',
                       iconSize: 30,
+                      mobileIcon: Icons.copy,
                       afterShare: () => Navigator.pop(context),
                     ),
                   ),

@@ -24,20 +24,20 @@ class ShareButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () {
-        if (kIsWeb) {
-          _webShare(context);
-        } else {
-          _mobileShare();
-        }
+      onPressed: () async {
+        await _webShare(context);
 
         afterShare?.call();
       },
-      icon: Icon(kIsWeb ? webIcon : mobileIcon, size: iconSize),
+      icon: Icon(
+        kIsWeb ? webIcon : mobileIcon,
+        size: iconSize,
+        color: Theme.of(context).colorScheme.primary,
+      ),
     );
   }
 
-  void _webShare(BuildContext context) async {
+  Future<void> _webShare(BuildContext context) async {
     ClipboardData clipData = ClipboardData(text: data);
     await Clipboard.setData(clipData);
 
@@ -48,6 +48,7 @@ class ShareButton extends StatelessWidget {
     );
   }
 
+  /// TODO: retired, needs testing on iOS
   void _mobileShare() {
     Share.share(data);
   }

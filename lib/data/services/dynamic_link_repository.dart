@@ -1,9 +1,30 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:statera/firebase_options.dart';
 
 class DynamicLinkRepository {
+  Future<StreamSubscription<PendingDynamicLinkData>> retrieveDynamicLink(
+    BuildContext context,
+  ) async {
+    final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+
+    if (initialLink != null) {
+      Navigator.pushNamed(context, initialLink.link.path);
+    }
+
+    return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+      Navigator.pushNamed(context, dynamicLinkData.link.path);
+    })
+      ..onError((error) {
+        FirebaseCrashlytics.instance.recordFlutterError(error);
+      });
+  }
+
   Future<String> generateDynamicLink({
     String? path,
     String? socialTitle,
