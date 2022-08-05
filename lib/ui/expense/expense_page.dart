@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/ui/expense/expense_action_handlers.dart';
 import 'package:statera/ui/expense/expense_details.dart';
-import 'package:statera/ui/widgets/buttons/share_button.dart';
+import 'package:statera/ui/expense/expense_share_button.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatelessWidget {
-  static const String route = "/expense";
+  static const String route = '/expense';
 
   const ExpensePage({Key? key}) : super(key: key);
 
@@ -40,12 +39,7 @@ class ExpensePage extends StatelessWidget {
             onFabPressed:
                 expenseCanBeUpdated ? () => handleNewItemClick(context) : null,
             actions: [
-              ShareButton(
-                data: DynamicLinkService.generateDynamicLink(
-                  path: ModalRoute.of(context)!.settings.name,
-                ),
-                webIcon: Icons.share,
-              ),
+              ExpenseShareButton(),
               if (expense.canBeUpdatedBy(authBloc.uid))
                 IconButton(
                   icon: Icon(Icons.settings),

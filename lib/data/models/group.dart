@@ -12,6 +12,7 @@ class Group {
   late Map<String, Map<String, double>> balance;
   String? code;
   String? _currencySign;
+  String? inviteLink;
 
   static const String kdefaultCurrencySign = '\$';
 
@@ -22,6 +23,7 @@ class Group {
     members,
     balance,
     String? currencySign,
+    this.inviteLink,
   }) {
     this.members = [];
     this.balance = {};
@@ -145,7 +147,8 @@ class Group {
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
       'balance': balance,
-      'currencySign': _currencySign
+      'currencySign': _currencySign,
+      'inviteLink': inviteLink,
     };
   }
 
@@ -173,6 +176,7 @@ class Group {
               ),
             ),
       currencySign: map['currencySign'],
+      inviteLink: map['inviteLink'],
     );
   }
 }
