@@ -14,15 +14,22 @@ class DynamicLinkRepository {
     final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
 
     if (initialLink != null) {
-      Navigator.pushNamed(context, initialLink.link.path);
+      navigateToPath(context, initialLink.link.path);
     }
 
     return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      Navigator.pushNamed(context, dynamicLinkData.link.path);
+      navigateToPath(context, dynamicLinkData.link.path);
     })
       ..onError((error) {
         FirebaseCrashlytics.instance.recordFlutterError(error);
       });
+  }
+
+  void navigateToPath(BuildContext context, String path) {
+    final currentPath = ModalRoute.of(context)?.settings.name;
+    if (path != currentPath) {
+      Navigator.pushNamed(context, path);
+    }
   }
 
   Future<String> generateDynamicLink({
