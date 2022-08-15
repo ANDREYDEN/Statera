@@ -28,7 +28,7 @@ export const getReceiptData = functions
 
       return analyzeReceipt(
           data.receiptUrl,
-          data.isWalmart,
+          data.storeName,
           data.withNameImprovement
       )
     })

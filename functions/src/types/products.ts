@@ -6,3 +6,10 @@ export type Product = {
 export type WalmartProduct = Product & {
   sku?: string
 }
+
+export type LCBOProduct = Product & {
+  id: string
+  deposit: number
+  quantity: number
+  volume?: number
+}

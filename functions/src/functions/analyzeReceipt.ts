@@ -1,11 +1,11 @@
 import * as vision from '@google-cloud/vision'
 import { Product } from '../types/products'
-import { defaultStore, walmart } from '../types/stores'
+import { defaultStore, stores, walmart } from '../types/stores'
 import { verticalSegment } from '../utils'
 
 export async function analyzeReceipt(
     receiptUrl: string,
-    isWalmart: boolean,
+    storeName: string,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
   console.log(`Analyzing receipt at ${receiptUrl}`)
@@ -41,7 +41,7 @@ export async function analyzeReceipt(
   const rows = lines.map((line) => line.map((label) => label.description))
   console.log('Raw image text data:', rows)
 
-  const store = isWalmart ? walmart : defaultStore
+  const store = stores[storeName] ?? defaultStore
 
   let products = store.normalize(rows)
   products = store.filter(products)

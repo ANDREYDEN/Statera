@@ -1,4 +1,4 @@
-import { Product, WalmartProduct } from '../types/products'
+import { LCBOProduct, Product, WalmartProduct } from '../types/products'
 
 const CODE_REGEX = /\d{11,13}/
 const VALUE_REGEX = /\$?(\d+(\.|,)\d+)/
@@ -49,4 +49,54 @@ export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
 
     return product
   })
+}
+
+export function normalizeLCBOProducts(rows: string[][]): LCBOProduct[] {
+  const products: LCBOProduct[] = []
+  let currentProduct: LCBOProduct = {
+    name: '',
+    value: 0,
+    deposit: 0,
+    id: '',
+    volume: 0,
+    quantity: 0
+  }
+  const idRegex = /\d{8}/
+  const volumeRegex = /(\d{5})ML/
+  const depositRegex = /DEP (\d*\.\d{2}) ea/
+  const quantityValueRegex = /\((\d+) @ (\d+\.\d{2})\)/
+
+  for (const row of rows) {
+    const idMatcher = row[0].match(idRegex)
+    if (idMatcher) {
+      currentProduct.id = row[0]
+
+      const volumeMatcher = row[1].match(volumeRegex)
+      currentProduct.volume = volumeMatcher ? +volumeMatcher[0] : undefined
+
+      const depositMatcher = row[2].match(depositRegex)
+      currentProduct.deposit = depositMatcher ? +depositMatcher[0] : 0
+      continue
+    }
+
+    const quantityValueMatcher = row[0].match(quantityValueRegex)
+    if (quantityValueMatcher) {
+      currentProduct.quantity = +quantityValueMatcher[0]
+      currentProduct.value = +quantityValueMatcher[1]
+
+      products.push(currentProduct)
+      currentProduct = {
+        name: '',
+        value: 0,
+        deposit: 0,
+        id: '',
+        volume: 0,
+        quantity: 0
+      }
+      continue
+    }
+
+    currentProduct.name = row.join(' ')
+  }
+  return products
 }
