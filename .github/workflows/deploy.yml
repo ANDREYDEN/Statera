@@ -11,12 +11,6 @@ jobs:
   deploy-web:
     runs-on: ubuntu-latest
     steps:
-      - name: Get version bump from PR label
-        id: bump
-        uses: rymndhng/release-on-push-action@master
-        with:
-          # gets overriden by PR label
-          bump_version_scheme: minor
       - name: Checkout repo
         uses: actions/checkout@v2
 
