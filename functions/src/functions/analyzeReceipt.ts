@@ -1,6 +1,6 @@
 import * as vision from '@google-cloud/vision'
 import { Product } from '../types/products'
-import { defaultStore, stores, walmart } from '../types/stores'
+import { defaultStore, stores } from '../types/stores'
 import { verticalSegment } from '../utils'
 
 export async function analyzeReceipt(
