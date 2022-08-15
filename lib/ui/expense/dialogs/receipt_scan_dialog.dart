@@ -137,7 +137,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         () async {
           var response = await getItemsFromImage({
             'receiptUrl': url,
-            'storeName': _selectedStore.toString().split('.')[1].toLowwerCase(),
+            'storeName': _selectedStore.toString().split('.')[1].toLowerCase(),
             'withNameImprovement': _withNameImprovement
           });
           List<dynamic> items = response.data;
