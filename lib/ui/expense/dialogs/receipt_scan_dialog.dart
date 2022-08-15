@@ -13,7 +13,7 @@ import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firebase_storage_repository.dart';
 import 'package:statera/utils/helpers.dart';
 
-enum Store { Walmart, Other }
+enum Store { Walmart, LCBO, Other }
 
 class ReceiptScanDialog extends StatefulWidget {
   final Expense expense;
@@ -137,16 +137,19 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         () async {
           var response = await getItemsFromImage({
             'receiptUrl': url,
-            'isWalmart': _selectedStore == Store.Walmart,
+            'storeName': _selectedStore.toString().split('.')[1].toLowwerCase(),
             'withNameImprovement': _withNameImprovement
           });
           List<dynamic> items = response.data;
 
           items.forEach((itemData) {
             try {
+              final value = double.tryParse(itemData["value"].toString()) ?? 0
+              final quantity = double.tryParse(itemData["quantity"].toString()) ?? 1
               var item = Item(
                 name: itemData["name"] ?? "",
-                value: double.tryParse(itemData["value"].toString()) ?? 0,
+                value: value * quantity,
+                partition: quantity
               );
               widget.expense.addItem(item);
             } catch (e) {
