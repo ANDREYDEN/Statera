@@ -145,7 +145,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
           items.forEach((itemData) {
             try {
               final value = double.tryParse(itemData["value"].toString()) ?? 0
-              final quantity = double.tryParse(itemData["quantity"].toString()) ?? 1
+              final quantity = int.tryParse(itemData["quantity"].toString()) ?? 1
               var item = Item(
                 name: itemData["name"] ?? "",
                 value: value * quantity,
