@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -89,7 +85,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
-            "Cancel",
+            'Cancel',
             style: TextStyle(
               color: Theme.of(context).errorColor,
             ),
@@ -118,7 +114,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null)
-      throw new Exception("Something went wrong while taking a photo");
+      throw new Exception('Something went wrong while taking a photo');
 
     try {
       setStatus('Uploading...');
@@ -144,10 +140,10 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
           items.forEach((itemData) {
             try {
-              final value = double.tryParse(itemData["value"].toString()) ?? 0
-              final quantity = int.tryParse(itemData["quantity"].toString()) ?? 1
+              final value = double.tryParse(itemData['value'].toString()) ?? 0;
+              final quantity = int.tryParse(itemData['quantity'].toString()) ?? 1;
               var item = Item(
-                name: itemData["name"] ?? "",
+                name: itemData['name'] ?? '',
                 value: value * quantity,
                 partition: quantity
               );
