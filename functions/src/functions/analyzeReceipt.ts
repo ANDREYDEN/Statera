@@ -5,6 +5,7 @@ import { verticalSegment } from '../utils'
 
 export async function analyzeReceipt(
     receiptUrl: string,
+    isWalmart: boolean, //TODO: deprecate
     storeName: string,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
@@ -41,7 +42,7 @@ export async function analyzeReceipt(
   const rows = lines.map((line) => line.map((label) => label.description))
   console.log('Raw image text data:', rows)
 
-  const store = stores[storeName] ?? defaultStore
+  const store = isWalmart ? stores.walmart : stores[storeName] ?? defaultStore
 
   let products = store.normalize(rows)
   products = store.filter(products)
