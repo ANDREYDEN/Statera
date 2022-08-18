@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -123,6 +125,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         pickedFile,
         path: 'receipts/',
       );
+
+      log('Uploaded receipt: $url');
 
       setStatus('Analyzing receipt (this might take up to a minute)...');
 

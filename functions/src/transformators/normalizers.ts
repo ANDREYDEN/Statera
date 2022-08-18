@@ -61,28 +61,24 @@ export function normalizeLCBOProducts(rows: string[][]): LCBOProduct[] {
     volume: 0,
     quantity: 0
   }
-  const idRegex = /\d{8}/
-  const volumeRegex = /(\d{5})ML/
-  const depositRegex = /DEP (\d*\.\d{2}) ea/
-  const quantityValueRegex = /\((\d+) @ (\d+\.\d{2})\)/
+  const idVolumeDepositRegex = /(\d{8})\s*(\d{5})ML\s*DEP\s*(\d*\.\d{2})\s*ea/
+  const quantityValueRegex = /\(\s*(\d+)\s*@\s*(\d+\.\d{2})\s*\)/
 
-  for (const row of rows) {
-    const idMatcher = row[0].match(idRegex)
-    if (idMatcher) {
-      currentProduct.id = row[0]
+  const textRows = rows.map(row => row.join(' '))
 
-      const volumeMatcher = row[1].match(volumeRegex)
-      currentProduct.volume = volumeMatcher ? +volumeMatcher[0] : undefined
-
-      const depositMatcher = row[2].match(depositRegex)
-      currentProduct.deposit = depositMatcher ? +depositMatcher[0] : 0
+  for (const row of textRows) {
+    const idVolumeDepositMatcher = row.match(idVolumeDepositRegex)
+    if (idVolumeDepositMatcher) {
+      currentProduct.id = idVolumeDepositMatcher[1]
+      currentProduct.volume = +idVolumeDepositMatcher[2]
+      currentProduct.deposit = +idVolumeDepositMatcher[3]
       continue
     }
 
-    const quantityValueMatcher = row[0].match(quantityValueRegex)
+    const quantityValueMatcher = row.match(quantityValueRegex)
     if (quantityValueMatcher) {
-      currentProduct.quantity = +quantityValueMatcher[0]
-      currentProduct.value = +quantityValueMatcher[1]
+      currentProduct.quantity = +quantityValueMatcher[1]
+      currentProduct.value = +quantityValueMatcher[2]
 
       products.push(currentProduct)
       currentProduct = {
@@ -96,7 +92,7 @@ export function normalizeLCBOProducts(rows: string[][]): LCBOProduct[] {
       continue
     }
 
-    currentProduct.name = row.join(' ')
+    currentProduct.name = row
   }
   return products
 }
