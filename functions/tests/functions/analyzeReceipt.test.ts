@@ -1,5 +1,4 @@
 import { analyzeReceipt } from "../../src/functions/analyzeReceipt"
-import lcboReceiptProducts from '../__stubs__/lcbo_receipt_result.json'
 import lcboReceiptData from '../__stubs__/lcbo_receipt_data.json'
 
 const textDetection = jest.fn()
@@ -14,6 +13,6 @@ describe('analyzeReceipt', () => {
     textDetection.mockResolvedValue(lcboReceiptData)
     const products = await analyzeReceipt('https://example.com', false, 'lcbo')
 
-    expect(products).toEqual(lcboReceiptProducts)
+    expect(products).toMatchSnapshot()
   })
 })
