@@ -20,6 +20,7 @@ export async function removeUserFromGroups(uid: string) {
 
 async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot) {
   const app = admin.app()
+
   const memberIds = groupDoc.data()['memberIds']
   const members = groupDoc.data()['members']
   const balance = groupDoc.data()['balance']
@@ -46,6 +47,7 @@ async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot)
 
 async function deleteGroup(groupDoc: QueryDocumentSnapshot) {
   const app = admin.app()
+
   const expenses = await admin
       .firestore(app)
       .collection('expenses')

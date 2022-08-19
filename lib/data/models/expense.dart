@@ -32,11 +32,12 @@ class Expense {
   DateTime? finalizedDate;
   late bool acceptNewMembers;
 
-  Expense(
-      {required this.name,
-      required this.author,
-      required this.groupId,
-      this.acceptNewMembers = true}) {
+  Expense({
+    required this.name,
+    required this.author,
+    required this.groupId,
+    this.acceptNewMembers = true,
+  }) {
     this.assignees = [Assignee(uid: author.uid)];
     this.date = DateTime.now();
   }

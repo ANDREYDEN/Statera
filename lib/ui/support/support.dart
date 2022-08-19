@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:statera/ui/widgets/buttons/text_link.dart';
+import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class SupportPage extends StatelessWidget {
@@ -40,6 +42,20 @@ class SupportPage extends StatelessWidget {
                     url: 'https://github.com/ANDREYDEN/Statera',
                   ),
                   SizedBox(height: 30),
+                  FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: ((context, snapshot) {
+                      final packageInfo = snapshot.data;
+
+                      if (snapshot.hasError) {
+                        return Text('Error getting version: ${snapshot.error}');
+                      }
+
+                      if (packageInfo == null) return Loader();
+
+                      return Text('v${packageInfo.version}');
+                    }),
+                  ),
                   Text('Andrii Denysenko, ${DateTime.now().year}'),
                 ],
               ),

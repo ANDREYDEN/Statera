@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
@@ -48,14 +49,26 @@ class SignInCubit extends Cubit<SignInState> {
   signInWithGoogle() async {
     try {
       emit(SignInLoading());
-      await _authRepository.signInWithGoogle();
+      final signInTask = _authRepository.signInWithGoogle();
+      final timeout = Future.delayed(
+        Duration(seconds: 20),
+        () => throw Exception('Timeout'),
+      );
+      await Future.any([timeout, signInTask]);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
+      print(firebaseError);
       final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
           ? kSignInWithGoogleMessages[firebaseError.code]!
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
-    } catch (genericError) {
+    } on Exception catch (genericError) {
+      FirebaseCrashlytics.instance.recordError(
+        genericError,
+        null,
+        reason: 'Sign In with Google Failed',
+      );
+      print(genericError);
       emit(
         SignInError(error: 'Something went wrong: ${genericError.toString()}'),
       );

@@ -1,11 +1,13 @@
 import 'firebase-functions'
-import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
+import * as functions from 'firebase-functions'
 import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
 import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpdate'
 import { notifyAboutExpenseCreation } from './src/functions/notifications/notifyAboutExpenseCreation'
-import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
+import { updateUser } from './src/functions/updateUser'
+import { UserData } from './src/types/userData'
 
 admin.initializeApp()
 
@@ -38,6 +40,18 @@ export const cleanUpOnAccountDeletion = functions.auth
     .user()
     .onDelete(async (user, _) => {
       removeUserFromGroups(user.uid)
+    })
+
+export const changeUser = functions.firestore
+    .document('users/{userId}')
+    .onUpdate(async (change, context) => {
+      const oldUserData = change.before.data() as UserData
+      const newUserData = change.after.data() as UserData
+      if (oldUserData.name !== newUserData.name 
+        || oldUserData.photoURL !== newUserData.photoURL) {
+        await updateUser(context.params.userId, newUserData)
+      }
+      return null
     })
 
 export const notifyOnExpenceCreation = functions.firestore

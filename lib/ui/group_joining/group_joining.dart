@@ -19,7 +19,7 @@ class GroupJoining extends StatelessWidget {
     var user = context.select((AuthBloc authBloc) => authBloc.state.user);
 
     if (user == null) {
-      return PageScaffold(child: Text("Unauthorized"));
+      return PageScaffold(child: Text('Unauthorized'));
     }
 
     return PageScaffold(
@@ -27,7 +27,6 @@ class GroupJoining extends StatelessWidget {
         child: Container(
           width: 400,
           child: Card(
-            color: Colors.grey[200],
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: GroupBuilder(

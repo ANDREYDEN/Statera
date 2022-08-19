@@ -22,6 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
     on<AccountDeletionRequested>(_onAccountDeletionRequested);
+    on<UserDataUpdated>(_onUserDataUpdated);
     _userSubscription = authRepository.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
@@ -30,11 +31,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   User get user => state.user!;
   String get uid => state.user!.uid;
 
-  void _onUserChanged(UserChanged event, Emitter<AuthState> emit) async {
-    
+  void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
     emit(event.user != null
         ? AuthState.authenticated(event.user)
         : const AuthState.unauthenticated());
+  }
+
+  void _onUserDataUpdated(UserDataUpdated event, Emitter<AuthState> emit) {
+    _authRepository.updateUser(uid, event.name, event.photoURL);
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {

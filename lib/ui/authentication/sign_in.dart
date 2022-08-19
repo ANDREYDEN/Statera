@@ -5,6 +5,7 @@ import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/constants.dart';
+import 'package:statera/utils/utils.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -136,8 +137,7 @@ class _SignInState extends State<SignIn> {
                         ),
                       ),
                     SizedBox(height: 8),
-                    if (defaultTargetPlatform == TargetPlatform.iOS ||
-                        defaultTargetPlatform == TargetPlatform.macOS)
+                    if (isApplePlatform())
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null
@@ -155,15 +155,17 @@ class _SignInState extends State<SignIn> {
                       ),
                     SizedBox(height: 20),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignIn = !_isSignIn;
-                        });
-                      },
+                      onPressed: signInState is SignInLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isSignIn = !_isSignIn;
+                              });
+                            },
                       child: Text(_isSignIn
                           ? 'Create an account'
                           : 'Already have an account?'),
-                    ),
+                    )
                   ],
                 ),
               ),

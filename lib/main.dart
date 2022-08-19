@@ -20,29 +20,34 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   
-  if (Firebase.apps.isEmpty) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    FirebaseAnalytics.instance;
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseAnalytics.instance;
 
   configureEmulators();
 
-  runApp(Statera(authRepository: AuthRepository()));
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  runApp(Statera());
 }
 
 class Statera extends StatelessWidget {
-  final AuthRepository authRepository;
-
-  const Statera({Key? key, required this.authRepository}) : super(key: key);
+  const Statera({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: authRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => DynamicLinkRepository()),
+        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+      ],
       child: BlocProvider(
-        create: (context) => AuthBloc(authRepository),
+        create: (context) {
+          final authRepository = context.read<AuthRepository>();
+          return AuthBloc(authRepository);
+        },
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
@@ -53,7 +58,7 @@ class Statera extends StatelessWidget {
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
                 onGenerateRoute: onGenerateRoute,
-                initialRoute: LandingPage.route,
+                initialRoute: kIsWeb ? LandingPage.route : GroupList.route,
                 debugShowCheckedModeBanner: false,
               ),
             );
