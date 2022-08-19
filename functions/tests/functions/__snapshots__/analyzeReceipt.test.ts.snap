@@ -60,3 +60,83 @@ Array [
   },
 ]
 `;
+
+exports[`analyzeReceipt can analyze Walmart receipt 1`] = `
+Array [
+  Object {
+    "name": "YAM / SW POT R",
+    "sku": "000000004074",
+    "value": 5.98,
+  },
+  Object {
+    "name": "R LIB GRK 650 $ D",
+    "sku": "006568412394",
+    "value": 5.98,
+  },
+  Object {
+    "name": "HGDZ VNCMLPR R $",
+    "sku": "005500040742",
+    "value": 0,
+  },
+  Object {
+    "name": "CHK BST BNLS R $ D",
+    "sku": "060538876501",
+    "value": 1.97,
+  },
+  Object {
+    "name": "CL TUNA DILL R D",
+    "sku": "006136243483",
+    "value": 1.97,
+  },
+  Object {
+    "name": "CL TUNA - CHIL R D",
+    "sku": "006136243485",
+    "value": 1.97,
+  },
+  Object {
+    "name": "CL TUNA - CHIL R D",
+    "sku": "006136243485",
+    "value": 2.27,
+  },
+  Object {
+    "name": "MINI CARROTS R D",
+    "sku": "003338366602",
+    "value": 1.47,
+  },
+  Object {
+    "name": "CUCUMBER R",
+    "sku": "000000004593",
+    "value": 2.52,
+  },
+  Object {
+    "name": "SQURSH ZUCE D",
+    "sku": "0000000040678",
+    "value": 2.52,
+  },
+  Object {
+    "name": "R KIWI",
+    "sku": "000000004030",
+    "value": 6.97,
+  },
+  Object {
+    "name": "WLDRF SALAD R $",
+    "sku": "088804800082",
+    "value": 6.97,
+  },
+  Object {
+    "name": "ONION SCAL R $ D",
+    "sku": "000000004068",
+    "value": 0.97,
+  },
+  Object {
+    "name": "BROC STLK R $ D",
+    "sku": "000000004060",
+    "value": 2.47,
+  },
+  Object {
+    "name": "RED GRAPES R",
+    "sku": "000000004023",
+    "value": 0,
+  },
+]
+`;
