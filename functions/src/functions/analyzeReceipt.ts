@@ -1,4 +1,4 @@
-import * as vision from '@google-cloud/vision'
+import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
 import { verticalSegment } from '../utils'
@@ -10,7 +10,7 @@ export async function analyzeReceipt(
     withNameImprovement?: boolean
 ): Promise<Product[]> {
   console.log(`Analyzing receipt at ${receiptUrl}`)
-  const client = new vision.ImageAnnotatorClient()
+  const client = new ImageAnnotatorClient()
 
   console.log('Reading text from the image...')
   const [result] = await client.textDetection(receiptUrl)
