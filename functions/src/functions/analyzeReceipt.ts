@@ -1,15 +1,16 @@
-import * as vision from '@google-cloud/vision'
+import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { Product } from '../types/products'
-import { defaultStore, walmart } from '../types/stores'
+import { defaultStore, stores } from '../types/stores'
 import { verticalSegment } from '../utils'
 
 export async function analyzeReceipt(
     receiptUrl: string,
-    isWalmart: boolean,
+    isWalmart: boolean, //TODO: deprecate
+    storeName: string,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
   console.log(`Analyzing receipt at ${receiptUrl}`)
-  const client = new vision.ImageAnnotatorClient()
+  const client = new ImageAnnotatorClient()
 
   console.log('Reading text from the image...')
   const [result] = await client.textDetection(receiptUrl)
@@ -41,7 +42,7 @@ export async function analyzeReceipt(
   const rows = lines.map((line) => line.map((label) => label.description))
   console.log('Raw image text data:', rows)
 
-  const store = isWalmart ? walmart : defaultStore
+  const store = isWalmart ? stores.walmart : stores[storeName] ?? defaultStore
 
   let products = store.normalize(rows)
   products = store.filter(products)

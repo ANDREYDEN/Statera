@@ -10,19 +10,22 @@ class Callables {
 
   static Future<List<Item>> getReceiptData({
     required String receiptUrl,
-    required bool isWalmart,
+    required String selectedStore,
     required bool withNameImprovement,
   }) async {
     var response = await _getReceiptData({
       'receiptUrl': receiptUrl,
-      'isWalmart': isWalmart,
+      'storeName': selectedStore,
       'withNameImprovement': withNameImprovement
     });
 
     return (response.data as List<dynamic>).map((itemData) {
+      final value = double.tryParse(itemData['value'].toString()) ?? 0;
+      final quantity = int.tryParse(itemData['quantity'].toString()) ?? 1;
       return Item(
-        name: itemData["name"] ?? "item",
-        value: double.tryParse(itemData["value"].toString()) ?? 0,
+        name: itemData['name'] ?? 'item',
+        value: value,
+        partition: quantity,
       );
     }).toList();
   }
@@ -31,9 +34,6 @@ class Callables {
     required String uid,
     required String token,
   }) async {
-    await _updateUserNotificationToken({
-      'uid': uid,
-      'token': token
-    });
+    await _updateUserNotificationToken({'uid': uid, 'token': token});
   }
 }

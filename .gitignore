@@ -52,8 +52,7 @@ serviceAccount.json
 *.mocks.dart
 *.cache
 /admin
-photos
-.env
+receipts
 
 # fastlane specific
 **/fastlane/report.xml

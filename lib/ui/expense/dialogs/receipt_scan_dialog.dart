@@ -1,9 +1,7 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,7 +12,7 @@ import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firebase_storage_repository.dart';
 import 'package:statera/utils/helpers.dart';
 
-enum Store { Walmart, Other }
+enum Store { Walmart, LCBO, Other }
 
 class ReceiptScanDialog extends StatefulWidget {
   final Expense expense;
@@ -90,7 +88,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
-            "Cancel",
+            'Cancel',
             style: TextStyle(
               color: Theme.of(context).errorColor,
             ),
@@ -119,7 +117,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null)
-      throw new Exception("Something went wrong while taking a photo");
+      throw new Exception('Something went wrong while taking a photo');
 
     try {
       setStatus('Uploading...');
@@ -129,6 +127,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         path: 'receipts/',
       );
 
+      log('Uploaded receipt: $url');
+
       setStatus('Analyzing receipt (this might take up to a minute)...');
 
       var scanSuccessful = await snackbarCatch(
@@ -136,7 +136,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         () async {
           List<Item> items = await Callables.getReceiptData(
             receiptUrl: url,
-            isWalmart: _selectedStore == Store.Walmart,
+            selectedStore: _selectedStore.toString().split('.')[1].toLowerCase(),
             withNameImprovement: _withNameImprovement,
           );
 
