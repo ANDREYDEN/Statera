@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,9 +31,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     if (state is ExpenseLoaded) {
       final expense = (state as ExpenseLoaded).expense;
 
+      final wasCompleted = expense.completed;
       await event.update.call(expense);
       await ExpenseService.instance.updateExpense(expense);
-      if (expense.completed) {
+
+      if (!wasCompleted &&
+          expense.completed &&
+          event.issuer.uid != expense.author.uid) {
         Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
       }
     }
