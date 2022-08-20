@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
 import { firestore, messaging } from 'firebase-admin';
 
-export async function notifyWhenExpenseFinalizable(expenseId: string) {
+export async function notifyWhenExpenseCompleted(expenseId: string) {
   const app = admin.app()
   const expenseSnap = await firestore(app).collection('expenses').doc(expenseId).get()
   if (!expenseSnap.exists) {

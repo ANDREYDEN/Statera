@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:equatable/equatable.dart';
@@ -30,7 +31,10 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
       final expense = (state as ExpenseLoaded).expense;
 
       await event.update.call(expense);
-      ExpenseService.instance.updateExpense(expense);
+      await ExpenseService.instance.updateExpense(expense);
+      if (expense.completed) {
+        Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
+      }
     }
   }
 

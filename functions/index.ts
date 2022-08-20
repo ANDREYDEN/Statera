@@ -8,7 +8,7 @@ import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpda
 import { notifyAboutExpenseCreation } from './src/functions/notifications/notifyAboutExpenseCreation'
 import { updateUser } from './src/functions/updateUser'
 import { UserData } from './src/types/userData'
-import { notifyWhenExpenseFinalizable } from './src/functions/notifications/notifyWhenExpenseFinalizable'
+import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
 
 admin.initializeApp()
 
@@ -62,10 +62,10 @@ export const notifyOnExpenceCreation = functions.firestore
     return notifyAboutExpenseCreation(snap)
   })
 
-export const notifyWhenExpenseIsFinalizable = functions.https
+export const notifyWhenExpenseIsCompleted = functions.https
   .onCall((data, _) => {
     if (!data.expenseId) throw new Error('parameter expenseId is required')
-    return notifyWhenExpenseFinalizable(data.expenseId)
+    return notifyWhenExpenseCompleted(data.expenseId)
   })
 
 export const updateUserNotificationToken = functions.https

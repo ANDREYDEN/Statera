@@ -8,6 +8,10 @@ class Callables {
   static HttpsCallable _updateUserNotificationToken =
       FirebaseFunctions.instance.httpsCallable('updateUserNotificationToken');
 
+  static HttpsCallable _notifyWhenExpenseCompleted = FirebaseFunctions
+      .instance
+      .httpsCallable('notifyWhenExpenseIsCompleted');
+
   static Future<List<Item>> getReceiptData({
     required String receiptUrl,
     required String selectedStore,
@@ -35,5 +39,11 @@ class Callables {
     required String token,
   }) async {
     await _updateUserNotificationToken({'uid': uid, 'token': token});
+  }
+
+  static Future<void> notifyWhenExpenseCompleted({
+    required expenseId,
+  }) async {
+    await _notifyWhenExpenseCompleted({'expenseId': expenseId});
   }
 }
