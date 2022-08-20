@@ -22,7 +22,7 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
             body: `Expense "${expenseSnap.data()?.name}" is ready to be finalized`
         },
         data: {
-            type: 'expense_finalizable',
+            type: 'expense_completed',
             groupId
         }
     })

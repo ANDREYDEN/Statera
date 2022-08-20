@@ -1,13 +1,9 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/notifications_repository.dart';
 
 class NotificationsHandler extends StatefulWidget {
@@ -27,6 +23,11 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
     if (message.data['type'] == 'new_expense' &&
         message.data['expenseId'] != null) {
       Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
+    }
+
+    if (message.data['type'] == 'expense_completed' &&
+        message.data['groupId'] != null) {
+      Navigator.pushNamed(context, '/group/${message.data['groupId']}');
     }
   }
 
