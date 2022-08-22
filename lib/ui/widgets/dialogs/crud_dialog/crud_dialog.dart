@@ -2,53 +2,45 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/utils/utils.dart';
 
-class FieldData {
-  String id;
-  String label;
-  late TextEditingController controller;
-  late FocusNode focusNode;
-  TextInputType inputType;
-  dynamic initialData;
-  List<String Function(String)> validators;
-  List<TextInputFormatter> formatters;
-  bool isAdvanced;
+part 'field_data.dart';
 
-  FieldData({
-    required this.id,
-    required this.label,
-    this.initialData,
-    TextEditingController? controller,
-    this.validators = const [],
-    this.formatters = const [],
-    this.inputType = TextInputType.text,
-    this.isAdvanced = false,
-  }) {
-    this.controller = controller ?? TextEditingController();
-    resetController();
-    this.focusNode = FocusNode(debugLabel: this.id);
-  }
-
-  static String requiredValidator(String text) =>
-      text.isEmpty ? "Can't be empty" : "";
-  static String doubleValidator(String text) =>
-      double.tryParse(text) == null ? "Must be a number" : "";
-  static String intValidator(String text) =>
-      int.tryParse(text) == null ? "Must be a whole number" : "";
-
-  String getError() {
-    for (final formatter in this.validators) {
-      var error = formatter(this.controller.text);
-      if (error.isNotEmpty) return error;
-    }
-    return '';
-  }
-
-  void resetController() {
-    controller.text = initialData?.toString() ?? '';
-  }
+main() {
+  runApp(
+    MaterialApp(
+      theme: theme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Builder(builder: (context) {
+          return ElevatedButton(
+            child: Text('Open'),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => CRUDDialog(
+                  title: 'Edit Expense',
+                  fields: [
+                    FieldData(
+                      id: 'expense_name',
+                      label: 'Expense name',
+                      validators: [FieldData.requiredValidator],
+                      initialData: '',
+                    )
+                  ],
+                  onSubmit: (values) async {},
+                ),
+              );
+            },
+          );
+        }),
+      ),
+    ),
+  );
 }
 
 class CRUDDialog extends StatefulWidget {
@@ -80,10 +72,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
     return AlertDialog(
       title: Text(widget.title),
       content: Container(
-        width: double.maxFinite,
+        width: 200,
         child: ListView(
+          shrinkWrap: true,
           children: [
-            Column(children: [...getTextFields((f) => !f.isAdvanced)]),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [...getTextFields((f) => !f.isAdvanced)],
+            ),
             if (widget.fields.any((f) => f.isAdvanced))
               GestureDetector(
                 onTap: () => setState(() {
@@ -111,9 +107,10 @@ class _CRUDDialogState extends State<CRUDDialog> {
         ),
       ),
       actions: [
+        CancelButton(),
         ProtectedElevatedButton(
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
-          child: Text("Save"),
+          child: Text('Save'),
         ),
         if (widget.allowAddAnother)
           TextButton(onPressed: submit, child: Text('Save & add another'))
