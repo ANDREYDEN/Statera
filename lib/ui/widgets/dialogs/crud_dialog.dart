@@ -23,7 +23,7 @@ class FieldData {
     TextEditingController? controller,
     this.validators = const [],
     this.formatters = const [],
-    this.inputType = TextInputType.name,
+    this.inputType = TextInputType.text,
     this.isAdvanced = false,
   }) {
     this.controller = controller ?? TextEditingController();
