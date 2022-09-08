@@ -4,44 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
-import 'package:statera/utils/utils.dart';
 
 part 'field_data.dart';
-
-main() {
-  runApp(
-    MaterialApp(
-      theme: theme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Builder(builder: (context) {
-          return ElevatedButton(
-            child: Text('Open'),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => CRUDDialog(
-                  title: 'Edit Expense',
-                  fields: [
-                    FieldData(
-                      id: 'expense_name',
-                      label: 'Expense name',
-                      validators: [FieldData.requiredValidator],
-                      initialData: '',
-                    )
-                  ],
-                  onSubmit: (values) async {},
-                ),
-              );
-            },
-          );
-        }),
-      ),
-    ),
-  );
-}
 
 class CRUDDialog extends StatefulWidget {
   final String title;
