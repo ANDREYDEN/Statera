@@ -8,6 +8,7 @@ import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/theme.dart';
 
 class GroupServiceMock extends Mock implements GroupService {}
+
 class ExpenseServiceMock extends Mock implements ExpenseService {}
 
 main() {
@@ -33,11 +34,12 @@ class ListCover extends StatelessWidget {
             children: [
               PaymentListItem(
                 payment: Payment(
-                    groupId: 'asd',
-                    payerId: 'a',
-                    receiverId: 'b',
-                    value: 123,
-                    timeCreated: DateTime.now()),
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  timeCreated: DateTime.now(),
+                ),
                 receiverUid: 'a',
               ),
               PaymentListItem(
@@ -51,14 +53,15 @@ class ListCover extends StatelessWidget {
               ),
               PaymentListItem(
                 payment: Payment(
-                    groupId: 'asd',
-                    payerId: 'a',
-                    receiverId: 'b',
-                    value: 123,
-                    relatedExpense: PaymentExpenseInfo(
-                      id: 'dummy_expense',
-                      name: 'Some Expense',
-                    )),
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  relatedExpense: PaymentExpenseInfo(
+                    id: 'dummy_expense',
+                    name: 'Some Expense',
+                  ),
+                ),
                 receiverUid: 'b',
               ),
               PaymentListItem(

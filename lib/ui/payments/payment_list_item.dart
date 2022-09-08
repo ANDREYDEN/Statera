@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/src/provider.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
@@ -52,7 +50,7 @@ class PaymentListItem extends StatelessWidget {
             children: [
               Text(
                 toStringDateTime(payment.timeCreated) ??
-                    "Some time in the past",
+                    'Some time in the past',
               ),
               if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
             ],
@@ -82,6 +80,6 @@ class PaymentListItem extends StatelessWidget {
 
   _navigateToExpense(BuildContext context) {
     Navigator.of(context)
-        .pushNamed("${ExpensePage.route}/${payment.relatedExpense!.id}");
+        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
   }
 }
