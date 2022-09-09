@@ -10,7 +10,7 @@ import 'package:statera/data/models/group.dart';
 import 'package:statera/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
