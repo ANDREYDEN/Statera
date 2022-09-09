@@ -5,7 +5,7 @@ import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
 import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
 import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpdate'
-import { notifyAboutExpenseCreation } from './src/functions/notifications/notifyAboutExpenseCreation'
+import { notifyAboutExpenseCreation as notifyWhenExpenseCreated } from './src/functions/notifications/notifyAboutExpenseCreation'
 import { updateUser } from './src/functions/updateUser'
 import { UserData } from './src/types/userData'
 import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
@@ -56,10 +56,10 @@ export const changeUser = functions.firestore
       return null
     })
 
-export const notifyOnExpenceCreation = functions.firestore
+export const notifyWhenExpenceIsCreated = functions.firestore
   .document('expenses/{expeseId}')
   .onCreate((snap, _) => {
-    return notifyAboutExpenseCreation(snap)
+    return notifyWhenExpenseCreated(snap)
   })
 
 export const notifyWhenExpenseIsCompleted = functions.https
