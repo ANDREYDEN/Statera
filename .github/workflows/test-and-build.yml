@@ -24,11 +24,11 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-
-      - name: Copy google-services.json
+          
+      - name: Copy .env
         env:
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-        run: echo $FIREBASE_CONFIG > android/app/google-services.json
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
 
       - name: Get dependencies
         run: flutter pub get
