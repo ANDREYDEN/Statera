@@ -1,7 +1,8 @@
 import * as admin from 'firebase-admin'
 import { firestore, messaging } from 'firebase-admin';
+import { getGroupNotificationTokens } from './notificationUtils'
 
-export async function notifyAboutExpenseCreation(expenseSnap: firestore.QueryDocumentSnapshot) {
+export async function notifyWhenExpenseCreated(expenseSnap: firestore.QueryDocumentSnapshot) {
     const app = admin.app()
     const groupId = expenseSnap.data().groupId
     const authorName = expenseSnap.data()?.author?.name ?? "anonymous"
@@ -20,13 +21,4 @@ export async function notifyAboutExpenseCreation(expenseSnap: firestore.QueryDoc
             expenseId: expenseSnap.id
         }
     })
-}
-
-async function getGroupNotificationTokens(group: firestore.DocumentSnapshot<firestore.DocumentData>) {
-    const app = admin.app()
-    const userIds = (group?.data()?.memberIds ?? []) as string[];
-    console.log(`Sending notifications to ${userIds.join(', ')}`);
-    
-    const userDocs = await Promise.all(userIds.map(uid => firestore(app).collection('users').doc(uid).get()))
-    return userDocs.flatMap(doc => Object.keys(doc.data()?.notifications ?? {}))
 }

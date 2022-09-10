@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin'
 import { firestore, messaging } from 'firebase-admin';
+import { getUserNotificationTokens } from './notificationUtils'
 
 export async function notifyWhenExpenseCompleted(expenseId: string) {
   const app = admin.app()
@@ -12,7 +13,7 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
   const groupId = expenseSnap.data()?.groupId
 
   const author = expenseSnap.data()?.author
-  const authorTokens = await getNotificationTokens(author?.uid)
+  const authorTokens = await getUserNotificationTokens(author?.uid)
   console.log('Retrieved tokens:', authorTokens);
 
     return messaging(app).sendMulticast({
@@ -26,11 +27,4 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
             groupId
         }
     })
-}
-
-async function getNotificationTokens(uid: string) {
-  const app = admin.app()
-
-  const userDoc = await firestore(app).collection('users').doc(uid).get()
-  return Object.keys(userDoc.data()?.notifications ?? {})
 }

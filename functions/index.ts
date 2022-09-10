@@ -5,10 +5,11 @@ import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
 import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
 import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpdate'
-import { notifyAboutExpenseCreation as notifyWhenExpenseCreated } from './src/functions/notifications/notifyAboutExpenseCreation'
 import { updateUser } from './src/functions/updateUser'
 import { UserData } from './src/types/userData'
+import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
 import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
+import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
 
 admin.initializeApp()
 
@@ -66,6 +67,12 @@ export const notifyWhenExpenseIsCompleted = functions.https
   .onCall((data, _) => {
     if (!data.expenseId) throw new Error('parameter expenseId is required')
     return notifyWhenExpenseCompleted(data.expenseId)
+  })
+
+export const notifyWhenExpenseIsFinalized = functions.https
+  .onCall((data, _) => {
+    if (!data.expenseId) throw new Error('parameter expenseId is required')
+    return notifyWhenExpenseFinalized(data.expenseId)
   })
 
 export const updateUserNotificationToken = functions.https
