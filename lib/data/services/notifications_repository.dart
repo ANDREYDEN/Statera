@@ -10,7 +10,7 @@ class NotificationsRepository {
   StreamSubscription? _tokenRefreshSubscription;
   StreamSubscription? _notificationSubscription;
 
-  Future<void> setupNotifications({
+  Future<bool> setupNotifications({
     required String uid,
     required Function(RemoteMessage) onMessage,
   }) async {
@@ -62,7 +62,11 @@ class NotificationsRepository {
         });
       }
       // FirebaseMessaging.onMessage.listen(_handleMessage); // foreground
+
+      return true;
     }
+
+    return false;
   }
 
   void cancelSubscriptions() {

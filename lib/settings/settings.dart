@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -23,20 +24,20 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final _displayNameController = TextEditingController();
   String? _displayNameErrorText = null;
-  late bool _showNotifications;
   late bool _notifyWhenExpenseCreated;
   late bool _notifyWhenExpenseFinalized;
   late bool _notifyWhenExpenseCompleted;
   late bool _notifyWhenGroupOwageThresholdReached;
 
   AuthBloc get authBloc => context.read<AuthBloc>();
+  NotificationsCubit get notificationsCubit =>
+      context.read<NotificationsCubit>();
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
 
   @override
   void initState() {
     _displayNameController.text = authBloc.user.displayName ?? 'anonymous';
-    _showNotifications = true;
     _notifyWhenExpenseCreated = false;
     _notifyWhenExpenseFinalized = true;
     _notifyWhenExpenseCompleted = false;
@@ -139,61 +140,81 @@ class _SettingsState extends State<Settings> {
                     ],
                   ),
                   SizedBox(height: 40),
-                  SectionTitle('Notifications Preferences'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Show notifications'),
-                      Switch(
-                        value: _showNotifications,
-                        onChanged: (newValue) {
-                          setState(() {
-                            _showNotifications = newValue;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('New expense was created'),
-                      Switch(
-                        value: _notifyWhenExpenseCreated,
-                        onChanged: _showNotifications ? (newValue) {} : null,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Expense was finalized by its author'),
-                      Switch(
-                        value: _notifyWhenExpenseFinalized,
-                        onChanged: _showNotifications ? (newValue) {} : null,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Expense is ready to be finalized'),
-                      Switch(
-                        value: _notifyWhenExpenseCompleted,
-                        onChanged: _showNotifications ? (newValue) {} : null,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Reached group owage threshold'),
-                      Switch(
-                        value: _notifyWhenGroupOwageThresholdReached,
-                        onChanged: _showNotifications ? (newValue) {} : null,
-                      ),
-                    ],
-                  ),
+                  BlocBuilder<NotificationsCubit, NotificationsState>(
+                      builder: (context, state) {
+                    return Column(
+                      children: [
+                        SectionTitle('Notifications Preferences'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Show notifications'),
+                            Switch(
+                              value: notificationsCubit.state.allowed,
+                              onChanged: (showNotifications) {
+                                if (showNotifications) {
+                                  notificationsCubit.requestPermission(
+                                    uid: authBloc.uid,
+                                    onMessage: (p0) => null,
+                                  );
+                                } else {
+                                  notificationsCubit.removeListeners();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('New expense was created'),
+                            Switch(
+                              value: _notifyWhenExpenseCreated,
+                              onChanged: notificationsCubit.state.allowed
+                                  ? (newValue) {}
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Expense was finalized by its author'),
+                            Switch(
+                              value: _notifyWhenExpenseFinalized,
+                              onChanged: notificationsCubit.state.allowed
+                                  ? (newValue) {}
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Expense is ready to be finalized'),
+                            Switch(
+                              value: _notifyWhenExpenseCompleted,
+                              onChanged: notificationsCubit.state.allowed
+                                  ? (newValue) {}
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Reached group owage threshold'),
+                            Switch(
+                              value: _notifyWhenGroupOwageThresholdReached,
+                              onChanged: notificationsCubit.state.allowed
+                                  ? (newValue) {}
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }),
                   SizedBox(height: 40),
                   SectionTitle('Danger Zone'),
                   TextButton(
