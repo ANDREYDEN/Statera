@@ -9,6 +9,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 
 class Settings extends StatefulWidget {
   static const String route = '/settings';
@@ -22,6 +23,11 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final _displayNameController = TextEditingController();
   String? _displayNameErrorText = null;
+  late bool _showNotifications;
+  late bool _notifyWhenExpenseCreated;
+  late bool _notifyWhenExpenseFinalized;
+  late bool _notifyWhenExpenseCompleted;
+  late bool _notifyWhenGroupOwageThresholdReached;
 
   AuthBloc get authBloc => context.read<AuthBloc>();
   FirebaseStorageRepository get _firebaseStorageRepository =>
@@ -30,6 +36,11 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     _displayNameController.text = authBloc.user.displayName ?? 'anonymous';
+    _showNotifications = true;
+    _notifyWhenExpenseCreated = false;
+    _notifyWhenExpenseFinalized = true;
+    _notifyWhenExpenseCompleted = false;
+    _notifyWhenGroupOwageThresholdReached = false;
     super.initState();
   }
 
@@ -40,106 +51,174 @@ class _SettingsState extends State<Settings> {
 
     return PageScaffold(
       title: 'Settings',
-      child: Center(
-        child: Container(
-          width: 500,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      AuthorAvatar(
-                        author: Author.fromUser(authBloc.user),
-                        width: 200,
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: IconButton(
-                          onPressed: () async {
-                            try {
-                              final pickedFile = await _picker.pickImage(
-                                  source: ImageSource.gallery);
-                              if (pickedFile == null) return;
-                      
-                              String url = await _firebaseStorageRepository
-                                  .uploadPickedFile(
-                                pickedFile,
-                                path: 'profileUrls/',
-                              );
-                      
-                              authBloc.add(UserDataUpdated(photoURL: url));
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Error while updating profile: $e'),
-                              ));
-                              FirebaseCrashlytics.instance.recordError(
-                                e,
-                                null,
-                                reason: 'Profile image update failed',
-                              );
-                            }
-                          },
-                          icon: Icon(Icons.add_a_photo),
+      child: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            width: 500,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SectionTitle('Profile Information'),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Stack(
+                      children: [
+                        AuthorAvatar(
+                          author: Author.fromUser(authBloc.user),
+                          width: 200,
                         ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _displayNameController,
-                  decoration: InputDecoration(
-                    label: Text('Display Name'),
-                    errorText: _displayNameErrorText,
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _displayNameErrorText =
-                          value == '' ? 'Can not be empty' : null;
-                    });
-                  },
-                  onEditingComplete: () {
-                    if (_displayNameController.text == '') return;
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: IconButton(
+                            onPressed: () async {
+                              try {
+                                final pickedFile = await _picker.pickImage(
+                                    source: ImageSource.gallery);
+                                if (pickedFile == null) return;
 
-                    authBloc.add(
-                        UserDataUpdated(name: _displayNameController.text));
-                  },
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    authBloc.add(LogoutRequested());
-                  },
-                  child: Text('Log Out'),
-                ),
-                SizedBox(height: 10),
-                TextButton(
-                  onPressed: () async {
-                    var decision = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => OKCancelDialog(
-                        text: 'Are you sure you want to delete your account?',
-                      ),
-                    );
-                    if (decision!) {
-                      authBloc.add(AccountDeletionRequested());
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(
-                    'Delete Account',
-                    style: TextStyle(
-                      color: Theme.of(context).errorColor,
-                      decoration: TextDecoration.underline,
+                                String url = await _firebaseStorageRepository
+                                    .uploadPickedFile(
+                                  pickedFile,
+                                  path: 'profileUrls/',
+                                );
+
+                                authBloc.add(UserDataUpdated(photoURL: url));
+                              } catch (e) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content:
+                                      Text('Error while updating profile: $e'),
+                                ));
+                                FirebaseCrashlytics.instance.recordError(
+                                  e,
+                                  null,
+                                  reason: 'Profile image update failed',
+                                );
+                              }
+                            },
+                            icon: Icon(Icons.add_a_photo),
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                )
-              ],
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: _displayNameController,
+                    decoration: InputDecoration(
+                      label: Text('Display Name'),
+                      errorText: _displayNameErrorText,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _displayNameErrorText =
+                            value == '' ? 'Can not be empty' : null;
+                      });
+                    },
+                    onEditingComplete: () {
+                      if (_displayNameController.text == '') return;
+
+                      authBloc.add(
+                          UserDataUpdated(name: _displayNameController.text));
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            authBloc.add(LogoutRequested());
+                          },
+                          child: Text('Log Out'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 40),
+                  SectionTitle('Notifications Preferences'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Show notifications'),
+                      Switch(
+                        value: _showNotifications,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _showNotifications = newValue;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('New expense was created'),
+                      Switch(
+                        value: _notifyWhenExpenseCreated,
+                        onChanged: _showNotifications ? (newValue) {} : null,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Expense was finalized by its author'),
+                      Switch(
+                        value: _notifyWhenExpenseFinalized,
+                        onChanged: _showNotifications ? (newValue) {} : null,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Expense is ready to be finalized'),
+                      Switch(
+                        value: _notifyWhenExpenseCompleted,
+                        onChanged: _showNotifications ? (newValue) {} : null,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Reached group owage threshold'),
+                      Switch(
+                        value: _notifyWhenGroupOwageThresholdReached,
+                        onChanged: _showNotifications ? (newValue) {} : null,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 40),
+                  SectionTitle('Danger Zone'),
+                  TextButton(
+                    onPressed: () async {
+                      var decision = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => OKCancelDialog(
+                          text: 'Are you sure you want to delete your account?',
+                        ),
+                      );
+                      if (decision!) {
+                        authBloc.add(AccountDeletionRequested());
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(
+                      'Delete Account',
+                      style: TextStyle(
+                        color: Theme.of(context).errorColor,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
