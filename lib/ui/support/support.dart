@@ -3,6 +3,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:statera/ui/widgets/buttons/text_link.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 
 class SupportPage extends StatelessWidget {
   static final String route = '/support';
@@ -22,12 +23,7 @@ class SupportPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Questions about the app?',
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.headline5!.fontSize,
-                    ),
-                  ),
+                  SectionTitle('Questions about the app?'),
                   SizedBox(height: 20),
                   TextLink(
                     text: 'Submit an issue report',

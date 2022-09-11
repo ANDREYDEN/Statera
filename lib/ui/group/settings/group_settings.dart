@@ -5,6 +5,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 
 class GroupSettings extends StatelessWidget {
   const GroupSettings({Key? key}) : super(key: key);
@@ -29,10 +30,7 @@ class GroupSettings extends StatelessWidget {
             width: isWide ? MediaQuery.of(context).size.width / 3 : null,
             child: Column(
               children: [
-                Text(
-                  'Settings',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
+                SectionTitle('Settings'),
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(labelText: 'Name'),
