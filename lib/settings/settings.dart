@@ -1,8 +1,8 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/author.dart';
@@ -145,73 +145,93 @@ class _SettingsState extends State<Settings> {
                     return Column(
                       children: [
                         SectionTitle('Notifications Preferences'),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Show notifications'),
-                            Switch(
-                              value: notificationsCubit.state.allowed,
-                              onChanged: (showNotifications) {
-                                if (showNotifications) {
-                                  notificationsCubit.requestPermission(
-                                    uid: authBloc.uid,
-                                    onMessage: (p0) => null,
-                                  );
-                                } else {
-                                  notificationsCubit.removeListeners();
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('New expense was created'),
-                            Switch(
-                              value: _notifyWhenExpenseCreated,
-                              onChanged: notificationsCubit.state.allowed
-                                  ? (newValue) {}
-                                  : null,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Expense was finalized by its author'),
-                            Switch(
-                              value: _notifyWhenExpenseFinalized,
-                              onChanged: notificationsCubit.state.allowed
-                                  ? (newValue) {}
-                                  : null,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Expense is ready to be finalized'),
-                            Switch(
-                              value: _notifyWhenExpenseCompleted,
-                              onChanged: notificationsCubit.state.allowed
-                                  ? (newValue) {}
-                                  : null,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Reached group owage threshold'),
-                            Switch(
-                              value: _notifyWhenGroupOwageThresholdReached,
-                              onChanged: notificationsCubit.state.allowed
-                                  ? (newValue) {}
-                                  : null,
-                            ),
-                          ],
-                        ),
+                        if (!state.allowed)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (defaultTargetPlatform ==
+                                        TargetPlatform.android) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Please turn on system notifications for this app',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    notificationsCubit.requestPermission(
+                                      context: context,
+                                      uid: authBloc.uid,
+                                    );
+                                  },
+                                  child: Text('Enable notifications'),
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('New expense was created'),
+                                  Switch(
+                                    value: _notifyWhenExpenseCreated,
+                                    onChanged: notificationsCubit.state.allowed
+                                        ? (newValue) {}
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Expense was finalized by its author'),
+                                  Switch(
+                                    value: _notifyWhenExpenseFinalized,
+                                    onChanged: notificationsCubit.state.allowed
+                                        ? (newValue) {}
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Expense is ready to be finalized'),
+                                  Switch(
+                                    value: _notifyWhenExpenseCompleted,
+                                    onChanged: notificationsCubit.state.allowed
+                                        ? (newValue) {}
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Reached group owage threshold'),
+                                  Switch(
+                                    value:
+                                        _notifyWhenGroupOwageThresholdReached,
+                                    onChanged: notificationsCubit.state.allowed
+                                        ? (newValue) {}
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
                       ],
                     );
                   }),

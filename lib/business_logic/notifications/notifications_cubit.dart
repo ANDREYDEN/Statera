@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:statera/data/services/notifications_repository.dart';
+import 'package:statera/utils/utils.dart';
 
 part 'notifications_state.dart';
 
@@ -14,26 +18,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   void requestPermission({
+    required BuildContext context,
     required String uid,
-    required Function(RemoteMessage) onMessage,
   }) async {
     try {
       final success = await _notificationsRepository.setupNotifications(
-          uid: uid, onMessage: onMessage);
+        uid: uid,
+        onMessage: (message) => handleMessage(message, context),
+      );
       emit(NotificationsState(success));
     } on Exception catch (e) {
       emit(NotificationsState(false, error: e));
     }
-  }
-
-  void removeListeners() {
-    _notificationsRepository.cancelSubscriptions();
-    emit(NotificationsState(false));
-  }
-
-  @override
-  Future<void> close() {
-    _notificationsRepository.cancelSubscriptions();
-    return super.close();
   }
 }

@@ -68,9 +68,4 @@ class NotificationsRepository {
 
     return false;
   }
-
-  void cancelSubscriptions() {
-    _tokenRefreshSubscription?.cancel();
-    _notificationSubscription?.cancel();
-  }
 }

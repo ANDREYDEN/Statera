@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
-import 'package:statera/utils/notification_handler.dart';
 
 class NotificationsHandler extends StatefulWidget {
   final Widget child;
@@ -21,17 +20,8 @@ class _NotificationsHandlerState extends State<NotificationsHandler> {
   void initState() {
     var authBloc = context.read<AuthBloc>();
 
-    notificationsCubit.requestPermission(
-      uid: authBloc.uid,
-      onMessage: (message) => handleMessage(message, context),
-    );
+    notificationsCubit.requestPermission(context: context, uid: authBloc.uid);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    notificationsCubit.removeListeners();
-    super.dispose();
   }
 
   @override
