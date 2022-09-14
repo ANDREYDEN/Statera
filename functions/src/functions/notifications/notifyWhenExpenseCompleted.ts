@@ -1,10 +1,8 @@
-import * as admin from 'firebase-admin'
 import { firestore, messaging } from 'firebase-admin';
 import { getUserNotificationTokens } from './notificationUtils'
 
 export async function notifyWhenExpenseCompleted(expenseId: string) {
-  const app = admin.app()
-  const expenseSnap = await firestore(app).collection('expenses').doc(expenseId).get()
+  const expenseSnap = await firestore().collection('expenses').doc(expenseId).get()
   if (!expenseSnap.exists) {
     console.log(`Expense ${expenseId} no longer exists`);
     return
@@ -14,17 +12,19 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
 
   const author = expenseSnap.data()?.author
   const authorTokens = await getUserNotificationTokens(author?.uid)
-  console.log('Retrieved tokens:', authorTokens);
+  console.log('Retrieved tokens:', authorTokens)
 
-    return messaging(app).sendMulticast({
-        tokens: authorTokens as string[],
-        notification: {
-            title: 'Expense ready to be finalized',
-            body: `Expense "${expenseSnap.data()?.name}" is ready to be finalized`
-        },
-        data: {
-            type: 'expense_completed',
-            groupId
-        }
-    })
+  if (authorTokens.length === 0) return null
+  
+  return messaging().sendMulticast({
+      tokens: authorTokens as string[],
+      notification: {
+          title: 'Expense completed',
+          body: `Expense "${expenseSnap.data()?.name}" is ready to be finalized`
+      },
+      data: {
+          type: 'expense_completed',
+          groupId
+      }
+  })
 }

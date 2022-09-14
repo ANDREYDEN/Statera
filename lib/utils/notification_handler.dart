@@ -5,13 +5,21 @@ import 'package:flutter/cupertino.dart';
 
 void handleMessage(RemoteMessage message, BuildContext context) {
   log('handling message ${message.data}');
-  if (message.data['type'] == 'new_expense' &&
-      message.data['expenseId'] != null) {
-    Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
-  }
+  if (message.data['type'] == null) return;
 
-  if (message.data['type'] == 'expense_completed' &&
-      message.data['groupId'] != null) {
-    Navigator.pushNamed(context, '/group/${message.data['groupId']}');
+  switch (message.data['type']) {
+    case 'expense_created':
+    case 'expense_finalized':
+      if (message.data['expenseId'] != null) {
+        Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
+      }
+      break;
+    case 'expense_completed':
+      if (message.data['groupId'] != null) {
+        Navigator.pushNamed(context, '/group/${message.data['groupId']}');
+      }
+      break;
+    default:
+      return;
   }
 }

@@ -13,6 +13,8 @@ export async function notifyWhenExpenseFinalized(expenseId: string) {
   const authorTokens = await getExpenseNotificationTokens(expenseSnap, false)
   console.log('Retrieved tokens:', authorTokens);
 
+  if (authorTokens.length === 0) return null
+
   return messaging().sendMulticast({
       tokens: authorTokens as string[],
       notification: {
