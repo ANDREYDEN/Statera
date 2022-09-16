@@ -10,6 +10,7 @@ import { UserData } from './src/types/userData'
 import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
 import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
 import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
+import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
 
 admin.initializeApp()
 
@@ -61,6 +62,12 @@ export const notifyWhenExpenceIsCreated = functions.firestore
   .document('expenses/{expeseId}')
   .onCreate((snap, _) => {
     return notifyWhenExpenseCreated(snap)
+  })
+
+export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
+  .document('groups/{groupId}')
+  .onUpdate((change, _) => {
+    return notifyWhenGroupDebtThresholdReached(change)
   })
 
 export const notifyWhenExpenseIsCompleted = functions.https

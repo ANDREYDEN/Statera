@@ -7,7 +7,7 @@ service cloud.firestore {
     
     // only allow access to the groups that the user is a member of
     match /groups/{groupId} {
-    	allow read, write: if request.auth.uid in resource.data.memberIds;
+    	allow read, write: if debug(request.auth.uid) in resource.data.memberIds;
     }
   }
 }

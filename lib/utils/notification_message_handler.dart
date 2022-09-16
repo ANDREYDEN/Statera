@@ -14,6 +14,7 @@ void handleMessage(RemoteMessage message, BuildContext context) {
         Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
       }
       break;
+    case 'group_debt_threshold_reached':
     case 'expense_completed':
       if (message.data['groupId'] != null) {
         Navigator.pushNamed(context, '/group/${message.data['groupId']}');

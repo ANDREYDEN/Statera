@@ -5,10 +5,24 @@ import 'package:statera/utils/helpers.dart';
 import 'author.dart';
 import 'expense.dart';
 
+/// Describes a group of users sharing expenses
 class Group {
   String? id;
   late String name;
   late List<Author> members = [];
+
+  /// Describes the debt that each member of the group has
+  /// 
+  /// For example, the following configuration describes that Alice owes Bob $145:
+  /// 
+  /// ```balance: {
+  ///   Alice: {
+  ///     Bob: 145
+  ///   },
+  ///   Bob: {
+  ///     Alice: -145
+  ///   }
+  /// }```
   late Map<String, Map<String, double>> balance;
   String? code;
   late String currencySign;
