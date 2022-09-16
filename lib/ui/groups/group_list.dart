@@ -1,8 +1,10 @@
 import 'dart:developer' as developer;
+import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
@@ -108,35 +110,47 @@ class _GroupListState extends State<GroupList> {
   }
 
   updateOrCreateGroup(GroupsCubit groupsCubit, User creator, {Group? group}) {
+    final groupToModify = group ?? new Group.empty(name: '');
+
     showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: 'New Group',
         fields: [
           FieldData(
-            id: 'group_name',
-            label: 'Group Name',
+            id: 'name',
+            label: 'Name',
             validators: [FieldData.requiredValidator],
-            initialData: group?.name,
+            initialData: groupToModify.name,
           ),
           FieldData(
-            id: 'group_currency',
-            label: 'Group Currency',
-            initialData: group?.currencySign ?? Group.kdefaultCurrencySign,
+            id: 'currency',
+            label: 'Currency Sign',
+            initialData: groupToModify.currencySign,
             validators: [FieldData.requiredValidator],
             formatters: [SingleCharacterTextInputFormatter()],
             isAdvanced: true,
-          )
+          ),
+          FieldData(
+            id: 'debt_threshold',
+            label: 'Debt Threshold',
+            initialData: groupToModify.debtThreshold,
+            validators: [FieldData.requiredValidator, FieldData.doubleValidator],
+            formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+            isAdvanced: true,
+          ),
         ],
         onSubmit: (values) async {
-          var groupToModify = group ?? new Group.fake();
-          final wasModified = groupToModify.name != values['group_name']! ||
-              groupToModify.currencySign != values['group_currency'];
+          final wasModified = groupToModify.name != values['name']! ||
+              groupToModify.currencySign != values['currency'] || 
+              groupToModify.debtThreshold != double.tryParse(values['debt_threshold']!);
 
           if (!wasModified) return;
 
-          groupToModify.name = values['group_name']!;
-          groupToModify.currencySign = values['group_currency'];
+          groupToModify.name = values['name']!;
+          groupToModify.currencySign = values['currency']!;
+          groupToModify.debtThreshold = double.parse(values['debt_threshold']!);
+
           if (group == null) {
             groupsCubit.addGroup(groupToModify, creator);
           } else {

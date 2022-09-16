@@ -11,10 +11,12 @@ class Group {
   late List<Author> members = [];
   late Map<String, Map<String, double>> balance;
   String? code;
-  String? _currencySign;
+  late String currencySign;
   String? inviteLink;
+  late double debtThreshold;
 
   static const String kdefaultCurrencySign = '\$';
+  static const double kdefaultDebtThreshold = 50;
 
   Group({
     required this.name,
@@ -24,6 +26,7 @@ class Group {
     balance,
     String? currencySign,
     this.inviteLink,
+    double? debtThreshold,
   }) {
     this.members = [];
     this.balance = {};
@@ -31,27 +34,20 @@ class Group {
       this.members = members;
       this.balance = balance ?? createBalanceFromMembers(members);
     }
-    _currencySign = currencySign;
+    this.currencySign = currencySign ?? kdefaultCurrencySign;
+    this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
   }
 
-  Group.fake({List<Author>? members, String? code}) {
-    this.name = "Empty";
-    this.members = [];
-    this.balance = {};
-    this.code = code;
-    if (members != null) {
-      this.members = members;
-      this.balance = createBalanceFromMembers(members);
-    }
-  }
-
-  String get currencySign => (_currencySign == null || _currencySign!.isEmpty)
-      ? kdefaultCurrencySign
-      : _currencySign!;
-  set currencySign(String? value) => _currencySign = value;
+  Group.empty({List<Author>? members, String? code, String? name})
+      : this(
+          name: name ?? 'Empty',
+          members: members,
+          balance: {},
+          code: code,
+        );
 
   void generateCode() {
-    code = "";
+    code = '';
     for (var i = 0; i < 5; i++) {
       code = code! + getRandomLetter();
     }
@@ -112,11 +108,11 @@ class Group {
   void payOffBalance({required Payment payment}) {
     if (this.members.every((member) => member.uid != payment.payerId)) {
       throw new Exception(
-          "User with id ${payment.payerId} is not a member of group $name");
+          'User with id ${payment.payerId} is not a member of group $name');
     }
     if (this.members.every((member) => member.uid != payment.receiverId)) {
       throw new Exception(
-          "User with id ${payment.receiverId} is not a member of group $name");
+          'User with id ${payment.receiverId} is not a member of group $name');
     }
 
     this.balance[payment.payerId]![payment.receiverId] =
@@ -147,8 +143,9 @@ class Group {
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
       'balance': balance,
-      'currencySign': _currencySign,
+      'currencySign': currencySign,
       'inviteLink': inviteLink,
+      'debtThreshold': debtThreshold,
     };
   }
 
@@ -177,6 +174,7 @@ class Group {
             ),
       currencySign: map['currencySign'],
       inviteLink: map['inviteLink'],
+      debtThreshold: double.tryParse(map['debtThreshold'].toString()),
     );
   }
 }

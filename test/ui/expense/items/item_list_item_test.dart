@@ -37,7 +37,7 @@ void main() {
       item = Item(name: "foo", value: 145);
       groupCubit = MockGroupCubit();
       when(() => groupCubit.state)
-          .thenReturn(GroupLoaded(group: Group.fake()));
+          .thenReturn(GroupLoaded(group: Group.empty()));
       authBloc = MockAuthBloc();
       final fakeUser = MockUser();
       when(() => fakeUser.uid).thenReturn('');

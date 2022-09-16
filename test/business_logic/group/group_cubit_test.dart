@@ -21,7 +21,7 @@ void main() {
     late ExpenseService expenseService;
     late User testUser;
     final String testCode = 'qweqwe321';
-    final Group testGroup = Group.fake(code: testCode);
+    final Group testGroup = Group.empty(code: testCode);
 
     setUpAll(() {
       registerFallbackValue(FakeUser());
@@ -84,7 +84,7 @@ void main() {
         'emmits error state if the user is already a member of the group',
         build: () => groupCubit,
         seed: () {
-          Group testGroup = Group.fake(code: 'qwe123');
+          Group testGroup = Group.empty(code: 'qwe123');
           testGroup.addUser(testUser);
           return GroupLoaded(group: testGroup);
         },

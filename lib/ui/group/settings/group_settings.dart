@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
@@ -18,11 +19,13 @@ class GroupSettings extends StatelessWidget {
 
     final currencyController = TextEditingController();
     final nameController = TextEditingController();
+    final debtThresholdController = TextEditingController();
 
     return GroupBuilder(
       builder: (context, group) {
         currencyController.text = group.currencySign;
         nameController.text = group.name;
+        debtThresholdController.text = group.debtThreshold.toString();
 
         return Center(
           child: Container(
@@ -31,6 +34,7 @@ class GroupSettings extends StatelessWidget {
             child: Column(
               children: [
                 SectionTitle('Settings'),
+                // TODO: validate these fields the same way as in the CRUD Dialog
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(labelText: 'Name'),
@@ -49,13 +53,23 @@ class GroupSettings extends StatelessWidget {
                     });
                   },
                 ),
+                TextField(
+                  controller: debtThresholdController,
+                  decoration: InputDecoration(labelText: 'Debt Threshold'),
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+                  onSubmitted: (value) {
+                    groupCubit.update((group) {
+                      group.debtThreshold = double.parse(value);
+                    });
+                  },
+                ),
                 SizedBox(height: 10),
                 TextButton(
                   onPressed: () async {
                     var decision = await showDialog<bool>(
                       context: context,
                       builder: (context) => OKCancelDialog(
-                        text: "Are you sure you want to leave the group?",
+                        text: 'Are you sure you want to leave the group?',
                       ),
                     );
                     if (decision!) {
@@ -64,7 +78,7 @@ class GroupSettings extends StatelessWidget {
                     }
                   },
                   child: Text(
-                    "Leave group",
+                    'Leave group',
                     style: TextStyle(
                       color: Theme.of(context).errorColor,
                       decoration: TextDecoration.underline,
