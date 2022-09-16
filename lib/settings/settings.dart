@@ -175,63 +175,8 @@ class _SettingsState extends State<Settings> {
                             ],
                           )
                         else
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('New expense was created'),
-                                  Switch(
-                                    value: _notifyWhenExpenseCreated,
-                                    onChanged: notificationsCubit.state.allowed
-                                        ? (newValue) {}
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Expense was finalized by its author'),
-                                  Switch(
-                                    value: _notifyWhenExpenseFinalized,
-                                    onChanged: notificationsCubit.state.allowed
-                                        ? (newValue) {}
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Expense is ready to be finalized'),
-                                  Switch(
-                                    value: _notifyWhenExpenseCompleted,
-                                    onChanged: notificationsCubit.state.allowed
-                                        ? (newValue) {}
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Reached group owage threshold'),
-                                  Switch(
-                                    value:
-                                        _notifyWhenGroupOwageThresholdReached,
-                                    onChanged: notificationsCubit.state.allowed
-                                        ? (newValue) {}
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )
+                          Column(children: [] //notificationPermissionToggles,
+                              )
                       ],
                     );
                   }),
@@ -265,5 +210,51 @@ class _SettingsState extends State<Settings> {
         ),
       ),
     );
+  }
+
+  // TODO: use this
+  List<Widget> get notificationPermissionToggles {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('New expense was created'),
+          Switch(
+            value: _notifyWhenExpenseCreated,
+            onChanged: notificationsCubit.state.allowed ? (newValue) {} : null,
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Expense was finalized by its author'),
+          Switch(
+            value: _notifyWhenExpenseFinalized,
+            onChanged: notificationsCubit.state.allowed ? (newValue) {} : null,
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Expense is ready to be finalized'),
+          Switch(
+            value: _notifyWhenExpenseCompleted,
+            onChanged: notificationsCubit.state.allowed ? (newValue) {} : null,
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Reached group owage threshold'),
+          Switch(
+            value: _notifyWhenGroupOwageThresholdReached,
+            onChanged: notificationsCubit.state.allowed ? (newValue) {} : null,
+          ),
+        ],
+      ),
+    ];
   }
 }
