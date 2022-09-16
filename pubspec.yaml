@@ -32,7 +32,7 @@ dependencies:
   firebase_dynamic_links: ^4.3.3
   firebase_core_desktop: ^1.0.0
   firebase_auth_desktop: ^1.0.0
-  firebase_messaging: ^11.4.2
+  firebase_messaging: ^13.0.0
   firebase_analytics: ^9.1.12
   cloud_firestore: ^3.4.0
   cloud_functions: ^3.3.0
