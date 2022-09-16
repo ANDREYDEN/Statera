@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
@@ -17,6 +16,7 @@ class AssigneePickerDialog extends StatefulWidget {
 
 class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
   late List<String> _selectedUids;
+  String _error = '';
 
   @override
   initState() {
@@ -24,6 +24,10 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
         widget.expense.assignees.map((assignee) => assignee.uid).toList();
     super.initState();
   }
+
+  bool get onlyAuthorSelected =>
+      _selectedUids.length == 1 &&
+      _selectedUids.contains(widget.expense.author.uid);
 
   @override
   Widget build(BuildContext context) {
@@ -33,29 +37,38 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
         width: 200,
         child: GroupBuilder(
           builder: (context, group) {
-            return ListView.builder(
-              itemCount: group.members.length,
-              itemBuilder: (context, index) {
-                final member = group.members[index];
-            
-                return AuthorAvatar(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  author: member,
-                  borderColor: this._selectedUids.contains(member.uid)
-                      ? Colors.green
-                      : Colors.transparent,
-                  withName: true,
-                  onTap: () {
-                    setState(() {
-                      if (this._selectedUids.contains(member.uid)) {
-                        this._selectedUids.remove(member.uid);
-                      } else {
-                        this._selectedUids.add(member.uid);
-                      }
-                    });
-                  },
-                );
-              },
+            return Column(
+              children: [
+                Visibility(
+                  visible: onlyAuthorSelected || _selectedUids.isEmpty,
+                  child: Text(
+                    'Please select at least one assignee other than yourself',
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  ),
+                ),
+                ListView(
+                  shrinkWrap: true,
+                  children: group.members.map((member) {
+                    return AuthorAvatar(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      author: member,
+                      borderColor: this._selectedUids.contains(member.uid)
+                          ? Colors.green
+                          : Colors.transparent,
+                      withName: true,
+                      onTap: () {
+                        setState(() {
+                          if (this._selectedUids.contains(member.uid)) {
+                            this._selectedUids.remove(member.uid);
+                          } else {
+                            this._selectedUids.add(member.uid);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
             );
           },
         ),
@@ -63,11 +76,9 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
       actions: [
         CancelButton(),
         ElevatedButton(
-          onPressed: () async {
-            widget.expense.updateAssignees(this._selectedUids);
-            await ExpenseService.instance.updateExpense(widget.expense);
-            Navigator.pop(context);
-          },
+          onPressed: _selectedUids.isEmpty || onlyAuthorSelected
+              ? null
+              : () => Navigator.pop(context, _selectedUids),
           child: Text('Save'),
         ),
       ],

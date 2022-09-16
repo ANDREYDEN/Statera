@@ -4,6 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/expense/dialogs/assignee_picker_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 
 void handleNewExpenseClick(
@@ -16,11 +17,11 @@ void handleNewExpenseClick(
   showDialog(
     context: context,
     builder: (context) => CRUDDialog(
-      title: "New Expense",
+      title: 'New Expense',
       fields: [
         FieldData(
-          id: "expense_name",
-          label: "Expense Name",
+          id: 'expense_name',
+          label: 'Expense Name',
           validators: [FieldData.requiredValidator],
         )
       ],
@@ -28,8 +29,12 @@ void handleNewExpenseClick(
       onSubmit: (values) async {
         var newExpense = Expense(
           author: Author.fromUser(authBloc.user),
-          name: values["expense_name"]!,
+          name: values['expense_name']!,
           groupId: groupId,
+        );
+        await showDialog(
+          context: context,
+          builder: (context) => AssigneePickerDialog(expense: newExpense),
         );
         final expenseId = await expensesCubit.addExpense(newExpense, groupId);
 

@@ -190,16 +190,16 @@ class ExpenseDetails extends StatelessWidget {
       UpdateRequested(
         issuer: authBloc.state.user!,
         update: (expense) async {
-          final newAssignees = await showDialog<List<Assignee>>(
+          final newAssigneeIds = await showDialog<List<String>>(
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
               child: AssigneePickerDialog(expense: expense),
             ),
           );
-          if (newAssignees == null) return;
+          if (newAssigneeIds == null) return;
 
-          expense.assignees = newAssignees;
+          expense.updateAssignees(newAssigneeIds);
         },
       ),
     );
