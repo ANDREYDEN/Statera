@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -151,23 +152,19 @@ class _SettingsState extends State<Settings> {
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (defaultTargetPlatform ==
-                                        TargetPlatform.android) {
+                                    if (kIsWeb) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            'Please turn on system notifications for this app',
+                                            'Please turn on notifications for this website',
                                           ),
                                         ),
                                       );
                                       return;
                                     }
 
-                                    notificationsCubit.requestPermission(
-                                      context: context,
-                                      uid: authBloc.uid,
-                                    );
+                                    AppSettings.openNotificationSettings();
                                   },
                                   child: Text('Enable notifications'),
                                 ),
@@ -175,7 +172,9 @@ class _SettingsState extends State<Settings> {
                             ],
                           )
                         else
-                          Column(children: [] //notificationPermissionToggles,
+                          Column(children: [
+                            Text('Coming Soon...')
+                          ] //notificationPermissionToggles,
                               )
                       ],
                     );
