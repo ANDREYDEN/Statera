@@ -5,7 +5,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/expenses/expense_list_filters.dart';
 import 'package:statera/ui/group/expenses/expenses_list_body.dart';
-import 'package:statera/ui/group/expenses/new_expense_handler.dart';
+import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
 
 class ExpenseList extends StatelessWidget {
   const ExpenseList({Key? key}) : super(key: key);
@@ -24,10 +24,15 @@ class ExpenseList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
             child: ElevatedButton(
-              onPressed: () => handleNewExpenseClick(context, (expenseId) {
-                Navigator.of(context).pop();
-                expenseBloc.load(expenseId);
-              }),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => NewExpenseDialog(
+                  afterAddition: (expenseId) {
+                    Navigator.of(context).pop();
+                    expenseBloc.load(expenseId);
+                  },
+                ),
+              ),
               child: Icon(Icons.add),
             ),
           ),

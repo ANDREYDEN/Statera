@@ -19,3 +19,5 @@ const kSignInWithGoogleMessages = {
   'user-not-found': 'There is no user associated with this email address',
   'user-disabled': 'This user has been disabled',
 };
+
+const kRequiredValidationMessage = "Can't be empty";

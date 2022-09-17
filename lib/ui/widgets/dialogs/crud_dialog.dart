@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/utils/utils.dart';
 
 class FieldData {
   String id;
@@ -32,11 +33,11 @@ class FieldData {
   }
 
   static String requiredValidator(String text) =>
-      text.isEmpty ? "Can't be empty" : "";
+      text.isEmpty ? kRequiredValidationMessage : '';
   static String doubleValidator(String text) =>
-      double.tryParse(text) == null ? "Must be a number" : "";
+      double.tryParse(text) == null ? 'Must be a number' : '';
   static String intValidator(String text) =>
-      int.tryParse(text) == null ? "Must be a whole number" : "";
+      int.tryParse(text) == null ? 'Must be a whole number' : '';
 
   String getError() {
     for (final formatter in this.validators) {
@@ -113,7 +114,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
       actions: [
         ProtectedElevatedButton(
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
-          child: Text("Save"),
+          child: Text('Save'),
         ),
         if (widget.allowAddAnother)
           TextButton(onPressed: submit, child: Text('Save & add another'))
