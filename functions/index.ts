@@ -86,6 +86,7 @@ export const updateUserNotificationToken = functions.https
   .onCall((data, _) => {
     if (!data.uid) throw new Error('parameter uid is required')
     if (!data.token) throw new Error('parameter token is required')
+    if (!data.platform) throw new Error('parameter platform is required')
 
-    return handleTokenUpdate(data.uid, data.token)
+    return handleTokenUpdate(data.uid, data.token, data.platform)
   })

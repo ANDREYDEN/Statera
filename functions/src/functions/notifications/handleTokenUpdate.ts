@@ -1,12 +1,13 @@
-import * as admin from 'firebase-admin'
 import { firestore } from 'firebase-admin'
 
-export async function handleTokenUpdate(userId: string, token: string) {
-    const app = admin.app()
-    const userDoc = await firestore(app).collection('users').doc(userId).get();
+export async function handleTokenUpdate(userId: string, token: string, platform: string) {
+    const userDoc = await firestore().collection('users').doc(userId).get();
 
     const notifications = userDoc.data()?.notifications ?? {}
-    notifications[token] = firestore.FieldValue.serverTimestamp()
+    notifications[platform] = {
+        token: token,
+        lastUpdatedAt: firestore.FieldValue.serverTimestamp()
+    }
     
-    await firestore(app).collection('users').doc(userId).set({notifications}, { merge: true })
+    await firestore().collection('users').doc(userId).set({notifications}, { merge: true })
 }

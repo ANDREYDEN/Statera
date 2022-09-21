@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:statera/data/models/models.dart';
 
 class Callables {
@@ -40,7 +41,11 @@ class Callables {
     required String uid,
     required String token,
   }) async {
-    await _updateUserNotificationToken({'uid': uid, 'token': token});
+    await _updateUserNotificationToken({
+      'uid': uid,
+      'token': token,
+      'platform': kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1],
+    });
   }
 
   static Future<void> notifyWhenExpenseCompleted({required expenseId}) async {
