@@ -24,14 +24,12 @@ class ExpenseList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
             child: ElevatedButton(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) => NewExpenseDialog(
-                  afterAddition: (expenseId) {
-                    Navigator.of(context).pop();
-                    expenseBloc.load(expenseId);
-                  },
-                ),
+              onPressed: () => showNewExpenseDialog(
+                context,
+                afterAddition: (expenseId) {
+                  Navigator.of(context).pop();
+                  expenseBloc.load(expenseId);
+                },
               ),
               child: Icon(Icons.add),
             ),

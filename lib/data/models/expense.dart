@@ -163,18 +163,6 @@ class Expense {
     });
   }
 
-  assignGroup(Group group) {
-    this.groupId = group.id;
-    var assignees =
-        group.members.map((member) => Assignee(uid: member.uid)).toList();
-    this.assignees = assignees;
-    this.items.forEach((item) {
-      item.assignees = group.members
-          .map((member) => AssigneeDecision(uid: member.uid))
-          .toList();
-    });
-  }
-
   double getConfirmedTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 

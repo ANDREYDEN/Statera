@@ -6,10 +6,13 @@ import 'package:statera/ui/widgets/author_avatar.dart';
 class AssigneePicker extends StatefulWidget {
   final Expense expense;
   final AssigneeController controller;
+  final void Function(List<String> value)? onChange;
+
   const AssigneePicker({
     Key? key,
     required this.expense,
     required this.controller,
+    this.onChange,
   }) : super(key: key);
 
   @override
@@ -24,22 +27,18 @@ class _AssigneePickerState extends State<AssigneePicker> {
     super.initState();
   }
 
-  List<String> get selectedUids => widget.controller.value;
-
-  bool get onlyAuthorSelected =>
-      selectedUids.length == 1 &&
-      selectedUids.contains(widget.expense.author.uid);
-
   @override
   Widget build(BuildContext context) {
     return GroupBuilder(
       builder: (context, group) {
         return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Visibility(
-              visible: onlyAuthorSelected || selectedUids.isEmpty,
+              visible: widget.controller.value.isEmpty,
               child: Text(
-                'Please select at least one assignee other than yourself',
+                'Please select at least one assignee',
                 style: TextStyle(color: Theme.of(context).errorColor),
               ),
             ),
@@ -49,18 +48,19 @@ class _AssigneePickerState extends State<AssigneePicker> {
                 return AuthorAvatar(
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   author: member,
-                  borderColor: this.selectedUids.contains(member.uid)
+                  borderColor: widget.controller.value.contains(member.uid)
                       ? Colors.green
                       : Colors.transparent,
                   withName: true,
                   onTap: () {
                     setState(() {
-                      if (this.selectedUids.contains(member.uid)) {
-                        this.selectedUids.remove(member.uid);
+                      if (widget.controller.value.contains(member.uid)) {
+                        widget.controller.value.remove(member.uid);
                       } else {
-                        this.selectedUids.add(member.uid);
+                        widget.controller.value.add(member.uid);
                       }
                     });
+                    widget.onChange?.call(widget.controller.value);
                   },
                 );
               }).toList(),
@@ -73,5 +73,5 @@ class _AssigneePickerState extends State<AssigneePicker> {
 }
 
 class AssigneeController extends ValueNotifier<List<String>> {
-  AssigneeController(List<String> value) : super(value);
+  AssigneeController({List<String>? value}) : super(value ?? []);
 }

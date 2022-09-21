@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/ui/expense/expense_details.dart';
@@ -71,14 +72,12 @@ class _GroupPageState extends State<GroupPage> {
           ? null
           : _selectedNavBarItemIndex == 0
               ? null
-              : () => showDialog(
-                    context: context,
-                    builder: (context) => NewExpenseDialog(
-                      afterAddition: (expenseId) {
-                        Navigator.of(context)
-                            .popAndPushNamed('${ExpensePage.route}/$expenseId');
-                      },
-                    ),
+              : () => showNewExpenseDialog(
+                    context,
+                    afterAddition: (expenseId) {
+                      Navigator.of(context)
+                          .popAndPushNamed('${ExpensePage.route}/$expenseId');
+                    },
                   ),
       bottomNavBar: isWide
           ? null
