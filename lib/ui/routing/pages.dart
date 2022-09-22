@@ -124,12 +124,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final regExpPattern = RegExp(path.pattern);
     if (regExpPattern.hasMatch(route)) {
       final firstMatch = regExpPattern.firstMatch(route);
-      builder = (context) => _renderPage(
-            path,
-            context,
-            match: firstMatch,
-            originalRoute: route,
-          );
+      builder = (context) => _renderPage(path, context, match: firstMatch);
       break;
     }
   }
@@ -137,8 +132,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
   // navigate home if nothing matched
   if (builder == null) {
     builder = (context) => kIsWeb
-        ? _renderPage(_landingPagePath, context, originalRoute: GroupList.route)
-        : _renderPage(_groupsPagePath, context, originalRoute: GroupList.route);
+        ? _renderPage(_landingPagePath, context)
+        : _renderPage(_groupsPagePath, context);
     route = GroupList.route;
   }
 
@@ -148,12 +143,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
   );
 }
 
-Widget _renderPage(
-  PagePath path,
-  BuildContext context, {
-  RegExpMatch? match,
-  required String originalRoute,
-}) {
+Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   final matches = match?.groups(
     List.generate(match.groupCount, (index) => index + 1),
   );
@@ -162,7 +152,6 @@ Widget _renderPage(
       child: path.isPublic
           ? path.builder(context, matches)
           : AuthGuard(
-              originalRoute: originalRoute,
               builder: () => path.builder(context, matches),
             ),
     ),
