@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
@@ -29,6 +30,14 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   AuthBloc get authBloc => context.read<AuthBloc>();
   GroupsCubit get groupsCubit => context.read<GroupsCubit>();
+  NotificationsCubit get notificationsCubit =>
+      context.read<NotificationsCubit>();
+
+  @override
+  void initState() {
+    notificationsCubit.requestPermission(context: context, uid: authBloc.uid);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,15 +143,19 @@ class _GroupListState extends State<GroupList> {
             id: 'debt_threshold',
             label: 'Debt Threshold',
             initialData: groupToModify.debtThreshold,
-            validators: [FieldData.requiredValidator, FieldData.doubleValidator],
+            validators: [
+              FieldData.requiredValidator,
+              FieldData.doubleValidator
+            ],
             formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
             isAdvanced: true,
           ),
         ],
         onSubmit: (values) async {
           final wasModified = groupToModify.name != values['name']! ||
-              groupToModify.currencySign != values['currency'] || 
-              groupToModify.debtThreshold != double.tryParse(values['debt_threshold']!);
+              groupToModify.currencySign != values['currency'] ||
+              groupToModify.debtThreshold !=
+                  double.tryParse(values['debt_threshold']!);
 
           if (!wasModified) return;
 

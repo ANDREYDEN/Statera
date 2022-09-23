@@ -8,7 +8,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/services/notifications_repository.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
@@ -56,11 +55,6 @@ class Statera extends StatelessWidget {
               return AuthBloc(authRepository);
             },
           ),
-          BlocProvider(create: (context) {
-            final notificationsRepository =
-                context.read<NotificationsRepository>();
-            return NotificationsCubit(notificationsRepository);
-          })
         ],
         child: LayoutBuilder(
           builder: (context, constraints) {

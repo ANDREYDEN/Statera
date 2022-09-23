@@ -7,7 +7,9 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
+import 'package:statera/data/services/notifications_repository.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/settings/settings.dart';
@@ -29,9 +31,20 @@ final _landingPagePath = PagePath(
 
 final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
-  builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (context) =>
-        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
+  builder: (context, _) => MultiBlocProvider(
+    providers: [
+      BlocProvider<GroupsCubit>(
+        create: (context) => GroupsCubit(GroupService.instance)
+          ..load(context.read<AuthBloc>().uid),
+      ),
+      BlocProvider(
+        create: (context) {
+          final notificationsRepository =
+              context.read<NotificationsRepository>();
+          return NotificationsCubit(notificationsRepository);
+        },
+      ),
+    ],
     child: GroupList(),
   ),
 );
