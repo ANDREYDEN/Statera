@@ -7,18 +7,16 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
-import 'package:statera/data/services/notifications_repository.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/settings/settings.dart';
-import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
-import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
@@ -31,20 +29,9 @@ final _landingPagePath = PagePath(
 
 final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
-  builder: (context, _) => MultiBlocProvider(
-    providers: [
-      BlocProvider<GroupsCubit>(
-        create: (context) => GroupsCubit(GroupService.instance)
-          ..load(context.read<AuthBloc>().uid),
-      ),
-      BlocProvider(
-        create: (context) {
-          final notificationsRepository =
-              context.read<NotificationsRepository>();
-          return NotificationsCubit(notificationsRepository);
-        },
-      ),
-    ],
+  builder: (context, _) => BlocProvider<GroupsCubit>(
+    create: (context) =>
+        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
 );

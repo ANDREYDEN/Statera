@@ -27,24 +27,6 @@ class NotificationsRepository {
 
     log('Got permissions: ${settings.authorizationStatus}');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      final fcmToken = await FirebaseMessaging.instance
-          .getToken(vapidKey: kIsWeb ? dotenv.env['WEB_PUSH_VAPID_KEY'] : null);
-      if (fcmToken == null) throw Exception('Could not get FCM token');
-
-      await Callables.updateUserNotificationToken(
-        uid: uid,
-        token: fcmToken,
-      );
-
-      if (_tokenRefreshSubscription == null) {
-        log('Initialized user notification token refresh subscription');
-        _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
-            .listen((token) => Callables.updateUserNotificationToken(
-                  uid: uid,
-                  token: token,
-                ));
-      }
-
       RemoteMessage? initialMessage =
           await FirebaseMessaging.instance.getInitialMessage();
 
@@ -67,5 +49,22 @@ class NotificationsRepository {
     }
 
     return false;
+  }
+
+  Future<void> updateNotificationToken({required String uid}) async {
+    final fcmToken = await FirebaseMessaging.instance
+        .getToken(vapidKey: kIsWeb ? dotenv.env['WEB_PUSH_VAPID_KEY'] : null);
+    if (fcmToken == null) throw Exception('Could not get FCM token');
+
+    await Callables.updateUserNotificationToken(uid: uid, token: fcmToken);
+
+    if (_tokenRefreshSubscription == null) {
+      log('Initialized user notification token refresh subscription');
+      _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
+          .listen((token) => Callables.updateUserNotificationToken(
+                uid: uid,
+                token: token,
+              ));
+    }
   }
 }

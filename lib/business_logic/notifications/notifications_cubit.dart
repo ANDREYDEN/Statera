@@ -28,4 +28,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       emit(NotificationsState(false, error: e));
     }
   }
+
+  void updateToken({required String uid}) async {
+    await _notificationsRepository.updateNotificationToken(uid: uid);
+  }
 }
