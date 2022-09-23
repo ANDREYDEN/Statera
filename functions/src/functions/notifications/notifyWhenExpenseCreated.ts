@@ -1,11 +1,11 @@
 import { firestore, messaging } from 'firebase-admin';
-import { getGroupNotificationTokens } from './notificationUtils'
+import { getExpenseNotificationTokens } from './notificationUtils'
 
 export async function notifyWhenExpenseCreated(expenseSnap: firestore.QueryDocumentSnapshot) {
     const groupId = expenseSnap.data().groupId
     const authorName = expenseSnap.data()?.author?.name ?? "anonymous"
     const group = await firestore().collection('groups').doc(groupId).get()
-    const userTokens = await getGroupNotificationTokens(group)
+    const userTokens = await getExpenseNotificationTokens(expenseSnap)
     console.log('Retrieved tokens:', userTokens);
 
     if (userTokens.length === 0) return null

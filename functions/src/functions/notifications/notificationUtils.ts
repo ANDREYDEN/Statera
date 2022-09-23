@@ -13,7 +13,7 @@ export async function getExpenseNotificationTokens(expense: firestore.DocumentSn
   const targetUserIds = assigneeIds.filter(uid => uid !== authorId)
   console.log(`Sending notifications to ${targetUserIds.join(', ')}`)
   
-  return getUsersNotificationTokens(assigneeIds)
+  return getUsersNotificationTokens(targetUserIds)
 }
 
 export async function getUsersNotificationTokens(uids: string[]) {
