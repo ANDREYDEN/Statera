@@ -60,30 +60,31 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('New Expense'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            autofocus: true,
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: 'Name',
-              errorText: _dirty && _nameController.text == ''
-                  ? kRequiredValidationMessage
-                  : null,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              autofocus: true,
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                errorText: _dirty && _nameController.text == ''
+                    ? kRequiredValidationMessage
+                    : null,
+              ),
+              onChanged: (text) {
+                setState(() {
+                  this._dirty = true;
+                });
+              },
             ),
-            onChanged: (text) {
-              setState(() {
-                this._dirty = true;
-              });
-            },
-          ),
-          SizedBox(height: 20),
-          Text('Pick Assignees'),
-          Expanded(
-            child: Container(
+            SizedBox(height: 20),
+            Text('Pick Assignees'),
+            Container(
               width: 400,
+              height: 400,
               child: GroupBuilder(
                 builder: (context, group) {
                   _newExpense.updateAssignees(
@@ -95,8 +96,8 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
                 },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         CancelButton(),
