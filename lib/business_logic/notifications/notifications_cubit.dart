@@ -8,20 +8,23 @@ part 'notifications_state.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
   late final NotificationsRepository _notificationsRepository;
+  late final BuildContext _context;
 
-  NotificationsCubit(NotificationsRepository notificationsRepository)
-      : super(NotificationsState(false)) {
+  NotificationsCubit({
+    required BuildContext context,
+    required NotificationsRepository notificationsRepository,
+  }) : super(NotificationsState(false)) {
     _notificationsRepository = notificationsRepository;
+    _context = context;
   }
 
-  void requestPermission({
-    required BuildContext context,
-    required String uid,
-  }) async {
+  void setContext(BuildContext context) => _context = context;
+
+  void requestPermission({required String uid}) async {
     try {
       final success = await _notificationsRepository.setupNotifications(
         uid: uid,
-        onMessage: (message) => handleMessage(message, context),
+        onMessage: (message) => handleMessage(message, _context),
       );
       emit(NotificationsState(success));
     } on Exception catch (e) {

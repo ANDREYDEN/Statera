@@ -35,7 +35,7 @@ class _GroupListState extends State<GroupList> {
 
   @override
   void initState() {
-    notificationsCubit.requestPermission(context: context, uid: authBloc.uid);
+    notificationsCubit.requestPermission(uid: authBloc.uid);
     super.initState();
   }
 

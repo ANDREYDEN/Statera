@@ -25,30 +25,39 @@ class NotificationsRepository {
       sound: true,
     );
 
-    log('Got permissions: ${settings.authorizationStatus}');
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      RemoteMessage? initialMessage =
-          await FirebaseMessaging.instance.getInitialMessage();
+    log('Got notification permissions: ${settings.authorizationStatus}');
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
+  }
 
-      if (initialMessage != null) {
-        log('Got initial message: ${initialMessage.data}');
-        onMessage(initialMessage);
-      }
+  /// Handles when the app was **opened** through a notification
+  void listenForNotification({required Function(RemoteMessage) onMessage}) {
+    if (_notificationSubscription == null) {
+      log('Initialized notification handler subscription');
 
-      if (_notificationSubscription == null) {
-        log('Initialized notification handler subscription');
-        _notificationSubscription =
-            FirebaseMessaging.onMessageOpenedApp.listen((m) {
-          log('Got message that opened app: ${m.data}');
-          onMessage(m);
-        });
-      }
-      // FirebaseMessaging.onMessage.listen(_handleMessage); // foreground
-
-      return true;
+      _notificationSubscription =
+          FirebaseMessaging.onMessageOpenedApp.listen((m) {
+        log('Got message that opened app: ${m.data}');
+        onMessage(m);
+      });
     }
+  }
 
-    return false;
+  /// Checks if the app was **launched** through a notification
+  Future<void> checkForLaunchingNotification({
+    required Function(RemoteMessage) onMessage,
+  }) async {
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      log('Got message that launched app: ${initialMessage.data}');
+      onMessage(initialMessage);
+    }
+  }
+
+  // TODO: fetch token from firestore and update if necessary
+  Future<String> getNotificationToken({required String uid}) async {
+    throw UnimplementedError();
   }
 
   Future<void> updateNotificationToken({required String uid}) async {
@@ -61,10 +70,8 @@ class NotificationsRepository {
     if (_tokenRefreshSubscription == null) {
       log('Initialized user notification token refresh subscription');
       _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
-          .listen((token) => Callables.updateUserNotificationToken(
-                uid: uid,
-                token: token,
-              ));
+          .listen((token) =>
+              Callables.updateUserNotificationToken(uid: uid, token: token));
     }
   }
 }
