@@ -18,7 +18,12 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     _userRepostiry = userRepository;
   }
 
-  void requestPermission({required String uid}) async {
+  void load(BuildContext context) {
+    _listenForNotifications(context);
+    _checkIfNotificationLaunchedApp(context);
+  }
+
+  Future<void> requestPermission({required String uid}) async {
     try {
       final success = await _notificationService.requestPermission();
       emit(NotificationsState(success));
@@ -34,13 +39,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     );
   }
 
-  void listenForNotifications(BuildContext context) {
+  void _listenForNotifications(BuildContext context) {
     _notificationService.listenForNotification(
       onMessage: (message) => handleMessage(message, context),
     );
   }
 
-  void checkIfNotificationLaunchedApp(BuildContext context) {
+  void _checkIfNotificationLaunchedApp(BuildContext context) {
     _notificationService.checkForLaunchingNotification(
       onMessage: (message) => handleMessage(message, context),
     );

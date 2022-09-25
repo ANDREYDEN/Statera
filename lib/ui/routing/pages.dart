@@ -7,6 +7,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/dynamic_link_handler.dart';
@@ -147,6 +148,10 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   final matches = match?.groups(
     List.generate(match.groupCount, (index) => index + 1),
   );
+
+  // final notificationsCubit = context.read<NotificationsCubit>();
+  // notifi
+
   return DynamicLinkHandler(
     child: SafeArea(
       child: path.isPublic

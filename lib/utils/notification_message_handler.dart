@@ -3,6 +3,11 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 
+/// Handles the notification [message] (tapping on a notification) from a particular app [context]. 
+/// Because different places in the app will try to handle a notification tap (opening vs launching)
+/// this method ensures that each notification will be handled exactly once 
+/// (ignoring all invocations for a given period of time)
+/// TODO: add cooldown
 void handleMessage(RemoteMessage message, BuildContext context) {
   log('handling message ${message.data}');
   if (message.data['type'] == null) return;

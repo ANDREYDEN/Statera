@@ -114,4 +114,4 @@ isApplePlatform() {
       defaultTargetPlatform == TargetPlatform.macOS;
 }
 
-String currentPlatformName = defaultTargetPlatform.toString().split('.')[1];
+String currentPlatformName = kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];

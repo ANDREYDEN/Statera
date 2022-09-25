@@ -57,18 +57,6 @@ class Statera extends StatelessWidget {
               return AuthBloc(authService, userRepository);
             },
           ),
-          BlocProvider(
-            create: (context) {
-              final notificationsRepository =
-                  context.read<NotificationService>();
-              final userRepository = context.read<UserRepository>();
-
-              return NotificationsCubit(
-                notificationsRepository: notificationsRepository,
-                userRepository: userRepository,
-              );
-            },
-          ),
         ],
         child: LayoutBuilder(
           builder: (context, constraints) {

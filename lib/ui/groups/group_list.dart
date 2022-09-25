@@ -7,10 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -30,12 +29,9 @@ class GroupList extends StatefulWidget {
 class _GroupListState extends State<GroupList> {
   AuthBloc get authBloc => context.read<AuthBloc>();
   GroupsCubit get groupsCubit => context.read<GroupsCubit>();
-  NotificationsCubit get notificationsCubit =>
-      context.read<NotificationsCubit>();
 
   @override
   void initState() {
-    notificationsCubit.requestPermission(uid: authBloc.uid);
     super.initState();
   }
 

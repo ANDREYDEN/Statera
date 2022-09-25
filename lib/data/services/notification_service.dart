@@ -59,6 +59,7 @@ class NotificationService {
     if (fcmToken == null) throw Exception('Could not get FCM token');
 
     await onUpdate(fcmToken);
+    log('Updated user notification token');
 
     if (_tokenRefreshSubscription == null) {
       log('Initialized user notification token refresh subscription');
