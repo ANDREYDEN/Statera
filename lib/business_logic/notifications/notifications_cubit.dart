@@ -9,26 +9,18 @@ part 'notifications_state.dart';
 class NotificationsCubit extends Cubit<NotificationsState> {
   late final NotificationService _notificationService;
   late final UserRepository _userRepostiry;
-  late final BuildContext _context;
 
   NotificationsCubit({
-    required BuildContext context,
     required UserRepository userRepository,
     required NotificationService notificationsRepository,
   }) : super(NotificationsState(false)) {
     _notificationService = notificationsRepository;
     _userRepostiry = userRepository;
-    _context = context;
   }
-
-  void setContext(BuildContext context) => _context = context;
 
   void requestPermission({required String uid}) async {
     try {
-      final success = await _notificationService.setupNotifications(
-        uid: uid,
-        onMessage: (message) => handleMessage(message, _context),
-      );
+      final success = await _notificationService.requestPermission();
       emit(NotificationsState(success));
     } on Exception catch (e) {
       emit(NotificationsState(false, error: e));
@@ -36,9 +28,21 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   void updateToken({required String uid}) async {
-    await _notificationService.updateNotificationToken(
+    await _notificationService.updateToken(
       onUpdate: (token) =>
           _userRepostiry.updateUser(uid: uid, notificationToken: token),
+    );
+  }
+
+  void listenForNotifications(BuildContext context) {
+    _notificationService.listenForNotification(
+      onMessage: (message) => handleMessage(message, context),
+    );
+  }
+
+  void checkIfNotificationLaunchedApp(BuildContext context) {
+    _notificationService.checkForLaunchingNotification(
+      onMessage: (message) => handleMessage(message, context),
     );
   }
 }

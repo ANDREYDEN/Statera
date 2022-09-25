@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -24,7 +22,6 @@ class AuthGuard extends StatelessWidget {
       listener: (context, state) =>
           notificationsCubit.updateToken(uid: state.user!.uid),
       builder: (context, authState) {
-        log(authState.status.toString(), name: 'AUTH_STATUS');
         if (authState.status == AuthStatus.unauthenticated) {
           return BlocProvider<SignInCubit>(
             create: (_) => SignInCubit(context.read<AuthService>()),

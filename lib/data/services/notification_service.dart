@@ -9,10 +9,7 @@ class NotificationService {
   StreamSubscription? _tokenRefreshSubscription;
   StreamSubscription? _notificationSubscription;
 
-  Future<bool> setupNotifications({
-    required String uid,
-    required Function(RemoteMessage) onMessage,
-  }) async {
+  Future<bool> requestPermission() async {
     NotificationSettings settings =
         await FirebaseMessaging.instance.requestPermission(
       alert: true,
@@ -54,7 +51,7 @@ class NotificationService {
     }
   }
 
-  Future<void> updateNotificationToken({
+  Future<void> updateToken({
     required Future Function(String token) onUpdate,
   }) async {
     final fcmToken = await FirebaseMessaging.instance

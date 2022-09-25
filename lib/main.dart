@@ -64,7 +64,6 @@ class Statera extends StatelessWidget {
               final userRepository = context.read<UserRepository>();
 
               return NotificationsCubit(
-                context: context,
                 notificationsRepository: notificationsRepository,
                 userRepository: userRepository,
               );
