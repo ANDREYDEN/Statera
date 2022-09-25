@@ -113,3 +113,5 @@ isApplePlatform() {
   return defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS;
 }
+
+String currentPlatformName = defaultTargetPlatform.toString().split('.')[1];

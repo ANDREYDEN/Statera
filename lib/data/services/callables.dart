@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/utils/utils.dart';
 
 class Callables {
   static HttpsCallable _getReceiptData =
@@ -35,17 +36,6 @@ class Callables {
         partition: quantity,
       );
     }).toList();
-  }
-
-  static Future<void> updateUserNotificationToken({
-    required String uid,
-    required String token,
-  }) async {
-    await _updateUserNotificationToken({
-      'uid': uid,
-      'token': token,
-      'platform': kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1],
-    });
   }
 
   static Future<void> notifyWhenExpenseCompleted({required expenseId}) async {

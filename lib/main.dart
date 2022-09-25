@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
-import 'package:statera/data/services/notifications_repository.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/groups/group_list.dart';
@@ -47,7 +46,7 @@ class Statera extends StatelessWidget {
         RepositoryProvider(create: (_) => UserRepository()),
         RepositoryProvider(create: (_) => DynamicLinkRepository()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
-        RepositoryProvider(create: (_) => NotificationsRepository())
+        RepositoryProvider(create: (_) => NotificationService())
       ],
       child: MultiBlocProvider(
         providers: [
@@ -61,10 +60,13 @@ class Statera extends StatelessWidget {
           BlocProvider(
             create: (context) {
               final notificationsRepository =
-                  context.read<NotificationsRepository>();
+                  context.read<NotificationService>();
+              final userRepository = context.read<UserRepository>();
+
               return NotificationsCubit(
                 context: context,
                 notificationsRepository: notificationsRepository,
+                userRepository: userRepository,
               );
             },
           ),

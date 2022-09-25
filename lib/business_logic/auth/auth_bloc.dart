@@ -40,7 +40,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onUserDataUpdated(UserDataUpdated event, Emitter<AuthState> emit) {
-    _userRepostiry.updateUser(uid, event.name, event.photoURL);
+    _userRepostiry.updateUser(
+      uid: uid,
+      name: event.name,
+      photoURL: event.photoURL,
+    );
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {

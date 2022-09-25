@@ -4,9 +4,8 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:statera/data/services/callables.dart';
 
-class NotificationsRepository {
+class NotificationService {
   StreamSubscription? _tokenRefreshSubscription;
   StreamSubscription? _notificationSubscription;
 
@@ -55,23 +54,19 @@ class NotificationsRepository {
     }
   }
 
-  // TODO: fetch token from firestore and update if necessary
-  Future<String> getNotificationToken({required String uid}) async {
-    throw UnimplementedError();
-  }
-
-  Future<void> updateNotificationToken({required String uid}) async {
+  Future<void> updateNotificationToken({
+    required Future Function(String token) onUpdate,
+  }) async {
     final fcmToken = await FirebaseMessaging.instance
         .getToken(vapidKey: kIsWeb ? dotenv.env['WEB_PUSH_VAPID_KEY'] : null);
     if (fcmToken == null) throw Exception('Could not get FCM token');
 
-    await Callables.updateUserNotificationToken(uid: uid, token: fcmToken);
+    await onUpdate(fcmToken);
 
     if (_tokenRefreshSubscription == null) {
       log('Initialized user notification token refresh subscription');
-      _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
-          .listen((token) =>
-              Callables.updateUserNotificationToken(uid: uid, token: token));
+      _tokenRefreshSubscription =
+          FirebaseMessaging.instance.onTokenRefresh.listen(onUpdate);
     }
   }
 }
