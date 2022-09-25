@@ -1,14 +1,9 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/utils/utils.dart';
 
 class Callables {
   static HttpsCallable _getReceiptData =
       FirebaseFunctions.instance.httpsCallable('getReceiptData');
-
-  static HttpsCallable _updateUserNotificationToken =
-      FirebaseFunctions.instance.httpsCallable('updateUserNotificationToken');
 
   static HttpsCallable _notifyWhenExpenseCompleted =
       FirebaseFunctions.instance.httpsCallable('notifyWhenExpenseIsCompleted');
