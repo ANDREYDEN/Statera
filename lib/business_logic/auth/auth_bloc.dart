@@ -9,16 +9,18 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  late final AuthRepository _authRepository;
+  late final AuthService _authService;
+  late final UserRepository _userRepostiry;
   late final StreamSubscription<User?> _userSubscription;
 
-  AuthBloc(AuthRepository authRepository)
+  AuthBloc(AuthService authRepository, UserRepository userRepository)
       : super(
           authRepository.currentUser != null
               ? AuthState.authenticated(authRepository.currentUser)
               : const AuthState.unauthenticated(),
         ) {
-    _authRepository = authRepository;
+    _authService = authRepository;
+    _userRepostiry = userRepository;
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
     on<AccountDeletionRequested>(_onAccountDeletionRequested);
@@ -38,18 +40,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onUserDataUpdated(UserDataUpdated event, Emitter<AuthState> emit) {
-    _authRepository.updateUser(uid, event.name, event.photoURL);
+    _userRepostiry.updateUser(uid, event.name, event.photoURL);
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
-    unawaited(_authRepository.signOut());
+    unawaited(_authService.signOut());
   }
 
   void _onAccountDeletionRequested(
     AccountDeletionRequested event,
     Emitter<AuthState> emit,
   ) {
-    var currentUser = _authRepository.currentUser;
+    var currentUser = _authService.currentUser;
     if (currentUser != null) currentUser.delete();
   }
 

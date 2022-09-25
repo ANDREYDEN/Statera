@@ -20,3 +20,7 @@ export function stripSku(sku: string): string {
   if (!matches) return sku
   return matches[1]
 }
+
+export function propertyChanged<T>(obj1: T, obj2: T, propertyName: keyof T): boolean {
+  return JSON.stringify(obj1[propertyName]) != JSON.stringify(obj2[propertyName])
+}

@@ -6,7 +6,7 @@ import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/constants.dart';
 
-class MockAuthRepository extends Mock implements AuthRepository {}
+class MockAuthRepository extends Mock implements AuthService {}
 
 class MockUserCredential extends Mock implements UserCredential {}
 
@@ -15,7 +15,7 @@ final userCredential = MockUserCredential();
 void main() {
   group('SignInCubit', () {
     late SignInCubit signInCubit;
-    late AuthRepository authRepository;
+    late AuthService authRepository;
 
     setUp(() {
       authRepository = MockAuthRepository();

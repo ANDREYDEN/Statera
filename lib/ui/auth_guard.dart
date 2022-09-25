@@ -27,7 +27,7 @@ class AuthGuard extends StatelessWidget {
         log(authState.status.toString(), name: 'AUTH_STATUS');
         if (authState.status == AuthStatus.unauthenticated) {
           return BlocProvider<SignInCubit>(
-            create: (_) => SignInCubit(context.read<AuthRepository>()),
+            create: (_) => SignInCubit(context.read<AuthService>()),
             child: SignIn(),
           );
         }

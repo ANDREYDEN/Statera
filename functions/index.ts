@@ -51,11 +51,8 @@ export const changeUser = functions.firestore
     .onUpdate(async (change, context) => {
       const oldUserData = change.before.data() as UserData
       const newUserData = change.after.data() as UserData
-      if (oldUserData.name !== newUserData.name 
-        || oldUserData.photoURL !== newUserData.photoURL) {
-        await updateUser(context.params.userId, newUserData)
-      }
-      return null
+
+      return await updateUser(context.params.userId, oldUserData, newUserData)
     })
 
 export const notifyWhenExpenceIsCreated = functions.firestore

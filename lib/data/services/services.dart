@@ -1,4 +1,5 @@
-export 'auth_repository.dart';
+export 'auth_service.dart';
+export 'user_repository.dart';
 export 'firebase_storage_repository.dart';
 export 'dynamic_link_repository.dart';
 export 'firestore.dart';

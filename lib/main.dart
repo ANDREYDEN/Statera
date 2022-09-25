@@ -43,7 +43,8 @@ class Statera extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => AuthService()),
+        RepositoryProvider(create: (_) => UserRepository()),
         RepositoryProvider(create: (_) => DynamicLinkRepository()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
         RepositoryProvider(create: (_) => NotificationsRepository())
@@ -52,8 +53,9 @@ class Statera extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) {
-              final authRepository = context.read<AuthRepository>();
-              return AuthBloc(authRepository);
+              final authService = context.read<AuthService>();
+              final userRepository = context.read<UserRepository>();
+              return AuthBloc(authService, userRepository);
             },
           ),
           BlocProvider(
