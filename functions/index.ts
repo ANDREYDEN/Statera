@@ -4,7 +4,6 @@ import * as functions from 'firebase-functions'
 import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
 import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
-import { handleTokenUpdate } from './src/functions/notifications/handleTokenUpdate'
 import { updateUser } from './src/functions/updateUser'
 import { UserData } from './src/types/userData'
 import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
@@ -77,13 +76,4 @@ export const notifyWhenExpenseIsFinalized = functions.https
   .onCall((data, _) => {
     if (!data.expenseId) throw new Error('parameter expenseId is required')
     return notifyWhenExpenseFinalized(data.expenseId)
-  })
-
-export const updateUserNotificationToken = functions.https
-  .onCall((data, _) => {
-    if (!data.uid) throw new Error('parameter uid is required')
-    if (!data.token) throw new Error('parameter token is required')
-    if (!data.platform) throw new Error('parameter platform is required')
-
-    return handleTokenUpdate(data.uid, data.token, data.platform)
   })
