@@ -5,7 +5,7 @@ import { verticalSegment } from '../utils'
 
 export async function analyzeReceipt(
     receiptUrl: string,
-    isWalmart: boolean, //TODO: deprecate
+    isWalmart: boolean, // TODO: deprecate
     storeName: string,
     withNameImprovement?: boolean
 ): Promise<Product[]> {

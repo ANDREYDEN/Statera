@@ -55,25 +55,25 @@ export const changeUser = functions.firestore
     })
 
 export const notifyWhenExpenceIsCreated = functions.firestore
-  .document('expenses/{expeseId}')
-  .onCreate((snap, _) => {
-    return notifyWhenExpenseCreated(snap)
-  })
+    .document('expenses/{expeseId}')
+    .onCreate((snap, _) => {
+      return notifyWhenExpenseCreated(snap)
+    })
 
 export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
-  .document('groups/{groupId}')
-  .onUpdate((change, _) => {
-    return notifyWhenGroupDebtThresholdReached(change)
-  })
+    .document('groups/{groupId}')
+    .onUpdate((change, _) => {
+      return notifyWhenGroupDebtThresholdReached(change)
+    })
 
 export const notifyWhenExpenseIsCompleted = functions.https
-  .onCall((data, _) => {
-    if (!data.expenseId) throw new Error('parameter expenseId is required')
-    return notifyWhenExpenseCompleted(data.expenseId)
-  })
+    .onCall((data, _) => {
+      if (!data.expenseId) throw new Error('parameter expenseId is required')
+      return notifyWhenExpenseCompleted(data.expenseId)
+    })
 
 export const notifyWhenExpenseIsFinalized = functions.https
-  .onCall((data, _) => {
-    if (!data.expenseId) throw new Error('parameter expenseId is required')
-    return notifyWhenExpenseFinalized(data.expenseId)
-  })
+    .onCall((data, _) => {
+      if (!data.expenseId) throw new Error('parameter expenseId is required')
+      return notifyWhenExpenseFinalized(data.expenseId)
+    })
