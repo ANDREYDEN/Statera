@@ -1,3 +1,4 @@
+import 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as functions from 'firebase-functions'
 import { firestoreBackup } from './src/admin'
@@ -5,6 +6,10 @@ import { analyzeReceipt } from './src/functions/analyzeReceipt'
 import { removeUserFromGroups } from './src/functions/removeUserFromGroups'
 import { updateUser } from './src/functions/updateUser'
 import { UserData } from './src/types/userData'
+import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
+import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
+import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
+import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
 
 admin.initializeApp()
 
@@ -45,9 +50,30 @@ export const changeUser = functions.firestore
     .onUpdate(async (change, context) => {
       const oldUserData = change.before.data() as UserData
       const newUserData = change.after.data() as UserData
-      if (oldUserData.name !== newUserData.name 
-        || oldUserData.photoURL !== newUserData.photoURL) {
-        await updateUser(context.params.userId, newUserData)
-      }
-      return null
+
+      return await updateUser(context.params.userId, oldUserData, newUserData)
+    })
+
+export const notifyWhenExpenceIsCreated = functions.firestore
+    .document('expenses/{expeseId}')
+    .onCreate((snap, _) => {
+      return notifyWhenExpenseCreated(snap)
+    })
+
+export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
+    .document('groups/{groupId}')
+    .onUpdate((change, _) => {
+      return notifyWhenGroupDebtThresholdReached(change)
+    })
+
+export const notifyWhenExpenseIsCompleted = functions.https
+    .onCall((data, _) => {
+      if (!data.expenseId) throw new Error('parameter expenseId is required')
+      return notifyWhenExpenseCompleted(data.expenseId)
+    })
+
+export const notifyWhenExpenseIsFinalized = functions.https
+    .onCall((data, _) => {
+      if (!data.expenseId) throw new Error('parameter expenseId is required')
+      return notifyWhenExpenseFinalized(data.expenseId)
     })

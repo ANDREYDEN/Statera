@@ -7,16 +7,17 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/settings/settings.dart';
-import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
-import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
@@ -124,12 +125,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final regExpPattern = RegExp(path.pattern);
     if (regExpPattern.hasMatch(route)) {
       final firstMatch = regExpPattern.firstMatch(route);
-      builder = (context) => _renderPage(
-            path,
-            context,
-            match: firstMatch,
-            originalRoute: route,
-          );
+      builder = (context) => _renderPage(path, context, match: firstMatch);
       break;
     }
   }
@@ -137,8 +133,8 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
   // navigate home if nothing matched
   if (builder == null) {
     builder = (context) => kIsWeb
-        ? _renderPage(_landingPagePath, context, originalRoute: GroupList.route)
-        : _renderPage(_groupsPagePath, context, originalRoute: GroupList.route);
+        ? _renderPage(_landingPagePath, context)
+        : _renderPage(_groupsPagePath, context);
     route = GroupList.route;
   }
 
@@ -148,21 +144,16 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
   );
 }
 
-Widget _renderPage(
-  PagePath path,
-  BuildContext context, {
-  RegExpMatch? match,
-  required String originalRoute,
-}) {
+Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   final matches = match?.groups(
     List.generate(match.groupCount, (index) => index + 1),
   );
+
   return DynamicLinkHandler(
     child: SafeArea(
       child: path.isPublic
           ? path.builder(context, matches)
           : AuthGuard(
-              originalRoute: originalRoute,
               builder: () => path.builder(context, matches),
             ),
     ),

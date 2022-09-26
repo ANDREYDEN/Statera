@@ -39,7 +39,7 @@ export const lcbo: Store = {
   normalize: normalizeLCBOProducts,
   filter: filterProducts,
   merge: (p) => p,
-  improveNaming
+  improveNaming,
 }
 
 export const stores: {[name: string]: Store} = { walmart, lcbo }

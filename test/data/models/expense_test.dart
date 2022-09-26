@@ -247,27 +247,6 @@ void main() {
       });
     });
 
-    test("can be assigned to a group", () {
-      var groupMembers = [
-        Author.fake(uid: "1"),
-        Author.fake(uid: "2"),
-      ];
-      var group = Group(name: "foo", members: groupMembers);
-
-      var item = Item.fake();
-      expense.addItem(item);
-      expense.assignGroup(group);
-
-      expect(
-        expense.assignees.map((a) => a.uid),
-        orderedEquals(groupMembers.map((g) => g.uid)),
-      );
-      expect(
-        item.assignees.map((a) => a.uid),
-        orderedEquals(groupMembers.map((g) => g.uid)),
-      );
-    });
-
     test("can only be updated by the author if not finalized", () {
       var item = Item.fake();
       expense.addItem(item);

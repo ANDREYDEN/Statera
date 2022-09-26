@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/ui/expense/dialogs/group_invite_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/group_invite_dialog.dart';
 
 class GroupQRButton extends StatelessWidget {
   const GroupQRButton({Key? key}) : super(key: key);

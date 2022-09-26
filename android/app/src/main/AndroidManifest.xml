@@ -35,6 +35,7 @@
             </intent-filter>
             
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

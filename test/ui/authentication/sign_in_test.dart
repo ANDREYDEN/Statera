@@ -12,7 +12,7 @@ class MockSignInCubit extends MockCubit<SignInState> implements SignInCubit {
   MockSignInCubit() : super();
 }
 
-class MockAuthRepository extends Mock implements AuthRepository {}
+class MockAuthRepository extends Mock implements AuthService {}
 
 class MockUserCredential extends Mock implements UserCredential {}
 

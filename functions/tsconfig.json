@@ -13,6 +13,7 @@
   "compileOnSave": true,
   "include": [
     "src",
-    "tests"
-, "index.ts"  ]
+    "tests",
+    "index.ts"
+  ]
 }

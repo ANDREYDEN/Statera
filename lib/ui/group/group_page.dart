@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
-import 'package:statera/ui/group/expenses/new_expense_handler.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/group_title.dart';
 import 'package:statera/ui/group/members/owings_list.dart';
@@ -15,11 +15,12 @@ import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
 import 'package:statera/ui/payments/payment_list_body.dart';
+import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
-  static const String route = "/group";
+  static const String route = '/group';
   static final scaffoldKey = GlobalKey<ScaffoldState>();
   final String? groupId;
 
@@ -71,10 +72,13 @@ class _GroupPageState extends State<GroupPage> {
           ? null
           : _selectedNavBarItemIndex == 0
               ? null
-              : () => handleNewExpenseClick(context, (expenseId) {
-                    Navigator.of(context)
-                        .popAndPushNamed('${ExpensePage.route}/$expenseId');
-                  }),
+              : () => showNewExpenseDialog(
+                    context,
+                    afterAddition: (expenseId) {
+                      Navigator.of(context)
+                          .popAndPushNamed('${ExpensePage.route}/$expenseId');
+                    },
+                  ),
       bottomNavBar: isWide
           ? null
           : GroupBottomNavBar(

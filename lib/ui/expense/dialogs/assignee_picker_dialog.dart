@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/assignee_picker.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class AssigneePickerDialog extends StatefulWidget {
@@ -16,14 +14,8 @@ class AssigneePickerDialog extends StatefulWidget {
 }
 
 class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
-  late List<String> _selectedUids;
-
-  @override
-  initState() {
-    _selectedUids =
-        widget.expense.assignees.map((assignee) => assignee.uid).toList();
-    super.initState();
-  }
+  final AssigneeController _assigneeController = AssigneeController();
+  bool _invalidSelection = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,43 +23,20 @@ class _AssigneePickerDialogState extends State<AssigneePickerDialog> {
       title: Text('Pick Assignees'),
       content: Container(
         width: 200,
-        child: GroupBuilder(
-          builder: (context, group) {
-            return ListView.builder(
-              itemCount: group.members.length,
-              itemBuilder: (context, index) {
-                final member = group.members[index];
-            
-                return AuthorAvatar(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  author: member,
-                  borderColor: this._selectedUids.contains(member.uid)
-                      ? Colors.green
-                      : Colors.transparent,
-                  withName: true,
-                  onTap: () {
-                    setState(() {
-                      if (this._selectedUids.contains(member.uid)) {
-                        this._selectedUids.remove(member.uid);
-                      } else {
-                        this._selectedUids.add(member.uid);
-                      }
-                    });
-                  },
-                );
-              },
-            );
-          },
+        child: AssigneePicker(
+          controller: _assigneeController,
+          expense: widget.expense,
+          onChange: (value) => setState(() {
+            _invalidSelection = value.isEmpty;
+          }),
         ),
       ),
       actions: [
         CancelButton(),
         ElevatedButton(
-          onPressed: () async {
-            widget.expense.updateAssignees(this._selectedUids);
-            await ExpenseService.instance.updateExpense(widget.expense);
-            Navigator.pop(context);
-          },
+          onPressed: _invalidSelection
+              ? null
+              : () => Navigator.pop(context, _assigneeController.value),
           child: Text('Save'),
         ),
       ],

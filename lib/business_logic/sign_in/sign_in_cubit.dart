@@ -8,9 +8,9 @@ import 'package:statera/utils/utils.dart';
 part 'sign_in_state.dart';
 
 class SignInCubit extends Cubit<SignInState> {
-  late final AuthRepository _authRepository;
+  late final AuthService _authRepository;
 
-  SignInCubit(AuthRepository authRepository) : super(SignInLoaded()) {
+  SignInCubit(AuthService authRepository) : super(SignInLoaded()) {
     _authRepository = authRepository;
   }
 

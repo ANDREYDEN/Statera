@@ -5,6 +5,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
@@ -105,6 +106,8 @@ class ExpenseListItem extends StatelessWidget {
                           // TODO: use transaction
                           await ExpenseService.instance
                               .finalizeExpense(expense);
+                          await Callables.notifyWhenExpenseFinalized(
+                              expenseId: expense.id);
                           groupCubit.update((group) {
                             group.updateBalance(expense);
                           });

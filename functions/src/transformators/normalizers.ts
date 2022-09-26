@@ -59,12 +59,12 @@ export function normalizeLCBOProducts(rows: string[][]): LCBOProduct[] {
     deposit: 0,
     id: '',
     volume: 0,
-    quantity: 0
+    quantity: 0,
   }
   const idVolumeDepositRegex = /(\d{8})\s*(\d{5})ML\s*DEP\s*(\d*\.\d{2})\s*ea/
   const quantityValueRegex = /\(\s*(\d+)\s*@\s*(\d+\.\d{2})\s*\)/
 
-  const textRows = rows.map(row => row.join(' '))
+  const textRows = rows.map((row) => row.join(' '))
 
   for (const row of textRows) {
     const idVolumeDepositMatcher = row.match(idVolumeDepositRegex)
@@ -87,7 +87,7 @@ export function normalizeLCBOProducts(rows: string[][]): LCBOProduct[] {
         deposit: 0,
         id: '',
         volume: 0,
-        quantity: 0
+        quantity: 0,
       }
       continue
     }
