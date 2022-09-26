@@ -8,13 +8,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:statera/data/services/services.dart';
 
-class AuthRepository extends Firestore {
+class AuthService {
   late FirebaseAuth _auth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  AuthRepository() {
+  AuthService() {
     _auth = FirebaseAuth.instance;
   }
 
@@ -22,18 +21,6 @@ class AuthRepository extends Firestore {
 
   Stream<User?> currentUserStream() {
     return _auth.userChanges();
-  }
-
-  Future<void> updateUser(String uid, String? name, String? photoURL) async {
-    if (name != null) {
-      await _auth.currentUser?.updateDisplayName(name);
-      await usersCollection.doc(uid).update({ 'name': name });
-    }
-
-    if (photoURL != null) {
-      await _auth.currentUser?.updatePhotoURL(photoURL);
-      await usersCollection.doc(uid).update({ 'photoURL': photoURL });
-    }
   }
 
   Future<UserCredential> signIn(String email, String password) {

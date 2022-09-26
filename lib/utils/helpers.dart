@@ -10,14 +10,15 @@ import 'package:intl/intl.dart';
 
 configureEmulators() async {
   const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
+  final host = 'localhost';
   if (useEmulators) {
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
-    FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+    await FirebaseStorage.instance.useStorageEmulator(host, 9199);
+    FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
+    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
   }
-  print("Talking to Firebase " +
-      (useEmulators ? "via EMULATORS" : "in PRODUCTION"));
+  print('Talking to Firebase ' +
+      (useEmulators ? 'via EMULATORS' : 'in PRODUCTION'));
 }
 
 String getRandomLetter() {
@@ -112,3 +113,5 @@ isApplePlatform() {
   return defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS;
 }
+
+String currentPlatformName = kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];

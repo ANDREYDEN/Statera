@@ -22,7 +22,7 @@ class ExpenseStage {
 }
 
 class Expense {
-  String? id = "";
+  String? id = '';
   String? groupId;
   List<Item> items = [];
   List<Assignee> assignees = [];
@@ -35,7 +35,7 @@ class Expense {
   Expense({
     required this.name,
     required this.author,
-    required this.groupId,
+    this.groupId,
     this.acceptNewMembers = true,
   }) {
     this.assignees = [Assignee(uid: author.uid)];
@@ -43,15 +43,15 @@ class Expense {
   }
 
   Expense.fake() {
-    this.name = "foo";
-    this.author = Author(name: "foo", uid: "foo");
+    this.name = 'foo';
+    this.author = Author(name: 'foo', uid: 'foo');
     this.date = DateTime.now();
     this.acceptNewMembers = true;
   }
 
   Expense.empty() {
-    this.name = "";
-    this.author = Author(name: "", uid: "");
+    this.name = '';
+    this.author = Author(name: '', uid: '');
   }
 
   bool wasEarlierThan(Expense other) {
@@ -96,19 +96,19 @@ class Expense {
   static List<ExpenseStage> expenseStages(String uid) {
     return [
       ExpenseStage(
-        name: "Not Marked",
+        name: 'Not Marked',
         color: Colors.red[200]!,
         test: (expense) => expense.hasAssignee(uid) && !expense.isMarkedBy(uid),
       ),
       ExpenseStage(
-        name: "Pending",
+        name: 'Pending',
         color: Colors.yellow[300]!,
         test: (expense) =>
             (expense.isMarkedBy(uid) || !expense.hasAssignee(uid)) &&
             !expense.finalized,
       ),
       ExpenseStage(
-        name: "Finalized",
+        name: 'Finalized',
         color: Colors.grey[400]!,
         test: (expense) => expense.finalized,
       ),
@@ -163,18 +163,6 @@ class Expense {
     });
   }
 
-  assignGroup(Group group) {
-    this.groupId = group.id;
-    var assignees =
-        group.members.map((member) => Assignee(uid: member.uid)).toList();
-    this.assignees = assignees;
-    this.items.forEach((item) {
-      item.assignees = group.members
-          .map((member) => AssigneeDecision(uid: member.uid))
-          .toList();
-    });
-  }
-
   double getConfirmedTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 
@@ -190,41 +178,41 @@ class Expense {
 
   Map<String, dynamic> toFirestore() {
     return {
-      "groupId": groupId,
-      "name": name,
-      "items": items.map((item) => item.toFirestore()).toList(),
-      "author": author.toFirestore(),
-      "assigneeIds":
+      'groupId': groupId,
+      'name': name,
+      'items': items.map((item) => item.toFirestore()).toList(),
+      'author': author.toFirestore(),
+      'assigneeIds':
           assignees.map((assignee) => assignee.uid).toList().toList(),
-      "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
-      "unmarkedAssigneeIds": assignees
+      'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
+      'unmarkedAssigneeIds': assignees
           .where((assignee) => !isMarkedBy(assignee.uid))
           .map((assignee) => assignee.uid)
           .toList(),
-      "date": date,
-      "finalizedDate": finalizedDate,
-      "acceptNewMembers": acceptNewMembers,
+      'date': date,
+      'finalizedDate': finalizedDate,
+      'acceptNewMembers': acceptNewMembers,
     };
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
     var expense = new Expense(
-      author: Author.fromFirestore(data["author"]),
-      name: data["name"],
-      groupId: data["groupId"],
-      acceptNewMembers: data["acceptNewMembers"] ?? true,
+      author: Author.fromFirestore(data['author']),
+      name: data['name'],
+      groupId: data['groupId'],
+      acceptNewMembers: data['acceptNewMembers'] ?? true,
     );
     expense.id = id;
-    expense.date = data["date"] == null
+    expense.date = data['date'] == null
         ? null
-        : DateTime.parse(data["date"].toDate().toString());
-    expense.finalizedDate = data["finalizedDate"] == null
+        : DateTime.parse(data['date'].toDate().toString());
+    expense.finalizedDate = data['finalizedDate'] == null
         ? null
-        : DateTime.parse(data["finalizedDate"].toDate().toString());
-    expense.assignees = data["assignees"]
+        : DateTime.parse(data['finalizedDate'].toDate().toString());
+    expense.assignees = data['assignees']
         .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
         .toList();
-    data["items"].forEach(
+    data['items'].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
   }

@@ -13,7 +13,7 @@ void main() {
   });
 
   test("can add a member to the group", () {
-    var group = Group.fake();
+    var group = Group.empty();
 
     group.addUser(mockUser);
 

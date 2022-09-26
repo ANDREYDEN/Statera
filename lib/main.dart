@@ -1,15 +1,15 @@
-import 'dart:async';
-
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:statera/firebase_options.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/firebase_options.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -20,9 +20,12 @@ Future<void> main() async {
   setPathUrlStrategy();
 
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseAnalytics.instance;
 
   configureEmulators();
 
@@ -38,14 +41,17 @@ class Statera extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => AuthService()),
+        RepositoryProvider(create: (_) => UserRepository()),
         RepositoryProvider(create: (_) => DynamicLinkRepository()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+        RepositoryProvider(create: (_) => NotificationService())
       ],
       child: BlocProvider(
         create: (context) {
-          final authRepository = context.read<AuthRepository>();
-          return AuthBloc(authRepository);
+          final authService = context.read<AuthService>();
+          final userRepository = context.read<UserRepository>();
+          return AuthBloc(authService, userRepository);
         },
         child: LayoutBuilder(
           builder: (context, constraints) {

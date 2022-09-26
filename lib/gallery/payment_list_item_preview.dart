@@ -28,7 +28,7 @@ class ListCover extends StatelessWidget {
         create: (_) => GroupCubit(
           GroupServiceMock(),
           ExpenseServiceMock(),
-        )..fake(),
+        )..empty(),
         child: Scaffold(
           body: ListView(
             children: [

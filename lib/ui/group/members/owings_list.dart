@@ -6,6 +6,7 @@ import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 
 class OwingsList extends StatelessWidget {
   const OwingsList({Key? key}) : super(key: key);
@@ -17,10 +18,7 @@ class OwingsList extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: 20),
-        Text(
-          'Your Owings',
-          style: Theme.of(context).textTheme.headline6,
-        ),
+        SectionTitle('Your Owings'),
         Flexible(
           child: GroupBuilder(
             builder: (context, group) {

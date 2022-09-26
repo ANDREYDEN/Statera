@@ -1,32 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/sign_in.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget Function() builder;
-  final String originalRoute;
 
-  const AuthGuard({
-    Key? key,
-    required this.builder,
-    required this.originalRoute,
-  }) : super(key: key);
+  const AuthGuard({Key? key, required this.builder}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    final notificationsRepository = context.read<NotificationService>();
+    final userRepository = context.read<UserRepository>();
+    final notificationsCubit = NotificationsCubit(
+      notificationsRepository: notificationsRepository,
+      userRepository: userRepository,
+    )..load(context);
+
+    return BlocConsumer<AuthBloc, AuthState>(
+      listenWhen: (previousState, currentState) =>
+          previousState.status == AuthStatus.unauthenticated &&
+          currentState.status == AuthStatus.authenticated,
+      listener: (context, state) =>
+          notificationsCubit.updateToken(uid: state.user!.uid),
       builder: (context, authState) {
         if (authState.status == AuthStatus.unauthenticated) {
           return BlocProvider<SignInCubit>(
-            create: (_) => SignInCubit(context.read<AuthRepository>()),
+            create: (_) => SignInCubit(context.read<AuthService>()),
             child: SignIn(),
           );
         }
 
-        return this.builder();
+        notificationsCubit.requestPermission(uid: authState.user!.uid);
+
+        return BlocProvider<NotificationsCubit>(
+          create: (context) => notificationsCubit,
+          child: this.builder(),
+        );
       },
     );
   }

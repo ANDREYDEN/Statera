@@ -29,6 +29,11 @@ dependencies:
   firebase_auth: ^3.5.0
   firebase_storage: ^10.0.1
   firebase_crashlytics: ^2.8.6
+  firebase_dynamic_links: ^4.3.3
+  firebase_core_desktop: ^1.0.0
+  firebase_auth_desktop: ^1.0.0
+  firebase_messaging: ^13.0.0
+  firebase_analytics: ^9.1.12
   cloud_firestore: ^3.4.0
   cloud_functions: ^3.3.0
   google_sign_in: ^5.0.7
@@ -48,8 +53,9 @@ dependencies:
   share_plus: ^4.0.4
   url_launcher: ^6.1.2
   crypto: ^3.0.1
-  firebase_dynamic_links: ^4.3.3
   package_info_plus: ^1.4.3
+  flutter_dotenv: ^5.0.2
+  app_settings: ^4.1.8
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +67,7 @@ flutter:
 
   assets:
     - images/logo.png
+    - .env
 
   fonts:
     - family: Nunito

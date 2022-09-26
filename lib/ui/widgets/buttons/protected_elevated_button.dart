@@ -45,6 +45,7 @@ class _ProtectedElevatedButtonState extends State<ProtectedElevatedButton> {
               : () async {
                   _actionStateController.add(true);
                   await widget.onPressed!();
+                  _actionStateController.add(false);
                 },
           child: widget.child,
         );
