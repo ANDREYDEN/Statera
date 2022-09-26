@@ -33,7 +33,7 @@ function getUsersWithBalanceModificationsThatExceedThreshold(oldGroup: any, newG
   const newThreshold = newGroup.debtThreshold
 
   const usersWhoPassedThreshold = []
-  for (const fromUid in newGroup.balance) {
+  for (const fromUid of Object.keys(newGroup.balance)) {
     for (const [toUid, debt] of Object.entries<number>(newGroup.balance[fromUid])) {
       if (oldGroup.balance[fromUid]?.[toUid] === undefined) continue
 
