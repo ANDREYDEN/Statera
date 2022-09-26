@@ -13,13 +13,12 @@ class AuthGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notificationsRepository =
-                  context.read<NotificationService>();
-              final userRepository = context.read<UserRepository>();
+    final notificationsRepository = context.read<NotificationService>();
+    final userRepository = context.read<UserRepository>();
     final notificationsCubit = NotificationsCubit(
-                notificationsRepository: notificationsRepository,
-                userRepository: userRepository,
-              )..load(context);;
+      notificationsRepository: notificationsRepository,
+      userRepository: userRepository,
+    )..load(context);
 
     return BlocConsumer<AuthBloc, AuthState>(
       listenWhen: (previousState, currentState) =>
@@ -29,18 +28,18 @@ class AuthGuard extends StatelessWidget {
           notificationsCubit.updateToken(uid: state.user!.uid),
       builder: (context, authState) {
         if (authState.status == AuthStatus.unauthenticated) {
-          return BlocProvider(
-            create: (context) => notificationsCubit,
-            child: BlocProvider<SignInCubit>(
-              create: (_) => SignInCubit(context.read<AuthService>()),
-              child: SignIn(),
-            ),
+          return BlocProvider<SignInCubit>(
+            create: (_) => SignInCubit(context.read<AuthService>()),
+            child: SignIn(),
           );
         }
 
         notificationsCubit.requestPermission(uid: authState.user!.uid);
 
-        return this.builder();
+        return BlocProvider<NotificationsCubit>(
+          create: (context) => notificationsCubit,
+          child: this.builder(),
+        );
       },
     );
   }

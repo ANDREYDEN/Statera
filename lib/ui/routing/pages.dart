@@ -149,9 +149,6 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
     List.generate(match.groupCount, (index) => index + 1),
   );
 
-  // final notificationsCubit = context.read<NotificationsCubit>();
-  // notifi
-
   return DynamicLinkHandler(
     child: SafeArea(
       child: path.isPublic

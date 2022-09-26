@@ -9,6 +9,7 @@ part 'notifications_state.dart';
 class NotificationsCubit extends Cubit<NotificationsState> {
   late final NotificationService _notificationService;
   late final UserRepository _userRepostiry;
+  late final NotificationMessageHandler _messageHandler;
 
   NotificationsCubit({
     required UserRepository userRepository,
@@ -16,6 +17,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }) : super(NotificationsState(false)) {
     _notificationService = notificationsRepository;
     _userRepostiry = userRepository;
+    _messageHandler = NotificationMessageHandler();
   }
 
   void load(BuildContext context) {
@@ -41,13 +43,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   void _listenForNotifications(BuildContext context) {
     _notificationService.listenForNotification(
-      onMessage: (message) => handleMessage(message, context),
+      onMessage: (message) => _messageHandler.handleMessage(message, context),
     );
   }
 
   void _checkIfNotificationLaunchedApp(BuildContext context) {
     _notificationService.checkForLaunchingNotification(
-      onMessage: (message) => handleMessage(message, context),
+      onMessage: (message) => _messageHandler.handleMessage(message, context),
     );
   }
 }
