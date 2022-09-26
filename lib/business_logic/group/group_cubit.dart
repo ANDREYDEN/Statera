@@ -28,8 +28,8 @@ class GroupCubit extends Cubit<GroupState> {
         .listen(emit);
   }
 
-  void fake() {
-    emit(GroupLoaded(group: Group.fake()));
+  void empty() {
+    emit(GroupLoaded(group: Group.empty()));
   }
 
   void loadFromExpense(String? expenseId) async {
