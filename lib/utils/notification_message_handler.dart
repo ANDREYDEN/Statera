@@ -16,7 +16,6 @@ class NotificationMessageHandler {
   /// Because different places in the app will try to handle a notification tap (opening vs launching)
   /// this method ensures that each notification will be handled exactly once
   /// (ignoring all invocations for a given period of time)
-  /// TODO: add cooldown
   void handleMessage(RemoteMessage message, BuildContext context) {
     if (!acceptingMessages) return;
     _lastMessageHandledAt = DateTime.now();
