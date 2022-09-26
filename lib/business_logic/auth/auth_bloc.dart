@@ -13,19 +13,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late final UserRepository _userRepostiry;
   late final StreamSubscription<User?> _userSubscription;
 
-  AuthBloc(AuthService authRepository, UserRepository userRepository)
+  AuthBloc(AuthService authService, UserRepository userRepository)
       : super(
-          authRepository.currentUser != null
-              ? AuthState.authenticated(authRepository.currentUser)
+          authService.currentUser != null
+              ? AuthState.authenticated(authService.currentUser)
               : const AuthState.unauthenticated(),
         ) {
-    _authService = authRepository;
+    _authService = authService;
     _userRepostiry = userRepository;
     on<UserChanged>(_onUserChanged);
     on<LogoutRequested>(_onLogoutRequested);
     on<AccountDeletionRequested>(_onAccountDeletionRequested);
     on<UserDataUpdated>(_onUserDataUpdated);
-    _userSubscription = authRepository.currentUserStream().listen(
+    _userSubscription = authService.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
   }
