@@ -62,8 +62,11 @@ class Statera extends StatelessWidget {
                 theme: theme,
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
+                initialRoute: kIsWeb
+                    ? LandingPage.route
+                    // see https://api.flutter.dev/flutter/material/MaterialApp/initialRoute.html for explanation
+                    : GroupList.route.replaceFirst('/', ''),
                 onGenerateRoute: onGenerateRoute,
-                initialRoute: kIsWeb ? LandingPage.route : GroupList.route,
                 debugShowCheckedModeBanner: false,
               ),
             );
