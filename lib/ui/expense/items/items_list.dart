@@ -50,15 +50,7 @@ class ItemsList extends StatelessWidget {
                         return OptionallyDismissible(
                           key: Key(item.hashCode.toString()),
                           isDismissible: expense.canBeUpdatedBy(authBloc.uid),
-                          onDismissed: (_) async {
-                            expenseBloc.add(
-                              UpdateRequested(
-                                issuer: authBloc.user,
-                                update: (expense) =>
-                                    expense.items.removeAt(index),
-                              ),
-                            );
-                          },
+                          onDismissed: (_) => _handleItemDelete(index, context),
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: GestureDetector(
@@ -108,17 +100,17 @@ class ItemsList extends StatelessWidget {
           await showDialog(
             context: context,
             builder: (context) => CRUDDialog(
-              title: "Edit Item",
+              title: 'Edit Item',
               fields: [
                 FieldData(
-                  id: "item_name",
-                  label: "Item Name",
+                  id: 'item_name',
+                  label: 'Item Name',
                   initialData: item.name,
                   validators: [FieldData.requiredValidator],
                 ),
                 FieldData(
-                  id: "item_value",
-                  label: "Item Value",
+                  id: 'item_value',
+                  label: 'Item Value',
                   initialData: item.value,
                   inputType: TextInputType.numberWithOptions(decimal: true),
                   validators: [
@@ -129,13 +121,24 @@ class ItemsList extends StatelessWidget {
                 ),
               ],
               onSubmit: (values) async {
-                item.name = values["item_name"]!;
-                item.value = double.parse(values["item_value"]!);
+                item.name = values['item_name']!;
+                item.value = double.parse(values['item_value']!);
                 expense.updateItem(item);
               },
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _handleItemDelete(int index, BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+    final expenseBloc = context.read<ExpenseBloc>();
+    expenseBloc.add(
+      UpdateRequested(
+        issuer: authBloc.user,
+        update: (expense) => expense.items.removeAt(index),
       ),
     );
   }
