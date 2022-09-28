@@ -51,6 +51,7 @@ class ItemsList extends StatelessWidget {
                           key: Key(item.hashCode.toString()),
                           isDismissible: expense.canBeUpdatedBy(authBloc.uid),
                           onDismissed: (_) => _handleItemDelete(index, context),
+                          confirmation: 'Are you sure you want to delete this item?',
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: GestureDetector(
