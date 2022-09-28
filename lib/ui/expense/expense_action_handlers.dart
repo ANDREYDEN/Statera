@@ -25,55 +25,63 @@ handleSettingsClick(BuildContext context) {
   );
 }
 
-handleNewItemClick(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
-    final expenseBloc = context.read<ExpenseBloc>();
+handleItemUpsert(BuildContext context, {Item? intialItem}) {
+  final authBloc = context.read<AuthBloc>();
+  final expenseBloc = context.read<ExpenseBloc>();
 
-    showDialog(
-      context: context,
-      builder: (context) => CRUDDialog(
-        title: "New Item",
-        fields: [
-          FieldData(
-            id: "item_name",
-            label: "Item Name",
-            validators: [FieldData.requiredValidator],
+  showDialog(
+    context: context,
+    builder: (context) => CRUDDialog(
+      title: intialItem == null ? 'Add Item' : 'Edit Item',
+      fields: [
+        FieldData(
+          id: 'item_name',
+          label: 'Item Name',
+          initialData: intialItem?.name,
+          validators: [FieldData.requiredValidator],
+        ),
+        FieldData(
+          id: 'item_value',
+          label: 'Item Value',
+          initialData: intialItem?.value,
+          inputType: TextInputType.numberWithOptions(decimal: true),
+          validators: [FieldData.requiredValidator, FieldData.doubleValidator],
+          formatters: [CommaReplacerTextInputFormatter()],
+        ),
+        FieldData(
+          id: 'item_partition',
+          label: 'Item Parts',
+          inputType: TextInputType.number,
+          initialData: intialItem?.partition ?? 1,
+          validators: [FieldData.requiredValidator, FieldData.intValidator],
+          formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
+          isAdvanced: true,
+        ),
+      ],
+      onSubmit: (values) {
+        final newItem = intialItem ?? Item(name: '', value: 0);
+        newItem.name = values['item_name']!;
+        newItem.value = double.parse(values['item_value']!);
+        var newPartition = int.parse(values['item_partition']!);
+        if (intialItem != null && newPartition != intialItem.partition) {
+          newItem.resetAssigneeDecisions();
+          newItem.partition = newPartition;
+        }
+
+        expenseBloc.add(
+          UpdateRequested(
+            issuer: authBloc.user,
+            update: (expense) {
+              if (intialItem == null) {
+                expense.addItem(newItem);
+              } else {
+                expense.updateItem(newItem);
+              }
+            },
           ),
-          FieldData(
-            id: "item_value",
-            label: "Item Value",
-            inputType: TextInputType.numberWithOptions(decimal: true),
-            validators: [
-              FieldData.requiredValidator,
-              FieldData.doubleValidator
-            ],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData(
-            id: "item_partition",
-            label: "Item Parts",
-            inputType: TextInputType.number,
-            initialData: 1,
-            validators: [FieldData.requiredValidator, FieldData.intValidator],
-            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
-            isAdvanced: true,
-          ),
-        ],
-        onSubmit: (values) {
-          expenseBloc.add(
-            UpdateRequested(
-              issuer: authBloc.user,
-              update: (expense) {
-                expense.addItem(Item(
-                  name: values["item_name"]!,
-                  value: double.parse(values["item_value"]!),
-                  partition: int.parse(values["item_partition"]!),
-                ));
-              },
-            ),
-          );
-        },
-        allowAddAnother: true,
-      ),
-    );
-  }
+        );
+      },
+      allowAddAnother: intialItem == null,
+    ),
+  );
+}
