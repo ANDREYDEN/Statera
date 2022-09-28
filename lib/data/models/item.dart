@@ -23,7 +23,7 @@ class Item {
   Item.fake({this.partition = 1}) {
     var uuid = Uuid();
     this.id = uuid.v1();
-    this.name = "foo";
+    this.name = 'foo';
     this.value = 145;
   }
 
@@ -83,25 +83,31 @@ class Item {
     assignee.parts = parts;
   }
 
+  void resetAssigneeDecisions() {
+    for (var assignee in assignees) {
+      assignee.parts = 0;
+    }
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
-      "id": id,
-      "name": name,
-      "value": value,
-      "partition": partition,
-      "assignees": assignees.map((assignee) => assignee.toFirestore()).toList(),
+      'id': id,
+      'name': name,
+      'value': value,
+      'partition': partition,
+      'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
     };
   }
 
   static Item fromFirestore(Map<String, dynamic> data) {
     var uuid = Uuid();
     var item = Item(
-      name: data["name"],
-      value: double.parse(data["value"].toString()),
-      partition: data["partition"] ?? 1,
+      name: data['name'],
+      value: double.parse(data['value'].toString()),
+      partition: data['partition'] ?? 1,
     );
-    item.id = data["id"] ?? uuid.v1();
-    item.assignees = data["assignees"]
+    item.id = data['id'] ?? uuid.v1();
+    item.assignees = data['assignees']
         .map<AssigneeDecision>(
             (assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
         .toList();
