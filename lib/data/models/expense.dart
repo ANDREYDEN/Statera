@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:statera/data/models/item.dart';
 
 import 'assignee.dart';
 import 'assignee_decision.dart';
 import 'author.dart';
-import 'group.dart';
 
 class ExpenseStage {
   String name;
@@ -122,7 +120,7 @@ class Expense {
     return Colors.blue[200]!;
   }
 
-  addItem(Item newItem) {
+  void addItem(Item newItem) {
     newItem.assignees = this
         .assignees
         .map((assignee) => AssigneeDecision(uid: assignee.uid))
