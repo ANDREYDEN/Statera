@@ -46,7 +46,7 @@ class Group {
     this.balance = {};
     if (members != null) {
       this.members = members;
-      this.balance = balance ?? createBalanceFromMembers(members);
+      this.balance = balance ?? _createBalanceFromMembers(members);
     }
     this.currencySign = currencySign ?? kdefaultCurrencySign;
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
@@ -56,9 +56,10 @@ class Group {
       : this(
           name: name ?? 'Empty',
           members: members,
-          balance: {},
           code: code,
         );
+
+  Author get admin => members.first;
 
   void generateCode() {
     code = '';
@@ -70,7 +71,7 @@ class Group {
   String renderPrice(double value) =>
       '$currencySign${value.toStringAsFixed(2)}';
 
-  static Map<String, Map<String, double>> createBalanceFromMembers(
+  static Map<String, Map<String, double>> _createBalanceFromMembers(
     List<Author> members,
   ) {
     return Map.fromEntries(
