@@ -22,7 +22,7 @@ class OwingsList extends StatelessWidget {
         Flexible(
           child: GroupBuilder(
             builder: (context, group) {
-              final owings = group.extendedBalance(authBloc.uid);
+              final owings = group.getOwingsForUser(authBloc.uid);
               return owings.isEmpty
                   ? ListEmpty(
                       text: 'Start by inviting people to your group...',
