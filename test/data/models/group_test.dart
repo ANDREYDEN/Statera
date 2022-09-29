@@ -21,7 +21,7 @@ void main() {
     expect(group.members.first.uid, mockUser.uid);
   });
 
-  group('group admin', () {
+  group('admin', () {
     test('if set, retrieves matching member information', () {
       final firstMember = Author(uid: 'first', name: 'First');
       final secondMember = Author(uid: 'second', name: 'Second');
@@ -41,6 +41,35 @@ void main() {
       final group = Group.empty(members: [firstMember, secondMember]);
 
       expect(group.admin, equals(firstMember));
+    });
+  });
+
+  group('conversion', () {
+    test('to Firestore maps member ids', () {
+      final firstMember = Author(uid: 'first', name: 'First');
+      final secondMember = Author(uid: 'second', name: 'Second');
+      var group = Group.empty(members: [firstMember, secondMember]);
+
+      var firestoreData = group.toFirestore();
+
+      var memberIds = [firstMember.uid, secondMember.uid];
+      expect(firestoreData['memberIds'], equals(memberIds));
+    });
+
+    test('parses Firestore document data', () {
+      const id = 'foo';
+      const name = 'Foo';
+      const adminId = 'FooAdmin';
+
+      Map<String, dynamic> firestoreData = {
+        'name': name,
+        'adminId': adminId
+      };
+
+      final group = Group.fromFirestore(firestoreData, id: id);
+      expect(group.id, equals(id));
+      expect(group.name, equals(name));
+      expect(group.adminId, equals(adminId));
     });
   });
 }

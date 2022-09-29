@@ -164,6 +164,7 @@ class Group {
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
+      'adminId': adminId,
       'balance': balance,
       'currencySign': currencySign,
       'inviteLink': inviteLink,
@@ -173,13 +174,14 @@ class Group {
 
   factory Group.fromFirestore(Map<String, dynamic> map, {required String? id}) {
     var members = List<Author>.from(
-      map['members']?.map((x) => Author.fromFirestore(x)),
+      (map['members'] ?? []).map((x) => Author.fromFirestore(x)),
     );
 
     return Group(
       id: id,
       name: map['name'],
       members: members,
+      adminId: map['adminId'],
       code: map['code'],
       balance: map['balance'] == null
           ? null
