@@ -10,11 +10,12 @@ class Group {
   String? id;
   late String name;
   late List<Author> members = [];
+  String? adminId;
 
   /// Describes the debt that each member of the group has
-  /// 
+  ///
   /// For example, the following configuration describes that Alice owes Bob $145:
-  /// 
+  ///
   /// ```balance: {
   ///   Alice: {
   ///     Bob: 145
@@ -37,6 +38,7 @@ class Group {
     this.code,
     this.id,
     members,
+    this.adminId,
     balance,
     String? currencySign,
     this.inviteLink,
@@ -52,14 +54,19 @@ class Group {
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
   }
 
-  Group.empty({List<Author>? members, String? code, String? name})
-      : this(
+  Group.empty({
+    String? name,
+    String? code,
+    List<Author>? members,
+    String? adminId,
+  }) : this(
           name: name ?? 'Empty',
-          members: members,
           code: code,
+          members: members,
+          adminId: adminId,
         );
 
-  Author get admin => members.first;
+  Author get admin => adminId != null ? getUser(adminId!) : members.first;
 
   void generateCode() {
     code = '';

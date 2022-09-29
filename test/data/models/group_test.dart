@@ -22,6 +22,18 @@ void main() {
   });
 
   group('group admin', () {
+    test('if set, retrieves matching member information', () {
+      final firstMember = Author(uid: 'first', name: 'First');
+      final secondMember = Author(uid: 'second', name: 'Second');
+
+      final group = Group.empty(
+        members: [firstMember, secondMember],
+        adminId: secondMember.uid,
+      );
+
+      expect(group.admin, equals(secondMember));
+    });
+
     test('if not set, defaults to the first member', () {
       final firstMember = Author(uid: 'first', name: 'First');
       final secondMember = Author(uid: 'second', name: 'Second');
