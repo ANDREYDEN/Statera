@@ -10,7 +10,7 @@ class Group {
   String? id;
   late String name;
   late List<Author> members = [];
-  String? _adminId;
+  String? adminId;
 
   /// Describes the debt that each member of the group has
   ///
@@ -38,7 +38,7 @@ class Group {
     this.code,
     this.id,
     members,
-    String? adminId,
+    this.adminId,
     balance,
     String? currencySign,
     this.inviteLink,
@@ -53,7 +53,6 @@ class Group {
     this.currencySign = currencySign ?? kdefaultCurrencySign;
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
     if (code == null) _generateCode();
-    this._adminId = adminId;
   }
 
   Group.empty({
@@ -68,15 +67,7 @@ class Group {
           adminId: adminId,
         );
 
-  Author get admin => _adminId != null ? getUser(_adminId!) : members.first;
-
-  set adminUid(String uid) {
-    if (!memberExists(uid))
-      throw Exception('Member with id $uid does not exist in group "$name"');
-    _adminId = uid;
-  }
-
-  bool isAdmin(String uid) => uid == admin.uid;
+  Author get admin => adminId != null ? getUser(adminId!) : members.first;
 
   void _generateCode() {
     code = '';
@@ -171,7 +162,7 @@ class Group {
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
-      'adminId': admin.uid,
+      'adminId': adminId,
       'balance': balance,
       'currencySign': currencySign,
       'inviteLink': inviteLink,
