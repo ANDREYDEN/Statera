@@ -52,6 +52,7 @@ class Group {
     }
     this.currencySign = currencySign ?? kdefaultCurrencySign;
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
+    if (code == null) _generateCode();
   }
 
   Group.empty({
@@ -68,7 +69,7 @@ class Group {
 
   Author get admin => adminId != null ? getUser(adminId!) : members.first;
 
-  void generateCode() {
+  void _generateCode() {
     code = '';
     for (var i = 0; i < 5; i++) {
       code = code! + getRandomLetter();
@@ -118,13 +119,10 @@ class Group {
     this.balance.forEach((key, value) => value.remove(uid));
   }
 
-  Map<Author, double> extendedBalance(String consumerUid) {
-    return this.balance[consumerUid]!.map(
-          (uid, balance) => MapEntry(
-            this.members.where((member) => member.uid == uid).first,
-            balance,
-          ),
-        );
+  Map<Author, double> getOwingsForUser(String uid) {
+    return this
+        .balance[uid]!
+        .map((otherUid, balance) => MapEntry(getUser(otherUid), balance));
   }
 
   void payOffBalance({required Payment payment}) {
