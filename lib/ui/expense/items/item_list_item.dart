@@ -54,7 +54,7 @@ class ItemListItem extends StatelessWidget {
                           item.getAssigneeParts(user.uid) - 1),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
-                        primary: !item.isMarkedBy(user.uid)
+                        backgroundColor: !item.isMarkedBy(user.uid)
                             ? Colors.grey[300]
                             : item.isMarkedBy(user.uid) &&
                                     item.getAssigneeParts(user.uid) == 0
@@ -80,7 +80,7 @@ class ItemListItem extends StatelessWidget {
                           item.getAssigneeParts(user.uid) + 1),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
-                        primary: !item.isMarkedBy(user.uid)
+                        backgroundColor: !item.isMarkedBy(user.uid)
                             ? Colors.grey[300]
                             : item.undefinedParts == 0 &&
                                     item.isMarkedBy(user.uid) &&
