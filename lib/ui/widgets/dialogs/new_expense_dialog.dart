@@ -7,7 +7,6 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
-import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/utils/utils.dart';
 
 showNewExpenseDialog(
