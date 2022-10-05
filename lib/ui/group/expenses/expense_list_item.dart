@@ -10,7 +10,7 @@ import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -98,7 +98,7 @@ class ExpenseListItem extends StatelessWidget {
                   ],
                 ),
                 if (expense.canBeFinalizedBy(authBloc.state.user!.uid))
-                  ProtectedElevatedButton(
+                  ProtectedButton(
                     onPressed: () {
                       snackbarCatch(
                         GroupPage.scaffoldKey.currentContext!,
