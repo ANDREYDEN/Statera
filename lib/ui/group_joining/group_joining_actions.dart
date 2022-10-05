@@ -4,7 +4,7 @@ import 'package:provider/src/provider.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
-import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
 
 class GroupJoiningActions extends StatelessWidget {
   final String? code;
@@ -20,7 +20,7 @@ class GroupJoiningActions extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: ProtectedElevatedButton(
+          child: ProtectedButton(
             onPressed: () {
               groupCubit.join(code, user);
             },

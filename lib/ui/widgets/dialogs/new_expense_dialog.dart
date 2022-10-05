@@ -7,7 +7,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/assignee_picker.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
-import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/utils.dart';
 
 showNewExpenseDialog(
@@ -101,7 +101,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
       ),
       actions: [
         CancelButton(),
-        ProtectedElevatedButton(
+        ProtectedButton(
           onPressed: () async {
             setState(() {
               _dirty = true;
