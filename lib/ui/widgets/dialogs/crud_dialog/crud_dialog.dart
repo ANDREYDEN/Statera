@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
-import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog/advanced_dropdown.dart';
 
 part 'field_data.dart';
 
@@ -30,13 +33,68 @@ class CRUDDialog extends StatefulWidget {
 class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
   bool _showAdvanced = false;
+  late bool _addAnother = true;
 
   @override
   Widget build(BuildContext context) {
+    final isWide = context.read<LayoutState>().isWide;
+
+    final wideScreenActions = [
+      CancelButton(),
+      ProtectedButton(
+        onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
+        buttonType: ButtonType.text,
+        child: Text('Save'),
+      ),
+      if (widget.allowAddAnother)
+        ProtectedButton(onPressed: submit, child: Text('Save & add another'))
+    ];
+
+    final narrowScreenActions = [
+      Column(
+        children: [
+          if (widget.allowAddAnother)
+            GestureDetector(
+              onTap: () => setState(() {
+                _addAnother = !_addAnother;
+              }),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('Add another'),
+                  Checkbox(
+                    value: _addAnother,
+                    onChanged: (_) => setState(() {
+                      _addAnother = !_addAnother;
+                    }),
+                  )
+                ],
+              ),
+            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(width: 8),
+              CancelButton(),
+              SizedBox(width: 16),
+              ProtectedButton(
+                onPressed: () => submit(
+                    closeAfterSubmit:
+                        (!widget.allowAddAnother || !_addAnother) &&
+                            widget.closeAfterSubmit),
+                child: Text('Save'),
+              ),
+              SizedBox(width: 8),
+            ],
+          ),
+        ],
+      ),
+    ];
+
     return AlertDialog(
       title: Text(widget.title),
       content: Container(
-        width: 200,
+        width: isWide ? 400 : 200,
         child: ListView(
           shrinkWrap: true,
           children: [
@@ -44,43 +102,23 @@ class _CRUDDialogState extends State<CRUDDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [...getTextFields((f) => !f.isAdvanced)],
             ),
-            if (widget.fields.any((f) => f.isAdvanced))
-              GestureDetector(
+            if (_advancedFieldsPresent)
+              AdvancedDropdown(
                 onTap: () => setState(() {
                   _showAdvanced = !_showAdvanced;
                 }),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Text('Advanced'),
-                      Icon(
-                        _showAdvanced
-                            ? Icons.arrow_drop_up
-                            : Icons.arrow_drop_down,
-                      ),
-                    ],
-                  ),
-                ),
+                isCollapsed: _showAdvanced,
               ),
-            Visibility(
-              visible: _showAdvanced,
-              child: Column(children: [...getTextFields((f) => f.isAdvanced)]),
-            ),
+            if (_showAdvanced)
+              Column(children: [...getTextFields((f) => f.isAdvanced)]),
           ],
         ),
       ),
-      actions: [
-        CancelButton(),
-        ProtectedElevatedButton(
-          onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
-          child: Text('Save'),
-        ),
-        if (widget.allowAddAnother)
-          TextButton(onPressed: submit, child: Text('Save & add another'))
-      ],
+      actions: isWide ? wideScreenActions : narrowScreenActions,
     );
   }
+
+  bool get _advancedFieldsPresent => widget.fields.any((f) => f.isAdvanced);
 
   Iterable<Widget> getTextFields(bool Function(FieldData) criteria) sync* {
     final selectedFields = widget.fields.where(criteria).toList();

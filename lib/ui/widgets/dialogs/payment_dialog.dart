@@ -4,7 +4,7 @@ import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/payment_service.dart';
-import 'package:statera/ui/widgets/buttons/protected_elevated_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentDialog extends StatefulWidget {
@@ -79,7 +79,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text("Cancel"),
         ),
-        ProtectedElevatedButton(
+        ProtectedButton(
           onPressed: this.balanceToPay < 0.01
               ? null
               : () async {
