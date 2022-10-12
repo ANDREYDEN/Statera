@@ -162,7 +162,7 @@ class Group {
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
-      'adminId': adminId,
+      'adminId': admin.uid,
       'balance': balance,
       'currencySign': currencySign,
       'inviteLink': inviteLink,
