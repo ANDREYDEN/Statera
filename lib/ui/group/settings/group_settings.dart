@@ -110,7 +110,7 @@ class GroupSettings extends StatelessWidget {
                           valueName: 'group name',
                           value: group.name,
                           onConfirm: () {
-                            groupCubit.removeUser(authBloc.uid);
+                            groupCubit.delete();
                             Navigator.pop(context);
                           },
                         ),

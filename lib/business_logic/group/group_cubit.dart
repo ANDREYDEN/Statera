@@ -81,6 +81,13 @@ class GroupCubit extends Cubit<GroupState> {
     await _groupService.generateInviteLink(group);
   }
 
+  void delete() {
+    final group = loadedState.group;
+    emit(GroupLoading());
+
+    _groupService.deleteGroup(group.id);
+  }
+
   @override
   Future<void> close() {
     _groupSubscription?.cancel();
