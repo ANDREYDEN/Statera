@@ -13,8 +13,6 @@ class GroupSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groupCubit = context.read<GroupCubit>();
-    final authBloc = context.read<AuthBloc>();
     final isWide = context.read<LayoutState>().isWide;
 
     final currencyController = TextEditingController();
@@ -39,6 +37,8 @@ class GroupSettings extends StatelessWidget {
                   controller: nameController,
                   decoration: InputDecoration(labelText: 'Name'),
                   onSubmitted: (value) {
+                    final groupCubit = context.read<GroupCubit>();
+
                     groupCubit.update((group) {
                       group.name = value;
                     });
@@ -48,6 +48,8 @@ class GroupSettings extends StatelessWidget {
                   controller: currencyController,
                   decoration: InputDecoration(labelText: 'Currency Sign'),
                   onSubmitted: (value) {
+                    final groupCubit = context.read<GroupCubit>();
+
                     groupCubit.update((group) {
                       group.currencySign = value;
                     });
@@ -56,14 +58,19 @@ class GroupSettings extends StatelessWidget {
                 TextField(
                   controller: debtThresholdController,
                   decoration: InputDecoration(labelText: 'Debt Threshold'),
-                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp('-'))
+                  ],
                   onSubmitted: (value) {
+                    final groupCubit = context.read<GroupCubit>();
+
                     groupCubit.update((group) {
                       group.debtThreshold = double.parse(value);
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 40),
+                SectionTitle('Danger Zone'),
                 TextButton(
                   onPressed: () async {
                     var decision = await showDialog<bool>(
@@ -73,6 +80,9 @@ class GroupSettings extends StatelessWidget {
                       ),
                     );
                     if (decision!) {
+                      final groupCubit = context.read<GroupCubit>();
+                      final authBloc = context.read<AuthBloc>();
+
                       groupCubit.removeUser(authBloc.uid);
                       Navigator.pop(context);
                     }
