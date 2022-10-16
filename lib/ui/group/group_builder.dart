@@ -45,7 +45,7 @@ class GroupBuilder extends StatelessWidget {
           return builder(groupContext, state.group);
         }
 
-        return Container();
+        return SizedBox.shrink();
       },
     );
   }
