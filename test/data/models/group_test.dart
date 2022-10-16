@@ -79,6 +79,18 @@ void main() {
 
       expect(group.admin, equals(firstMember));
     });
+
+    test('can be checked', () {
+      final firstMember = Author(uid: 'first', name: 'First');
+      final secondMember = Author(uid: mockUserId, name: 'Second');
+
+      final group = Group.empty(
+        members: [firstMember, secondMember],
+        adminId: secondMember.uid,
+      );
+
+      expect(group.isAdmin(mockUser), isTrue);
+    });
   });
 
   group('conversion', () {
@@ -98,12 +110,19 @@ void main() {
       const name = 'Foo';
       const adminId = 'FooAdmin';
 
-      Map<String, dynamic> firestoreData = {'name': name, 'adminId': adminId};
+      Map<String, dynamic> firestoreData = {
+        'name': name, 
+        'adminId': adminId, 
+        'members': [{
+          'uid': adminId,
+          'name': 'admin'
+        }]
+      };
 
       final group = Group.fromFirestore(firestoreData, id: id);
       expect(group.id, equals(id));
       expect(group.name, equals(name));
-      expect(group.adminId, equals(adminId));
+      expect(group.admin.uid, equals(adminId));
     });
   });
 }

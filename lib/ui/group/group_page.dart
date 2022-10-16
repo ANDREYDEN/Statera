@@ -36,6 +36,8 @@ class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
+  AuthBloc get authBloc => context.read<AuthBloc>();
+
   Widget build(BuildContext context) {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     final isWide = context.select((LayoutState state) => state.isWide);
@@ -59,7 +61,7 @@ class _GroupPageState extends State<GroupPage> {
         }
 
         if (state is GroupLoaded) {
-          final isAdmin = state.group.isAdmin(uid);
+          final isAdmin = state.group.isAdmin(authBloc.user);
 
           final _navBarItems = [
             NavBarItemData(
@@ -73,26 +75,29 @@ class _GroupPageState extends State<GroupPage> {
               activeIcon: Icons.receipt_long_rounded,
               wrapper: (child) => UnmarkedExpensesBadge(child: child),
             ),
-            NavBarItemData(
-              label: 'Settings',
-              icon: Icons.settings_outlined,
-              activeIcon: Icons.settings_rounded,
-            )
+            if (isAdmin)
+              NavBarItemData(
+                label: 'Settings',
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings_rounded,
+              )
           ];
 
           return PageScaffold(
             key: GroupPage.scaffoldKey,
             titleWidget: GroupTitle(),
             actions: isAdmin ? [GroupQRButton()] : [],
-            onFabPressed: isWide || _selectedNavBarItemIndex != 1
+            onFabPressed: isWide
                 ? null
-                : () => showNewExpenseDialog(
-                      context,
-                      afterAddition: (expenseId) {
-                        Navigator.of(context)
-                            .popAndPushNamed('${ExpensePage.route}/$expenseId');
-                      },
-                    ),
+                : _selectedNavBarItemIndex == 0
+                    ? null
+                    : () => showNewExpenseDialog(
+                          context,
+                          afterAddition: (expenseId) {
+                            Navigator.of(context).popAndPushNamed(
+                                '${ExpensePage.route}/$expenseId');
+                          },
+                        ),
             bottomNavBar: isWide
                 ? null
                 : GroupBottomNavBar(
