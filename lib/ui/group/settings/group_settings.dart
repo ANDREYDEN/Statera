@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class GroupSettings extends StatelessWidget {
@@ -13,7 +13,9 @@ class GroupSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = context.read<LayoutState>().isWide;
+    final layoutState = context.read<LayoutState>();
+    final groupCubit = context.read<GroupCubit>();
+    final authBloc = context.read<AuthBloc>();
 
     final currencyController = TextEditingController();
     final nameController = TextEditingController();
@@ -28,7 +30,9 @@ class GroupSettings extends StatelessWidget {
         return Center(
           child: Container(
             padding: EdgeInsets.all(20),
-            width: isWide ? MediaQuery.of(context).size.width / 3 : null,
+            width: layoutState.isWide
+                ? MediaQuery.of(context).size.width / 3
+                : null,
             child: Column(
               children: [
                 SectionTitle('Settings'),
@@ -48,8 +52,6 @@ class GroupSettings extends StatelessWidget {
                   controller: currencyController,
                   decoration: InputDecoration(labelText: 'Currency Sign'),
                   onSubmitted: (value) {
-                    final groupCubit = context.read<GroupCubit>();
-
                     groupCubit.update((group) {
                       group.currencySign = value;
                     });
@@ -62,8 +64,6 @@ class GroupSettings extends StatelessWidget {
                     FilteringTextInputFormatter.deny(RegExp('-'))
                   ],
                   onSubmitted: (value) {
-                    final groupCubit = context.read<GroupCubit>();
-
                     groupCubit.update((group) {
                       group.debtThreshold = double.parse(value);
                     });
@@ -72,23 +72,53 @@ class GroupSettings extends StatelessWidget {
                 SizedBox(height: 40),
                 SectionTitle('Danger Zone'),
                 TextButton(
-                  onPressed: () async {
-                    var decision = await showDialog<bool>(
+                  onPressed: () {
+                    showDialog<bool>(
                       context: context,
-                      builder: (context) => OKCancelDialog(
-                        text: 'Are you sure you want to leave the group?',
+                      builder: (context) => Provider<LayoutState>.value(
+                        value: layoutState,
+                        child: DangerDialog(
+                          title:
+                              'You are about to LEAVE the group "${group.name}"',
+                          valueName: 'group name',
+                          value: group.name,
+                          onConfirm: () {
+                            groupCubit.removeUser(authBloc.uid);
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     );
-                    if (decision!) {
-                      final groupCubit = context.read<GroupCubit>();
-                      final authBloc = context.read<AuthBloc>();
-
-                      groupCubit.removeUser(authBloc.uid);
-                      Navigator.pop(context);
-                    }
                   },
                   child: Text(
                     'Leave group',
+                    style: TextStyle(
+                      color: Theme.of(context).errorColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (context) => Provider<LayoutState>.value(
+                        value: layoutState,
+                        child: DangerDialog(
+                          title:
+                              'You are about to DELETE the group "${group.name}"',
+                          valueName: 'group name',
+                          value: group.name,
+                          onConfirm: () {
+                            groupCubit.removeUser(authBloc.uid);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Delete group',
                     style: TextStyle(
                       color: Theme.of(context).errorColor,
                       decoration: TextDecoration.underline,
