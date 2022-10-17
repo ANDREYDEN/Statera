@@ -5,6 +5,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
@@ -113,45 +114,33 @@ class GroupSettings extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 40),
-                SectionTitle('Danger Zone'),
-                SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.error,
+                DangerZone(
+                  children: [
+                    ListTile(
+                      title: Text('Leave the group'),
+                      subtitle: Text(
+                          'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses.'),
+                      trailing: ElevatedButton(
+                        onPressed: () => _handleLeave(context, group.name),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.error)),
+                        child: Text('Leave group'),
+                      ),
                     ),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        title: Text('Leave the group'),
-                        subtitle: Text(
-                            'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses.'),
-                        trailing: ElevatedButton(
-                          onPressed: () => _handleLeave(context, group.name),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Theme.of(context).colorScheme.error)),
-                          child: Text('Leave group'),
-                        ),
+                    ListTile(
+                      title: Text('Delete the group'),
+                      subtitle: Text(
+                          'Deleting the group will erase all group data. There is no way to undo this action.'),
+                      trailing: ElevatedButton(
+                        onPressed: () => _handleDelete(context, group.name),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.error)),
+                        child: Text('Delete group'),
                       ),
-                      ListTile(
-                        title: Text('Delete the group'),
-                        subtitle: Text(
-                            'Deleting the group will erase all group data. There is no way to undo this action.'),
-                        trailing: ElevatedButton(
-                          onPressed: () => _handleDelete(context, group.name),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Theme.of(context).colorScheme.error)),
-                          child: Text('Delete group'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

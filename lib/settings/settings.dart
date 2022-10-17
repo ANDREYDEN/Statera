@@ -9,6 +9,8 @@ import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/danger_zone.dart';
+import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -180,28 +182,33 @@ class _SettingsState extends State<Settings> {
                     );
                   }),
                   SizedBox(height: 40),
-                  SectionTitle('Danger Zone'),
-                  TextButton(
-                    onPressed: () async {
-                      var decision = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => OKCancelDialog(
-                          text: 'Are you sure you want to delete your account?',
+                  DangerZone(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          showDialog<bool>(
+                            context: context,
+                            builder: (context) => DangerDialog(
+                              title: 'You are about to DELETE you account',
+                              valueName: 'username',
+                              value: authBloc.user.displayName!,
+                              onConfirm: () {
+                                authBloc.add(AccountDeletionRequested());
+                                Navigator.pop(context);
+                              },
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Delete Account',
+                          style: TextStyle(
+                            color: Theme.of(context).errorColor,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
-                      );
-                      if (decision!) {
-                        authBloc.add(AccountDeletionRequested());
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: Text(
-                      'Delete Account',
-                      style: TextStyle(
-                        color: Theme.of(context).errorColor,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  )
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),
