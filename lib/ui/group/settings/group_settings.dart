@@ -11,11 +11,53 @@ import 'package:statera/ui/widgets/section_title.dart';
 class GroupSettings extends StatelessWidget {
   const GroupSettings({Key? key}) : super(key: key);
 
+  void _handleLeave(BuildContext context, String groupName) {
+    final authBloc = context.read<AuthBloc>();
+    final layoutState = context.read<LayoutState>();
+    final groupCubit = context.read<GroupCubit>();
+
+    showDialog<bool>(
+      context: context,
+      builder: (context) => Provider<LayoutState>.value(
+        value: layoutState,
+        child: DangerDialog(
+          title: 'You are about to LEAVE the group "$groupName"',
+          valueName: 'group name',
+          value: groupName,
+          onConfirm: () {
+            groupCubit.removeUser(authBloc.uid);
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _handleDelete(BuildContext context, String groupName) {
+    final layoutState = context.read<LayoutState>();
+    final groupCubit = context.read<GroupCubit>();
+
+    showDialog<bool>(
+      context: context,
+      builder: (context) => Provider<LayoutState>.value(
+        value: layoutState,
+        child: DangerDialog(
+          title: 'You are about to DELETE the group "$groupName"',
+          valueName: 'group name',
+          value: groupName,
+          onConfirm: () {
+            groupCubit.delete();
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
-    final authBloc = context.read<AuthBloc>();
 
     final currencyController = TextEditingController();
     final nameController = TextEditingController();
@@ -34,6 +76,7 @@ class GroupSettings extends StatelessWidget {
                 ? MediaQuery.of(context).size.width / 3
                 : null,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SectionTitle('Settings'),
                 // TODO: validate these fields the same way as in the CRUD Dialog
@@ -71,60 +114,45 @@ class GroupSettings extends StatelessWidget {
                 ),
                 SizedBox(height: 40),
                 SectionTitle('Danger Zone'),
-                TextButton(
-                  onPressed: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (context) => Provider<LayoutState>.value(
-                        value: layoutState,
-                        child: DangerDialog(
-                          title:
-                              'You are about to LEAVE the group "${group.name}"',
-                          valueName: 'group name',
-                          value: group.name,
-                          onConfirm: () {
-                            groupCubit.removeUser(authBloc.uid);
-                            Navigator.pop(context);
-                          },
+                SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text('Leave the group'),
+                        subtitle: Text(
+                            'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses.'),
+                        trailing: ElevatedButton(
+                          onPressed: () => _handleLeave(context, group.name),
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  Theme.of(context).colorScheme.error)),
+                          child: Text('Leave group'),
                         ),
                       ),
-                    );
-                  },
-                  child: Text(
-                    'Leave group',
-                    style: TextStyle(
-                      color: Theme.of(context).errorColor,
-                      decoration: TextDecoration.underline,
-                    ),
+                      ListTile(
+                        title: Text('Delete the group'),
+                        subtitle: Text(
+                            'Deleting the group will erase all group data. There is no way to undo this action.'),
+                        trailing: ElevatedButton(
+                          onPressed: () => _handleDelete(context, group.name),
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  Theme.of(context).colorScheme.error)),
+                          child: Text('Delete group'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (context) => Provider<LayoutState>.value(
-                        value: layoutState,
-                        child: DangerDialog(
-                          title:
-                              'You are about to DELETE the group "${group.name}"',
-                          valueName: 'group name',
-                          value: group.name,
-                          onConfirm: () {
-                            groupCubit.delete();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'Delete group',
-                    style: TextStyle(
-                      color: Theme.of(context).errorColor,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                )
               ],
             ),
           ),
