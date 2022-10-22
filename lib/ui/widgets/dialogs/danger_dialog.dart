@@ -33,9 +33,10 @@ class _DangerDialogState extends State<DangerDialog> {
   @override
   void initState() {
     _confirmController.addListener(() {
-      if (_confirmed ^ (_confirmController.text == widget.value)) {
+      var valueEnteredCorrectly = _confirmController.text == widget.value;
+      if (_confirmed ^ valueEnteredCorrectly) {
         setState(() {
-          _confirmed = _confirmController.text == widget.value;
+          _confirmed = valueEnteredCorrectly;
         });
       }
     });
@@ -52,9 +53,7 @@ class _DangerDialogState extends State<DangerDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('Please enter the ${widget.valueName} to confirm'),
-            TextField(
-              controller: _confirmController,
-            ),
+            TextField(controller: _confirmController),
           ],
         ),
       ),

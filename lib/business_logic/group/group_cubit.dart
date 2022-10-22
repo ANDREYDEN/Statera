@@ -65,7 +65,7 @@ class GroupCubit extends Cubit<GroupState> {
       return;
     }
 
-    if (loadedState.group.userExists(user.uid)) {
+    if (loadedState.group.memberExists(user.uid)) {
       emit(GroupError(error: 'You are already a member of this group'));
       return;
     }
@@ -86,6 +86,14 @@ class GroupCubit extends Cubit<GroupState> {
     emit(GroupLoading());
 
     _groupService.deleteGroup(group.id);
+  }
+
+  void transferOwnershipTo(String uid) {
+    final group = loadedState.group;
+    emit(GroupLoading());
+
+    group.adminUid = uid;
+    _groupService.saveGroup(group);
   }
 
   @override

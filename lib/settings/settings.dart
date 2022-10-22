@@ -145,6 +145,7 @@ class _SettingsState extends State<Settings> {
               ElevatedButton(
                 onPressed: () {
                   authBloc.add(LogoutRequested());
+                  Navigator.pop(context);
                 },
                 child: Text('Log Out'),
               ),

@@ -88,7 +88,7 @@ class _GroupPageState extends State<GroupPage> {
             actions: isAdmin ? [GroupQRButton()] : [],
             onFabPressed: isWide
                 ? null
-                : _selectedNavBarItemIndex == 0
+                : _selectedNavBarItemIndex != 1
                     ? null
                     : () => showNewExpenseDialog(
                           context,
