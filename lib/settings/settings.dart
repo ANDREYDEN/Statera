@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
@@ -37,6 +37,7 @@ class _SettingsState extends State<Settings> {
       context.read<NotificationsCubit>();
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
+  LayoutState get layoutState => context.read<LayoutState>();
 
   @override
   void initState() {
@@ -48,170 +49,160 @@ class _SettingsState extends State<Settings> {
     super.initState();
   }
 
+  void _handleDeleteAccount() {
+    showDialog<bool>(
+      context: context,
+      builder: (context) => DangerDialog(
+        title: 'You are about to DELETE you account',
+        valueName: 'username',
+        value: authBloc.user.displayName!,
+        onConfirm: () {
+          authBloc.add(AccountDeletionRequested());
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.watch<AuthBloc>();
     final ImagePicker _picker = ImagePicker();
 
     return PageScaffold(
       title: 'Settings',
       child: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            width: 500,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SectionTitle('Profile Information'),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Stack(
-                      children: [
-                        AuthorAvatar(
-                          author: Author.fromUser(authBloc.user),
-                          width: 200,
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: IconButton(
-                            onPressed: () async {
-                              try {
-                                final pickedFile = await _picker.pickImage(
-                                    source: ImageSource.gallery);
-                                if (pickedFile == null) return;
-
-                                String url = await _firebaseStorageRepository
-                                    .uploadPickedFile(
-                                  pickedFile,
-                                  path: 'profileUrls/',
-                                );
-
-                                authBloc.add(UserDataUpdated(photoURL: url));
-                              } catch (e) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content:
-                                      Text('Error while updating profile: $e'),
-                                ));
-                                FirebaseCrashlytics.instance.recordError(
-                                  e,
-                                  null,
-                                  reason: 'Profile image update failed',
-                                );
-                              }
-                            },
-                            icon: Icon(Icons.add_a_photo),
-                          ),
-                        )
-                      ],
+        child: Container(
+          width:
+              layoutState.isWide ? MediaQuery.of(context).size.width / 3 : null,
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SectionTitle('Profile Information'),
+              Align(
+                alignment: Alignment.center,
+                child: Stack(
+                  children: [
+                    AuthorAvatar(
+                      author: Author.fromUser(authBloc.user),
+                      width: 200,
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  TextField(
-                    controller: _displayNameController,
-                    decoration: InputDecoration(
-                      label: Text('Display Name'),
-                      errorText: _displayNameErrorText,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _displayNameErrorText =
-                            value == '' ? 'Can not be empty' : null;
-                      });
-                    },
-                    onEditingComplete: () {
-                      if (_displayNameController.text == '') return;
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: IconButton(
+                        onPressed: () async {
+                          try {
+                            final pickedFile = await _picker.pickImage(
+                                source: ImageSource.gallery);
+                            if (pickedFile == null) return;
 
-                      authBloc.add(
-                          UserDataUpdated(name: _displayNameController.text));
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Row(
+                            String url = await _firebaseStorageRepository
+                                .uploadPickedFile(
+                              pickedFile,
+                              path: 'profileUrls/',
+                            );
+
+                            authBloc.add(UserDataUpdated(photoURL: url));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Error while updating profile: $e'),
+                            ));
+                            FirebaseCrashlytics.instance.recordError(
+                              e,
+                              null,
+                              reason: 'Profile image update failed',
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.add_a_photo),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _displayNameController,
+                decoration: InputDecoration(
+                  label: Text('Display Name'),
+                  errorText: _displayNameErrorText,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _displayNameErrorText =
+                        value == '' ? 'Can not be empty' : null;
+                  });
+                },
+                onEditingComplete: () {
+                  if (_displayNameController.text == '') return;
+
+                  authBloc
+                      .add(UserDataUpdated(name: _displayNameController.text));
+                },
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  authBloc.add(LogoutRequested());
+                },
+                child: Text('Log Out'),
+              ),
+              SizedBox(height: 40),
+              BlocBuilder<NotificationsCubit, NotificationsState>(
+                builder: (context, state) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: ElevatedButton(
+                      SectionTitle('Notifications Preferences'),
+                      if (!state.allowed)
+                        ElevatedButton(
                           onPressed: () {
-                            authBloc.add(LogoutRequested());
+                            if (kIsWeb) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Please turn on notifications for this website',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+
+                            AppSettings.openNotificationSettings();
                           },
-                          child: Text('Log Out'),
+                          child: Text('Enable notifications'),
+                        )
+                      else
+                        Column(
+                          children: [
+                            Text('Coming Soon...')
+                          ], //notificationPermissionToggles
+                        )
+                    ],
+                  );
+                },
+              ),
+              SizedBox(height: 40),
+              DangerZone(
+                children: [
+                  ListTile(
+                    title: Text('Delete your Account'),
+                    subtitle: Text(
+                        'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
+                    trailing: ElevatedButton(
+                      onPressed: _handleDeleteAccount,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.error,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 40),
-                  BlocBuilder<NotificationsCubit, NotificationsState>(
-                      builder: (context, state) {
-                    return Column(
-                      children: [
-                        SectionTitle('Notifications Preferences'),
-                        if (!state.allowed)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    if (kIsWeb) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Please turn on notifications for this website',
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-
-                                    AppSettings.openNotificationSettings();
-                                  },
-                                  child: Text('Enable notifications'),
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Column(children: [
-                            Text('Coming Soon...')
-                          ] //notificationPermissionToggles,
-                              )
-                      ],
-                    );
-                  }),
-                  SizedBox(height: 40),
-                  DangerZone(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          showDialog<bool>(
-                            context: context,
-                            builder: (context) => DangerDialog(
-                              title: 'You are about to DELETE you account',
-                              valueName: 'username',
-                              value: authBloc.user.displayName!,
-                              onConfirm: () {
-                                authBloc.add(AccountDeletionRequested());
-                                Navigator.pop(context);
-                              },
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'Delete Account',
-                          style: TextStyle(
-                            color: Theme.of(context).errorColor,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+                      child: Text('Delete Account'),
+                    ),
+                  )
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
