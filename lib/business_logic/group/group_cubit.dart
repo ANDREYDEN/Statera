@@ -88,14 +88,6 @@ class GroupCubit extends Cubit<GroupState> {
     _groupService.deleteGroup(group.id);
   }
 
-  void transferOwnershipTo(String uid) {
-    final group = loadedState.group;
-    emit(GroupLoading());
-
-    group.adminUid = uid;
-    _groupService.saveGroup(group);
-  }
-
   @override
   Future<void> close() {
     _groupSubscription?.cancel();

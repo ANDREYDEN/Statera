@@ -33,8 +33,9 @@ class GroupSettings extends StatelessWidget {
     );
 
     if (newAuthor != null) {
-      groupCubit.transferOwnershipTo(newAuthor.uid);
-      Navigator.pop(context);
+      groupCubit.update((group) {
+        group.adminUid = newAuthor.uid;
+      });
     }
   }
 
@@ -85,6 +86,7 @@ class GroupSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     final currencyController = TextEditingController();
     final nameController = TextEditingController();
@@ -95,6 +97,7 @@ class GroupSettings extends StatelessWidget {
         currencyController.text = group.currencySign;
         nameController.text = group.name;
         debtThresholdController.text = group.debtThreshold.toString();
+        final isAdmin = group.isAdmin(uid);
 
         return Container(
           padding: EdgeInsets.all(20),
@@ -102,81 +105,87 @@ class GroupSettings extends StatelessWidget {
               layoutState.isWide ? MediaQuery.of(context).size.width / 3 : null,
           child: ListView(
             children: [
-              SectionTitle('Settings'),
-              // TODO: validate these fields the same way as in the CRUD Dialog
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-                onSubmitted: (value) {
-                  final groupCubit = context.read<GroupCubit>();
+              if (isAdmin) ...[
+                SectionTitle('General Settings'),
+                // TODO: validate these fields the same way as in the CRUD Dialog
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: 'Name'),
+                  onSubmitted: (value) {
+                    final groupCubit = context.read<GroupCubit>();
 
-                  groupCubit.update((group) {
-                    group.name = value;
-                  });
-                },
-              ),
-              TextField(
-                controller: currencyController,
-                decoration: InputDecoration(labelText: 'Currency Sign'),
-                onSubmitted: (value) {
-                  groupCubit.update((group) {
-                    group.currencySign = value;
-                  });
-                },
-              ),
-              TextField(
-                controller: debtThresholdController,
-                decoration: InputDecoration(labelText: 'Debt Threshold'),
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(RegExp('-'))
-                ],
-                onSubmitted: (value) {
-                  groupCubit.update((group) {
-                    group.debtThreshold = double.parse(value);
-                  });
-                },
-              ),
-              SizedBox(height: 40),
+                    groupCubit.update((group) {
+                      group.name = value;
+                    });
+                  },
+                ),
+                TextField(
+                  controller: currencyController,
+                  decoration: InputDecoration(labelText: 'Currency Sign'),
+                  onSubmitted: (value) {
+                    groupCubit.update((group) {
+                      group.currencySign = value;
+                    });
+                  },
+                ),
+                TextField(
+                  controller: debtThresholdController,
+                  decoration: InputDecoration(labelText: 'Debt Threshold'),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp('-'))
+                  ],
+                  onSubmitted: (value) {
+                    groupCubit.update((group) {
+                      group.debtThreshold = double.parse(value);
+                    });
+                  },
+                ),
+                SizedBox(height: 40),
+              ],
               DangerZone(
                 children: [
-                  ListTile(
-                    title: Text('Transfer group ownership'),
-                    subtitle:
-                        Text('Choose another group member to take charge.'),
-                    trailing: ElevatedButton(
-                      onPressed: () =>
-                          _handleTransferOwnership(context, group.name),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.error)),
-                      child: Text('Transfer ownership'),
+                  if (isAdmin)
+                    ListTile(
+                      title: Text('Transfer group ownership'),
+                      subtitle:
+                          Text('Choose another group member to take charge.'),
+                      trailing: ElevatedButton(
+                        onPressed: () =>
+                            _handleTransferOwnership(context, group.name),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.error)),
+                        child: Text('Transfer ownership'),
+                      ),
                     ),
-                  ),
                   ListTile(
                     title: Text('Leave the group'),
                     subtitle: Text(
                       'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.',
                     ),
                     trailing: ElevatedButton(
-                      onPressed: () => _handleLeave(context, group.name),
+                      onPressed: isAdmin
+                          ? null
+                          : () => _handleLeave(context, group.name),
                       style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(
                               Theme.of(context).colorScheme.error)),
                       child: Text('Leave group'),
                     ),
                   ),
-                  ListTile(
-                    title: Text('Delete the group'),
-                    subtitle: Text(
-                        'Deleting the group will erase all group data. There is no way to undo this action.'),
-                    trailing: ElevatedButton(
-                      onPressed: () => _handleDelete(context, group.name),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.error)),
-                      child: Text('Delete group'),
+                  if (isAdmin)
+                    ListTile(
+                      title: Text('Delete the group'),
+                      subtitle: Text(
+                          'Deleting the group will erase all group data. There is no way to undo this action.'),
+                      trailing: ElevatedButton(
+                        onPressed: () => _handleDelete(context, group.name),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.error)),
+                        child: Text('Delete group'),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],

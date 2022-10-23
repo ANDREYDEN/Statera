@@ -76,7 +76,7 @@ class Group {
     _adminId = uid;
   }
 
-  bool isAdmin(User user) => user.uid == admin.uid;
+  bool isAdmin(String uid) => uid == admin.uid;
 
   void _generateCode() {
     code = '';
