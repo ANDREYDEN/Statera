@@ -7,6 +7,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -149,13 +150,10 @@ class GroupSettings extends StatelessWidget {
                       title: Text('Transfer group ownership'),
                       subtitle:
                           Text('Choose another group member to take charge.'),
-                      trailing: ElevatedButton(
+                      trailing: DangerButton(
+                        text: 'Transfer ownership',
                         onPressed: () =>
                             _handleTransferOwnership(context, group.name),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).colorScheme.error)),
-                        child: Text('Transfer ownership'),
                       ),
                     ),
                   ListTile(
@@ -163,14 +161,11 @@ class GroupSettings extends StatelessWidget {
                     subtitle: Text(
                       'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.',
                     ),
-                    trailing: ElevatedButton(
+                    trailing: DangerButton(
+                      text: 'Leave group',
                       onPressed: isAdmin
                           ? null
                           : () => _handleLeave(context, group.name),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.error)),
-                      child: Text('Leave group'),
                     ),
                   ),
                   if (isAdmin)
@@ -178,12 +173,9 @@ class GroupSettings extends StatelessWidget {
                       title: Text('Delete the group'),
                       subtitle: Text(
                           'Deleting the group will erase all group data. There is no way to undo this action.'),
-                      trailing: ElevatedButton(
+                      trailing: DangerButton(
                         onPressed: () => _handleDelete(context, group.name),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).colorScheme.error)),
-                        child: Text('Delete group'),
+                        text: 'Delete group',
                       ),
                     ),
                 ],

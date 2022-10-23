@@ -10,6 +10,7 @@ import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -191,14 +192,9 @@ class _SettingsState extends State<Settings> {
                     title: Text('Delete your Account'),
                     subtitle: Text(
                         'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
-                    trailing: ElevatedButton(
+                    trailing: DangerButton(
+                      text: 'Delete Account',
                       onPressed: _handleDeleteAccount,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      child: Text('Delete Account'),
                     ),
                   )
                 ],
