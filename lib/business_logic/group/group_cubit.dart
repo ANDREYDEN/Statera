@@ -65,7 +65,7 @@ class GroupCubit extends Cubit<GroupState> {
       return;
     }
 
-    if (loadedState.group.userExists(user.uid)) {
+    if (loadedState.group.memberExists(user.uid)) {
       emit(GroupError(error: 'You are already a member of this group'));
       return;
     }
@@ -79,6 +79,13 @@ class GroupCubit extends Cubit<GroupState> {
     final group = loadedState.group;
     emit(GroupLoading());
     await _groupService.generateInviteLink(group);
+  }
+
+  void delete() {
+    final group = loadedState.group;
+    emit(GroupLoading());
+
+    _groupService.deleteGroup(group.id);
   }
 
   @override
