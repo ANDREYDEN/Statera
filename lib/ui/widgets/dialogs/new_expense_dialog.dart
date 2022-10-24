@@ -5,7 +5,7 @@ import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/assignee_picker.dart';
+import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/utils.dart';
@@ -39,7 +39,7 @@ class NewExpenseDialog extends StatefulWidget {
 
 class _NewExpenseDialogState extends State<NewExpenseDialog> {
   final TextEditingController _nameController = TextEditingController();
-  final AssigneeController _assigneeController = AssigneeController();
+  final MemberController _memberController = MemberController();
   late final Expense _newExpense;
   bool _dirty = false;
 
@@ -47,7 +47,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   GroupCubit get groupCubit => context.read<GroupCubit>();
 
   bool get _nameIsValid => _nameController.text != '';
-  bool get _assigneePickerValid => _assigneeController.value.isNotEmpty;
+  bool get _pickedValidAssignees => _memberController.value.isNotEmpty;
 
   @override
   void initState() {
@@ -87,11 +87,14 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
               height: 400,
               child: GroupBuilder(
                 builder: (context, group) {
-                  _newExpense.updateAssignees(
-                      group.members.map((m) => m.uid).toList());
-                  return AssigneePicker(
-                    controller: _assigneeController,
-                    expense: _newExpense,
+                  final expenseMemberUids =
+                      group.members.map((m) => m.uid).toList();
+
+                  _newExpense.updateAssignees(expenseMemberUids);
+                  return MemberPicker(
+                    controller: _memberController,
+                    value: expenseMemberUids,
+                    allSelected: true,
                   );
                 },
               ),
@@ -107,9 +110,9 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
               _dirty = true;
             });
 
-            if (_nameIsValid && _assigneePickerValid) {
+            if (_nameIsValid && _pickedValidAssignees) {
               _newExpense.name = _nameController.text;
-              _newExpense.updateAssignees(_assigneeController.value);
+              _newExpense.updateAssignees(_memberController.value);
               await expensesCubit.addExpense(
                 _newExpense,
                 groupCubit.loadedState.group.id,

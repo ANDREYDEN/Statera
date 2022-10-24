@@ -172,7 +172,10 @@ class ExpenseDetails extends StatelessWidget {
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
-              child: MemberSelectDialog(title: 'Change author'),
+              child: MemberSelectDialog(
+                title: 'Change author',
+                excludeMe: true,
+              ),
             ),
           );
           if (newAuthor == null) return;
@@ -195,7 +198,10 @@ class ExpenseDetails extends StatelessWidget {
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
-              child: AssigneePickerDialog(expense: expense),
+              child: MemberSelectDialog(
+                title: 'Change Assignees',
+                value: expense.assignees.map((a) => a.uid).toList(),
+              ),
             ),
           );
           if (newAssigneeIds == null) return;

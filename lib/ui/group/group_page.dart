@@ -84,17 +84,15 @@ class _GroupPageState extends State<GroupPage> {
             key: GroupPage.scaffoldKey,
             titleWidget: GroupTitle(),
             actions: isAdmin ? [GroupQRButton()] : [],
-            onFabPressed: isWide
+            onFabPressed: isWide || _selectedNavBarItemIndex != 1
                 ? null
-                : _selectedNavBarItemIndex != 1
-                    ? null
-                    : () => showNewExpenseDialog(
-                          context,
-                          afterAddition: (expenseId) {
-                            Navigator.of(context).popAndPushNamed(
-                                '${ExpensePage.route}/$expenseId');
-                          },
-                        ),
+                : () => showNewExpenseDialog(
+                      context,
+                      afterAddition: (expenseId) {
+                        Navigator.of(context)
+                            .popAndPushNamed('${ExpensePage.route}/$expenseId');
+                      },
+                    ),
             bottomNavBar: isWide
                 ? null
                 : GroupBottomNavBar(
