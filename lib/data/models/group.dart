@@ -70,7 +70,13 @@ class Group {
 
   Author get admin => _adminId != null ? getUser(_adminId!) : members.first;
 
-  bool isAdmin(User user) => user.uid == admin.uid;
+  set adminUid(String uid) {
+    if (!memberExists(uid))
+      throw Exception('Member with id $uid does not exist in group "$name"');
+    _adminId = uid;
+  }
+
+  bool isAdmin(String uid) => uid == admin.uid;
 
   void _generateCode() {
     code = '';
@@ -99,7 +105,7 @@ class Group {
     );
   }
 
-  bool userExists(String uid) =>
+  bool memberExists(String uid) =>
       this.members.any((member) => member.uid == uid);
 
   Author getUser(String uid) =>

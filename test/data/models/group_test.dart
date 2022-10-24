@@ -89,7 +89,7 @@ void main() {
         adminId: secondMember.uid,
       );
 
-      expect(group.isAdmin(mockUser), isTrue);
+      expect(group.isAdmin(mockUserId), isTrue);
     });
   });
 

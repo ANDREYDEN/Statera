@@ -36,9 +36,8 @@ class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
-  AuthBloc get authBloc => context.read<AuthBloc>();
-
   Widget build(BuildContext context) {
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     final isWide = context.select((LayoutState state) => state.isWide);
 
     if (_pageController.hasClients) {
@@ -60,7 +59,7 @@ class _GroupPageState extends State<GroupPage> {
         }
 
         if (state is GroupLoaded) {
-          final isAdmin = state.group.isAdmin(authBloc.user);
+          final isAdmin = state.group.isAdmin(uid);
 
           final _navBarItems = [
             NavBarItemData(
@@ -74,12 +73,11 @@ class _GroupPageState extends State<GroupPage> {
               activeIcon: Icons.receipt_long_rounded,
               wrapper: (child) => UnmarkedExpensesBadge(child: child),
             ),
-            if (isAdmin)
-              NavBarItemData(
-                label: 'Settings',
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings_rounded,
-              )
+            NavBarItemData(
+              label: 'Settings',
+              icon: Icons.settings_outlined,
+              activeIcon: Icons.settings_rounded,
+            )
           ];
 
           return PageScaffold(
@@ -88,7 +86,7 @@ class _GroupPageState extends State<GroupPage> {
             actions: isAdmin ? [GroupQRButton()] : [],
             onFabPressed: isWide
                 ? null
-                : _selectedNavBarItemIndex == 0
+                : _selectedNavBarItemIndex != 1
                     ? null
                     : () => showNewExpenseDialog(
                           context,
