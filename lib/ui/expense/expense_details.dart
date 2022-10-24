@@ -172,10 +172,7 @@ class ExpenseDetails extends StatelessWidget {
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
-              child: MemberSelectDialog(
-                title: 'Change author',
-                excludeMe: true,
-              ),
+              child: MemberSelectDialog(title: 'Change author'),
             ),
           );
           if (newAuthor == null) return;
