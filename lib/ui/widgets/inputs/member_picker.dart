@@ -44,9 +44,9 @@ class _MemberPickerState extends State<MemberPicker> {
           widget.controller.value = members.map((e) => e.uid).toList();
         }
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return ListView(
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
           children: [
             Visibility(
               visible: isDirty && widget.controller.value.isEmpty,
@@ -55,37 +55,34 @@ class _MemberPickerState extends State<MemberPicker> {
                 style: TextStyle(color: Theme.of(context).errorColor),
               ),
             ),
-            ListView(
-              shrinkWrap: true,
-              children: members.map((member) {
-                return AuthorAvatar(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  author: member,
-                  borderColor: widget.controller.value.contains(member.uid)
-                      ? Colors.green
-                      : Colors.transparent,
-                  withName: true,
-                  onTap: () {
-                    setState(() {
-                      isDirty = true;
+            ...members.map((member) {
+              return AuthorAvatar(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                author: member,
+                borderColor: widget.controller.value.contains(member.uid)
+                    ? Colors.green
+                    : Colors.transparent,
+                withName: true,
+                onTap: () {
+                  setState(() {
+                    isDirty = true;
 
-                      if (widget.singleSelection) {
-                        if (!widget.controller.value.contains(member.uid)) {
-                          widget.controller.value = [member.uid];
-                        }
-                      } else {
-                        if (widget.controller.value.contains(member.uid)) {
-                          widget.controller.value.remove(member.uid);
-                        } else {
-                          widget.controller.value.add(member.uid);
-                        }
+                    if (widget.singleSelection) {
+                      if (!widget.controller.value.contains(member.uid)) {
+                        widget.controller.value = [member.uid];
                       }
-                    });
-                    widget.onChange?.call(widget.controller.value);
-                  },
-                );
-              }).toList(),
-            ),
+                    } else {
+                      if (widget.controller.value.contains(member.uid)) {
+                        widget.controller.value.remove(member.uid);
+                      } else {
+                        widget.controller.value.add(member.uid);
+                      }
+                    }
+                  });
+                  widget.onChange?.call(widget.controller.value);
+                },
+              );
+            }).toList(),
           ],
         );
       },

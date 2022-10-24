@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/utils/utils.dart';
 
 showNewExpenseDialog(
@@ -45,6 +45,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
 
   ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
   GroupCubit get groupCubit => context.read<GroupCubit>();
+  bool get isWide => context.read<LayoutState>().isWide;
 
   bool get _nameIsValid => _nameController.text != '';
   bool get _pickedValidAssignees => _memberController.value.isNotEmpty;
@@ -60,10 +61,10 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('New Expense'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      content: SizedBox(
+        width: isWide ? 400 : 200,
+        child: ListView(
+          shrinkWrap: true,
           children: [
             TextField(
               autofocus: true,
@@ -82,22 +83,9 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
             ),
             SizedBox(height: 20),
             Text('Pick Assignees'),
-            Container(
-              width: 400,
-              height: 400,
-              child: GroupBuilder(
-                builder: (context, group) {
-                  final expenseMemberUids =
-                      group.members.map((m) => m.uid).toList();
-
-                  _newExpense.updateAssignees(expenseMemberUids);
-                  return MemberPicker(
-                    controller: _memberController,
-                    value: expenseMemberUids,
-                    allSelected: true,
-                  );
-                },
-              ),
+            MemberPicker(
+              controller: _memberController,
+              allSelected: true,
             ),
           ],
         ),
