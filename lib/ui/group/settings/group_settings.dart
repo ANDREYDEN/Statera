@@ -5,83 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/buttons/danger_button.dart';
+import 'package:statera/ui/group/settings/delete_group_setting.dart';
+import 'package:statera/ui/group/settings/leave_group_setting.dart';
+import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class GroupSettings extends StatelessWidget {
   const GroupSettings({Key? key}) : super(key: key);
-
-  void _handleTransferOwnership(BuildContext context, String groupName) async {
-    final layoutState = context.read<LayoutState>();
-    final groupCubit = context.read<GroupCubit>();
-
-    final newAuthor = await showDialog<Author?>(
-      context: context,
-      builder: (context) => MultiProvider(
-        providers: [
-          Provider<LayoutState>.value(value: layoutState),
-          BlocProvider<GroupCubit>.value(value: groupCubit)
-        ],
-        child: MemberSelectDialog(
-          title:
-              'Select a member to TRASFER OWNERSHIP of group "$groupName" to',
-        ),
-      ),
-    );
-
-    if (newAuthor != null) {
-      groupCubit.update((group) {
-        group.adminUid = newAuthor.uid;
-      });
-    }
-  }
-
-  void _handleLeave(BuildContext context, String groupName) {
-    final authBloc = context.read<AuthBloc>();
-    final layoutState = context.read<LayoutState>();
-    final groupCubit = context.read<GroupCubit>();
-
-    showDialog<bool>(
-      context: context,
-      builder: (context) => Provider<LayoutState>.value(
-        value: layoutState,
-        child: DangerDialog(
-          title: 'You are about to LEAVE the group "$groupName"',
-          valueName: 'group name',
-          value: groupName,
-          onConfirm: () {
-            groupCubit.removeUser(authBloc.uid);
-            Navigator.pop(context);
-          },
-        ),
-      ),
-    );
-  }
-
-  void _handleDelete(BuildContext context, String groupName) {
-    final layoutState = context.read<LayoutState>();
-    final groupCubit = context.read<GroupCubit>();
-
-    showDialog<bool>(
-      context: context,
-      builder: (context) => Provider<LayoutState>.value(
-        value: layoutState,
-        child: DangerDialog(
-          title: 'You are about to DELETE the group "$groupName"',
-          valueName: 'group name',
-          value: groupName,
-          onConfirm: () {
-            groupCubit.delete();
-            Navigator.pop(context);
-          },
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,39 +77,9 @@ class GroupSettings extends StatelessWidget {
               ],
               DangerZone(
                 children: [
-                  if (isAdmin)
-                    ListTile(
-                      title: Text('Transfer group ownership'),
-                      subtitle:
-                          Text('Choose another group member to take charge.'),
-                      trailing: DangerButton(
-                        text: 'Transfer ownership',
-                        onPressed: () =>
-                            _handleTransferOwnership(context, group.name),
-                      ),
-                    ),
-                  ListTile(
-                    title: Text('Leave the group'),
-                    subtitle: Text(
-                      'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.',
-                    ),
-                    trailing: DangerButton(
-                      text: 'Leave group',
-                      onPressed: isAdmin
-                          ? null
-                          : () => _handleLeave(context, group.name),
-                    ),
-                  ),
-                  if (isAdmin)
-                    ListTile(
-                      title: Text('Delete the group'),
-                      subtitle: Text(
-                          'Deleting the group will erase all group data. There is no way to undo this action.'),
-                      trailing: DangerButton(
-                        onPressed: () => _handleDelete(context, group.name),
-                        text: 'Delete group',
-                      ),
-                    ),
+                  if (isAdmin) TransferOwnershipSetting(groupName: group.name),
+                  LeaveGroupSetting(isAdmin: isAdmin, groupName: group.name),
+                  if (isAdmin) DeleteGroupSetting(groupName: group.name)
                 ],
               ),
             ],
