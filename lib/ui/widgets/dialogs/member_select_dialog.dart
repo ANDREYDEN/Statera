@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/inputs/member_picker.dart';
 
 class MemberSelectDialog extends StatefulWidget {
   final String title;
+  final List<String>? value;
+  final bool singleSelection;
+  final bool allSelected;
+  final bool excludeMe;
 
   const MemberSelectDialog({
     Key? key,
     required this.title,
+    this.value,
+    this.singleSelection = false,
+    this.allSelected = false,
+    this.excludeMe = false,
   }) : super(key: key);
 
   @override
@@ -20,44 +25,44 @@ class MemberSelectDialog extends StatefulWidget {
 }
 
 class _MemberSelectDialogState extends State<MemberSelectDialog> {
-  Author? _selectedMember;
+  late List<String> _selectedMemberUids;
+
+  @override
+  void initState() {
+    _selectedMemberUids = widget.value ?? [];
+    super.initState();
+  }
 
   bool get isWide => context.read<LayoutState>().isWide;
 
   @override
   Widget build(BuildContext context) {
-    String uid = context.select<AuthBloc, String>((a) => a.uid);
     return AlertDialog(
       title: Text(this.widget.title),
       content: SizedBox(
         width: isWide ? 400 : 200,
-        child: GroupBuilder(
-          builder: (context, group) => ListView(
-            children: group.members
-                .where((m) => m.uid != uid)
-                .map(
-                  (member) => AuthorAvatar(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    onTap: () {
-                      setState(() {
-                        _selectedMember = member;
-                      });
-                    },
-                    author: member,
-                    withName: true,
-                    checked: member.uid == _selectedMember?.uid,
-                  ),
-                )
-                .toList(),
-          ),
+        child: MemberPicker(
+          value: _selectedMemberUids,
+          singleSelection: widget.singleSelection,
+          allSelected: widget.allSelected,
+          excludeMe: widget.excludeMe,
+          onChange: (selectedMembers) => setState(() {
+            _selectedMemberUids = selectedMembers;
+          }),
         ),
       ),
       actions: [
         CancelButton(),
         ElevatedButton(
-          onPressed: _selectedMember != null
+          onPressed: _selectedMemberUids.isNotEmpty
               ? () {
-                  Navigator.pop(context, _selectedMember);
+                  Navigator.pop(
+                      context,
+                      widget.singleSelection
+                          ? _selectedMemberUids.isEmpty
+                              ? null
+                              : _selectedMemberUids.first
+                          : _selectedMemberUids);
                 }
               : null,
           child: Text('Confirm'),

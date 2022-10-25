@@ -19,7 +19,7 @@ class TransferOwnershipSetting extends StatelessWidget {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
 
-    final newAuthor = await showDialog<Author?>(
+    final newAuthorUid = await showDialog<String?>(
       context: context,
       builder: (context) => MultiProvider(
         providers: [
@@ -29,13 +29,15 @@ class TransferOwnershipSetting extends StatelessWidget {
         child: MemberSelectDialog(
           title:
               'Select a member to TRASFER OWNERSHIP of group "$groupName" to',
+          singleSelection: true,
+          excludeMe: true,
         ),
       ),
     );
 
-    if (newAuthor != null) {
+    if (newAuthorUid != null) {
       groupCubit.update((group) {
-        group.adminUid = newAuthor.uid;
+        group.adminUid = newAuthorUid;
       });
     }
   }
