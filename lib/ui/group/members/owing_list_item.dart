@@ -31,6 +31,7 @@ class OwingListItem extends StatelessWidget {
         final owingColor = this.owing >= group.debtThreshold
             ? Theme.of(context).errorColor
             : null;
+        final isAdmin = group.admin.uid == this.member.uid;
 
         return InkWell(
           onTap: () => isWide
@@ -46,7 +47,14 @@ class OwingListItem extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: AuthorAvatar(author: this.member, withName: true),
+                  child: AuthorAvatar(
+                    author: this.member,
+                    withName: true,
+                    withIcon: isAdmin,
+                    icon: isAdmin ? Icons.star : null,
+                    iconColor: isAdmin ? Colors.yellow : null,
+                    iconBackgroudColor: isAdmin ? Colors.black : null,
+                  ),
                 ),
                 PriceText(
                   value: this.owing,

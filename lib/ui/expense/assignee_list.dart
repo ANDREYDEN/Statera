@@ -24,7 +24,7 @@ class AssigneeList extends StatelessWidget {
                     return AuthorAvatar(
                       margin: const EdgeInsets.only(right: 4),
                       author: member,
-                      checked: expense.isMarkedBy(assignee.uid),
+                      withIcon: expense.isMarkedBy(assignee.uid),
                     );
                   }).toList(),
                 ),
