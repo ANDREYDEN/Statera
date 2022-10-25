@@ -6,7 +6,10 @@ class AuthorAvatar extends StatelessWidget {
   late final Function()? onTap;
   final bool withName;
   final Color? borderColor;
-  final bool checked;
+  final bool withIcon;
+  final IconData? icon;
+  final Color? iconColor;
+  final Color? iconBackgroudColor;
   final double? width;
   final EdgeInsets? margin;
 
@@ -16,7 +19,10 @@ class AuthorAvatar extends StatelessWidget {
     this.onTap,
     this.withName = false,
     this.borderColor,
-    this.checked = false,
+    this.withIcon = false,
+    this.icon = Icons.check,
+    this.iconColor = Colors.white,
+    this.iconBackgroudColor = Colors.green,
     this.width,
     this.margin,
   }) : super(key: key);
@@ -69,17 +75,17 @@ class AuthorAvatar extends StatelessWidget {
                             ),
                     ),
                   ),
-                  if (this.checked)
+                  if (this.withIcon)
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.green,
+                          color: this.iconBackgroudColor,
                         ),
                         padding: EdgeInsets.all(2),
-                        child: Icon(Icons.check, size: 20, color: Colors.white),
+                        child: Icon(this.icon, size: 20, color: this.iconColor),
                       ),
                     )
                 ],
