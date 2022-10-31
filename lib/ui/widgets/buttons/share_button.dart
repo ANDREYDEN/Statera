@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 
 class ShareButton extends StatelessWidget {
   final String data;
@@ -46,10 +45,5 @@ class ShareButton extends StatelessWidget {
         content: Text(copyMessage ?? 'Link copied to clipboard'),
       ),
     );
-  }
-
-  /// TODO: retired, needs testing on iOS
-  void _mobileShare() {
-    Share.share(data);
   }
 }

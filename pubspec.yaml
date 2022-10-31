@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: "none"
 
-version: 1.4.1+8
+version: 1.5.0+9
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -39,7 +39,6 @@ dependencies:
   google_sign_in: ^5.0.7
   sign_in_with_apple: ^4.0.0
   desktop_webview_auth: ^0.0.9
-  multi_select_flutter: ^4.0.0
   build_runner: ^2.0.6
   badges: ^2.0.1
   uuid: ^3.0.4
@@ -50,7 +49,6 @@ dependencies:
   mocktail: ^0.2.0
   qr_flutter: ^4.0.0
   url_strategy: ^0.2.0
-  share_plus: ^4.0.4
   url_launcher: ^6.1.2
   crypto: ^3.0.1
   package_info_plus: ^1.4.3
