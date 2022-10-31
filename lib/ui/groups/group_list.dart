@@ -51,7 +51,7 @@ class _GroupListState extends State<GroupList> {
       ],
       onFabPressed: defaultTargetPlatform == TargetPlatform.windows
           ? null
-          : () => updateOrCreateGroup(groupsCubit, authBloc.user),
+          : () => createGroup(groupsCubit, authBloc.user),
       child: defaultTargetPlatform == TargetPlatform.windows
           ? Center(
               child:
@@ -74,7 +74,6 @@ class _GroupListState extends State<GroupList> {
 
                 if (groupsState is GroupsLoaded) {
                   final groups = groupsState.groups;
-                  final groupsCubit = context.read<GroupsCubit>();
 
                   return Column(
                     children: [
@@ -92,14 +91,7 @@ class _GroupListState extends State<GroupList> {
                                 itemCount: groups.length,
                                 itemBuilder: (context, index) {
                                   var group = groups[index];
-                                  return GestureDetector(
-                                    onLongPress: () => updateOrCreateGroup(
-                                      groupsCubit,
-                                      authBloc.user,
-                                      group: group,
-                                    ),
-                                    child: GroupListItem(group: group),
-                                  );
+                                  return GroupListItem(group: group);
                                 },
                               ),
                       ),
@@ -113,8 +105,8 @@ class _GroupListState extends State<GroupList> {
     );
   }
 
-  updateOrCreateGroup(GroupsCubit groupsCubit, User creator, {Group? group}) {
-    final groupToModify = group ?? new Group.empty(name: '');
+  createGroup(GroupsCubit groupsCubit, User creator) {
+    final newGroup = Group.empty(name: '');
 
     showDialog(
       context: context,
@@ -125,12 +117,12 @@ class _GroupListState extends State<GroupList> {
             id: 'name',
             label: 'Name',
             validators: [FieldData.requiredValidator],
-            initialData: groupToModify.name,
+            initialData: '',
           ),
           FieldData(
             id: 'currency',
             label: 'Currency Sign',
-            initialData: groupToModify.currencySign,
+            initialData: newGroup.currencySign,
             validators: [FieldData.requiredValidator],
             formatters: [SingleCharacterTextInputFormatter()],
             isAdvanced: true,
@@ -138,7 +130,7 @@ class _GroupListState extends State<GroupList> {
           FieldData(
             id: 'debt_threshold',
             label: 'Debt Threshold',
-            initialData: groupToModify.debtThreshold,
+            initialData: newGroup.debtThreshold,
             validators: [
               FieldData.requiredValidator,
               FieldData.doubleValidator
@@ -148,22 +140,11 @@ class _GroupListState extends State<GroupList> {
           ),
         ],
         onSubmit: (values) async {
-          final wasModified = groupToModify.name != values['name']! ||
-              groupToModify.currencySign != values['currency'] ||
-              groupToModify.debtThreshold !=
-                  double.tryParse(values['debt_threshold']!);
+          newGroup.name = values['name']!;
+          newGroup.currencySign = values['currency']!;
+          newGroup.debtThreshold = double.parse(values['debt_threshold']!);
 
-          if (!wasModified) return;
-
-          groupToModify.name = values['name']!;
-          groupToModify.currencySign = values['currency']!;
-          groupToModify.debtThreshold = double.parse(values['debt_threshold']!);
-
-          if (group == null) {
-            groupsCubit.addGroup(groupToModify, creator);
-          } else {
-            groupsCubit.updateGroup(groupToModify);
-          }
+          groupsCubit.addGroup(newGroup, creator);
         },
       ),
     );

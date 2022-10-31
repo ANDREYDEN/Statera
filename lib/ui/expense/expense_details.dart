@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +11,7 @@ import 'package:statera/ui/expense/expense_actions_wide.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/utils.dart';
@@ -121,7 +120,9 @@ class ExpenseDetails extends StatelessWidget {
                 ),
               ),
             ),
-            if (expense.hasNoItems && expenseCanBeUpdated && defaultTargetPlatform != TargetPlatform.macOS)
+            if (expense.hasNoItems &&
+                expenseCanBeUpdated &&
+                defaultTargetPlatform != TargetPlatform.macOS)
               ElevatedButton.icon(
                 onPressed: () => showDialog(
                   context: context,
@@ -171,7 +172,10 @@ class ExpenseDetails extends StatelessWidget {
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
-              child: AuthorChangeDialog(expense: expense),
+              child: MemberSelectDialog(
+                title: 'Change author',
+                excludeMe: true,
+              ),
             ),
           );
           if (newAuthor == null) return;
@@ -194,7 +198,10 @@ class ExpenseDetails extends StatelessWidget {
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
-              child: AssigneePickerDialog(expense: expense),
+              child: MemberSelectDialog(
+                title: 'Change Assignees',
+                value: expense.assignees.map((a) => a.uid).toList(),
+              ),
             ),
           );
           if (newAssigneeIds == null) return;

@@ -10,11 +10,12 @@ class Group {
   String? id;
   late String name;
   late List<Author> members = [];
+  String? _adminId;
 
   /// Describes the debt that each member of the group has
-  /// 
+  ///
   /// For example, the following configuration describes that Alice owes Bob $145:
-  /// 
+  ///
   /// ```balance: {
   ///   Alice: {
   ///     Bob: 145
@@ -37,6 +38,7 @@ class Group {
     this.code,
     this.id,
     members,
+    String? adminId,
     balance,
     String? currencySign,
     this.inviteLink,
@@ -46,21 +48,37 @@ class Group {
     this.balance = {};
     if (members != null) {
       this.members = members;
-      this.balance = balance ?? createBalanceFromMembers(members);
+      this.balance = balance ?? _createBalanceFromMembers(members);
     }
     this.currencySign = currencySign ?? kdefaultCurrencySign;
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
+    if (code == null) _generateCode();
+    this._adminId = adminId;
   }
 
-  Group.empty({List<Author>? members, String? code, String? name})
-      : this(
+  Group.empty({
+    String? name,
+    String? code,
+    List<Author>? members,
+    String? adminId,
+  }) : this(
           name: name ?? 'Empty',
-          members: members,
-          balance: {},
           code: code,
+          members: members,
+          adminId: adminId,
         );
 
-  void generateCode() {
+  Author get admin => _adminId != null ? getUser(_adminId!) : members.first;
+
+  set adminUid(String uid) {
+    if (!memberExists(uid))
+      throw Exception('Member with id $uid does not exist in group "$name"');
+    _adminId = uid;
+  }
+
+  bool isAdmin(String uid) => uid == admin.uid;
+
+  void _generateCode() {
     code = '';
     for (var i = 0; i < 5; i++) {
       code = code! + getRandomLetter();
@@ -70,7 +88,7 @@ class Group {
   String renderPrice(double value) =>
       '$currencySign${value.toStringAsFixed(2)}';
 
-  static Map<String, Map<String, double>> createBalanceFromMembers(
+  static Map<String, Map<String, double>> _createBalanceFromMembers(
     List<Author> members,
   ) {
     return Map.fromEntries(
@@ -87,7 +105,7 @@ class Group {
     );
   }
 
-  bool userExists(String uid) =>
+  bool memberExists(String uid) =>
       this.members.any((member) => member.uid == uid);
 
   Author getUser(String uid) =>
@@ -110,13 +128,10 @@ class Group {
     this.balance.forEach((key, value) => value.remove(uid));
   }
 
-  Map<Author, double> extendedBalance(String consumerUid) {
-    return this.balance[consumerUid]!.map(
-          (uid, balance) => MapEntry(
-            this.members.where((member) => member.uid == uid).first,
-            balance,
-          ),
-        );
+  Map<Author, double> getOwingsForUser(String uid) {
+    return this
+        .balance[uid]!
+        .map((otherUid, balance) => MapEntry(getUser(otherUid), balance));
   }
 
   void payOffBalance({required Payment payment}) {
@@ -156,6 +171,7 @@ class Group {
       'members': members.map((x) => x.toFirestore()).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
+      'adminId': admin.uid,
       'balance': balance,
       'currencySign': currencySign,
       'inviteLink': inviteLink,
@@ -165,13 +181,14 @@ class Group {
 
   factory Group.fromFirestore(Map<String, dynamic> map, {required String? id}) {
     var members = List<Author>.from(
-      map['members']?.map((x) => Author.fromFirestore(x)),
+      (map['members'] ?? []).map((x) => Author.fromFirestore(x)),
     );
 
     return Group(
       id: id,
       name: map['name'],
       members: members,
+      adminId: map['adminId'],
       code: map['code'],
       balance: map['balance'] == null
           ? null
