@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/payment_service.dart';
+import 'package:statera/data/services/payment_repository.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/helpers.dart';
 

@@ -9,6 +9,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
+import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/auth_guard.dart';
@@ -113,6 +114,14 @@ final List<PagePath> _paths = [
         ),
         BlocProvider<OwingCubit>(
           create: (context) => OwingCubit()..load(matches?[1] ?? ''),
+        ),
+        BlocProvider(
+          create: (context) => PaymentsCubit(context.read<PaymentService>())
+            ..load(
+              groupId: matches?[0] ?? '',
+              uid: context.select<AuthBloc, String>((authBloc) => authBloc.uid),
+              otherUid: matches?[1] ?? '',
+            ),
         ),
       ],
       child: PaymentListPage(),

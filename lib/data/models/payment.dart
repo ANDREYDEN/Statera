@@ -61,7 +61,7 @@ class Payment {
           : DateTime.parse(map['timeCreated'].toDate().toString()),
       reason: map['reason'],
       oldPayerBalance: map['oldPayerBalance'],
-      viewedBy: map['viewedBy'] ?? [],
+      viewedBy: List<String>.from(map['viewedBy'] ?? []),
     );
   }
 
