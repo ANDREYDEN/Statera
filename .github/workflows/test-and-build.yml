@@ -18,13 +18,13 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: 'stable'
-          
+          channel: "stable"
+
       - name: Copy .env
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
@@ -35,7 +35,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-  
+
   build_and_test_functions:
     name: Run tests and build Firebase Functions
     runs-on: ubuntu-latest
@@ -49,14 +49,14 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: "16"
 
       - name: Install dependencies
         run: npm i
 
       - name: Run linter
         run: npm run lint
-      
+
       - name: Run functions tests
         run: npm test
 
@@ -70,12 +70,12 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Copy google-services.json
         env:
@@ -83,7 +83,7 @@ jobs:
         run: echo $FIREBASE_CONFIG > android/app/google-services.json
 
       - name: Copy keystore
-        env: 
+        env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: echo $KEYSTORE_BASE64 | base64 -d > android/app/upload-keystore.jks
 
@@ -91,6 +91,11 @@ jobs:
         env:
           KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: echo $KEY_PROPERTIES > android/key.properties
+
+      - name: Copy .env
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
 
       - name: Print files
         run: cd android && ls -R
@@ -111,12 +116,12 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Copy .env
         env:
