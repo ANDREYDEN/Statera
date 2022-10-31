@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/payment_service.dart';
+import 'package:statera/data/services/payment_repository.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -87,7 +87,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                     context,
                     () async {
                       widget.payment.value = this.balanceToPay;
-                      await PaymentService.instance
+                      await PaymentRepository.instance
                           .payOffBalance(payment: widget.payment);
                       Navigator.of(context).pop();
                     },

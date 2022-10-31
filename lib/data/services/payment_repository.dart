@@ -3,17 +3,8 @@ import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/group_service.dart';
 
-class PaymentService extends Firestore {
-  static PaymentService? _instance;
-
-  PaymentService() : super();
-
-  static PaymentService get instance {
-    if (_instance == null) {
-      _instance = PaymentService();
-    }
-    return _instance!;
-  }
+class PaymentRepository extends Firestore {
+  PaymentRepository() : super();
 
   /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({

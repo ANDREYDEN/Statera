@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
@@ -6,16 +8,13 @@ import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
-  final String receiverUid;
 
-  const PaymentListItem({
-    Key? key,
-    required this.payment,
-    required this.receiverUid,
-  }) : super(key: key);
+  const PaymentListItem({Key? key, required this.payment}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final receiverUid = context.select<AuthBloc, String>((a) => a.uid);
+
     Color paymentColor =
         payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
 

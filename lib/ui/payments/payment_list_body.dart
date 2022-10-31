@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/services/services.dart';
+import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
-import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
+import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 
 import '../../data/models/models.dart';
@@ -59,7 +59,7 @@ class PaymentListBody extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: Text("Pay"),
+                          child: Text('Pay'),
                         ),
                       ),
                       SizedBox(width: 16),
@@ -78,46 +78,58 @@ class PaymentListBody extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: Text("Receive"),
+                          child: Text('Receive'),
                         ),
                       ),
                     ],
                   ),
                 ),
                 Flexible(
-                  child: CustomStreamBuilder<List<Payment>>(
-                    stream: PaymentService.instance.paymentsStream(
-                      groupId: group.id,
-                      userId1: otherMemberId,
-                      userId2: authBloc.uid,
-                    ),
-                    builder: (context, payments) {
-                      if (payments.isEmpty) {
-                        return ListEmpty(text: "Payment History is empty");
+                  child: BlocBuilder<PaymentsCubit, PaymentsState>(
+                    builder: (context, paymentsState) {
+                      if (paymentsState is PaymentsLoading) {
+                        return Center(child: Loader());
                       }
 
-                      payments.sort((Payment payment1, Payment payment2) {
-                        if (payment1.timeCreated == null) {
-                          return 1;
-                        }
-                        if (payment2.timeCreated == null) {
-                          return -1;
-                        }
-                        return payment1.timeCreated!
-                                .isAfter(payment2.timeCreated!)
-                            ? -1
-                            : 1;
-                      });
+                      if (paymentsState is PaymentsError) {
+                        return Center(
+                          child: Text(
+                            paymentsState.error,
+                            style: TextStyle(
+                              color: Theme.of(context).errorColor,
+                            ),
+                          ),
+                        );
+                      }
 
-                      return ListView.builder(
-                        itemCount: payments.length,
-                        itemBuilder: (context, index) {
-                          return PaymentListItem(
-                            payment: payments[index],
-                            receiverUid: authBloc.uid,
-                          );
-                        },
-                      );
+                      if (paymentsState is PaymentsLoaded) {
+                        final payments = paymentsState.payments;
+
+                        if (payments.isEmpty) {
+                          return ListEmpty(text: 'Payment History is empty');
+                        }
+
+                        payments.sort((Payment payment1, Payment payment2) {
+                          if (payment1.timeCreated == null) {
+                            return 1;
+                          }
+                          if (payment2.timeCreated == null) {
+                            return -1;
+                          }
+                          return payment1.timeCreated!
+                                  .isAfter(payment2.timeCreated!)
+                              ? -1
+                              : 1;
+                        });
+
+                        return ListView(
+                          children: payments
+                              .map((p) => PaymentListItem(payment: p))
+                              .toList(),
+                        );
+                      }
+
+                      return SizedBox.shrink();
                     },
                   ),
                 )

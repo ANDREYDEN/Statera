@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
-import 'package:statera/data/services/payment_service.dart';
+import 'package:statera/data/services/payment_repository.dart';
 
 class ExpenseService extends Firestore {
   static ExpenseService? _instance;
@@ -67,7 +67,7 @@ class ExpenseService extends Firestore {
         .update({'finalizedDate': Timestamp.now()});
     // add expense payments from author to all assignees
     await Future.wait(
-      expense.assignees.map((assignee) => PaymentService.instance.addPayment(
+      expense.assignees.map((assignee) => PaymentRepository.instance.addPayment(
             Payment(
               groupId: expense.groupId,
               payerId: expense.author.uid,
