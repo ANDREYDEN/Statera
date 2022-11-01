@@ -17,7 +17,7 @@ class PaymentListPage extends StatelessWidget {
       builder: (context, otherMemberId) {
         return GroupBuilder(
           builder: (context, group) {
-            var otherMember = group.getUser(otherMemberId);
+            var otherMember = group.getMember(otherMemberId);
 
             return PageScaffold(
               title: "${otherMember.name} payments",

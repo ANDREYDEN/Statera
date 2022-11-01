@@ -25,7 +25,7 @@ class PaymentListBody extends StatelessWidget {
       builder: (context, otherMemberId) {
         return GroupBuilder(
           builder: (context, group) {
-            final otherMember = group.getUser(otherMemberId);
+            final otherMember = group.getMember(otherMemberId);
             final balance = group.balance[authBloc.uid]![otherMemberId]!;
 
             return Column(
