@@ -68,7 +68,7 @@ class GroupService extends Firestore {
       Group group = Group.fromFirestore(
           groupSnap.data() as Map<String, dynamic>,
           id: groupSnap.id);
-      return group.getUser(memberId);
+      return group.getMember(memberId);
     });
   }
 

@@ -4,6 +4,10 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 
+/// Shows all group members to select from.
+/// 
+/// If [singleSelection] is `true`, returns a `String?` containing the picked member uid.
+/// If [singleSelection] is `false`, returns a `List<String>?` containing the picked members' uids.
 class MemberSelectDialog extends StatefulWidget {
   final String title;
   final List<String>? value;
@@ -52,7 +56,7 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
         ),
       ),
       actions: [
-        CancelButton(),
+        CancelButton(returnsNull: true),
         ElevatedButton(
           onPressed: _selectedMemberUids.isNotEmpty
               ? () {

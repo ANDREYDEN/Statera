@@ -68,7 +68,7 @@ class Group {
           adminId: adminId,
         );
 
-  Author get admin => _adminId != null ? getUser(_adminId!) : members.first;
+  Author get admin => _adminId != null ? getMember(_adminId!) : members.first;
 
   set adminUid(String uid) {
     if (!memberExists(uid))
@@ -108,7 +108,7 @@ class Group {
   bool memberExists(String uid) =>
       this.members.any((member) => member.uid == uid);
 
-  Author getUser(String uid) =>
+  Author getMember(String uid) =>
       this.members.firstWhere((member) => member.uid == uid);
 
   void addUser(User user) {
@@ -131,7 +131,7 @@ class Group {
   Map<Author, double> getOwingsForUser(String uid) {
     return this
         .balance[uid]!
-        .map((otherUid, balance) => MapEntry(getUser(otherUid), balance));
+        .map((otherUid, balance) => MapEntry(getMember(otherUid), balance));
   }
 
   void payOffBalance({required Payment payment}) {
