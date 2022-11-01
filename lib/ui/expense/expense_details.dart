@@ -163,24 +163,26 @@ class ExpenseDetails extends StatelessWidget {
   _handleAuthorClick(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
+    final groupCubit = context.read<GroupCubit>();
 
     expenseBloc.add(
       UpdateRequested(
         issuer: authBloc.state.user!,
         update: (expense) async {
-          Author? newAuthor = await showDialog<Author>(
+          final newAuthorUid = await showDialog<String?>(
             context: context,
             builder: (_) => BlocProvider<GroupCubit>.value(
               value: context.read<GroupCubit>(),
               child: MemberSelectDialog(
                 title: 'Change author',
+                singleSelection: true,
                 excludeMe: true,
               ),
             ),
           );
-          if (newAuthor == null) return;
+          if (newAuthorUid == null) return;
 
-          expense.author = newAuthor;
+          expense.author = groupCubit.loadedState.group.getMember(newAuthorUid);
         },
       ),
     );

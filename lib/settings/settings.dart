@@ -56,7 +56,7 @@ class _SettingsState extends State<Settings> {
       builder: (context) => DangerDialog(
         title: 'You are about to DELETE you account',
         valueName: 'username',
-        value: authBloc.user.displayName!,
+        value: authBloc.user.displayName ?? 'anonymous',
         onConfirm: () {
           authBloc.add(AccountDeletionRequested());
           Navigator.pop(context);
@@ -71,137 +71,132 @@ class _SettingsState extends State<Settings> {
 
     return PageScaffold(
       title: 'Settings',
-      child: SingleChildScrollView(
-        child: Container(
-          width:
-              layoutState.isWide ? MediaQuery.of(context).size.width / 3 : null,
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SectionTitle('Profile Information'),
-              Align(
-                alignment: Alignment.center,
-                child: Stack(
-                  children: [
-                    AuthorAvatar(
-                      author: Author.fromUser(authBloc.user),
-                      width: 200,
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: IconButton(
-                        onPressed: () async {
-                          try {
-                            final pickedFile = await _picker.pickImage(
-                                source: ImageSource.gallery);
-                            if (pickedFile == null) return;
-
-                            String url = await _firebaseStorageRepository
-                                .uploadPickedFile(
-                              pickedFile,
-                              path: 'profileUrls/',
-                            );
-
-                            authBloc.add(UserDataUpdated(photoURL: url));
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Error while updating profile: $e'),
-                            ));
-                            FirebaseCrashlytics.instance.recordError(
-                              e,
-                              null,
-                              reason: 'Profile image update failed',
-                            );
-                          }
-                        },
-                        icon: Icon(Icons.add_a_photo),
-                      ),
-                    )
-                  ],
+      child: ListView(
+        padding: EdgeInsets.symmetric(
+          vertical: 20,
+          horizontal:
+              layoutState.isWide ? MediaQuery.of(context).size.width / 3 : 20,
+        ),
+        children: [
+          SectionTitle('Profile Information'),
+          Align(
+            alignment: Alignment.center,
+            child: Stack(
+              children: [
+                AuthorAvatar(
+                  author: Author.fromUser(authBloc.user),
+                  width: 200,
                 ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _displayNameController,
-                decoration: InputDecoration(
-                  label: Text('Display Name'),
-                  errorText: _displayNameErrorText,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _displayNameErrorText =
-                        value == '' ? 'Can not be empty' : null;
-                  });
-                },
-                onEditingComplete: () {
-                  if (_displayNameController.text == '') return;
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    onPressed: () async {
+                      try {
+                        final pickedFile = await _picker.pickImage(
+                            source: ImageSource.gallery);
+                        if (pickedFile == null) return;
 
-                  authBloc
-                      .add(UserDataUpdated(name: _displayNameController.text));
-                },
-              ),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  authBloc.add(LogoutRequested());
-                  Navigator.pop(context);
-                },
-                child: Text('Log Out'),
-              ),
-              SizedBox(height: 40),
-              BlocBuilder<NotificationsCubit, NotificationsState>(
-                builder: (context, state) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SectionTitle('Notifications Preferences'),
-                      if (!state.allowed)
-                        ElevatedButton(
-                          onPressed: () {
-                            if (kIsWeb) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Please turn on notifications for this website',
-                                  ),
-                                ),
-                              );
-                              return;
-                            }
+                        String url =
+                            await _firebaseStorageRepository.uploadPickedFile(
+                          pickedFile,
+                          path: 'profileUrls/',
+                        );
 
-                            AppSettings.openNotificationSettings();
-                          },
-                          child: Text('Enable notifications'),
-                        )
-                      else
-                        Column(
-                          children: [
-                            Text('Coming Soon...')
-                          ], //notificationPermissionToggles
-                        )
-                    ],
-                  );
-                },
-              ),
-              SizedBox(height: 40),
-              DangerZone(
+                        authBloc.add(UserDataUpdated(photoURL: url));
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Error while updating profile: $e'),
+                        ));
+                        FirebaseCrashlytics.instance.recordError(
+                          e,
+                          null,
+                          reason: 'Profile image update failed',
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.add_a_photo),
+                  ),
+                )
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          TextField(
+            controller: _displayNameController,
+            decoration: InputDecoration(
+              label: Text('Display Name'),
+              errorText: _displayNameErrorText,
+            ),
+            onChanged: (value) {
+              setState(() {
+                _displayNameErrorText = value == '' ? 'Can not be empty' : null;
+              });
+            },
+            onEditingComplete: () {
+              if (_displayNameController.text == '') return;
+
+              authBloc.add(UserDataUpdated(name: _displayNameController.text));
+            },
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              authBloc.add(LogoutRequested());
+              Navigator.pop(context);
+            },
+            child: Text('Log Out'),
+          ),
+          SizedBox(height: 40),
+          BlocBuilder<NotificationsCubit, NotificationsState>(
+            builder: (context, state) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ListTile(
-                    title: Text('Delete your Account'),
-                    subtitle: Text(
-                        'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
-                    trailing: DangerButton(
-                      text: 'Delete Account',
-                      onPressed: _handleDeleteAccount,
-                    ),
-                  )
+                  SectionTitle('Notifications Preferences'),
+                  if (!state.allowed)
+                    ElevatedButton(
+                      onPressed: () {
+                        if (kIsWeb) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Please turn on notifications for this website',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        AppSettings.openNotificationSettings();
+                      },
+                      child: Text('Enable notifications'),
+                    )
+                  else
+                    Column(
+                      children: [
+                        Text('Coming Soon...')
+                      ], //notificationPermissionToggles
+                    )
                 ],
-              ),
+              );
+            },
+          ),
+          SizedBox(height: 40),
+          DangerZone(
+            children: [
+              ListTile(
+                title: Text('Delete your Account'),
+                subtitle: Text(
+                    'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
+                trailing: DangerButton(
+                  text: 'Delete Account',
+                  onPressed: _handleDeleteAccount,
+                ),
+              )
             ],
           ),
-        ),
+        ],
       ),
     );
   }

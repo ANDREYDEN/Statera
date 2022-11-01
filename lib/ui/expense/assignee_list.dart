@@ -20,7 +20,7 @@ class AssigneeList extends StatelessWidget {
                   children: expense.assignees.map((assignee) {
                     if (!group.memberExists(assignee.uid))
                       return Icon(Icons.error);
-                    var member = group.getUser(assignee.uid);
+                    var member = group.getMember(assignee.uid);
                     return AuthorAvatar(
                       margin: const EdgeInsets.only(right: 4),
                       author: member,

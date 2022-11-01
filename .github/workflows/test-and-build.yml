@@ -131,5 +131,5 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build Android app
+      - name: Build Web app
         run: flutter build web
