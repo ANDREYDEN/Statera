@@ -56,7 +56,7 @@ class _SettingsState extends State<Settings> {
       builder: (context) => DangerDialog(
         title: 'You are about to DELETE you account',
         valueName: 'username',
-        value: authBloc.user.displayName!,
+        value: authBloc.user.displayName ?? 'anonymous',
         onConfirm: () {
           authBloc.add(AccountDeletionRequested());
           Navigator.pop(context);
@@ -71,13 +71,12 @@ class _SettingsState extends State<Settings> {
 
     return PageScaffold(
       title: 'Settings',
-      child: SingleChildScrollView(
+      child: Center(
         child: Container(
           width:
               layoutState.isWide ? MediaQuery.of(context).size.width / 3 : null,
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
               SectionTitle('Profile Information'),
               Align(
