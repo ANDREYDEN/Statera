@@ -32,58 +32,58 @@ class GroupSettings extends StatelessWidget {
         debtThresholdController.text = group.debtThreshold.toString();
         final isAdmin = group.isAdmin(uid);
 
-        return Container(
-          padding: EdgeInsets.all(20),
-          width:
-              layoutState.isWide ? MediaQuery.of(context).size.width / 3 : null,
-          child: ListView(
-            children: [
-              if (isAdmin) ...[
-                SectionTitle('General Settings'),
-                // TODO: validate these fields the same way as in the CRUD Dialog
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
-                  onSubmitted: (value) {
-                    final groupCubit = context.read<GroupCubit>();
-
-                    groupCubit.update((group) {
-                      group.name = value;
-                    });
-                  },
-                ),
-                TextField(
-                  controller: currencyController,
-                  decoration: InputDecoration(labelText: 'Currency Sign'),
-                  onSubmitted: (value) {
-                    groupCubit.update((group) {
-                      group.currencySign = value;
-                    });
-                  },
-                ),
-                TextField(
-                  controller: debtThresholdController,
-                  decoration: InputDecoration(labelText: 'Debt Threshold'),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp('-'))
-                  ],
-                  onSubmitted: (value) {
-                    groupCubit.update((group) {
-                      group.debtThreshold = double.parse(value);
-                    });
-                  },
-                ),
-                SizedBox(height: 40),
-              ],
-              DangerZone(
-                children: [
-                  if (isAdmin) TransferOwnershipSetting(groupName: group.name),
-                  LeaveGroupSetting(isAdmin: isAdmin, groupName: group.name),
-                  if (isAdmin) DeleteGroupSetting(groupName: group.name)
-                ],
-              ),
-            ],
+        return ListView(
+          padding: EdgeInsets.symmetric(
+            vertical: 20,
+            horizontal:
+                layoutState.isWide ? MediaQuery.of(context).size.width / 4 : 20,
           ),
+          children: [
+            if (isAdmin) ...[
+              SectionTitle('General Settings'),
+              // TODO: validate these fields the same way as in the CRUD Dialog
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+                onSubmitted: (value) {
+                  final groupCubit = context.read<GroupCubit>();
+
+                  groupCubit.update((group) {
+                    group.name = value;
+                  });
+                },
+              ),
+              TextField(
+                controller: currencyController,
+                decoration: InputDecoration(labelText: 'Currency Sign'),
+                onSubmitted: (value) {
+                  groupCubit.update((group) {
+                    group.currencySign = value;
+                  });
+                },
+              ),
+              TextField(
+                controller: debtThresholdController,
+                decoration: InputDecoration(labelText: 'Debt Threshold'),
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp('-'))
+                ],
+                onSubmitted: (value) {
+                  groupCubit.update((group) {
+                    group.debtThreshold = double.parse(value);
+                  });
+                },
+              ),
+              SizedBox(height: 40),
+            ],
+            DangerZone(
+              children: [
+                if (isAdmin) TransferOwnershipSetting(groupName: group.name),
+                LeaveGroupSetting(isAdmin: isAdmin, groupName: group.name),
+                if (isAdmin) DeleteGroupSetting(groupName: group.name)
+              ],
+            ),
+          ],
         );
       },
     );
