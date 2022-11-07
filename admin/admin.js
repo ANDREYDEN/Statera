@@ -7,20 +7,20 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    // const groupId = 'YRhfpXAsOiRH9eOvFpBr';
-    const groupId = 'mX6FbRb5do50QYzEAmoS';
+    const groupId = '34zsdaQ63veJqM35MmhQ';
+    // const groupId = 'mX6FbRb5do50QYzEAmoS';
     const groupSnap = await db.collection('groups').doc(groupId).get();
     let group = groupSnap.data();
 
-    // const expenseId = 'G3vGbiZOx0Pbovy886NK'
     const expenseId = 'G3vGbiZOx0Pbovy886NK'
+    // const expenseId = 'aba7qqKHpRMlOeeWqCC8'
     const expenseSnap = await db.collection('expenses').doc(expenseId).get();
     let expense = expenseSnap.data();
 
     group = finalizeExpense(group, expense)
 
-    console.log(group);
-    // await groupSnap.ref.set(group)
+    // console.log(group);
+    await groupSnap.ref.set(group)
 })();
 
 /**
@@ -46,9 +46,10 @@ function addUserToGroup(group, user) {
 
 function finalizeExpense(group, expense) {
     const authorId = expense.author.uid
-    
-    for (const assigneeId of expense.assigneeIds) {
+
+    for (const assigneeId of expense.assigneeIds.filter(a => a != authorId)) {
         const owedValueToAuthor = getTotalDebt(expense, assigneeId)
+        console.log({ assigneeId, owedValueToAuthor });
         group.balance[assigneeId][authorId] += owedValueToAuthor;
         group.balance[authorId][assigneeId] -= owedValueToAuthor;
     }
