@@ -37,7 +37,7 @@ service cloud.firestore {
     }
 
     function fieldsChanged(fields) {
-      return debug(request.resource.data.diff(resource.data).affectedKeys()).hasOnly(fields);
+      return debug(request.resource.data.diff(resource.data).changedKeys()).hasOnly(fields);
     }
   }
 }
