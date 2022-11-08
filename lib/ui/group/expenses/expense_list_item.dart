@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -21,7 +23,6 @@ class ExpenseListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthBloc authBloc = context.read<AuthBloc>();
-    final groupCubit = context.read<GroupCubit>();
     final expenseBloc = context.read<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
 
@@ -72,8 +73,8 @@ class ExpenseListItem extends StatelessWidget {
                                 Text(
                                   pluralize('item', this.expense.items.length) +
                                       (toStringDate(this.expense.date) == null
-                                          ? ""
-                                          : " on ${toStringDate(this.expense.date)!}"),
+                                          ? ''
+                                          : ' on ${toStringDate(this.expense.date)!}'),
                                 ),
                               ],
                             ),
@@ -97,26 +98,17 @@ class ExpenseListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (expense.canBeFinalizedBy(authBloc.state.user!.uid))
+                if (expense.canBeFinalizedBy(authBloc.uid))
                   ProtectedButton(
                     onPressed: () {
                       snackbarCatch(
                         GroupPage.scaffoldKey.currentContext!,
-                        () async {
-                          // TODO: use transaction
-                          await ExpenseService.instance
-                              .finalizeExpense(expense);
-                          await Callables.notifyWhenExpenseFinalized(
-                              expenseId: expense.id);
-                          groupCubit.update((group) {
-                            group.updateBalance(expense);
-                          });
-                        },
+                        () => _handleFinalizeExpense(context),
                         successMessage:
                             "The expense is now finalized. Participants' balances updated.",
                       );
                     },
-                    child: Text("Finalize"),
+                    child: Text('Finalize'),
                   ),
               ],
             ),
@@ -124,5 +116,18 @@ class ExpenseListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleFinalizeExpense(BuildContext context) async {
+    final groupCubit = context.read<GroupCubit>();
+
+    // TODO: use transaction
+    await ExpenseService.instance.finalizeExpense(expense);
+    try {
+      Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
+    } catch (e) {
+      log(e.toString());
+    }
+    groupCubit.update((group) => group.updateBalance(expense));
   }
 }

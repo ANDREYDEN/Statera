@@ -28,7 +28,7 @@ class GroupSettingsPreview extends StatelessWidget {
     when(() => authBloc.stream).thenAnswer((_) => Stream.fromIterable([]));
 
     final groupCubit = GroupCubitMock();
-    when(() => groupCubit.update(any())).thenAnswer((_) {});
+    when(() => groupCubit.update(any())).thenAnswer((_) async {});
     when(() => groupCubit.removeUser(any())).thenAnswer((_) {});
     when(() => groupCubit.delete()).thenAnswer((_) {});
     when(() => groupCubit.stream).thenAnswer((_) => Stream.fromIterable([]));

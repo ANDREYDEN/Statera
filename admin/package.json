@@ -1,0 +1,15 @@
+{
+  "name": "admin-statera",
+  "version": "1.0.0",
+  "description": "",
+  "main": "admin.js",
+  "scripts": {
+    "start": "export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && node admin.js",
+    "start:emulate": "export FIRESTORE_EMULATOR_HOST=\"localhost:8080\" && export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && node admin.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-admin": "^10.0.0"
+  }
+}
