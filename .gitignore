@@ -51,7 +51,6 @@ GoogleService-Info.plist
 serviceAccount.json
 *.mocks.dart
 *.cache
-/admin
 receipts
 
 # fastlane specific
