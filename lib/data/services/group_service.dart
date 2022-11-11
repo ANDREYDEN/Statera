@@ -6,10 +6,10 @@ import 'package:statera/data/services/services.dart';
 
 class GroupService extends Firestore {
   static GroupService? _instance;
-  late final DynamicLinkRepository _dynamicLinkRepository;
+  late final DynamicLinkService _dynamicLinkRepository;
 
   GroupService() : super() {
-    _dynamicLinkRepository = DynamicLinkRepository();
+    _dynamicLinkRepository = DynamicLinkService();
   }
 
   static GroupService get instance {

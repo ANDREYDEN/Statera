@@ -1,9 +1,6 @@
-import 'dart:async';
-
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/data/services/dynamic_link_repository.dart';
+import 'package:statera/data/services/dynamic_link_service.dart';
 import 'package:statera/utils/helpers.dart';
 
 class DynamicLinkHandler extends StatefulWidget {
@@ -16,25 +13,15 @@ class DynamicLinkHandler extends StatefulWidget {
 }
 
 class _DynamicLinkHandlerState extends State<DynamicLinkHandler> {
-  StreamSubscription<PendingDynamicLinkData>? _dynamicLinkSubscription;
-
-  DynamicLinkRepository get dynamicLinkRepository =>
-      context.read<DynamicLinkRepository>();
+  DynamicLinkService get dynamicLinkRepository =>
+      context.read<DynamicLinkService>();
 
   @override
   void initState() {
     if (isMobilePlatform()) {
-      dynamicLinkRepository
-          .retrieveDynamicLink(context)
-          .then((subscription) => _dynamicLinkSubscription = subscription);
+      dynamicLinkRepository.listen(context);
     }
     super.initState();
-  }
-
-  @override
-  void deactivate() {
-    _dynamicLinkSubscription?.cancel();
-    super.deactivate();
   }
 
   @override

@@ -22,7 +22,6 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   void load(BuildContext context) {
     _listenForNotifications(context);
-    _checkIfNotificationLaunchedApp(context);
   }
 
   Future<void> requestPermission({required String uid}) async {
@@ -43,12 +42,6 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   void _listenForNotifications(BuildContext context) {
     _notificationService.listenForNotification(
-      onMessage: (message) => _messageHandler.handleMessage(message, context),
-    );
-  }
-
-  void _checkIfNotificationLaunchedApp(BuildContext context) {
-    _notificationService.checkForLaunchingNotification(
       onMessage: (message) => _messageHandler.handleMessage(message, context),
     );
   }

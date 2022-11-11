@@ -21,23 +21,32 @@ class NotificationMessageHandler {
     _lastMessageHandledAt = DateTime.now();
 
     log('handling message ${message.data}');
-    if (message.data['type'] == null) return;
 
+    final path = getPath(message);
+    if (path == null) return;
+
+    Navigator.pushNamed(context, path);
+  }
+
+  static String? getPath(RemoteMessage? message) {
+    if (message == null) return null;
     switch (message.data['type']) {
       case 'expense_created':
       case 'expense_finalized':
         if (message.data['expenseId'] != null) {
-          Navigator.pushNamed(context, '/expense/${message.data['expenseId']}');
+          return '/expense/${message.data['expenseId']}';
         }
         break;
       case 'group_debt_threshold_reached':
       case 'expense_completed':
         if (message.data['groupId'] != null) {
-          Navigator.pushNamed(context, '/group/${message.data['groupId']}');
+          return '/group/${message.data['groupId']}';
         }
         break;
       default:
-        return;
+        return null;
     }
+
+    return null;
   }
 }
