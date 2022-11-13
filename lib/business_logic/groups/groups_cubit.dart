@@ -53,13 +53,6 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
-  joinGroup(String groupCode, User newMember) async {
-    if (state is GroupsLoaded) {
-      emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await _groupService.joinGroup(groupCode, newMember);
-    }
-  }
-
   @override
   Future<void> close() {
     _groupsSubscription?.cancel();

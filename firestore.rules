@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /groups/{groupId} {
       // only authorize members to read group data
-    	allow read: if isGroupMember();
+    	allow read: if true; //isGroupMember(); TODO: this does not work for joining groups
       
       // authorize any authenticated user to create groups
     	allow create: if request.auth != null;

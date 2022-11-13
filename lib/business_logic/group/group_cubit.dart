@@ -25,7 +25,13 @@ class GroupCubit extends Cubit<GroupState> {
         .map((group) => group == null
             ? GroupError(error: 'Group does not exist')
             : GroupLoaded(group: group))
-        .listen(emit);
+        .handleError((e) {
+      if (e is FirebaseException) {
+        emit(GroupError(error: 'Permission denied'));
+      } else {
+        emit(GroupError(error: 'Something went wrong'));
+      }
+    }).listen(emit);
   }
 
   void empty() {
