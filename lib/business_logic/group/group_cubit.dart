@@ -68,7 +68,7 @@ class GroupCubit extends Cubit<GroupState> {
     _groupService.saveGroup(group);
   }
 
-  void join(String? code, String uid) async {
+  Future<void> join(String? code, String uid) async {
     if (code != loadedState.group.code) {
       emit(GroupError(
           error:
@@ -83,9 +83,9 @@ class GroupCubit extends Cubit<GroupState> {
 
     emit(GroupLoading());
     final user = await _userRepository.getUser(uid);
-    final groupId = await _groupService.joinGroup(code!, user);
-    await _expenseService.addUserToOutstandingExpenses(uid, groupId);
-    emit(GroupJoinSuccess());
+    final group = await _groupService.joinGroup(code!, user);
+    await _expenseService.addUserToOutstandingExpenses(uid, group.id);
+    emit(GroupJoinSuccess(group: group));
   }
 
   void generateInviteLink() async {

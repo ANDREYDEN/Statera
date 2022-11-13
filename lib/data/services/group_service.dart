@@ -83,7 +83,7 @@ class GroupService extends Firestore {
     return groupReference.id;
   }
 
-  Future<String?> joinGroup(String groupCode, Author user) async {
+  Future<Group> joinGroup(String groupCode, Author user) async {
     var group = await getGroup(groupCode);
     if (group.members.any((member) => member.uid == user.uid)) {
       throw Exception('Member ${user.uid} already exists');
@@ -92,7 +92,7 @@ class GroupService extends Firestore {
     group.addMember(user);
     await groupsCollection.doc(group.id).update(group.toFirestore());
 
-    return group.id;
+    return group;
   }
 
   Future<void> saveGroup(Group group) async {

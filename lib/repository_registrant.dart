@@ -20,6 +20,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => NotificationService()),
         RepositoryProvider(create: (_) => groupService),
         RepositoryProvider(create: (_) => PaymentService(groupService)),
+        RepositoryProvider(create: (_) => ExpenseService()),
       ],
       child: child,
     );

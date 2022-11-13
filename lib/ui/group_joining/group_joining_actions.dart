@@ -9,8 +9,7 @@ import 'package:statera/ui/widgets/buttons/protected_button.dart';
 class GroupJoiningActions extends StatelessWidget {
   final String? code;
 
-  const GroupJoiningActions({Key? key, this.code})
-      : super(key: key);
+  const GroupJoiningActions({Key? key, this.code}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +20,9 @@ class GroupJoiningActions extends StatelessWidget {
       children: [
         Expanded(
           child: ProtectedButton(
-            onPressed: () {
-              groupCubit.join(code, uid);
+            onPressed: () async {
+              await groupCubit.join(code, uid);
+              Navigator.pushReplacementNamed(context, GroupList.route);
             },
             child: Text('Join'),
           ),

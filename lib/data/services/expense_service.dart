@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
-import 'package:statera/data/services/payment_service.dart';
 
 class ExpenseService extends Firestore {
-  final PaymentService _paymentSerice;
-
-  ExpenseService(this._paymentSerice) : super();
+  ExpenseService() : super();
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return queryToExpensesStream(
@@ -58,18 +55,6 @@ class ExpenseService extends Firestore {
     await expensesCollection
         .doc(expense.id)
         .update({'finalizedDate': Timestamp.now()});
-    // add expense payments from author to all assignees
-    await Future.wait(
-      expense.assignees.map((assignee) => _paymentSerice.addPayment(
-            Payment(
-              groupId: expense.groupId,
-              payerId: expense.author.uid,
-              receiverId: assignee.uid,
-              value: expense.getConfirmedTotalForUser(assignee.uid),
-              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-            ),
-          )),
-    );
   }
 
   Future<void> deleteExpense(Expense expense) {

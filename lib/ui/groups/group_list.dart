@@ -101,7 +101,7 @@ class _GroupListState extends State<GroupList> {
   }
 
   createGroup() {
-    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    final authBloc = context.read<AuthBloc>();
     final groupsCubit = context.read<GroupsCubit>();
 
     final newGroup = Group.empty(name: '');
@@ -142,7 +142,7 @@ class _GroupListState extends State<GroupList> {
           newGroup.currencySign = values['currency']!;
           newGroup.debtThreshold = double.parse(values['debt_threshold']!);
 
-          groupsCubit.addGroup(newGroup, uid);
+          groupsCubit.addGroup(newGroup, authBloc.uid);
         },
       ),
     );

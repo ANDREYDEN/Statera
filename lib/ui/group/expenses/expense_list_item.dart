@@ -6,9 +6,9 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/callables.dart';
-import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
@@ -121,9 +121,22 @@ class ExpenseListItem extends StatelessWidget {
   Future<void> _handleFinalizeExpense(BuildContext context) async {
     final groupCubit = context.read<GroupCubit>();
     final expenseService = context.read<ExpenseService>();
+    final paymentService = context.read<PaymentService>();
 
     // TODO: use transaction
     await expenseService.finalizeExpense(expense);
+    // add expense payments from author to all assignees
+    await Future.wait(
+      expense.assignees.map((assignee) => paymentService.addPayment(
+            Payment(
+              groupId: expense.groupId,
+              payerId: expense.author.uid,
+              receiverId: assignee.uid,
+              value: expense.getConfirmedTotalForUser(assignee.uid),
+              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
+            ),
+          )),
+    );
     try {
       Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
     } catch (e) {
