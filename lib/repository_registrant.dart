@@ -9,12 +9,11 @@ class RepositoryRegistrant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userRepository = UserRepository();
-    final groupService = GroupService(userRepository);
+    final groupService = GroupService();
 
     return MultiRepositoryProvider(providers: [
       RepositoryProvider(create: (_) => AuthService()),
-      RepositoryProvider(create: (_) => userRepository),
+      RepositoryProvider(create: (_) => UserRepository()),
       RepositoryProvider(create: (_) => DynamicLinkRepository()),
       RepositoryProvider(create: (_) => FirebaseStorageRepository()),
       RepositoryProvider(create: (_) => NotificationService()),
