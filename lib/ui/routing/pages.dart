@@ -30,8 +30,10 @@ final _landingPagePath = PagePath(
 final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
   builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (context) => GroupsCubit(context.read<GroupService>())
-      ..load(context.read<AuthBloc>().uid),
+    create: (context) => GroupsCubit(
+      context.read<GroupService>(),
+      context.read<UserRepository>(),
+    )..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
 );
@@ -52,6 +54,7 @@ final List<PagePath> _paths = [
           create: (context) => GroupCubit(
             context.read<GroupService>(),
             context.read<ExpenseService>(),
+            context.read<UserRepository>(),
           )..load(matches?[0]),
         ),
         BlocProvider(
@@ -80,6 +83,7 @@ final List<PagePath> _paths = [
           create: (_) => GroupCubit(
             context.read<GroupService>(),
             context.read<ExpenseService>(),
+            context.read<UserRepository>(),
           )..loadFromExpense(matches?[0]),
         )
       ],
@@ -95,6 +99,7 @@ final List<PagePath> _paths = [
           create: (context) => GroupCubit(
             context.read<GroupService>(),
             context.read<ExpenseService>(),
+            context.read<UserRepository>(),
           )..load(matches?[0]),
         ),
         BlocProvider<OwingCubit>(
@@ -110,6 +115,7 @@ final List<PagePath> _paths = [
       create: (context) => GroupCubit(
         context.read<GroupService>(),
         context.read<ExpenseService>(),
+        context.read<UserRepository>(),
       )..load(matches?[0]),
       child: GroupJoining(code: matches?[1]),
     ),

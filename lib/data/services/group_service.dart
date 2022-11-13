@@ -77,21 +77,18 @@ class GroupService extends Firestore {
   }
 
   /// Creates a new group and returns its Firestore id
-  Future<String> createGroup(Group newGroup, String uid) async {
-    final user = await _userRepository.getUser(uid);
+  Future<String> createGroup(Group newGroup, Author user) async {
     newGroup.addMember(user);
 
     final groupReference = await groupsCollection.add(newGroup.toFirestore());
     return groupReference.id;
   }
 
-  Future<String?> joinGroup(String groupCode, String uid) async {
+  Future<String?> joinGroup(String groupCode, Author user) async {
     var group = await getGroup(groupCode);
-    if (group.members.any((member) => member.uid == uid)) {
-      throw Exception('Member $uid already exists');
+    if (group.members.any((member) => member.uid == user.uid)) {
+      throw Exception('Member ${user.uid} already exists');
     }
-
-    final user = await _userRepository.getUser(uid);
     
     group.addMember(user);
     await groupsCollection.doc(group.id).update(group.toFirestore());

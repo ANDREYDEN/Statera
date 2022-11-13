@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
@@ -9,6 +9,16 @@ import 'package:statera/data/services/services.dart';
 class MockGroupService extends Mock implements GroupService {}
 
 class MockExpenseService extends Mock implements ExpenseService {}
+
+class MockUserRepository extends Mock implements UserRepository {
+  Future<Author> getUser(String uid) => super.noSuchMethod(
+        Invocation.method(
+          #getUser,
+          [uid],
+        ),
+        returnValue: Future.value(Author.fake()),
+      );
+}
 
 class MockUser extends Mock implements User {}
 
@@ -19,21 +29,21 @@ void main() {
     late GroupCubit groupCubit;
     late GroupService groupService;
     late ExpenseService expenseService;
+    late UserRepository userRepository;
     final String testUserId = 'qwe145';
+    final Author testUser = Author(uid: testUserId, name: 'Foo');
     final String testCode = 'qweqwe321';
     final Group testGroup = Group.empty(code: testCode);
-
-    setUpAll(() {
-      registerFallbackValue(FakeUser());
-    });
 
     setUp(() {
       groupService = MockGroupService();
       expenseService = MockExpenseService();
-      groupCubit = GroupCubit(groupService, expenseService);
-      when(() => groupService.groupStream(any()))
+      userRepository = MockUserRepository();
+      groupCubit = GroupCubit(groupService, expenseService, userRepository);
+      when(groupService.groupStream(any))
           .thenAnswer((_) => Stream.fromIterable([testGroup]));
-      when(() => groupService.joinGroup(any(), any())).thenAnswer((_) async => testGroup.id);
+      when(groupService.joinGroup(testGroup.code!, testUser))
+          .thenAnswer((_) async => testGroup.id);
     });
 
     test('has initial state of GroupLoading', () {
@@ -58,7 +68,7 @@ void main() {
         act: (cubit) => cubit.join(testCode, testUserId),
         expect: () => [GroupLoading(), GroupJoinSuccess()],
         verify: (_) {
-          verify(() => groupService.joinGroup(testCode, testUserId)).called(1);
+          verify(() => groupService.joinGroup(testCode, testUser)).called(1);
         },
       );
 
@@ -74,7 +84,7 @@ void main() {
           )
         ],
         verify: (_) {
-          verifyNever(() => groupService.joinGroup(any(), any()));
+          verifyNever(() => groupService.joinGroup(testGroup.code!, testUser));
         },
       );
 
@@ -90,7 +100,7 @@ void main() {
         expect: () =>
             [GroupError(error: 'You are already a member of this group')],
         verify: (_) {
-          verifyNever(() => groupService.joinGroup(any(), any()));
+          verifyNever(() => groupService.joinGroup(testGroup.code!, testUser));
         },
       );
     });

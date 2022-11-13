@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
@@ -10,12 +9,14 @@ import 'package:statera/data/services/services.dart';
 part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
-  late final GroupService _groupService;
+  final GroupService _groupService;
+  final UserRepository _userRepository;
   StreamSubscription? _groupsSubscription;
 
-  GroupsCubit(GroupService groupService) : super(GroupsLoading()) {
-    _groupService = groupService;
-  }
+  GroupsCubit(
+    this._groupService,
+    this._userRepository,
+  ) : super(GroupsLoading());
 
   void load(String? userId) {
     _groupsSubscription?.cancel();
@@ -48,7 +49,8 @@ class GroupsCubit extends Cubit<GroupsState> {
     final groupState = state;
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
-      final groupId = await _groupService.createGroup(group, uid);
+      final user = await _userRepository.getUser(uid);
+      final groupId = await _groupService.createGroup(group, user);
       await _groupService.generateInviteLink(group..id = groupId);
     }
   }
