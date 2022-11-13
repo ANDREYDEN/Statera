@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 
+@GenerateNiceMocks([MockSpec<ExpenseService>()])
 class ExpenseService extends Firestore {
   ExpenseService() : super();
 

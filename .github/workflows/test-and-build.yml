@@ -33,6 +33,12 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Generate mocks
+        run: derry create-mocks
+
       - name: Run tests
         run: flutter test
   

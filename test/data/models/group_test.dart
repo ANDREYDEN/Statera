@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/models.dart';
 
 void main() {
-  Author mockUser = Author(uid: 'foo', name: 'Foo');
   const mockUserId = '145';
+  Author mockUser = Author(uid: mockUserId, name: 'Foo');
 
   test('should generate code if not provided', () {
     final group = Group.empty();
@@ -43,7 +43,7 @@ void main() {
 
       group.addMember(mockUser);
 
-      expect(group.balance, contains(mockUserId));
+      expect(group.balance.keys.toList(), contains(mockUserId));
       expect(group.balance[existingMember.uid], contains(mockUserId));
       expect(group.balance[mockUserId], contains(existingMember.uid));
     });
