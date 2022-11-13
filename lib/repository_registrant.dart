@@ -11,14 +11,17 @@ class RepositoryRegistrant extends StatelessWidget {
   Widget build(BuildContext context) {
     final groupService = GroupService();
 
-    return MultiRepositoryProvider(providers: [
-      RepositoryProvider(create: (_) => AuthService()),
-      RepositoryProvider(create: (_) => UserRepository()),
-      RepositoryProvider(create: (_) => DynamicLinkRepository()),
-      RepositoryProvider(create: (_) => FirebaseStorageRepository()),
-      RepositoryProvider(create: (_) => NotificationService()),
-      RepositoryProvider(create: (_) => groupService),
-      RepositoryProvider(create: (_) => PaymentService(groupService)),
-    ], child: child);
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthService()),
+        RepositoryProvider(create: (_) => UserRepository()),
+        RepositoryProvider(create: (_) => DynamicLinkRepository()),
+        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+        RepositoryProvider(create: (_) => NotificationService()),
+        RepositoryProvider(create: (_) => groupService),
+        RepositoryProvider(create: (_) => PaymentService(groupService)),
+      ],
+      child: child,
+    );
   }
 }
