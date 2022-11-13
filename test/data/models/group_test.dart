@@ -3,7 +3,7 @@ import 'package:statera/data/models/models.dart';
 
 void main() {
   const mockUserId = '145';
-  Author mockUser = Author(uid: mockUserId, name: 'Foo');
+  CustomUser mockUser = CustomUser(uid: mockUserId, name: 'Foo');
 
   test('should generate code if not provided', () {
     final group = Group.empty();
@@ -12,9 +12,9 @@ void main() {
   });
 
   test('can get owings for user', () {
-    final firstMember = Author(uid: 'first', name: 'First');
-    final secondMember = Author(uid: 'second', name: 'Second');
-    final thirdMember = Author(uid: 'third', name: 'Third');
+    final firstMember = CustomUser(uid: 'first', name: 'First');
+    final secondMember = CustomUser(uid: 'second', name: 'Second');
+    final thirdMember = CustomUser(uid: 'third', name: 'Third');
 
     final group = Group.empty(
       members: [firstMember, secondMember, thirdMember],
@@ -38,7 +38,7 @@ void main() {
     });
 
     test('adds new balance entries', () {
-      final existingMember = Author.fake();
+      final existingMember = CustomUser.fake();
       var group = Group.empty(members: [existingMember]);
 
       group.addMember(mockUser);
@@ -51,8 +51,8 @@ void main() {
 
   group('admin', () {
     test('if set, retrieves matching member information', () {
-      final firstMember = Author(uid: 'first', name: 'First');
-      final secondMember = Author(uid: 'second', name: 'Second');
+      final firstMember = CustomUser(uid: 'first', name: 'First');
+      final secondMember = CustomUser(uid: 'second', name: 'Second');
 
       final group = Group.empty(
         members: [firstMember, secondMember],
@@ -63,8 +63,8 @@ void main() {
     });
 
     test('if not set, defaults to the first member', () {
-      final firstMember = Author(uid: 'first', name: 'First');
-      final secondMember = Author(uid: 'second', name: 'Second');
+      final firstMember = CustomUser(uid: 'first', name: 'First');
+      final secondMember = CustomUser(uid: 'second', name: 'Second');
 
       final group = Group.empty(members: [firstMember, secondMember]);
 
@@ -72,8 +72,8 @@ void main() {
     });
 
     test('can be checked', () {
-      final firstMember = Author(uid: 'first', name: 'First');
-      final secondMember = Author(uid: mockUserId, name: 'Second');
+      final firstMember = CustomUser(uid: 'first', name: 'First');
+      final secondMember = CustomUser(uid: mockUserId, name: 'Second');
 
       final group = Group.empty(
         members: [firstMember, secondMember],
@@ -86,8 +86,8 @@ void main() {
 
   group('conversion', () {
     test('to Firestore maps member ids', () {
-      final firstMember = Author(uid: 'first', name: 'First');
-      final secondMember = Author(uid: 'second', name: 'Second');
+      final firstMember = CustomUser(uid: 'first', name: 'First');
+      final secondMember = CustomUser(uid: 'second', name: 'Second');
       var group = Group.empty(members: [firstMember, secondMember]);
 
       var firestoreData = group.toFirestore();

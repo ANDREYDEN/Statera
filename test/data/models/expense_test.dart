@@ -2,13 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/assignee.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/item.dart';
 
 void main() {
   group('Expense', () {
     late Expense expense;
-    Author author = Author(name: 'foo', uid: 'bar');
+    CustomUser author = CustomUser(name: 'foo', uid: 'bar');
     Assignee assignee = Assignee(uid: 'qwe');
 
     setUp(() {
@@ -42,7 +41,7 @@ void main() {
           expect(item.getAssigneeParts(assignee.uid), initialParts);
         });
 
-        test("restricts updating with an empty list", () {
+        test('restricts updating with an empty list', () {
           expect(() => expense.updateAssignees([]), throwsException);
         });
       });
@@ -64,7 +63,7 @@ void main() {
           expect(
             item.getAssigneeParts(assignee.uid),
             firstAssigneeParts,
-            reason: "First assignee decision was removed",
+            reason: 'First assignee decision was removed',
           );
           expect(item.isMarkedBy(newAssignee.uid), isFalse);
         });
@@ -77,7 +76,7 @@ void main() {
           expect(expense.canReceiveAssignees, isTrue);
         });
 
-        test("can be performed even if all assignees have made their decisions",
+        test('can be performed even if all assignees have made their decisions',
             () {
           expense.addItem(Item.fake());
           expense.assignees = [assignee];
@@ -145,10 +144,10 @@ void main() {
       expect(expense.isMarkedBy(assignee.uid), isTrue);
     });
 
-    test("can return the number of assignees that have marked all items", () {
-      var firstAssignee = Assignee.fake(uid: "1");
-      var secondAssignee = Assignee.fake(uid: "2");
-      var thirdAssignee = Assignee.fake(uid: "3");
+    test('can return the number of assignees that have marked all items', () {
+      var firstAssignee = Assignee.fake(uid: '1');
+      var secondAssignee = Assignee.fake(uid: '2');
+      var thirdAssignee = Assignee.fake(uid: '3');
       expense.assignees = [firstAssignee, secondAssignee, thirdAssignee];
 
       var item1 = Item.fake();
@@ -168,8 +167,8 @@ void main() {
       expect(expense.definedAssignees, 1);
     });
 
-    group("calculating totals", () {
-      test("gets the total of its items", () {
+    group('calculating totals', () {
+      test('gets the total of its items', () {
         var item1 = Item(name: 'big', value: 124);
         var item2 = Item(name: 'small', value: 42);
         expense.addItem(item1);
@@ -247,7 +246,7 @@ void main() {
       });
     });
 
-    test("can only be updated by the author if not finalized", () {
+    test('can only be updated by the author if not finalized', () {
       var item = Item.fake();
       expense.addItem(item);
       var somebodyElse = Assignee.fake(uid: 'other');
@@ -299,7 +298,7 @@ void main() {
       expect(expense.canBeMarkedBy(outsider.uid), isFalse);
     });
 
-    test("can be marked by any assignee", () {
+    test('can be marked by any assignee', () {
       var item = Item.fake();
       expense.addItem(item);
       var anotherAssignee = Assignee.fake();
@@ -311,7 +310,7 @@ void main() {
       });
     });
 
-    group("conversion", () {
+    group('conversion', () {
       test('expense can be converted to Firestore object', () {
         var expense = Expense(name: 'foo', author: author, groupId: '123');
 
@@ -319,7 +318,7 @@ void main() {
 
         expect(firestoreData['name'], expense.name);
         expect(
-          Author.fromFirestore(firestoreData['author']).uid,
+          CustomUser.fromFirestore(firestoreData['author']).uid,
           expense.author.uid,
         );
         expect(

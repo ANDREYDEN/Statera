@@ -50,7 +50,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
       ? widget.payment.payerId
       : widget.payment.receiverId;
 
-  Author get otherMember => widget.group.getMember(otherMemberUid);
+  CustomUser get otherMember => widget.group.getMember(otherMemberUid);
 
   @override
   Widget build(BuildContext context) {

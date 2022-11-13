@@ -15,7 +15,7 @@ void main() {
     late ExpenseService expenseService;
     late UserRepository userRepository;
     final String testUserId = 'qwe145';
-    final Author testUser = Author(uid: testUserId, name: 'Foo');
+    final CustomUser testUser = CustomUser(uid: testUserId, name: 'Foo');
     final String testCode = 'qweqwe321';
     final Group testGroup = Group.empty(code: testCode);
 
@@ -79,7 +79,7 @@ void main() {
         build: () => groupCubit,
         seed: () {
           Group testGroup = Group.empty(code: 'qwe123');
-          testGroup.addMember(Author(uid: testUserId, name: 'Foo'));
+          testGroup.addMember(CustomUser(uid: testUserId, name: 'Foo'));
           return GroupLoaded(group: testGroup);
         },
         act: (GroupCubit cubit) => cubit.join('qwe123', testUserId),

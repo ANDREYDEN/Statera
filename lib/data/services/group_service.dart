@@ -7,7 +7,7 @@ import 'package:statera/data/services/services.dart';
 @GenerateNiceMocks([MockSpec<GroupService>()])
 class GroupService extends Firestore {
   late final DynamicLinkRepository _dynamicLinkRepository;
-  
+
   GroupService() : super() {
     _dynamicLinkRepository = DynamicLinkRepository();
   }
@@ -53,7 +53,7 @@ class GroupService extends Firestore {
     await groupsCollection.doc(groupId).delete();
   }
 
-  Stream<Author> getGroupMemberStream(
+  Stream<CustomUser> getGroupMemberStream(
       {String? groupId, required String memberId}) {
     return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
       if (!groupSnap.exists) throw new Exception('No group with id $groupId');
@@ -78,19 +78,19 @@ class GroupService extends Firestore {
   }
 
   /// Creates a new group and returns its Firestore id
-  Future<String> createGroup(Group newGroup, Author user) async {
+  Future<String> createGroup(Group newGroup, CustomUser user) async {
     newGroup.addMember(user);
 
     final groupReference = await groupsCollection.add(newGroup.toFirestore());
     return groupReference.id;
   }
 
-  Future<Group> joinGroup(String groupCode, Author user) async {
+  Future<Group> joinGroup(String groupCode, CustomUser user) async {
     var group = await getGroup(groupCode);
     if (group.members.any((member) => member.uid == user.uid)) {
       throw Exception('Member ${user.uid} already exists');
     }
-    
+
     group.addMember(user);
     await groupsCollection.doc(group.id).update(group.toFirestore());
 

@@ -25,7 +25,7 @@ class Expense {
   List<Item> items = [];
   List<Assignee> assignees = [];
   late String name;
-  late Author author;
+  late CustomUser author;
   DateTime? date;
   DateTime? finalizedDate;
   late bool acceptNewMembers;
@@ -42,14 +42,14 @@ class Expense {
 
   Expense.fake() {
     this.name = 'foo';
-    this.author = Author(name: 'foo', uid: 'foo');
+    this.author = CustomUser(name: 'foo', uid: 'foo');
     this.date = DateTime.now();
     this.acceptNewMembers = true;
   }
 
   Expense.empty() {
     this.name = '';
-    this.author = Author(name: '', uid: '');
+    this.author = CustomUser(name: '', uid: '');
   }
 
   bool wasEarlierThan(Expense other) {
@@ -195,7 +195,7 @@ class Expense {
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
     var expense = new Expense(
-      author: Author.fromFirestore(data['author']),
+      author: CustomUser.fromFirestore(data['author']),
       name: data['name'],
       groupId: data['groupId'],
       acceptNewMembers: data['acceptNewMembers'] ?? true,
