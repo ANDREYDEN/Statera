@@ -63,7 +63,7 @@ class GroupCubit extends Cubit<GroupState> {
     _groupService.saveGroup(group);
   }
 
-  void join(String? code, User user) async {
+  void join(String? code, String uid) async {
     if (code != loadedState.group.code) {
       emit(GroupError(
           error:
@@ -71,13 +71,14 @@ class GroupCubit extends Cubit<GroupState> {
       return;
     }
 
-    if (loadedState.group.memberExists(user.uid)) {
+    if (loadedState.group.memberExists(uid)) {
       emit(GroupError(error: 'You are already a member of this group'));
       return;
     }
 
     emit(GroupLoading());
-    await _groupService.joinGroup(code!, user);
+    final groupId = await _groupService.joinGroup(code!, uid);
+    await _expenseService.addUserToOutstandingExpenses(uid, groupId);
     emit(GroupJoinSuccess());
   }
 

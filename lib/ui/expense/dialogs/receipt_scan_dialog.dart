@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +33,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
+
+  ExpenseService get _expenseService => context.read<ExpenseService>();
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +137,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         () async {
           List<Item> items = await Callables.getReceiptData(
             receiptUrl: url,
-            selectedStore: _selectedStore.toString().split('.')[1].toLowerCase(),
+            selectedStore:
+                _selectedStore.toString().split('.')[1].toLowerCase(),
             withNameImprovement: _withNameImprovement,
           );
 
@@ -146,7 +148,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       );
 
       if (scanSuccessful) {
-        await ExpenseService.instance.updateExpense(widget.expense);
+        await _expenseService.updateExpense(widget.expense);
       }
     } on Exception catch (e) {
       ScaffoldMessenger.of(context)

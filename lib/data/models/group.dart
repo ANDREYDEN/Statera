@@ -111,13 +111,12 @@ class Group {
   Author getMember(String uid) =>
       this.members.firstWhere((member) => member.uid == uid);
 
-  void addUser(User user) {
-    var newAuthor = Author.fromUser(user);
-    this.members.add(newAuthor);
+  void addMember(Author member) {
+    this.members.add(member);
     this.balance.keys.forEach((uid) {
-      this.balance[uid]![newAuthor.uid] = 0;
+      this.balance[uid]![member.uid] = 0;
     });
-    this.balance[newAuthor.uid] = Map.fromEntries(
+    this.balance[member.uid] = Map.fromEntries(
       this.balance.entries.map((entry) => MapEntry(entry.key, 0)),
     );
   }

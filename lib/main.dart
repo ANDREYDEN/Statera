@@ -10,6 +10,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
+import 'package:statera/repository_registrant.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -39,14 +40,7 @@ class Statera extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(create: (_) => AuthService()),
-        RepositoryProvider(create: (_) => UserRepository()),
-        RepositoryProvider(create: (_) => DynamicLinkRepository()),
-        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
-        RepositoryProvider(create: (_) => NotificationService())
-      ],
+    return RepositoryRegistrant(
       child: BlocProvider(
         create: (context) {
           final authService = context.read<AuthService>();

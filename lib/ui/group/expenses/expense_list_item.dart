@@ -120,9 +120,10 @@ class ExpenseListItem extends StatelessWidget {
 
   Future<void> _handleFinalizeExpense(BuildContext context) async {
     final groupCubit = context.read<GroupCubit>();
+    final expenseService = context.read<ExpenseService>();
 
     // TODO: use transaction
-    await ExpenseService.instance.finalizeExpense(expense);
+    await expenseService.finalizeExpense(expense);
     try {
       Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
     } catch (e) {

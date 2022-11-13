@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
@@ -43,7 +44,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
   bool get currentUserIsReceiving =>
       widget.payment.receiverId == widget.currentUid;
 
-  String get actionWord => currentUserIsReceiving ? "Receive" : "Pay";
+  String get actionWord => currentUserIsReceiving ? 'Receive' : 'Pay';
 
   String get otherMemberUid => currentUserIsReceiving
       ? widget.payment.payerId
@@ -53,6 +54,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final paymentService = context.watch<PaymentService>();
     return AlertDialog(
       title: Text(actionWord),
       content: Column(
@@ -61,7 +63,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
           TextField(
             controller: _balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: "Value to $actionWord"),
+            decoration: InputDecoration(labelText: 'Value to $actionWord'),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[\.\d]'))
             ],
@@ -69,15 +71,15 @@ class _PaymentDialogState extends State<PaymentDialog> {
           SizedBox(height: 10),
           Text(
             currentUserIsReceiving
-                ? "You aknowledge that you received a payment of ${this.balanceToPay} from ${this.otherMember.name}."
-                : "At this point you should make a payment (e-Transfer or cash) of ${this.balanceToPay} to ${this.otherMember.name}.",
+                ? 'You aknowledge that you received a payment of ${this.balanceToPay} from ${this.otherMember.name}.'
+                : 'At this point you should make a payment (e-Transfer or cash) of ${this.balanceToPay} to ${this.otherMember.name}.',
           ),
         ],
       ),
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text("Cancel"),
+          child: Text('Cancel'),
         ),
         ProtectedButton(
           onPressed: this.balanceToPay < 0.01
@@ -87,16 +89,16 @@ class _PaymentDialogState extends State<PaymentDialog> {
                     context,
                     () async {
                       widget.payment.value = this.balanceToPay;
-                      await PaymentService.instance
-                          .payOffBalance(payment: widget.payment);
+                      await paymentService.payOffBalance(
+                          payment: widget.payment);
                       Navigator.of(context).pop();
                     },
                     successMessage: currentUserIsReceiving
-                        ? "Successfully received ${this.balanceToPay} from ${this.otherMember.name}"
-                        : "Successfully paid ${this.balanceToPay} to ${this.otherMember.name}",
+                        ? 'Successfully received ${this.balanceToPay} from ${this.otherMember.name}'
+                        : 'Successfully paid ${this.balanceToPay} to ${this.otherMember.name}',
                   );
                 },
-          child: Text("$actionWord ${this.balanceToPay}"),
+          child: Text('$actionWord ${this.balanceToPay}'),
         ),
       ],
     );

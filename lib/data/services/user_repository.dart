@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/utils/utils.dart';
 
@@ -22,5 +23,13 @@ class UserRepository extends Firestore {
     };
 
     await usersCollection.doc(uid).update(newUserData);
+  }
+
+  Future<Author> getUser(String uid) async {
+    final userDoc = await usersCollection.doc(uid).get();
+
+    if (!userDoc.exists) throw Exception('User data for $uid was not found');
+
+    return Author.fromUserDoc(userDoc);
   }
 }

@@ -1,18 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:statera/data/models/models.dart';
 
-class MockUser extends Mock implements User {}
-
 void main() {
-  late MockUser mockUser;
+  Author mockUser = Author(uid: 'foo', name: 'Foo');
   const mockUserId = '145';
-
-  setUp(() {
-    mockUser = MockUser();
-    when(() => mockUser.uid).thenReturn(mockUserId);
-  });
 
   test('should generate code if not provided', () {
     final group = Group.empty();
@@ -40,7 +31,7 @@ void main() {
     test('adds them to the members list', () {
       final group = Group.empty();
 
-      group.addUser(mockUser);
+      group.addMember(mockUser);
 
       expect(group.members, hasLength(1));
       expect(group.members.first.uid, equals(mockUser.uid));
@@ -50,7 +41,7 @@ void main() {
       final existingMember = Author.fake();
       var group = Group.empty(members: [existingMember]);
 
-      group.addUser(mockUser);
+      group.addMember(mockUser);
 
       expect(group.balance, contains(mockUserId));
       expect(group.balance[existingMember.uid], contains(mockUserId));
@@ -111,12 +102,11 @@ void main() {
       const adminId = 'FooAdmin';
 
       Map<String, dynamic> firestoreData = {
-        'name': name, 
-        'adminId': adminId, 
-        'members': [{
-          'uid': adminId,
-          'name': 'admin'
-        }]
+        'name': name,
+        'adminId': adminId,
+        'members': [
+          {'uid': adminId, 'name': 'admin'}
+        ]
       };
 
       final group = Group.fromFirestore(firestoreData, id: id);

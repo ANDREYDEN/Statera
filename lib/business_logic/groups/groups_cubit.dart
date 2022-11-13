@@ -44,11 +44,11 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
-  addGroup(Group group, User creator) async {
+  addGroup(Group group, String uid) async {
     final groupState = state;
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
-      final groupId = await _groupService.createGroup(group, creator);
+      final groupId = await _groupService.createGroup(group, uid);
       await _groupService.generateInviteLink(group..id = groupId);
     }
   }

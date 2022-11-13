@@ -19,7 +19,7 @@ void main() {
     late GroupCubit groupCubit;
     late GroupService groupService;
     late ExpenseService expenseService;
-    late User testUser;
+    final String testUserId = 'qwe145';
     final String testCode = 'qweqwe321';
     final Group testGroup = Group.empty(code: testCode);
 
@@ -30,12 +30,10 @@ void main() {
     setUp(() {
       groupService = MockGroupService();
       expenseService = MockExpenseService();
-      testUser = MockUser();
       groupCubit = GroupCubit(groupService, expenseService);
       when(() => groupService.groupStream(any()))
           .thenAnswer((_) => Stream.fromIterable([testGroup]));
-      when(() => groupService.joinGroup(any(), any())).thenAnswer((_) async {});
-      when(() => testUser.uid).thenAnswer((_) => 'qwe145');
+      when(() => groupService.joinGroup(any(), any())).thenAnswer((_) async => testGroup.id);
     });
 
     test('has initial state of GroupLoading', () {
@@ -57,10 +55,10 @@ void main() {
         'can successfully join a group',
         build: () => groupCubit,
         seed: () => GroupLoaded(group: testGroup),
-        act: (cubit) => cubit.join(testCode, testUser),
+        act: (cubit) => cubit.join(testCode, testUserId),
         expect: () => [GroupLoading(), GroupJoinSuccess()],
         verify: (_) {
-          verify(() => groupService.joinGroup(testCode, testUser)).called(1);
+          verify(() => groupService.joinGroup(testCode, testUserId)).called(1);
         },
       );
 
@@ -68,7 +66,7 @@ void main() {
         'emmits an error state if the code does not match the group code',
         build: () => groupCubit,
         seed: () => GroupLoaded(group: testGroup),
-        act: (cubit) => cubit.join('some other code', testUser),
+        act: (cubit) => cubit.join('some other code', testUserId),
         expect: () => [
           GroupError(
             error:
@@ -85,10 +83,10 @@ void main() {
         build: () => groupCubit,
         seed: () {
           Group testGroup = Group.empty(code: 'qwe123');
-          testGroup.addUser(testUser);
+          testGroup.addMember(Author(uid: testUserId, name: 'Foo'));
           return GroupLoaded(group: testGroup);
         },
-        act: (GroupCubit cubit) => cubit.join('qwe123', testUser),
+        act: (GroupCubit cubit) => cubit.join('qwe123', testUserId),
         expect: () =>
             [GroupError(error: 'You are already a member of this group')],
         verify: (_) {

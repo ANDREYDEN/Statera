@@ -1,19 +1,20 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:equatable/equatable.dart';
 
-part 'expense_state.dart';
 part 'expense_event.dart';
+part 'expense_state.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
-  ExpenseBloc() : super(ExpenseLoading()) {
+  final ExpenseService _expenseService;
+
+  ExpenseBloc(this._expenseService) : super(ExpenseLoading()) {
     on<UpdateRequested>(_handleUpdate);
     on<ExpenseChanged>(_handleExpenseChanged);
   }
@@ -22,7 +23,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
   void load(String? expenseId) {
     _expenseSubscription?.cancel();
-    _expenseSubscription = ExpenseService.instance
+    _expenseSubscription = _expenseService
         .expenseStream(expenseId)
         .listen((expense) => add(ExpenseChanged(expense)));
   }
@@ -33,7 +34,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       final wasCompleted = expense.completed;
       await event.update.call(expense);
-      await ExpenseService.instance.updateExpense(expense);
+      await _expenseService.updateExpense(expense);
 
       if (!wasCompleted &&
           expense.completed &&

@@ -30,8 +30,8 @@ final _landingPagePath = PagePath(
 final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
   builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (context) =>
-        GroupsCubit(GroupService.instance)..load(context.read<AuthBloc>().uid),
+    create: (context) => GroupsCubit(context.read<GroupService>())
+      ..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
 );
@@ -50,14 +50,14 @@ final List<PagePath> _paths = [
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
-            GroupService.instance,
-            ExpenseService.instance,
+            context.read<GroupService>(),
+            context.read<ExpenseService>(),
           )..load(matches?[0]),
         ),
         BlocProvider(
           create: (context) => ExpensesCubit(
-            ExpenseService.instance,
-            GroupService.instance,
+            context.read<ExpenseService>(),
+            context.read<GroupService>(),
           )..load(context.read<AuthBloc>().uid, matches?[0]),
         )
       ],
@@ -73,12 +73,13 @@ final List<PagePath> _paths = [
     builder: (context, matches) => MultiProvider(
       providers: [
         BlocProvider<ExpenseBloc>(
-          create: (_) => ExpenseBloc()..load(matches?[0]),
+          create: (_) =>
+              ExpenseBloc(context.read<ExpenseService>())..load(matches?[0]),
         ),
         BlocProvider<GroupCubit>(
           create: (_) => GroupCubit(
-            GroupService.instance,
-            ExpenseService.instance,
+            context.read<GroupService>(),
+            context.read<ExpenseService>(),
           )..loadFromExpense(matches?[0]),
         )
       ],
@@ -92,8 +93,8 @@ final List<PagePath> _paths = [
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
-            GroupService.instance,
-            ExpenseService.instance,
+            context.read<GroupService>(),
+            context.read<ExpenseService>(),
           )..load(matches?[0]),
         ),
         BlocProvider<OwingCubit>(
@@ -107,8 +108,8 @@ final List<PagePath> _paths = [
     pattern: '^${GroupPage.route}/([\\w-]+)${GroupJoining.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit(
-        GroupService.instance,
-        ExpenseService.instance,
+        context.read<GroupService>(),
+        context.read<ExpenseService>(),
       )..load(matches?[0]),
       child: GroupJoining(code: matches?[1]),
     ),

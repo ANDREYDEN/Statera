@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Author {
@@ -17,6 +18,15 @@ class Author {
     this.uid = uid ?? "foo";
     this.name = name ?? "bar";
     this.photoURL = photoURL ?? "baz";
+  }
+
+  static Author fromUserDoc(DocumentSnapshot<Object?> doc) {
+    final docData = doc.data() as Map<String, dynamic>;
+    return Author(
+      uid: doc.id,
+      name: docData['name'],
+      photoURL: docData['photoURL'],
+    );
   }
 
   static Author fromFirestore(Map<String, dynamic> data) {

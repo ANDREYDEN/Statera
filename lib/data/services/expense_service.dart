@@ -4,20 +4,13 @@ import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/payment_service.dart';
 
 class ExpenseService extends Firestore {
-  static ExpenseService? _instance;
+  final PaymentService _paymentSerice;
 
-  ExpenseService() : super();
-
-  static ExpenseService get instance {
-    if (_instance == null) {
-      _instance = ExpenseService();
-    }
-    return _instance!;
-  }
+  ExpenseService(this._paymentSerice) : super();
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return queryToExpensesStream(
-            expensesCollection.where("groupId", isEqualTo: groupId))
+            expensesCollection.where('groupId', isEqualTo: groupId))
         .map((expenses) => expenses
             .where((expense) =>
                 expense.hasAssignee(uid) || expense.isAuthoredBy(uid))
@@ -27,7 +20,7 @@ class ExpenseService extends Firestore {
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
     if (!expenseDoc.exists)
-      throw new Exception("Expense with id $expenseId does not exist.");
+      throw new Exception('Expense with id $expenseId does not exist.');
     return Expense.fromSnapshot(expenseDoc);
   }
 
@@ -67,7 +60,7 @@ class ExpenseService extends Firestore {
         .update({'finalizedDate': Timestamp.now()});
     // add expense payments from author to all assignees
     await Future.wait(
-      expense.assignees.map((assignee) => PaymentService.instance.addPayment(
+      expense.assignees.map((assignee) => _paymentSerice.addPayment(
             Payment(
               groupId: expense.groupId,
               payerId: expense.author.uid,
