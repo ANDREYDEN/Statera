@@ -7,20 +7,14 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const groupId = '34zsdaQ63veJqM35MmhQ';
-    // const groupId = 'mX6FbRb5do50QYzEAmoS';
-    const groupSnap = await db.collection('groups').doc(groupId).get();
-    let group = groupSnap.data();
+    const groupsReference = db.collection('groups')
+    const groups = await groupsReference.listDocuments()
 
-    const expenseId = 'G3vGbiZOx0Pbovy886NK'
-    // const expenseId = 'aba7qqKHpRMlOeeWqCC8'
-    const expenseSnap = await db.collection('expenses').doc(expenseId).get();
-    let expense = expenseSnap.data();
-
-    group = finalizeExpense(group, expense)
-
-    // console.log(group);
-    await groupSnap.ref.set(group)
+    for (const group of groups) {
+        const groupData = (await group.get()).data()
+        const fixedGroup = await fixAnonymousMembers(groupData)
+        await group.update(fixedGroup)
+    }
 })();
 
 /**
@@ -66,4 +60,31 @@ function getTotalDebt(expense, assigneeId) {
     );
 
     return owage;
+}
+
+async function fixAnonymousMembers(group) {
+    const correctMembers = []
+
+    for (const member of groupData.members) {
+        if (member.name == 'anonymous') {
+            console.log(member);
+            try {
+                const userRecord = await auth.getUser(member.uid)
+                correctMembers.push({
+                    uid: member.uid,
+                    name: userRecord.displayName ?? 'anonymous',
+                    photoURL: userRecord.photoURL ?? null
+                })
+            } catch {
+                correctMembers.push(member)
+            }
+        } else {
+            correctMembers.push(member)
+        }
+    }
+
+    return {
+        ...group,
+        members: correctMembers
+    }
 }

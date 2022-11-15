@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -9,7 +8,7 @@ import 'expense.dart';
 class Group {
   String? id;
   late String name;
-  late List<Author> members = [];
+  late List<CustomUser> members = [];
   String? _adminId;
 
   /// Describes the debt that each member of the group has
@@ -59,7 +58,7 @@ class Group {
   Group.empty({
     String? name,
     String? code,
-    List<Author>? members,
+    List<CustomUser>? members,
     String? adminId,
   }) : this(
           name: name ?? 'Empty',
@@ -68,7 +67,8 @@ class Group {
           adminId: adminId,
         );
 
-  Author get admin => _adminId != null ? getMember(_adminId!) : members.first;
+  CustomUser get admin =>
+      _adminId != null ? getMember(_adminId!) : members.first;
 
   set adminUid(String uid) {
     if (!memberExists(uid))
@@ -89,7 +89,7 @@ class Group {
       '$currencySign${value.toStringAsFixed(2)}';
 
   static Map<String, Map<String, double>> _createBalanceFromMembers(
-    List<Author> members,
+    List<CustomUser> members,
   ) {
     return Map.fromEntries(
       members.map(
@@ -108,16 +108,15 @@ class Group {
   bool memberExists(String uid) =>
       this.members.any((member) => member.uid == uid);
 
-  Author getMember(String uid) =>
+  CustomUser getMember(String uid) =>
       this.members.firstWhere((member) => member.uid == uid);
 
-  void addUser(User user) {
-    var newAuthor = Author.fromUser(user);
-    this.members.add(newAuthor);
+  void addMember(CustomUser member) {
+    this.members.add(member);
     this.balance.keys.forEach((uid) {
-      this.balance[uid]![newAuthor.uid] = 0;
+      this.balance[uid]![member.uid] = 0;
     });
-    this.balance[newAuthor.uid] = Map.fromEntries(
+    this.balance[member.uid] = Map.fromEntries(
       this.balance.entries.map((entry) => MapEntry(entry.key, 0)),
     );
   }
@@ -128,7 +127,7 @@ class Group {
     this.balance.forEach((key, value) => value.remove(uid));
   }
 
-  Map<Author, double> getOwingsForUser(String uid) {
+  Map<CustomUser, double> getOwingsForUser(String uid) {
     return this
         .balance[uid]!
         .map((otherUid, balance) => MapEntry(getMember(otherUid), balance));
@@ -151,15 +150,15 @@ class Group {
   }
 
   void updateBalance(Expense expense) {
-    expense.assignees
-        .where((assignee) => assignee.uid != expense.author.uid)
-        .forEach((assignee) {
+    expense.assigneeUids
+        .where((assigneeUid) => assigneeUid != expense.authorUid)
+        .forEach((assigneeUid) {
       this.payOffBalance(
         payment: Payment(
           groupId: this.id,
-          payerId: expense.author.uid,
-          receiverId: assignee.uid,
-          value: expense.getConfirmedTotalForUser(assignee.uid),
+          payerId: expense.authorUid,
+          receiverId: assigneeUid,
+          value: expense.getConfirmedTotalForUser(assigneeUid),
         ),
       );
     });
@@ -180,8 +179,8 @@ class Group {
   }
 
   factory Group.fromFirestore(Map<String, dynamic> map, {required String? id}) {
-    var members = List<Author>.from(
-      (map['members'] ?? []).map((x) => Author.fromFirestore(x)),
+    var members = List<CustomUser>.from(
+      (map['members'] ?? []).map((x) => CustomUser.fromFirestore(x)),
     );
 
     return Group(

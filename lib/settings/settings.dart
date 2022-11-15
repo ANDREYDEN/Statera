@@ -84,7 +84,7 @@ class _SettingsState extends State<Settings> {
             child: Stack(
               children: [
                 AuthorAvatar(
-                  author: Author.fromUser(authBloc.user),
+                  author: CustomUser.fromUser(authBloc.user),
                   width: 200,
                 ),
                 Positioned(

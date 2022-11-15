@@ -43,7 +43,6 @@ class _CRUDDialogState extends State<CRUDDialog> {
       CancelButton(),
       ProtectedButton(
         onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
-        buttonType: ButtonType.text,
         child: Text('Save'),
       ),
       if (widget.allowAddAnother)

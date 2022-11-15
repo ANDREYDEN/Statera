@@ -13,6 +13,7 @@ scripts:
   run-emulate: flutter run --dart-define="USE_EMULATORS=true"
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
+  create-mocks: flutter pub run build_runner build
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
   emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data
@@ -46,7 +47,7 @@ dependencies:
   flutter_bloc: ^8.0.0
   equatable: ^2.0.3
   bloc_test: ^9.0.0
-  mocktail: ^0.2.0
+  mockito: ^5.2.0
   qr_flutter: ^4.0.0
   url_strategy: ^0.2.0
   url_launcher: ^6.1.2

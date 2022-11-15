@@ -4,16 +4,9 @@ import 'package:statera/data/services/firestore.dart';
 import 'package:statera/data/services/group_service.dart';
 
 class PaymentService extends Firestore {
-  static PaymentService? _instance;
+  final GroupService _groupService;
 
-  PaymentService() : super();
-
-  static PaymentService get instance {
-    if (_instance == null) {
-      _instance = PaymentService();
-    }
-    return _instance!;
-  }
+  PaymentService(this._groupService) : super();
 
   /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({
@@ -41,9 +34,9 @@ class PaymentService extends Firestore {
   }
 
   Future<void> payOffBalance({required Payment payment}) async {
-    Group group = await GroupService.instance.getGroupById(payment.groupId);
+    Group group = await _groupService.getGroupById(payment.groupId);
     group.payOffBalance(payment: payment);
     await paymentsCollection.add(payment.toFirestore());
-    await GroupService.instance.saveGroup(group);
+    await _groupService.saveGroup(group);
   }
 }

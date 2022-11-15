@@ -11,6 +11,8 @@ class GroupServiceMock extends Mock implements GroupService {}
 
 class ExpenseServiceMock extends Mock implements ExpenseService {}
 
+class UserRepositoryMock extends Mock implements UserRepository {}
+
 main() {
   runApp(ListCover());
 }
@@ -28,6 +30,7 @@ class ListCover extends StatelessWidget {
         create: (_) => GroupCubit(
           GroupServiceMock(),
           ExpenseServiceMock(),
+          UserRepositoryMock(),
         )..empty(),
         child: Scaffold(
           body: ListView(
