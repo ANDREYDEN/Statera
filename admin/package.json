@@ -5,7 +5,7 @@
   "main": "admin.js",
   "scripts": {
     "start": "export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && node admin.js",
-    "start:emulate": "export FIRESTORE_EMULATOR_HOST=\"localhost:8080\" && export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && node admin.js"
+    "start:emulate": "export FIREBASE_AUTH_EMULATOR_HOST=\"localhost:9099\" && export FIRESTORE_EMULATOR_HOST=\"localhost:8080\" && export GOOGLE_APPLICATION_CREDENTIALS=\"./serviceAccount.json\" && node admin.js"
   },
   "author": "",
   "license": "ISC",

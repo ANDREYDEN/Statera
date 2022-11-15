@@ -66,3 +66,4 @@ receipts
 **/fastlane/test_output
 
 .env
+*.mocks.dart

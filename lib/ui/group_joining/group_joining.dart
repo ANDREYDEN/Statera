@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/src/provider.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group_joining/error_state.dart';
 import 'package:statera/ui/group_joining/group_joining_actions.dart';
@@ -16,12 +13,6 @@ class GroupJoining extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var user = context.select((AuthBloc authBloc) => authBloc.state.user);
-
-    if (user == null) {
-      return PageScaffold(child: Text('Unauthorized'));
-    }
-
     return PageScaffold(
       child: Center(
         child: Container(
@@ -47,7 +38,7 @@ class GroupJoining extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 30),
-                      GroupJoiningActions(code: code, user: user),
+                      GroupJoiningActions(code: code),
                     ],
                   );
                 },
