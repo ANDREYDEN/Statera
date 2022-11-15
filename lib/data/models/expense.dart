@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/item.dart';
 
-import 'assignee.dart';
 import 'assignee_decision.dart';
 import 'author.dart';
 
@@ -208,16 +207,9 @@ class Expense {
     expense.finalizedDate = data['finalizedDate'] == null
         ? null
         : DateTime.parse(data['finalizedDate'].toDate().toString());
-    // TODO: deprecate
-    final assignees = data['assignees'] == null
-        ? null
-        : (data['assignees'] as List<Map<String, dynamic>>)
-            .map<Assignee>(
-                (assigneeData) => Assignee.fromFirestore(assigneeData))
-            .toList();
-    expense.assigneeUids =
-        data['assineeUids'] ?? assignees?.map((a) => a.uid).toList() ?? [];
-
+    expense.assigneeUids = (data['assigneeIds'] as List<dynamic>)
+        .map((a) => a.toString())
+        .toList();
     data['items'].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
