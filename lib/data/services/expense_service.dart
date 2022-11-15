@@ -40,11 +40,11 @@ class ExpenseService extends Firestore {
         expensesSnap.docs.map((doc) => Expense.fromSnapshot(doc)).toList();
 
     for (var expense in expenses) {
-      final containsUser = expense.assignees.any((a) => a.uid == uid);
+      final containsUser = expense.assigneeUids.any((aUid) => aUid == uid);
       if (expense.canReceiveAssignees &&
           expense.acceptNewMembers &&
           !containsUser) {
-        expense.addAssignee(Assignee(uid: uid));
+        expense.addAssignee(uid);
       }
     }
 

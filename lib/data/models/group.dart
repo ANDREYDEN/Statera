@@ -150,15 +150,15 @@ class Group {
   }
 
   void updateBalance(Expense expense) {
-    expense.assignees
-        .where((assignee) => assignee.uid != expense.author.uid)
-        .forEach((assignee) {
+    expense.assigneeUids
+        .where((assigneeUid) => assigneeUid != expense.authorUid)
+        .forEach((assigneeUid) {
       this.payOffBalance(
         payment: Payment(
           groupId: this.id,
-          payerId: expense.author.uid,
-          receiverId: assignee.uid,
-          value: expense.getConfirmedTotalForUser(assignee.uid),
+          payerId: expense.authorUid,
+          receiverId: assigneeUid,
+          value: expense.getConfirmedTotalForUser(assigneeUid),
         ),
       );
     });

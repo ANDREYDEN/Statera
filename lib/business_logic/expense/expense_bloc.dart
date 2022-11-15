@@ -38,7 +38,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       if (!wasCompleted &&
           expense.completed &&
-          event.issuer.uid != expense.author.uid) {
+          event.issuer.uid != expense.authorUid) {
         Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
       }
     }

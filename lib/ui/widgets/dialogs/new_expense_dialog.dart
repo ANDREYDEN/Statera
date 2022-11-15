@@ -52,8 +52,8 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
 
   @override
   void initState() {
-    final user = context.read<AuthBloc>().user;
-    _newExpense = Expense(name: '', author: CustomUser.fromUser(user));
+    final authBloc = context.read<AuthBloc>();
+    _newExpense = Expense(name: '', authorUid: authBloc.uid);
     super.initState();
   }
 

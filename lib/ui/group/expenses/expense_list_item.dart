@@ -10,6 +10,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
@@ -57,7 +58,11 @@ class ExpenseListItem extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          AuthorAvatar(author: this.expense.author),
+                          GroupBuilder(builder: (context, group) {
+                            return AuthorAvatar(
+                              author: group.getMember(expense.authorUid),
+                            );
+                          }),
                           SizedBox(width: 15),
                           Flexible(
                             child: Column(
@@ -127,12 +132,12 @@ class ExpenseListItem extends StatelessWidget {
     await expenseService.finalizeExpense(expense);
     // add expense payments from author to all assignees
     await Future.wait(
-      expense.assignees.map((assignee) => paymentService.addPayment(
+      expense.assigneeUids.map((assigneeUid) => paymentService.addPayment(
             Payment(
               groupId: expense.groupId,
-              payerId: expense.author.uid,
-              receiverId: assignee.uid,
-              value: expense.getConfirmedTotalForUser(assignee.uid),
+              payerId: expense.authorUid,
+              receiverId: assigneeUid,
+              value: expense.getConfirmedTotalForUser(assigneeUid),
               relatedExpense: PaymentExpenseInfo.fromExpense(expense),
             ),
           )),

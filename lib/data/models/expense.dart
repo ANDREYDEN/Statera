@@ -23,33 +23,31 @@ class Expense {
   String? id = '';
   String? groupId;
   List<Item> items = [];
-  List<Assignee> assignees = [];
+  List<String> assigneeUids = [];
   late String name;
-  late CustomUser author;
+  String authorUid;
   DateTime? date;
   DateTime? finalizedDate;
   late bool acceptNewMembers;
 
   Expense({
     required this.name,
-    required this.author,
+    required this.authorUid,
     this.groupId,
     this.acceptNewMembers = true,
   }) {
-    this.assignees = [Assignee(uid: author.uid)];
+    this.assigneeUids = [authorUid];
     this.date = DateTime.now();
   }
 
-  Expense.fake() {
+  Expense.fake({this.authorUid = 'foo'}) {
     this.name = 'foo';
-    this.author = CustomUser(name: 'foo', uid: 'foo');
     this.date = DateTime.now();
     this.acceptNewMembers = true;
   }
 
-  Expense.empty() {
+  Expense.empty({this.authorUid = ''}) {
     this.name = '';
-    this.author = CustomUser(name: '', uid: '');
   }
 
   bool wasEarlierThan(Expense other) {
@@ -70,12 +68,12 @@ class Expense {
       items.isNotEmpty && items.every((item) => item.completed);
 
   bool get canReceiveAssignees =>
-      (assignees.length == 1 && this.isAuthoredBy(assignees.first.uid)) ||
+      (assigneeUids.length == 1 && this.isAuthoredBy(assigneeUids.first)) ||
       !finalized;
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
-  bool isAuthoredBy(String? uid) => this.author.uid == uid;
+  bool isAuthoredBy(String? uid) => this.authorUid == uid;
 
   bool canBeUpdatedBy(String uid) => this.isAuthoredBy(uid) && !this.finalized;
 
@@ -83,12 +81,12 @@ class Expense {
       !this.finalized && this.completed && this.isAuthoredBy(uid);
 
   bool canBeMarkedBy(String uid) =>
-      !this.finalized && this.assignees.any((assignee) => assignee.uid == uid);
+      !this.finalized && this.assigneeUids.contains(uid);
 
-  int get definedAssignees => assignees.fold(
+  int get definedAssignees => assigneeUids.fold(
         0,
-        (previousValue, assignee) =>
-            previousValue + (isMarkedBy(assignee.uid) ? 1 : 0),
+        (previousValue, assigneeUid) =>
+            previousValue + (isMarkedBy(assigneeUid) ? 1 : 0),
       );
 
   static List<ExpenseStage> expenseStages(String uid) {
@@ -122,8 +120,8 @@ class Expense {
 
   void addItem(Item newItem) {
     newItem.assignees = this
-        .assignees
-        .map((assignee) => AssigneeDecision(uid: assignee.uid))
+        .assigneeUids
+        .map((assigneeUid) => AssigneeDecision(uid: assigneeUid))
         .toList();
     this.items.add(newItem);
   }
@@ -135,20 +133,20 @@ class Expense {
 
   get hasNoItems => this.items.isEmpty;
 
-  addAssignee(Assignee newAssignee) {
+  addAssignee(String newAssigneeUid) {
     this.items.forEach((item) {
       item.assignees.add(AssigneeDecision(
-        uid: newAssignee.uid,
+        uid: newAssigneeUid,
       ));
     });
-    this.assignees.add(newAssignee);
+    this.assigneeUids.add(newAssigneeUid);
   }
 
   void updateAssignees(List<String> selectedUids) {
     if (selectedUids.isEmpty)
       throw new Exception('Assignee list can not be empty');
 
-    this.assignees = selectedUids.map((uid) => Assignee(uid: uid)).toList();
+    this.assigneeUids = [...selectedUids];
 
     this.items.forEach((item) {
       item.assignees = selectedUids.map((uid) {
@@ -171,7 +169,7 @@ class Expense {
   }
 
   bool hasAssignee(String uid) {
-    return this.assignees.any((assignee) => assignee.uid == uid);
+    return this.assigneeUids.contains(uid);
   }
 
   Map<String, dynamic> toFirestore() {
@@ -179,13 +177,10 @@ class Expense {
       'groupId': groupId,
       'name': name,
       'items': items.map((item) => item.toFirestore()).toList(),
-      'author': author.toFirestore(),
-      'assigneeIds':
-          assignees.map((assignee) => assignee.uid).toList().toList(),
-      'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
-      'unmarkedAssigneeIds': assignees
-          .where((assignee) => !isMarkedBy(assignee.uid))
-          .map((assignee) => assignee.uid)
+      'authorUid': authorUid,
+      'assigneeIds': assigneeUids,
+      'unmarkedAssigneeIds': assigneeUids
+          .where((assigneeUid) => !isMarkedBy(assigneeUid))
           .toList(),
       'date': date,
       'finalizedDate': finalizedDate,
@@ -194,8 +189,14 @@ class Expense {
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String? id) {
+    // TODO: deprecate
+    final author = data['author'] == null
+        ? null
+        : CustomUser.fromFirestore(data['author']);
+    final authorUid = data['authorUid'] ?? author?.uid ?? '';
+
     var expense = new Expense(
-      author: CustomUser.fromFirestore(data['author']),
+      authorUid: authorUid,
       name: data['name'],
       groupId: data['groupId'],
       acceptNewMembers: data['acceptNewMembers'] ?? true,
@@ -207,9 +208,16 @@ class Expense {
     expense.finalizedDate = data['finalizedDate'] == null
         ? null
         : DateTime.parse(data['finalizedDate'].toDate().toString());
-    expense.assignees = data['assignees']
-        .map<Assignee>((assigneeData) => Assignee.fromFirestore(assigneeData))
-        .toList();
+    // TODO: deprecate
+    final assignees = data['assignees'] == null
+        ? null
+        : (data['assignees'] as List<Map<String, dynamic>>)
+            .map<Assignee>(
+                (assigneeData) => Assignee.fromFirestore(assigneeData))
+            .toList();
+    expense.assigneeUids =
+        data['assineeUids'] ?? assignees?.map((a) => a.uid).toList() ?? [];
+
     data['items'].forEach(
         (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
     return expense;
@@ -228,9 +236,9 @@ class Expense {
         other.id == id &&
         other.groupId == groupId &&
         listEquals(other.items, items) &&
-        listEquals(other.assignees, assignees) &&
+        listEquals(other.assigneeUids, assigneeUids) &&
         other.name == name &&
-        other.author == author &&
+        other.authorUid == authorUid &&
         other.date == date &&
         other.finalizedDate == finalizedDate &&
         other.acceptNewMembers == acceptNewMembers;
@@ -238,7 +246,7 @@ class Expense {
 
   int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
 
-  int get assigneesHash => assignees.fold(0, (cur, e) => cur ^ e.hashCode);
+  int get assigneesHash => assigneeUids.fold(0, (cur, e) => cur ^ e.hashCode);
 
   @override
   int get hashCode {
@@ -247,7 +255,7 @@ class Expense {
         itemsHash ^
         assigneesHash ^
         name.hashCode ^
-        author.hashCode ^
+        authorUid.hashCode ^
         date.hashCode ^
         finalizedDate.hashCode ^
         acceptNewMembers.hashCode;
