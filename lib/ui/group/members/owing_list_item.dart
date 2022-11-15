@@ -10,7 +10,7 @@ import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 
 class OwingListItem extends StatelessWidget {
-  final Author member;
+  final CustomUser member;
   final double owing;
 
   const OwingListItem({

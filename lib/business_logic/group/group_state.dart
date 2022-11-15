@@ -18,7 +18,9 @@ class GroupLoaded extends GroupState {
   List<Object?> get props => [group];
 }
 
-class GroupJoinSuccess extends GroupState {}
+class GroupJoinSuccess extends GroupLoaded {
+  GroupJoinSuccess({required Group group}) : super(group: group);
+}
 
 class GroupError extends GroupState {
   final Object? error;

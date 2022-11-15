@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:statera/data/models/author.dart';
 
 class AuthorAvatar extends StatelessWidget {
-  final Author author;
+  final CustomUser author;
   late final Function()? onTap;
   final bool withName;
   final Color? borderColor;

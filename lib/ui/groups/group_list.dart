@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,8 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/settings/settings.dart';
+import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -27,9 +26,6 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  AuthBloc get authBloc => context.read<AuthBloc>();
-  GroupsCubit get groupsCubit => context.read<GroupsCubit>();
-
   @override
   void initState() {
     super.initState();
@@ -49,9 +45,8 @@ class _GroupListState extends State<GroupList> {
           icon: Icon(Icons.settings_outlined),
         ),
       ],
-      onFabPressed: defaultTargetPlatform == TargetPlatform.windows
-          ? null
-          : () => createGroup(groupsCubit, authBloc.user),
+      onFabPressed:
+          defaultTargetPlatform == TargetPlatform.windows ? null : createGroup,
       child: defaultTargetPlatform == TargetPlatform.windows
           ? Center(
               child:
@@ -105,7 +100,10 @@ class _GroupListState extends State<GroupList> {
     );
   }
 
-  createGroup(GroupsCubit groupsCubit, User creator) {
+  createGroup() {
+    final authBloc = context.read<AuthBloc>();
+    final groupsCubit = context.read<GroupsCubit>();
+
     final newGroup = Group.empty(name: '');
 
     showDialog(
@@ -144,7 +142,7 @@ class _GroupListState extends State<GroupList> {
           newGroup.currencySign = values['currency']!;
           newGroup.debtThreshold = double.parse(values['debt_threshold']!);
 
-          groupsCubit.addGroup(newGroup, creator);
+          groupsCubit.addGroup(newGroup, authBloc.uid);
         },
       ),
     );

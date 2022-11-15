@@ -5,11 +5,11 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/expense/expense_actions_wide.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
+import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -98,11 +98,15 @@ class ExpenseDetails extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          AuthorAvatar(
-                            author: expense.author,
-                            onTap: expenseCanBeUpdated
-                                ? () => _handleAuthorClick(context)
-                                : null,
+                          GroupBuilder(
+                            builder: (context, group) {
+                              return AuthorAvatar(
+                                author: group.getMember(expense.authorUid),
+                                onTap: expenseCanBeUpdated
+                                    ? () => _handleAuthorClick(context)
+                                    : null,
+                              );
+                            }
                           ),
                           Icon(Icons.arrow_forward),
                           Expanded(
@@ -163,7 +167,6 @@ class ExpenseDetails extends StatelessWidget {
   _handleAuthorClick(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
-    final groupCubit = context.read<GroupCubit>();
 
     expenseBloc.add(
       UpdateRequested(
@@ -182,7 +185,7 @@ class ExpenseDetails extends StatelessWidget {
           );
           if (newAuthorUid == null) return;
 
-          expense.author = groupCubit.loadedState.group.getMember(newAuthorUid);
+          expense.authorUid = newAuthorUid;
         },
       ),
     );
@@ -202,7 +205,7 @@ class ExpenseDetails extends StatelessWidget {
               value: context.read<GroupCubit>(),
               child: MemberSelectDialog(
                 title: 'Change Assignees',
-                value: expense.assignees.map((a) => a.uid).toList(),
+                value: expense.assigneeUids,
               ),
             ),
           );

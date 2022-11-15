@@ -5,6 +5,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
@@ -39,6 +40,7 @@ class _GroupPageState extends State<GroupPage> {
   Widget build(BuildContext context) {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     final isWide = context.select((LayoutState state) => state.isWide);
+    final expenseService = context.watch<ExpenseService>();
 
     if (_pageController.hasClients) {
       _pageController.animateToPage(
@@ -111,7 +113,7 @@ class _GroupPageState extends State<GroupPage> {
                   ),
             child: MultiBlocProvider(
               providers: [
-                BlocProvider(create: (context) => ExpenseBloc()),
+                BlocProvider(create: (context) => ExpenseBloc(expenseService)),
                 BlocProvider(create: (context) => OwingCubit()),
               ],
               child: isWide
@@ -142,7 +144,7 @@ class _GroupPageState extends State<GroupPage> {
                       children: [
                         OwingsList(),
                         BlocProvider(
-                          create: (context) => ExpenseBloc(),
+                          create: (context) => ExpenseBloc(expenseService),
                           child: ExpenseList(),
                         ),
                         GroupSettings()

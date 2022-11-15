@@ -17,14 +17,14 @@ class AssigneeList extends StatelessWidget {
               builder: (_, expense) => GroupBuilder(
                 builder: (_, group) => ListView(
                   scrollDirection: Axis.horizontal,
-                  children: expense.assignees.map((assignee) {
-                    if (!group.memberExists(assignee.uid))
+                  children: expense.assigneeUids.map((assigneeUid) {
+                    if (!group.memberExists(assigneeUid))
                       return Icon(Icons.error);
-                    var member = group.getMember(assignee.uid);
+                    var member = group.getMember(assigneeUid);
                     return AuthorAvatar(
                       margin: const EdgeInsets.only(right: 4),
                       author: member,
-                      withIcon: expense.isMarkedBy(assignee.uid),
+                      withIcon: expense.isMarkedBy(assigneeUid),
                     );
                   }).toList(),
                 ),

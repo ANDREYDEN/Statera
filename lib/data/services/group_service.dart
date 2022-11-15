@@ -1,29 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/author.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
 
+@GenerateNiceMocks([MockSpec<GroupService>()])
 class GroupService extends Firestore {
-  static GroupService? _instance;
   late final DynamicLinkRepository _dynamicLinkRepository;
 
   GroupService() : super() {
     _dynamicLinkRepository = DynamicLinkRepository();
   }
 
-  static GroupService get instance {
-    if (_instance == null) {
-      _instance = GroupService();
-    }
-    return _instance!;
-  }
-
   Future<Group> getGroup(String? groupCode) async {
     var groupSnap =
         await groupsCollection.where('code', isEqualTo: groupCode).get();
     if (groupSnap.docs.isEmpty)
-      throw new Exception("There was no group with code $groupCode");
+      throw new Exception('There was no group with code $groupCode');
     var groupDoc = groupSnap.docs.first;
     return Group.fromFirestore(
       groupDoc.data() as Map<String, dynamic>,
@@ -34,7 +27,7 @@ class GroupService extends Firestore {
   Future<Group> getGroupById(String? groupId) async {
     var groupDoc = await groupsCollection.doc(groupId).get();
     if (!groupDoc.exists)
-      throw new Exception("There was no group with id $groupId");
+      throw new Exception('There was no group with id $groupId');
     return Group.fromFirestore(
       groupDoc.data() as Map<String, dynamic>,
       id: groupDoc.id,
@@ -60,10 +53,10 @@ class GroupService extends Firestore {
     await groupsCollection.doc(groupId).delete();
   }
 
-  Stream<Author> getGroupMemberStream(
+  Stream<CustomUser> getGroupMemberStream(
       {String? groupId, required String memberId}) {
     return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
-      if (!groupSnap.exists) throw new Exception("No group with id $groupId");
+      if (!groupSnap.exists) throw new Exception('No group with id $groupId');
 
       Group group = Group.fromFirestore(
           groupSnap.data() as Map<String, dynamic>,
@@ -85,25 +78,23 @@ class GroupService extends Firestore {
   }
 
   /// Creates a new group and returns its Firestore id
-  Future<String> createGroup(Group newGroup, User author) async {
-    newGroup.addUser(author);
+  Future<String> createGroup(Group newGroup, CustomUser user) async {
+    newGroup.addMember(user);
 
-    final groupReference = await GroupService.instance.groupsCollection
-        .add(newGroup.toFirestore());
+    final groupReference = await groupsCollection.add(newGroup.toFirestore());
     return groupReference.id;
   }
 
-  Future<void> joinGroup(String groupCode, User user) async {
-    var group = await GroupService.instance.getGroup(groupCode);
-    if (group.members.any((member) => member.uid == user.uid)) return;
+  Future<Group> joinGroup(String groupCode, CustomUser user) async {
+    var group = await getGroup(groupCode);
+    if (group.members.any((member) => member.uid == user.uid)) {
+      throw Exception('Member ${user.uid} already exists');
+    }
 
-    group.addUser(user);
-    await GroupService.instance.groupsCollection
-        .doc(group.id)
-        .update(group.toFirestore());
+    group.addMember(user);
+    await groupsCollection.doc(group.id).update(group.toFirestore());
 
-    await ExpenseService.instance
-        .addUserToOutstandingExpenses(user.uid, group.id);
+    return group;
   }
 
   Future<void> saveGroup(Group group) async {

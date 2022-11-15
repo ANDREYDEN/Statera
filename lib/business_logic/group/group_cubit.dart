@@ -9,11 +9,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'group_state.dart';
 
 class GroupCubit extends Cubit<GroupState> {
-  GroupCubit(this._groupService, this._expenseService) : super(GroupLoading());
-
   StreamSubscription? _groupSubscription;
-  GroupService _groupService;
-  ExpenseService _expenseService;
+  final GroupService _groupService;
+  final ExpenseService _expenseService;
+  final UserRepository _userRepository;
+
+  GroupCubit(
+    this._groupService,
+    this._expenseService,
+    this._userRepository,
+  ) : super(GroupLoading());
 
   // TODO: error handling
   GroupLoaded get loadedState => state as GroupLoaded;
@@ -25,7 +30,13 @@ class GroupCubit extends Cubit<GroupState> {
         .map((group) => group == null
             ? GroupError(error: 'Group does not exist')
             : GroupLoaded(group: group))
-        .listen(emit);
+        .handleError((e) {
+      if (e is FirebaseException) {
+        emit(GroupError(error: 'Permission denied'));
+      } else {
+        emit(GroupError(error: 'Something went wrong'));
+      }
+    }).listen(emit);
   }
 
   void empty() {
@@ -57,7 +68,7 @@ class GroupCubit extends Cubit<GroupState> {
     _groupService.saveGroup(group);
   }
 
-  void join(String? code, User user) async {
+  Future<void> join(String? code, String uid) async {
     if (code != loadedState.group.code) {
       emit(GroupError(
           error:
@@ -65,14 +76,16 @@ class GroupCubit extends Cubit<GroupState> {
       return;
     }
 
-    if (loadedState.group.memberExists(user.uid)) {
+    if (loadedState.group.memberExists(uid)) {
       emit(GroupError(error: 'You are already a member of this group'));
       return;
     }
 
     emit(GroupLoading());
-    await _groupService.joinGroup(code!, user);
-    emit(GroupJoinSuccess());
+    final user = await _userRepository.getUser(uid);
+    final group = await _groupService.joinGroup(code!, user);
+    await _expenseService.addUserToOutstandingExpenses(uid, group.id);
+    emit(GroupJoinSuccess(group: group));
   }
 
   void generateInviteLink() async {
