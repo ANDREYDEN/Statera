@@ -18,7 +18,8 @@ class PaymentListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
+    final authBloc = context.watch<AuthBloc>();
+    final paymentService = context.watch<PaymentService>();
 
     return OwingBuilder(
       loadingWidget: ListEmpty(text: 'Pick a group member first'),
@@ -59,7 +60,7 @@ class PaymentListBody extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: Text("Pay"),
+                          child: Text('Pay'),
                         ),
                       ),
                       SizedBox(width: 16),
@@ -78,7 +79,7 @@ class PaymentListBody extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: Text("Receive"),
+                          child: Text('Receive'),
                         ),
                       ),
                     ],
@@ -86,14 +87,14 @@ class PaymentListBody extends StatelessWidget {
                 ),
                 Flexible(
                   child: CustomStreamBuilder<List<Payment>>(
-                    stream: PaymentService.instance.paymentsStream(
+                    stream: paymentService.paymentsStream(
                       groupId: group.id,
                       userId1: otherMemberId,
                       userId2: authBloc.uid,
                     ),
                     builder: (context, payments) {
                       if (payments.isEmpty) {
-                        return ListEmpty(text: "Payment History is empty");
+                        return ListEmpty(text: 'Payment History is empty');
                       }
 
                       payments.sort((Payment payment1, Payment payment2) {

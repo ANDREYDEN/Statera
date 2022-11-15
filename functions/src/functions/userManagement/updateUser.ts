@@ -1,7 +1,7 @@
-import { UserData } from '../types/userData'
+import { UserData } from '../../types/userData'
 import * as admin from 'firebase-admin'
 import { auth } from 'firebase-admin'
-import { propertyChanged } from '../utils'
+import { propertyChanged } from '../../utils'
 
 export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
   const nameChanged = propertyChanged(oldUserData, newUserData, 'name')
@@ -15,9 +15,9 @@ export async function updateUser(userId: string, oldUserData: UserData, newUserD
 
 async function updateUsersInGroups(userId: string, userData: UserData) {
   const groupsSnap = await admin.firestore()
-      .collection('groups')
-      .where('memberIds', 'array-contains', userId)
-      .get()
+    .collection('groups')
+    .where('memberIds', 'array-contains', userId)
+    .get()
 
   for (const groupDoc of groupsSnap.docs) {
     const members = groupDoc.data().members.map((member: any) => {
