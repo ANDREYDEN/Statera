@@ -37,8 +37,7 @@ Future<void> main() async {
   final dynamicLinkPath = initialDynamicLink?.link.path;
   final initialNotificationMessage =
       await FirebaseMessaging.instance.getInitialMessage();
-  final notificationPath =
-      NotificationMessageHandler.getPath(initialNotificationMessage);
+  final notificationPath = AppLaunchHandler.getPath(initialNotificationMessage);
 
   runApp(Statera(
     initialRoute: dynamicLinkPath ?? notificationPath,

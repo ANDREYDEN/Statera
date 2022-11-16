@@ -6,24 +6,16 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:statera/firebase_options.dart';
+import 'package:statera/utils/utils.dart';
 
 class DynamicLinkService {
   Future<StreamSubscription<PendingDynamicLinkData>> listen(
     BuildContext context,
   ) async {
-    return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      navigateToPath(context, dynamicLinkData.link.path);
-    })
+    return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) => AppLaunchHandler.handleDynamicLink(dynamicLinkData, context))
       ..onError((error) {
         FirebaseCrashlytics.instance.recordFlutterError(error);
       });
-  }
-
-  void navigateToPath(BuildContext context, String path) {
-    final currentPath = ModalRoute.of(context)?.settings.name;
-    if (path != currentPath) {
-      Navigator.pushNamed(context, path);
-    }
   }
 
   Future<String> generateDynamicLink({
