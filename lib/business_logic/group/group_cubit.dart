@@ -82,10 +82,14 @@ class GroupCubit extends Cubit<GroupState> {
     }
 
     emit(GroupLoading());
-    final user = await _userRepository.getUser(uid);
-    final group = await _groupService.joinGroup(code!, user);
-    await _expenseService.addUserToOutstandingExpenses(uid, group.id);
-    emit(GroupJoinSuccess(group: group));
+    try {
+      final user = await _userRepository.getUser(uid);
+      final group = await _groupService.joinGroup(code!, user);
+      await _expenseService.addUserToOutstandingExpenses(uid, group.id);
+      emit(GroupJoinSuccess(group: group));
+    } catch (e) {
+      emit(GroupError(error: 'Error joining group: ${e.toString()}'));
+    }
   }
 
   void generateInviteLink() async {

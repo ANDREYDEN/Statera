@@ -20,10 +20,7 @@ class GroupJoiningActions extends StatelessWidget {
       children: [
         Expanded(
           child: ProtectedButton(
-            onPressed: () async {
-              await groupCubit.join(code, uid);
-              Navigator.pushReplacementNamed(context, GroupList.route);
-            },
+            onPressed: () => groupCubit.join(code, uid),
             child: Text('Join'),
           ),
         ),
@@ -31,7 +28,11 @@ class GroupJoiningActions extends StatelessWidget {
         Expanded(
           child: CancelButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, GroupList.route);
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushReplacementNamed(context, GroupList.route);
+              }
             },
           ),
         ),

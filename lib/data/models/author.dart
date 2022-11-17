@@ -24,7 +24,7 @@ class CustomUser {
     final docData = doc.data() as Map<String, dynamic>;
     return CustomUser(
       uid: doc.id,
-      name: docData['name'],
+      name: docData['name'] ?? 'anonymous',
       photoURL: docData['photoURL'],
     );
   }
@@ -32,7 +32,7 @@ class CustomUser {
   static CustomUser fromFirestore(Map<String, dynamic> data) {
     return CustomUser(
       uid: data['uid'],
-      name: data['name'],
+      name: data['name'] ?? 'anonymous',
       photoURL: data['photoURL'],
     );
   }
