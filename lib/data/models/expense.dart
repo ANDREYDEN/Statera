@@ -23,30 +23,34 @@ class Expense {
   String? groupId;
   List<Item> items = [];
   List<String> assigneeUids = [];
-  late String name;
+  String name;
   String authorUid;
   DateTime? date;
   DateTime? finalizedDate;
-  late bool acceptNewMembers;
+  bool acceptNewMembers;
+
+  /// Controls wether to display individual item decisions made by expense asssignees.
+  bool showItemDecisions;
 
   Expense({
     required this.name,
     required this.authorUid,
     this.groupId,
     this.acceptNewMembers = true,
+    this.showItemDecisions = true,
   }) {
     this.assigneeUids = [authorUid];
     this.date = DateTime.now();
   }
 
-  Expense.fake({this.authorUid = 'foo'}) {
-    this.name = 'foo';
+  Expense.fake({
+    this.authorUid = 'foo',
+    this.name = 'foo',
+    this.acceptNewMembers = true,
+    this.showItemDecisions = true,
+  }) {
     this.date = DateTime.now();
     this.acceptNewMembers = true;
-  }
-
-  Expense.empty({this.authorUid = ''}) {
-    this.name = '';
   }
 
   bool wasEarlierThan(Expense other) {
@@ -184,6 +188,7 @@ class Expense {
       'date': date,
       'finalizedDate': finalizedDate,
       'acceptNewMembers': acceptNewMembers,
+      'showItemDecisions': showItemDecisions,
     };
   }
 
@@ -199,6 +204,7 @@ class Expense {
       name: data['name'],
       groupId: data['groupId'],
       acceptNewMembers: data['acceptNewMembers'] ?? true,
+      showItemDecisions: data['showItemDecisions'] ?? true,
     );
     expense.id = id;
     expense.date = data['date'] == null
@@ -233,7 +239,8 @@ class Expense {
         other.authorUid == authorUid &&
         other.date == date &&
         other.finalizedDate == finalizedDate &&
-        other.acceptNewMembers == acceptNewMembers;
+        other.acceptNewMembers == acceptNewMembers &&
+        other.showItemDecisions == showItemDecisions;
   }
 
   int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
@@ -250,6 +257,7 @@ class Expense {
         authorUid.hashCode ^
         date.hashCode ^
         finalizedDate.hashCode ^
-        acceptNewMembers.hashCode;
+        acceptNewMembers.hashCode ^
+        showItemDecisions.hashCode;
   }
 }

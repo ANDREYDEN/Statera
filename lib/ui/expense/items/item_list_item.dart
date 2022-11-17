@@ -8,12 +8,14 @@ import 'package:statera/ui/widgets/price_text.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
+  final bool showDecisions;
   final void Function(int) onChangePartition;
   final void Function()? onLongPress;
 
   const ItemListItem({
     Key? key,
     required this.item,
+    this.showDecisions = false,
     required this.onChangePartition,
     this.onLongPress,
   }) : super(key: key);
@@ -26,32 +28,36 @@ class ItemListItem extends StatelessWidget {
 
     return ListTile(
       title: Text(item.name),
-      subtitle: SizedBox(
-        height: 40,
-        child: GroupBuilder(
-          builder: (_, group) => ListView(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            children: item.assignees
-                .where((assigneeDecision) => (assigneeDecision.parts ?? 0) > 0)
-                .map((assigneeDecision) {
-              if (!group.memberExists(assigneeDecision.uid))
-                return Icon(Icons.error);
-              var member = group.getMember(assigneeDecision.uid);
-              return Row(
-                children: [
-                  if (item.isPartitioned) Text('x${assigneeDecision.parts}'),
-                  AuthorAvatar(
-                    margin: const EdgeInsets.only(right: 4),
-                    author: member,
-                    width: 30,
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
+      subtitle: !showDecisions
+          ? null
+          : SizedBox(
+              height: 40,
+              child: GroupBuilder(
+                builder: (_, group) => ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: item.assignees
+                      .where((assigneeDecision) =>
+                          (assigneeDecision.parts ?? 0) > 0)
+                      .map((assigneeDecision) {
+                    if (!group.memberExists(assigneeDecision.uid))
+                      return Icon(Icons.error);
+                    var member = group.getMember(assigneeDecision.uid);
+                    return Row(
+                      children: [
+                        if (item.isPartitioned)
+                          Text('x${assigneeDecision.parts}'),
+                        AuthorAvatar(
+                          margin: const EdgeInsets.only(right: 4),
+                          author: member,
+                          width: 30,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
       trailing: IntrinsicWidth(
         child: Row(
           mainAxisSize: MainAxisSize.min,
