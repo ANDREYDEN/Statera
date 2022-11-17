@@ -20,7 +20,7 @@ class FakeAuthEvent extends Fake implements AuthEvent {}
 class MockUser extends Mock implements User {}
 
 void main() {
-  group("Item List Item", () {
+  group('Item List Item', () {
     late int parts;
     late Item item;
     late MockGroupCubit groupCubit;
@@ -34,7 +34,7 @@ void main() {
 
     setUp(() {
       parts = 0;
-      item = Item(name: "foo", value: 145);
+      item = Item(name: 'foo', value: 145);
       groupCubit = MockGroupCubit();
       when(() => groupCubit.state)
           .thenReturn(GroupLoaded(group: Group.empty()));
@@ -63,19 +63,19 @@ void main() {
       );
     }
 
-    testWidgets("can mark an item as accepted", (WidgetTester tester) async {
+    testWidgets('can mark an item as accepted', (WidgetTester tester) async {
       await buildItemListItem(tester);
 
-      var checkButton = find.byIcon(Icons.check);
+      var checkButton = find.byIcon(Icons.check_rounded);
       await tester.tap(checkButton);
 
       expect(parts, 1);
     });
 
-    testWidgets("can mark an item as denied", (WidgetTester tester) async {
+    testWidgets('can mark an item as denied', (WidgetTester tester) async {
       await buildItemListItem(tester);
 
-      var checkButton = find.byIcon(Icons.close);
+      var checkButton = find.byIcon(Icons.close_rounded);
       await tester.tap(checkButton);
 
       expect(parts, -1);

@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/item.dart';
-
-import 'assignee_decision.dart';
-import 'author.dart';
+import 'package:statera/data/models/models.dart';
 
 class ExpenseStage {
   String name;
@@ -23,30 +20,29 @@ class Expense {
   String? groupId;
   List<Item> items = [];
   List<String> assigneeUids = [];
-  late String name;
+  String name;
   String authorUid;
   DateTime? date;
   DateTime? finalizedDate;
-  late bool acceptNewMembers;
+  late ExpenseSettings settings;
 
   Expense({
     required this.name,
     required this.authorUid,
     this.groupId,
-    this.acceptNewMembers = true,
+    ExpenseSettings? settings,
   }) {
     this.assigneeUids = [authorUid];
     this.date = DateTime.now();
+    this.settings = settings ?? ExpenseSettings();
   }
 
-  Expense.fake({this.authorUid = 'foo'}) {
-    this.name = 'foo';
+  Expense.fake({
+    this.authorUid = 'foo',
+    this.name = 'foo'
+  }) {
     this.date = DateTime.now();
-    this.acceptNewMembers = true;
-  }
-
-  Expense.empty({this.authorUid = ''}) {
-    this.name = '';
+    this.settings = ExpenseSettings();
   }
 
   bool wasEarlierThan(Expense other) {
@@ -183,7 +179,7 @@ class Expense {
           .toList(),
       'date': date,
       'finalizedDate': finalizedDate,
-      'acceptNewMembers': acceptNewMembers,
+      'settings': settings.toFirestore(),
     };
   }
 
@@ -193,12 +189,13 @@ class Expense {
         ? null
         : CustomUser.fromFirestore(data['author']);
     final authorUid = data['authorUid'] ?? author?.uid ?? '';
+    final settings = data['settings'] == null ? null : ExpenseSettings.fromFirestore(data['settings']);
 
     var expense = new Expense(
       authorUid: authorUid,
       name: data['name'],
       groupId: data['groupId'],
-      acceptNewMembers: data['acceptNewMembers'] ?? true,
+      settings: settings,
     );
     expense.id = id;
     expense.date = data['date'] == null
@@ -233,7 +230,7 @@ class Expense {
         other.authorUid == authorUid &&
         other.date == date &&
         other.finalizedDate == finalizedDate &&
-        other.acceptNewMembers == acceptNewMembers;
+        other.settings == settings;
   }
 
   int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
@@ -250,6 +247,6 @@ class Expense {
         authorUid.hashCode ^
         date.hashCode ^
         finalizedDate.hashCode ^
-        acceptNewMembers.hashCode;
+        settings.hashCode;
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
-import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';

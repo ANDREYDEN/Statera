@@ -32,8 +32,9 @@ Future<void> main() async {
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  final initialDynamicLink =
-      await FirebaseDynamicLinks.instance.getInitialLink();
+  final initialDynamicLink = isMobilePlatform()
+      ? await FirebaseDynamicLinks.instance.getInitialLink()
+      : null;
   final dynamicLinkPath = initialDynamicLink?.link.path;
   final initialNotificationMessage =
       await FirebaseMessaging.instance.getInitialMessage();

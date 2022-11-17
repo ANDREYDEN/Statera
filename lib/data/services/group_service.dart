@@ -1,5 +1,5 @@
 import 'package:mockito/annotations.dart';
-import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
@@ -102,7 +102,9 @@ class GroupService extends Firestore {
   }
 
   Future<String> addExpense(String? groupId, Expense expense) async {
+    final group = await getGroupById(groupId);
     expense.groupId = groupId;
+    expense.settings = group.defaultExpenseSettings;
     final docRef = await expensesCollection.add(expense.toFirestore());
     return docRef.id;
   }
