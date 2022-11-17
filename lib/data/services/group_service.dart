@@ -6,10 +6,10 @@ import 'package:statera/data/services/services.dart';
 
 @GenerateNiceMocks([MockSpec<GroupService>()])
 class GroupService extends Firestore {
-  late final DynamicLinkRepository _dynamicLinkRepository;
+  late final DynamicLinkService _dynamicLinkRepository;
 
   GroupService() : super() {
-    _dynamicLinkRepository = DynamicLinkRepository();
+    _dynamicLinkRepository = DynamicLinkService();
   }
 
   Future<Group> getGroup(String? groupCode) async {

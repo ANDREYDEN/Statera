@@ -6,30 +6,16 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:statera/firebase_options.dart';
+import 'package:statera/utils/utils.dart';
 
-class DynamicLinkRepository {
-  Future<StreamSubscription<PendingDynamicLinkData>> retrieveDynamicLink(
+class DynamicLinkService {
+  Future<StreamSubscription<PendingDynamicLinkData>> listen(
     BuildContext context,
   ) async {
-    final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
-
-    if (initialLink != null) {
-      navigateToPath(context, initialLink.link.path);
-    }
-
-    return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      navigateToPath(context, dynamicLinkData.link.path);
-    })
+    return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) => AppLaunchHandler.handleDynamicLink(dynamicLinkData, context))
       ..onError((error) {
         FirebaseCrashlytics.instance.recordFlutterError(error);
       });
-  }
-
-  void navigateToPath(BuildContext context, String path) {
-    final currentPath = ModalRoute.of(context)?.settings.name;
-    if (path != currentPath) {
-      Navigator.pushNamed(context, path);
-    }
   }
 
   Future<String> generateDynamicLink({
@@ -78,11 +64,10 @@ class DynamicLinkRepository {
       }),
     );
 
-    print('Attempted to create dynamic link: ${response.statusCode}');
-
     if (response.statusCode < 200 || response.statusCode >= 400) {
       throw Exception(
-          'Something went wrong while creating a dynamic link: ${response.body}');
+        'Something went wrong while creating a dynamic link: ${response.body}',
+      );
     }
 
     return json.decode(response.body)['shortLink'];

@@ -9,7 +9,6 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/dynamic_link_handler.dart';
 import 'package:statera/settings/settings.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -20,6 +19,7 @@ import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/support/support.dart';
+import 'package:statera/utils/helpers.dart';
 
 final _landingPagePath = PagePath(
   pattern: '^${LandingPage.route}\$',
@@ -155,13 +155,16 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
     List.generate(match.groupCount, (index) => index + 1),
   );
 
-  return DynamicLinkHandler(
-    child: SafeArea(
-      child: path.isPublic
-          ? path.builder(context, matches)
-          : AuthGuard(
-              builder: () => path.builder(context, matches),
-            ),
-    ),
+  if (isMobilePlatform()) {
+    final dynamicLinkRepository = context.read<DynamicLinkService>();
+    dynamicLinkRepository.listen(context);
+  }
+
+  return SafeArea(
+    child: path.isPublic
+        ? path.builder(context, matches)
+        : AuthGuard(
+            builder: () => path.builder(context, matches),
+          ),
   );
 }
