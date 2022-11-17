@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/custom_user.dart';
 
 class AuthorAvatar extends StatelessWidget {
   final CustomUser author;

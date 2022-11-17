@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 
 class ExpenseSettingsDialog extends StatefulWidget {
@@ -15,10 +16,12 @@ class ExpenseSettingsDialog extends StatefulWidget {
 
 class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
   late bool _automaticallyAddNewMembers;
+  late bool _showItemDecisions;
 
   @override
   void initState() {
-    _automaticallyAddNewMembers = widget.expense.acceptNewMembers;
+    _automaticallyAddNewMembers = widget.expense.settings.acceptNewMembers;
+    _showItemDecisions = widget.expense.settings.showItemDecisions;
     super.initState();
   }
 
@@ -29,34 +32,35 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SwitchListTile(
+            title: Text('Automatically add new members to this expense'),
             value: _automaticallyAddNewMembers,
             onChanged: (isOn) {
               setState(() {
                 _automaticallyAddNewMembers = !_automaticallyAddNewMembers;
               });
             },
-            title: Text('Automatically add new members to this expense'),
+          ),
+          SwitchListTile(
+            title: Text('Show how other people marked each item'),
+            value: _showItemDecisions,
+            onChanged: (isOn) {
+              setState(() {
+                _showItemDecisions = !_showItemDecisions;
+              });
+            },
           ),
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, false);
-          },
-          child: Text(
-            "Cancel",
-            style: TextStyle(
-              color: Theme.of(context).errorColor,
-            ),
-          ),
-        ),
+        CancelButton(),
         ProtectedButton(
           onPressed: () async {
-            widget.expense.acceptNewMembers = _automaticallyAddNewMembers;
+            widget.expense.settings.acceptNewMembers =
+                _automaticallyAddNewMembers;
+            widget.expense.settings.showItemDecisions = _showItemDecisions;
             Navigator.pop(context, true);
           },
-          child: Text("Save"),
+          child: Text('Save'),
         ),
       ],
     );

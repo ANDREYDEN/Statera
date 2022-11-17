@@ -42,7 +42,7 @@ class ExpenseService extends Firestore {
     for (var expense in expenses) {
       final containsUser = expense.assigneeUids.any((aUid) => aUid == uid);
       if (expense.canReceiveAssignees &&
-          expense.acceptNewMembers &&
+          expense.settings.acceptNewMembers &&
           !containsUser) {
         expense.addAssignee(uid);
       }
