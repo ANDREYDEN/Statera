@@ -5,17 +5,17 @@ import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
-import 'package:statera/ui/widgets/progress_bar.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
-
   final void Function(int) onChangePartition;
+  final void Function()? onLongPress;
 
   const ItemListItem({
     Key? key,
     required this.item,
     required this.onChangePartition,
+    this.onLongPress,
   }) : super(key: key);
 
   @override
@@ -113,6 +113,7 @@ class ItemListItem extends StatelessWidget {
           ],
         ),
       ),
+      onLongPress: onLongPress,
     );
   }
 }

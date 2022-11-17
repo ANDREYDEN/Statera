@@ -46,27 +46,23 @@ class ItemsList extends StatelessWidget {
                           key: Key(item.hashCode.toString()),
                           isDismissible: expense.canBeUpdatedBy(authBloc.uid),
                           onDismissed: (_) => _handleItemDelete(context, index),
-                          confirmation: 'Are you sure you want to delete this item?',
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: GestureDetector(
-                              onLongPress: expense.canBeUpdatedBy(authBloc.uid)
-                                  ? () => handleItemUpsert(
-                                        context,
-                                        intialItem: item,
-                                      )
-                                  : null,
-                              child: ItemListItem(
-                                item: item,
-                                onChangePartition: !expense.finalized
-                                    ? (partition) => _handleItemPartitionChange(
-                                          context,
-                                          partition,
-                                          index,
-                                        )
-                                    : (p) {},
-                              ),
-                            ),
+                          confirmation:
+                              'Are you sure you want to delete this item?',
+                          child: ItemListItem(
+                            onLongPress: expense.canBeUpdatedBy(authBloc.uid)
+                                ? () => handleItemUpsert(
+                                      context,
+                                      intialItem: item,
+                                    )
+                                : null,
+                            item: item,
+                            onChangePartition: !expense.finalized
+                                ? (partition) => _handleItemPartitionChange(
+                                      context,
+                                      partition,
+                                      index,
+                                    )
+                                : (p) {},
                           ),
                         );
                       },
