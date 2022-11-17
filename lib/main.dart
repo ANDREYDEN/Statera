@@ -1,6 +1,8 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,27 +21,41 @@ import 'package:url_strategy/url_strategy.dart';
 
 Future<void> main() async {
   setPathUrlStrategy();
-
   WidgetsFlutterBinding.ensureInitialized();
+
   await dotenv.load();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseAnalytics.instance;
 
   configureEmulators();
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  runApp(Statera());
+  final initialDynamicLink =
+      await FirebaseDynamicLinks.instance.getInitialLink();
+  final dynamicLinkPath = initialDynamicLink?.link.path;
+  final initialNotificationMessage =
+      await FirebaseMessaging.instance.getInitialMessage();
+  final notificationPath = AppLaunchHandler.getPath(initialNotificationMessage);
+
+  runApp(Statera(
+    initialRoute: dynamicLinkPath ?? notificationPath,
+  ));
 }
 
 class Statera extends StatelessWidget {
-  const Statera({Key? key}) : super(key: key);
+  final String? initialRoute;
+
+  const Statera({Key? key, this.initialRoute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final defaultRoute = kIsWeb
+        ? LandingPage.route
+        // see https://api.flutter.dev/flutter/material/MaterialApp/initialRoute.html for explanation
+        : GroupList.route.replaceFirst('/', '');
+
     return RepositoryRegistrant(
       child: BlocProvider(
         create: (context) {
@@ -56,10 +72,7 @@ class Statera extends StatelessWidget {
                 theme: theme,
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
-                initialRoute: kIsWeb
-                    ? LandingPage.route
-                    // see https://api.flutter.dev/flutter/material/MaterialApp/initialRoute.html for explanation
-                    : GroupList.route.replaceFirst('/', ''),
+                initialRoute: initialRoute ?? defaultRoute,
                 onGenerateRoute: onGenerateRoute,
                 debugShowCheckedModeBanner: false,
               ),

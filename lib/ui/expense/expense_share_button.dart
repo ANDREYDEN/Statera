@@ -9,7 +9,7 @@ class ExpenseShareButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dynamicLinkRepository = context.read<DynamicLinkRepository>();
+    final dynamicLinkRepository = context.read<DynamicLinkService>();
 
     return FutureBuilder<String>(
       future: dynamicLinkRepository.generateDynamicLink(

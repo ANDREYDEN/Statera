@@ -7,7 +7,7 @@ class MockHttpClient extends Mock implements http.Client {}
 
 void main() {
   group('DynamicLinkService', () {
-    final dynamicLinkRepository = DynamicLinkRepository();
+    final dynamicLinkRepository = DynamicLinkService();
     final mockHttpClient = MockHttpClient();
 
     setUpAll(() {
