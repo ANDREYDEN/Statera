@@ -32,22 +32,22 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SwitchListTile(
+            title: Text('Automatically add new members to this expense'),
             value: _automaticallyAddNewMembers,
             onChanged: (isOn) {
               setState(() {
                 _automaticallyAddNewMembers = !_automaticallyAddNewMembers;
               });
             },
-            title: Text('Automatically add new members to this expense'),
           ),
           SwitchListTile(
+            title: Text('Show how other people marked each item'),
             value: _showItemDecisions,
             onChanged: (isOn) {
               setState(() {
                 _showItemDecisions = !_showItemDecisions;
               });
             },
-            title: Text('Show how other people marked each item'),
           ),
         ],
       ),

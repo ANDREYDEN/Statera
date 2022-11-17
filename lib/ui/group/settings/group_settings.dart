@@ -75,6 +75,33 @@ class GroupSettings extends StatelessWidget {
                 },
               ),
               SizedBox(height: 40),
+              SectionTitle('Default Expense Settings'),
+              SizedBox(height: 20),
+              SwitchListTile(
+                title: Text(
+                  'Automatically add members who join the group to this expense',
+                ),
+                value: group.defaultExpenseSettings.acceptNewMembers,
+                onChanged: (isOn) {
+                  final groupCubit = context.read<GroupCubit>();
+
+                  groupCubit.update((group) {
+                    group.defaultExpenseSettings.acceptNewMembers = isOn;
+                  });
+                },
+              ),
+              SwitchListTile(
+                title: Text('Show how other people marked each item'),
+                value: group.defaultExpenseSettings.showItemDecisions,
+                onChanged: (isOn) {
+                  final groupCubit = context.read<GroupCubit>();
+
+                  groupCubit.update((group) {
+                    group.defaultExpenseSettings.showItemDecisions = isOn;
+                  });
+                },
+              ),
+              SizedBox(height: 40),
             ],
             DangerZone(
               children: [

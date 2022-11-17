@@ -1,8 +1,5 @@
-import 'package:statera/data/models/payment.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/utils/helpers.dart';
-
-import 'custom_user.dart';
-import 'expense.dart';
 
 /// Describes a group of users sharing expenses
 class Group {
@@ -28,6 +25,7 @@ class Group {
   late String currencySign;
   String? inviteLink;
   late double debtThreshold;
+  late ExpenseSettings defaultExpenseSettings;
 
   static const String kdefaultCurrencySign = '\$';
   static const double kdefaultDebtThreshold = 50;
@@ -42,6 +40,7 @@ class Group {
     String? currencySign,
     this.inviteLink,
     double? debtThreshold,
+    ExpenseSettings? defaultExpenseSettings,
   }) {
     this.members = [];
     this.balance = {};
@@ -53,6 +52,7 @@ class Group {
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
     if (code == null) _generateCode();
     this._adminId = adminId;
+    this.defaultExpenseSettings = defaultExpenseSettings ?? ExpenseSettings();
   }
 
   Group.empty({
@@ -175,6 +175,7 @@ class Group {
       'currencySign': currencySign,
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
+      'defaultExpenseSettings': defaultExpenseSettings.toFirestore(),
     };
   }
 
@@ -205,6 +206,9 @@ class Group {
       currencySign: map['currencySign'],
       inviteLink: map['inviteLink'],
       debtThreshold: double.tryParse(map['debtThreshold'].toString()),
+      defaultExpenseSettings: map['defaultExpenseSettings'] == null
+          ? null
+          : ExpenseSettings.fromFirestore(map['defaultExpenseSettings']),
     );
   }
 }
