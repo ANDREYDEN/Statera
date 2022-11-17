@@ -28,7 +28,8 @@ class ItemListItem extends StatelessWidget {
 
     return ListTile(
       title: Text(item.name),
-      subtitle: !showDecisions
+      subtitle: (!showDecisions ||
+              item.assignees.every((a) => a.parts == null || a.parts == 0))
           ? null
           : SizedBox(
               height: 40,
