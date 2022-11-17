@@ -1,7 +1,7 @@
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/utils/helpers.dart';
 
-import 'author.dart';
+import 'custom_user.dart';
 import 'expense.dart';
 
 /// Describes a group of users sharing expenses

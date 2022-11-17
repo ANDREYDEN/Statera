@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
-import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/author_avatar.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';

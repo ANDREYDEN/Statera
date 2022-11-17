@@ -20,8 +20,8 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
 
   @override
   void initState() {
-    _automaticallyAddNewMembers = widget.expense.acceptNewMembers;
-    _showItemDecisions = widget.expense.showItemDecisions;
+    _automaticallyAddNewMembers = widget.expense.settings.acceptNewMembers;
+    _showItemDecisions = widget.expense.settings.showItemDecisions;
     super.initState();
   }
 
@@ -55,8 +55,9 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         CancelButton(),
         ProtectedButton(
           onPressed: () async {
-            widget.expense.acceptNewMembers = _automaticallyAddNewMembers;
-            widget.expense.showItemDecisions = _showItemDecisions;
+            widget.expense.settings.acceptNewMembers =
+                _automaticallyAddNewMembers;
+            widget.expense.settings.showItemDecisions = _showItemDecisions;
             Navigator.pop(context, true);
           },
           child: Text('Save'),

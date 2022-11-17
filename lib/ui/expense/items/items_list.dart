@@ -52,7 +52,7 @@ class ItemsList extends StatelessWidget {
                                 'Are you sure you want to delete this item?',
                             child: ItemListItem(
                               item: item,
-                              showDecisions: expense.showItemDecisions,
+                              showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)
                                   ? () => handleItemUpsert(
                                         context,

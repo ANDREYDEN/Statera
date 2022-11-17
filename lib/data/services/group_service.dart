@@ -1,5 +1,5 @@
 import 'package:mockito/annotations.dart';
-import 'package:statera/data/models/author.dart';
+import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
