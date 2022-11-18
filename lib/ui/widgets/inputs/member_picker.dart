@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 
 class MemberPicker extends StatefulWidget {
   final List<String> value;
@@ -56,7 +56,7 @@ class _MemberPickerState extends State<MemberPicker> {
               ),
             ),
             ...members.map((member) {
-              return AuthorAvatar(
+              return UserAvatar(
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 author: member,
                 borderColor: widget.controller.value.contains(member.uid)
