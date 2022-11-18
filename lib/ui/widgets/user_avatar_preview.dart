@@ -24,13 +24,14 @@ class UserAvatarExamples extends StatelessWidget {
               dimension: 40,
             ),
             Row(
-              children: List.generate(
-                5,
-                (index) => UserAvatar(
-                  author: CustomUser.fake(name: 'User', photoURL: null),
-                  dimension: 20 + 20.0 * index,
-                ),
-              ),
+              children: [20, 40, 60, 100, 200]
+                  .map(
+                    (dimension) => UserAvatar(
+                      author: CustomUser.fake(name: 'User', photoURL: null),
+                      dimension: dimension * 1.0,
+                    ),
+                  )
+                  .toList(),
             ),
             UserAvatar(
               author: CustomUser.fake(

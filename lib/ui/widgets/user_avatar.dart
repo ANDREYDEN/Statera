@@ -69,7 +69,11 @@ class UserAvatar extends StatelessWidget {
                                   this.author.name.isEmpty
                                       ? '?'
                                       : this.author.name[0],
-                                  style: TextStyle(fontSize: 24),
+                                  style: TextStyle(
+                                    fontSize: dimension == null
+                                        ? 24
+                                        : (dimension! / 2),
+                                  ),
                                 ),
                               ],
                             ),
