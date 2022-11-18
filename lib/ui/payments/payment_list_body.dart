@@ -34,7 +34,7 @@ class PaymentListBody extends StatelessWidget {
               children: [
                 UserAvatar(
                   author: otherMember,
-                  width: 100,
+                  dimension: 100,
                   margin: EdgeInsets.symmetric(vertical: 10),
                 ),
                 SizedBox(height: 8),

@@ -17,7 +17,7 @@ class CustomUser {
   CustomUser.fake({String? name, String? uid, String? photoURL}) {
     this.uid = uid ?? 'foo';
     this.name = name ?? 'bar';
-    this.photoURL = photoURL ?? 'baz';
+    this.photoURL = photoURL;
   }
 
   static CustomUser fromUserDoc(DocumentSnapshot<Object?> doc) {

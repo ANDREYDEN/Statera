@@ -51,7 +51,7 @@ class ItemListItem extends StatelessWidget {
                         UserAvatar(
                           margin: const EdgeInsets.only(right: 4),
                           author: member,
-                          width: 30,
+                          dimension: 30,
                         ),
                       ],
                     );
