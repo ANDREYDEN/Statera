@@ -10,7 +10,7 @@ import 'package:statera/ui/expense/expense_actions_wide.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/price_text.dart';
@@ -98,16 +98,14 @@ class ExpenseDetails extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          GroupBuilder(
-                            builder: (context, group) {
-                              return AuthorAvatar(
-                                author: group.getMember(expense.authorUid),
-                                onTap: expenseCanBeUpdated
-                                    ? () => _handleAuthorClick(context)
-                                    : null,
-                              );
-                            }
-                          ),
+                          GroupBuilder(builder: (context, group) {
+                            return UserAvatar(
+                              author: group.getMember(expense.authorUid),
+                              onTap: expenseCanBeUpdated
+                                  ? () => _handleAuthorClick(context)
+                                  : null,
+                            );
+                          }),
                           Icon(Icons.arrow_forward),
                           Expanded(
                             child: GestureDetector(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/group/group_builder.dart';
 
@@ -21,7 +21,7 @@ class AssigneeList extends StatelessWidget {
                     if (!group.memberExists(assigneeUid))
                       return Icon(Icons.error);
                     var member = group.getMember(assigneeUid);
-                    return AuthorAvatar(
+                    return UserAvatar(
                       margin: const EdgeInsets.only(right: 4),
                       author: member,
                       withIcon: expense.isMarkedBy(assigneeUid),

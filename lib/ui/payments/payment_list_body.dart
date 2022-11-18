@@ -5,7 +5,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/custom_stream_builder.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -32,7 +32,7 @@ class PaymentListBody extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                AuthorAvatar(
+                UserAvatar(
                   author: otherMember,
                   width: 100,
                   margin: EdgeInsets.symmetric(vertical: 10),
