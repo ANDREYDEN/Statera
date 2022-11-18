@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 
 class ItemListItem extends StatelessWidget {
@@ -48,10 +48,10 @@ class ItemListItem extends StatelessWidget {
                       children: [
                         if (item.isPartitioned)
                           Text('x${assigneeDecision.parts}'),
-                        AuthorAvatar(
+                        UserAvatar(
                           margin: const EdgeInsets.only(right: 4),
                           author: member,
-                          width: 30,
+                          dimension: 30,
                         ),
                       ],
                     );

@@ -12,7 +12,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/utils/helpers.dart';
@@ -59,7 +59,7 @@ class ExpenseListItem extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           GroupBuilder(builder: (context, group) {
-                            return AuthorAvatar(
+                            return UserAvatar(
                               author: group.getMember(expense.authorUid),
                             );
                           }),

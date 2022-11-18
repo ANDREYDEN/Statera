@@ -6,7 +6,7 @@ import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 
 class OwingListItem extends StatelessWidget {
@@ -47,7 +47,7 @@ class OwingListItem extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: AuthorAvatar(
+                  child: UserAvatar(
                     author: this.member,
                     withName: true,
                     withIcon: isAdmin,

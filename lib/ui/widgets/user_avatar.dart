@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/custom_user.dart';
 
-class AuthorAvatar extends StatelessWidget {
+class UserAvatar extends StatelessWidget {
   final CustomUser author;
   late final Function()? onTap;
   final bool withName;
@@ -10,10 +10,10 @@ class AuthorAvatar extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
   final Color? iconBackgroudColor;
-  final double? width;
+  final double? dimension;
   final EdgeInsets? margin;
 
-  AuthorAvatar({
+  UserAvatar({
     Key? key,
     required this.author,
     this.onTap,
@@ -23,7 +23,7 @@ class AuthorAvatar extends StatelessWidget {
     this.icon = Icons.check,
     this.iconColor = Colors.white,
     this.iconBackgroudColor = Colors.green,
-    this.width,
+    this.dimension,
     this.margin,
   }) : super(key: key);
 
@@ -41,8 +41,8 @@ class AuthorAvatar extends StatelessWidget {
               Stack(
                 children: [
                   Container(
-                    width: this.width,
-                    height: this.width,
+                    width: this.dimension,
+                    height: this.dimension,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -69,7 +69,11 @@ class AuthorAvatar extends StatelessWidget {
                                   this.author.name.isEmpty
                                       ? '?'
                                       : this.author.name[0],
-                                  style: TextStyle(fontSize: 24),
+                                  style: TextStyle(
+                                    fontSize: dimension == null
+                                        ? 24
+                                        : (dimension! / 2),
+                                  ),
                                 ),
                               ],
                             ),
