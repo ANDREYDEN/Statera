@@ -121,7 +121,7 @@ class Group {
     );
   }
 
-  void removeUser(String uid) {
+  void removeMember(String uid) {
     this.members.removeWhere((member) => member.uid == uid);
     this.balance.remove(uid);
     this.balance.forEach((key, value) => value.remove(uid));
