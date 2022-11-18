@@ -7,23 +7,19 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const groupsReference = db.collection('groups')
-    const groups = await groupsReference.listDocuments()
+    // const groupId = 'jRiWZXKdAB7hdei0mQOi'
+    const groupId = 'mX6FbRb5do50QYzEAmoS'
+    const groupReference = await db.collection('groups').doc(groupId).get()
+    const group = groupReference.data()
 
-    for (const group of groups) {
-        const groupData = (await group.get()).data()
-        const fixedGroup = await fixAnonymousMembers(groupData)
-        await group.update(fixedGroup)
-    }
+    // const expenseId = '0h614sCqU2dhBIeaGiTC'
+    const expenseId = 'aba7qqKHpRMlOeeWqCC8'
+    const expenseReference = await db.collection('expenses').doc(expenseId).get()
+    const expense = expenseReference.data()
+
+    const newGroup = await finalizeExpense(group, expense)
+    await db.collection('groups').doc(groupId).set(newGroup)
 })();
-
-/**
- * 
- * @param {FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>} doc 
- */
-async function operateOnDoc(doc) {
-    console.log(doc.data());
-}
 
 function addUserToGroup(group, user) {
     for (const memberId1 of Object.keys(group.balance)) {
@@ -39,7 +35,7 @@ function addUserToGroup(group, user) {
 }
 
 function finalizeExpense(group, expense) {
-    const authorId = expense.author.uid
+    const authorId = expense.authorUid
 
     for (const assigneeId of expense.assigneeIds.filter(a => a != authorId)) {
         const owedValueToAuthor = getTotalDebt(expense, assigneeId)

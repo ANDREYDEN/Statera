@@ -9,7 +9,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/widgets/author_avatar.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
@@ -83,9 +83,9 @@ class _SettingsState extends State<Settings> {
             alignment: Alignment.center,
             child: Stack(
               children: [
-                AuthorAvatar(
+                UserAvatar(
                   author: CustomUser.fromUser(authBloc.user),
-                  width: 200,
+                  dimension: 200,
                 ),
                 Positioned(
                   right: 0,

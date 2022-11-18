@@ -97,10 +97,14 @@ class _LandingPageState extends State<LandingPage>
     return PageScaffold(
       title: 'Statera',
       actions: [
-        IconButton(
-          icon: Icon(Icons.login),
+        TextButton.icon(
           onPressed: () => Navigator.pushNamed(context, GroupList.route),
-        )
+          icon: Icon(Icons.login),
+          label: Text('Log in'),
+          style: TextButton.styleFrom(
+            textStyle: TextStyle(decoration: TextDecoration.none),
+          ),
+        ),
       ],
       child: Center(
         child: Padding(
