@@ -39,8 +39,8 @@ class GroupCubit extends Cubit<GroupState> {
     }).listen(emit);
   }
 
-  void empty() {
-    emit(GroupLoaded(group: Group.empty()));
+  void loadGroup(Group group) {
+    emit(GroupLoaded(group: group));
   }
 
   void loadFromExpense(String? expenseId) async {

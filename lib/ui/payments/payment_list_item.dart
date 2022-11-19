@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/payment.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
@@ -14,6 +17,77 @@ class PaymentListItem extends StatelessWidget {
     required this.receiverUid,
   }) : super(key: key);
 
+  void _navigateToExpense(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
+  }
+
+  void _handleTap(BuildContext context, Group group) {
+    final isWide = context.read<LayoutState>().isWide;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          width: isWide ? 400 : 200,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Text('Reason:'),
+                  Flexible(
+                    child: Text(
+                      payment.reason ??
+                          (payment.hasRelatedExpense
+                              ? 'Expense finalized'
+                              : 'Payment'),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(child: Text(group.getMember(payment.payerId).name, textAlign: TextAlign.center,)),
+                  Icon(Icons.arrow_forward_rounded),
+                  Expanded(
+                    child: Text(group.getMember(payment.receiverId).name),
+                  ),
+                ],
+              ),
+              if (payment.oldPayerBalance != null)
+                Row(
+                  children: [
+                    Text(
+                      '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
+                    ),
+                    Icon(Icons.arrow_forward_rounded),
+                    Text(
+                      '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          if (payment.hasRelatedExpense) CancelButton(),
+          if (payment.hasRelatedExpense)
+            ElevatedButton(
+              onPressed: () => _navigateToExpense(context),
+              child: Text('Go to expense'),
+            )
+          else
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Color paymentColor =
@@ -23,27 +97,20 @@ class PaymentListItem extends StatelessWidget {
       builder: (context, group) {
         return ListTile(
           isThreeLine: payment.hasRelatedExpense,
-          title: Text(
-            "${group.currencySign}${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
-            style: TextStyle(color: paymentColor),
-          ),
           leading: Icon(
             payment.isAdmin
-                ? Icons.warning
+                ? Icons.warning_rounded
                 : payment.hasRelatedExpense
-                    ? Icons.receipt_long
-                    : Icons.paid,
+                    ? Icons.receipt_long_rounded
+                    : Icons.paid_rounded,
             color: payment.isAdmin
                 ? Colors.red
                 : Theme.of(context).colorScheme.secondary,
             size: 30,
           ),
-          trailing: Icon(
-            payment.isReceivedBy(receiverUid)
-                ? Icons.call_received
-                : Icons.call_made,
-            color: paymentColor,
-            size: 30,
+          title: Text(
+            "${group.currencySign}${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+            style: TextStyle(color: paymentColor),
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,31 +122,16 @@ class PaymentListItem extends StatelessWidget {
               if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
             ],
           ),
-          onTap: payment.isAdmin
-              ? () => _displayReason(context)
-              : payment.hasRelatedExpense
-                  ? () => _navigateToExpense(context)
-                  : null,
+          trailing: Icon(
+            payment.isReceivedBy(receiverUid)
+                ? Icons.call_received_rounded
+                : Icons.call_made_rounded,
+            color: paymentColor,
+            size: 30,
+          ),
+          onTap: () => _handleTap(context, group),
         );
       },
     );
-  }
-
-  _displayReason(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text(payment.reason!),
-        actions: [
-          ElevatedButton(
-              onPressed: () => Navigator.pop(context), child: Text('OK'))
-        ],
-      ),
-    );
-  }
-
-  _navigateToExpense(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
   }
 }

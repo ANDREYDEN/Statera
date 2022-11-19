@@ -39,6 +39,7 @@ class Payment {
   PaymentExpenseInfo? relatedExpense;
   DateTime? timeCreated;
   String? reason;
+  double? oldPayerBalance;
 
   Payment({
     required this.groupId,
@@ -48,6 +49,7 @@ class Payment {
     this.relatedExpense,
     this.timeCreated,
     this.reason,
+    this.oldPayerBalance,
   });
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
@@ -62,9 +64,11 @@ class Payment {
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
-      'relatedExpense': relatedExpense == null ? null : relatedExpense!.toFirestore(),
+      'relatedExpense':
+          relatedExpense == null ? null : relatedExpense!.toFirestore(),
       'payerReceiverId': '${payerId}_$receiverId',
-      'reason': reason
+      'reason': reason,
+      'oldPayerBalance': oldPayerBalance,
     };
   }
 
@@ -74,9 +78,14 @@ class Payment {
       payerId: map['payerId'],
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),
-      relatedExpense: map['relatedExpense'] == null ? null : PaymentExpenseInfo.fromFirestore(map['relatedExpense']),
-      timeCreated: map['timeCreated'] == null ? null : DateTime.parse(map['timeCreated'].toDate().toString()),
-      reason: map['reason']
+      relatedExpense: map['relatedExpense'] == null
+          ? null
+          : PaymentExpenseInfo.fromFirestore(map['relatedExpense']),
+      timeCreated: map['timeCreated'] == null
+          ? null
+          : DateTime.parse(map['timeCreated'].toDate().toString()),
+      reason: map['reason'],
+      oldPayerBalance: map['oldPayerBalance'],
     );
   }
 

@@ -34,7 +34,7 @@ class Group {
     required this.name,
     this.code,
     this.id,
-    members,
+    List<CustomUser>? members,
     String? adminId,
     balance,
     String? currencySign,
