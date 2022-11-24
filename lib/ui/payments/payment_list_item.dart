@@ -5,6 +5,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
@@ -28,6 +29,7 @@ class PaymentListItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: Text('Payment Info'),
         content: SizedBox(
           width: isWide ? 400 : 200,
           child: Column(
@@ -35,29 +37,26 @@ class PaymentListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Reason:'),
-                  Flexible(
-                    child: Text(
-                      payment.reason ??
-                          (payment.hasRelatedExpense
-                              ? 'Expense finalized'
-                              : 'Payment'),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(child: Text(group.getMember(payment.payerId).name, textAlign: TextAlign.center,)),
+                  Text(group.getMember(payment.payerId).name),
                   Icon(Icons.arrow_forward_rounded),
-                  Expanded(
-                    child: Text(group.getMember(payment.receiverId).name),
-                  ),
+                  Text(group.getMember(payment.receiverId).name),
                 ],
               ),
-              if (payment.oldPayerBalance != null)
+              Divider(),
+              SectionTitle('Reason'),
+              Text(
+                payment.reason ??
+                    (payment.hasRelatedExpense
+                        ? 'Expense finalized'
+                        : 'Payment'),
+              ),
+              SizedBox(height: 20),
+              if (payment.oldPayerBalance != null) ...[
+                SectionTitle('Balance change'),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
@@ -68,6 +67,7 @@ class PaymentListItem extends StatelessWidget {
                     ),
                   ],
                 ),
+              ]
             ],
           ),
         ),

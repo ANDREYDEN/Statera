@@ -26,8 +26,8 @@ class ListCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user1 = CustomUser(uid: 'a', name: 'Example 1');
-    final user2 = CustomUser(uid: 'b', name: 'Example 2');
+    final user1 = CustomUser(uid: 'a', name: 'John Doe');
+    final user2 = CustomUser(uid: 'b', name: 'Adam Smith');
 
     return MaterialApp(
       theme: theme,
@@ -96,7 +96,8 @@ class ListCover extends StatelessWidget {
                       payerId: 'a',
                       receiverId: 'b',
                       value: 123,
-                      reason: 'There was a malfunction in the system',
+                      reason:
+                          'This is a very long and unneeded explanation that there was a malfunction in the system',
                     ),
                     receiverUid: 'b',
                   ),
@@ -117,6 +118,16 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 50,
                       oldPayerBalance: 10,
+                    ),
+                    receiverUid: 'b',
+                  ),
+                  PaymentListItem(
+                    payment: Payment(
+                      groupId: 'asd',
+                      payerId: 'b',
+                      receiverId: 'a',
+                      value: 30,
+                      oldPayerBalance: -40,
                     ),
                     receiverUid: 'b',
                   )
