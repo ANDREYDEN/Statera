@@ -31,11 +31,9 @@ class PaymentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final receiverUid =
-        context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
-    Color paymentColor =
-        payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
+    Color paymentColor = payment.isReceivedBy(uid) ? Colors.red : Colors.green;
 
     return GroupBuilder(
       builder: (context, group) {
@@ -53,7 +51,7 @@ class PaymentListItem extends StatelessWidget {
             size: 30,
           ),
           title: Text(
-            "${group.currencySign}${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+            "${group.currencySign}${payment.isReceivedBy(uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
             style: TextStyle(color: paymentColor),
           ),
           subtitle: Column(
@@ -67,9 +65,9 @@ class PaymentListItem extends StatelessWidget {
             ],
           ),
           trailing: Icon(
-            payment.isReceivedBy(receiverUid)
-                ? Icons.call_received_rounded
-                : Icons.call_made_rounded,
+            payment.isReceivedBy(uid)
+                ? Icons.arrow_upward_rounded
+                : Icons.arrow_downward_rounded,
             color: paymentColor,
             size: 30,
           ),
