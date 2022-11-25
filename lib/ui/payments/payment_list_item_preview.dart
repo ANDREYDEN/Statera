@@ -10,7 +10,6 @@ import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/auth_service.dart';
-import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';

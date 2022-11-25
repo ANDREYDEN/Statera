@@ -25,7 +25,8 @@ class PaymentDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final receiverUid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    final receiverUid =
+        context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     final isWide = context.watch<LayoutState>().isWide;
 
     return AlertDialog(
@@ -48,7 +49,9 @@ class PaymentDetailsDialog extends StatelessWidget {
             SectionTitle('Reason'),
             Text(
               payment.reason ??
-                  (payment.hasRelatedExpense ? 'Expense finalized' : 'Payment'),
+                  (payment.hasRelatedExpense
+                      ? 'Expense "${payment.relatedExpense!.name}" was finalized.'
+                      : 'Manual payment.'),
             ),
             SizedBox(height: 20),
             if (payment.oldPayerBalance != null) ...[

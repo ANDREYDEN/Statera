@@ -139,7 +139,8 @@ class ExpenseListItem extends StatelessWidget {
               receiverId: assigneeUid,
               value: expense.getConfirmedTotalForUser(assigneeUid),
               relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-              oldPayerBalance: groupCubit.loadedState.group.balance[expense.authorUid]?[expense.groupId]
+              oldPayerBalance: groupCubit
+                  .loadedState.group.balance[expense.authorUid]?[assigneeUid],
             ),
           )),
     );
