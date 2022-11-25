@@ -1,95 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
-import 'package:statera/ui/widgets/section_title.dart';
+import 'package:statera/ui/payments/payment_details_dialog.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
-  final String receiverUid;
 
   const PaymentListItem({
     Key? key,
     required this.payment,
-    required this.receiverUid,
   }) : super(key: key);
 
-  void _navigateToExpense(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
-  }
-
   void _handleTap(BuildContext context, Group group) {
-    final isWide = context.read<LayoutState>().isWide;
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Payment Info'),
-        content: SizedBox(
-          width: isWide ? 400 : 200,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(group.getMember(payment.payerId).name),
-                  Icon(Icons.arrow_forward_rounded),
-                  Text(group.getMember(payment.receiverId).name),
-                ],
-              ),
-              Divider(),
-              SectionTitle('Reason'),
-              Text(
-                payment.reason ??
-                    (payment.hasRelatedExpense
-                        ? 'Expense finalized'
-                        : 'Payment'),
-              ),
-              SizedBox(height: 20),
-              if (payment.oldPayerBalance != null) ...[
-                SectionTitle('Balance change'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
-                    ),
-                    Icon(Icons.arrow_forward_rounded),
-                    Text(
-                      '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
-                    ),
-                  ],
-                ),
-              ]
-            ],
-          ),
+      builder: (_) => Provider.value(
+        value: context.read<LayoutState>(),
+        child: BlocProvider<AuthBloc>.value(
+          value: context.read<AuthBloc>(),
+          child: PaymentDetailsDialog(payment: payment, group: group),
         ),
-        actions: [
-          if (payment.hasRelatedExpense) CancelButton(),
-          if (payment.hasRelatedExpense)
-            ElevatedButton(
-              onPressed: () => _navigateToExpense(context),
-              child: Text('Go to expense'),
-            )
-          else
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            )
-        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final receiverUid =
+        context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+
     Color paymentColor =
         payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
 

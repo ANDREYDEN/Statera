@@ -57,7 +57,8 @@ class PaymentListBody extends StatelessWidget {
                                 payerId: authBloc.uid,
                                 receiverId: otherMemberId,
                                 value: balance.abs(),
-                                oldPayerBalance: group.balance[authBloc.uid]?[otherMemberId],
+                                oldPayerBalance: group.balance[authBloc.uid]
+                                    ?[otherMemberId],
                               ),
                             ),
                           ),
@@ -77,7 +78,8 @@ class PaymentListBody extends StatelessWidget {
                                 payerId: otherMemberId,
                                 receiverId: authBloc.uid,
                                 value: balance.abs(),
-                                oldPayerBalance: group.balance[otherMemberId]?[authBloc.uid],
+                                oldPayerBalance: group.balance[otherMemberId]
+                                    ?[authBloc.uid],
                               ),
                             ),
                           ),
@@ -115,10 +117,7 @@ class PaymentListBody extends StatelessWidget {
                       return ListView.builder(
                         itemCount: payments.length,
                         itemBuilder: (context, index) {
-                          return PaymentListItem(
-                            payment: payments[index],
-                            receiverUid: authBloc.uid,
-                          );
+                          return PaymentListItem(payment: payments[index]);
                         },
                       );
                     },

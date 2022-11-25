@@ -1,21 +1,38 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/services.dart';
+import 'package:statera/data/services/auth_service.dart';
+import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/expense_service.mocks.dart';
+import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/theme.dart';
 
-class GroupServiceMock extends Mock implements GroupService {}
+class MockUser extends Mock implements User {
+  String get uid =>
+      super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
+}
 
-class ExpenseServiceMock extends Mock implements ExpenseService {}
+class AuthServiceMock extends Mock implements AuthService {
+  User? get currentUser => super
+      .noSuchMethod(Invocation.getter(#currentUser), returnValue: MockUser());
 
-class UserRepositoryMock extends Mock implements UserRepository {}
+  @override
+  Stream<User?> currentUserStream() => super.noSuchMethod(
+        Invocation.method(#currentUserStream, []),
+        returnValue: Stream<User?>.empty(),
+        returnValueForMissingStub: Stream<User?>.empty(),
+      ) as Stream<User?>;
+}
 
 main() {
   runApp(ListCover());
@@ -29,6 +46,11 @@ class ListCover extends StatelessWidget {
     final user1 = CustomUser(uid: 'a', name: 'John Doe');
     final user2 = CustomUser(uid: 'b', name: 'Adam Smith');
 
+    final authService = AuthServiceMock();
+    final user = MockUser();
+    when(user.uid).thenReturn('a');
+    when(authService.currentUser).thenReturn(user);
+
     return MaterialApp(
       theme: theme,
       darkTheme: darkTheme,
@@ -36,15 +58,25 @@ class ListCover extends StatelessWidget {
       home: LayoutBuilder(
         builder: (context, constraints) => Provider<LayoutState>.value(
           value: LayoutState(constraints),
-          child: BlocProvider<GroupCubit>(
-            create: (_) => GroupCubit(
-              GroupServiceMock(),
-              ExpenseServiceMock(),
-              UserRepositoryMock(),
-            )..loadGroup(Group(
-                name: 'Example',
-                members: [user1, user2],
-              )),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => GroupCubit(
+                  MockGroupService(),
+                  MockExpenseService(),
+                  MockUserRepository(),
+                )..loadGroup(Group(
+                    name: 'Example',
+                    members: [user1, user2],
+                  )),
+              ),
+              BlocProvider(
+                create: (_) => AuthBloc(
+                  authService,
+                  MockUserRepository(),
+                ),
+              )
+            ],
             child: Scaffold(
               body: ListView(
                 children: [
@@ -56,7 +88,6 @@ class ListCover extends StatelessWidget {
                       value: 123,
                       timeCreated: DateTime.now(),
                     ),
-                    receiverUid: 'a',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -65,7 +96,6 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 123,
                     ),
-                    receiverUid: 'b',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -78,7 +108,6 @@ class ListCover extends StatelessWidget {
                         name: 'Some Expense',
                       ),
                     ),
-                    receiverUid: 'b',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -88,7 +117,6 @@ class ListCover extends StatelessWidget {
                       value: 123,
                       reason: 'There was a malfunction in the system',
                     ),
-                    receiverUid: 'a',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -99,7 +127,6 @@ class ListCover extends StatelessWidget {
                       reason:
                           'This is a very long and unneeded explanation that there was a malfunction in the system',
                     ),
-                    receiverUid: 'b',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -109,7 +136,6 @@ class ListCover extends StatelessWidget {
                       value: 123,
                       oldPayerBalance: 33,
                     ),
-                    receiverUid: 'b',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -119,7 +145,6 @@ class ListCover extends StatelessWidget {
                       value: 50,
                       oldPayerBalance: 10,
                     ),
-                    receiverUid: 'b',
                   ),
                   PaymentListItem(
                     payment: Payment(
@@ -129,7 +154,6 @@ class ListCover extends StatelessWidget {
                       value: 30,
                       oldPayerBalance: -40,
                     ),
-                    receiverUid: 'b',
                   )
                 ],
               ),
