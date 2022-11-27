@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/payments/payment_details_dialog.dart';
@@ -19,12 +18,9 @@ class PaymentListItem extends StatelessWidget {
   void _handleTap(BuildContext context, Group group) {
     showDialog(
       context: context,
-      builder: (_) => Provider.value(
-        value: context.read<LayoutState>(),
-        child: BlocProvider<AuthBloc>.value(
-          value: context.read<AuthBloc>(),
-          child: PaymentDetailsDialog(payment: payment, group: group),
-        ),
+      builder: (_) => BlocProvider<AuthBloc>.value(
+        value: context.read<AuthBloc>(),
+        child: PaymentDetailsDialog(payment: payment, group: group),
       ),
     );
   }
