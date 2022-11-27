@@ -1,49 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/payment.dart';
-import 'package:statera/ui/expense/expense_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/payments/payment_details_dialog.dart';
 import 'package:statera/utils/helpers.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
-  final String receiverUid;
 
   const PaymentListItem({
     Key? key,
     required this.payment,
-    required this.receiverUid,
   }) : super(key: key);
+
+  void _handleTap(BuildContext context, Group group) {
+    showDialog(
+      context: context,
+      builder: (_) => Provider.value(
+        value: context.read<LayoutState>(),
+        child: BlocProvider<AuthBloc>.value(
+          value: context.read<AuthBloc>(),
+          child: PaymentDetailsDialog(payment: payment, group: group),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    Color paymentColor =
-        payment.isReceivedBy(receiverUid) ? Colors.green : Colors.red;
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+
+    Color paymentColor = payment.isReceivedBy(uid) ? Colors.red : Colors.green;
 
     return GroupBuilder(
       builder: (context, group) {
         return ListTile(
           isThreeLine: payment.hasRelatedExpense,
-          title: Text(
-            "${group.currencySign}${payment.isReceivedBy(receiverUid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
-            style: TextStyle(color: paymentColor),
-          ),
           leading: Icon(
             payment.isAdmin
-                ? Icons.warning
+                ? Icons.warning_rounded
                 : payment.hasRelatedExpense
-                    ? Icons.receipt_long
-                    : Icons.paid,
+                    ? Icons.receipt_long_rounded
+                    : Icons.paid_rounded,
             color: payment.isAdmin
                 ? Colors.red
                 : Theme.of(context).colorScheme.secondary,
             size: 30,
           ),
-          trailing: Icon(
-            payment.isReceivedBy(receiverUid)
-                ? Icons.call_received
-                : Icons.call_made,
-            color: paymentColor,
-            size: 30,
+          title: Text(
+            "${group.currencySign}${payment.isReceivedBy(uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+            style: TextStyle(color: paymentColor),
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,31 +64,16 @@ class PaymentListItem extends StatelessWidget {
               if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
             ],
           ),
-          onTap: payment.isAdmin
-              ? () => _displayReason(context)
-              : payment.hasRelatedExpense
-                  ? () => _navigateToExpense(context)
-                  : null,
+          trailing: Icon(
+            payment.isReceivedBy(uid)
+                ? Icons.arrow_upward_rounded
+                : Icons.arrow_downward_rounded,
+            color: paymentColor,
+            size: 30,
+          ),
+          onTap: () => _handleTap(context, group),
         );
       },
     );
-  }
-
-  _displayReason(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text(payment.reason!),
-        actions: [
-          ElevatedButton(
-              onPressed: () => Navigator.pop(context), child: Text('OK'))
-        ],
-      ),
-    );
-  }
-
-  _navigateToExpense(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
   }
 }
