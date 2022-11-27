@@ -54,109 +54,104 @@ class ListCover extends StatelessWidget {
       theme: theme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
-      home: LayoutBuilder(
-        builder: (context, constraints) => Provider<LayoutState>.value(
-          value: LayoutState(constraints),
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (_) => GroupCubit(
-                  MockGroupService(),
-                  MockExpenseService(),
-                  MockUserRepository(),
-                )..loadGroup(Group(
-                    name: 'Example',
-                    members: [user1, user2],
-                  )),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => GroupCubit(
+              MockGroupService(),
+              MockExpenseService(),
+              MockUserRepository(),
+            )..loadGroup(Group(
+                name: 'Example',
+                members: [user1, user2],
+              )),
+          ),
+          BlocProvider(
+            create: (_) => AuthBloc(
+              authService,
+              MockUserRepository(),
+            ),
+          )
+        ],
+        child: Scaffold(
+          body: ListView(
+            children: [
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  timeCreated: DateTime.now(),
+                ),
               ),
-              BlocProvider(
-                create: (_) => AuthBloc(
-                  authService,
-                  MockUserRepository(),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  relatedExpense: PaymentExpenseInfo(
+                    id: 'dummy_expense',
+                    name: 'Some Expense',
+                  ),
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  reason: 'There was a malfunction in the system',
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  reason:
+                      'This is a very long and unneeded explanation that there was a malfunction in the system',
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 123,
+                  oldPayerBalance: 33,
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'a',
+                  receiverId: 'b',
+                  value: 50,
+                  oldPayerBalance: 10,
+                ),
+              ),
+              PaymentListItem(
+                payment: Payment(
+                  groupId: 'asd',
+                  payerId: 'b',
+                  receiverId: 'a',
+                  value: 30,
+                  oldPayerBalance: -40,
                 ),
               )
             ],
-            child: Scaffold(
-              body: ListView(
-                children: [
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                      timeCreated: DateTime.now(),
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                      relatedExpense: PaymentExpenseInfo(
-                        id: 'dummy_expense',
-                        name: 'Some Expense',
-                      ),
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                      reason: 'There was a malfunction in the system',
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                      reason:
-                          'This is a very long and unneeded explanation that there was a malfunction in the system',
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 123,
-                      oldPayerBalance: 33,
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'a',
-                      receiverId: 'b',
-                      value: 50,
-                      oldPayerBalance: 10,
-                    ),
-                  ),
-                  PaymentListItem(
-                    payment: Payment(
-                      groupId: 'asd',
-                      payerId: 'b',
-                      receiverId: 'a',
-                      value: 30,
-                      oldPayerBalance: -40,
-                    ),
-                  )
-                ],
-              ),
-            ),
           ),
         ),
       ),
