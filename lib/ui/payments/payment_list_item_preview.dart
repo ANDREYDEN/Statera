@@ -2,10 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/mockito.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
@@ -83,14 +81,6 @@ class ListCover extends StatelessWidget {
                   receiverId: 'b',
                   value: 123,
                   timeCreated: DateTime.now(),
-                ),
-              ),
-              PaymentListItem(
-                payment: Payment(
-                  groupId: 'asd',
-                  payerId: 'a',
-                  receiverId: 'b',
-                  value: 123,
                 ),
               ),
               PaymentListItem(

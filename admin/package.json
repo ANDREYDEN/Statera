@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "firebase-admin": "^10.0.0"
+    "firebase-admin": "^11.3.0"
   }
 }
