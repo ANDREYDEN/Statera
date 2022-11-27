@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -27,22 +26,24 @@ class PaymentDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final receiverUid =
         context.select<AuthBloc, String>((authBloc) => authBloc.uid);
-    final isWide = context.watch<LayoutState>().isWide;
 
     return AlertDialog(
       title: Text('Payment Info'),
       content: SizedBox(
-        width: isWide ? 400 : 200,
+        width: 500,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(group.getMember(payment.payerId).name),
+                Expanded(child: Text(group.getMember(payment.payerId).name)),
                 Icon(Icons.arrow_forward_rounded),
-                Text(group.getMember(payment.receiverId).name),
+                Expanded(
+                    child: Text(
+                  group.getMember(payment.receiverId).name,
+                  textAlign: TextAlign.right,
+                )),
               ],
             ),
             Divider(),
