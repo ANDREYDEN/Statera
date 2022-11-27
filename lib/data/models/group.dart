@@ -34,7 +34,7 @@ class Group {
     required this.name,
     this.code,
     this.id,
-    members,
+    List<CustomUser>? members,
     String? adminId,
     balance,
     String? currencySign,
@@ -121,7 +121,7 @@ class Group {
     );
   }
 
-  void removeUser(String uid) {
+  void removeMember(String uid) {
     this.members.removeWhere((member) => member.uid == uid);
     this.balance.remove(uid);
     this.balance.forEach((key, value) => value.remove(uid));

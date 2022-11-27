@@ -35,7 +35,8 @@ function addUserToGroup(group, user) {
 }
 
 function finalizeExpense(group, expense) {
-    const authorId = expense.authorUid
+    const authorId = expense.author?.uid ?? expense.authorUid
+    console.log(authorId);
 
     for (const assigneeId of expense.assigneeIds.filter(a => a != authorId)) {
         const owedValueToAuthor = getTotalDebt(expense, assigneeId)
@@ -49,9 +50,12 @@ function finalizeExpense(group, expense) {
 
 function getTotalDebt(expense, assigneeId) {
     const owage = expense.items.reduce(
-        (acc, item) => acc + item.value *
-            (item.assignees.find(a => a.uid === assigneeId).parts
-                / item.assignees.reduce((acc, assignee) => acc + assignee.parts, 0)),
+        (acc, item) => { 
+            const totalParts = item.assignees.reduce((acc, assignee) => acc + assignee.parts, 0)
+            if (totalParts == 0) return acc
+            return acc + item.value *
+            (item.assignees.find(a => a.uid === assigneeId).parts / totalParts)
+        },
         0
     );
 

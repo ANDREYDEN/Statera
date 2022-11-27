@@ -1,47 +1,48 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/expense_service.mocks.dart';
+import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/services.dart';
+import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
 
-class MockGroupCubit extends MockCubit<GroupState> implements GroupCubit {}
-class FakeGroupLoaded extends Fake implements GroupLoaded {}
+class MockUser extends Mock implements User {
+  String get uid =>
+      super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
+}
 
-class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
-class FakeAuthState extends Fake implements AuthState {}
-class FakeAuthEvent extends Fake implements AuthEvent {}
+class AuthServiceMock extends Mock implements AuthService {
+  User? get currentUser => super
+      .noSuchMethod(Invocation.getter(#currentUser), returnValue: MockUser());
 
-class MockUser extends Mock implements User {}
+  @override
+  Stream<User?> currentUserStream() => super.noSuchMethod(
+        Invocation.method(#currentUserStream, []),
+        returnValue: Stream<User?>.empty(),
+        returnValueForMissingStub: Stream<User?>.empty(),
+      ) as Stream<User?>;
+}
 
 void main() {
   group('Item List Item', () {
-    late int parts;
     late Item item;
-    late MockGroupCubit groupCubit;
-    late MockAuthBloc authBloc;
-
-    setUpAll(() {
-      registerFallbackValue(FakeGroupLoaded());
-      registerFallbackValue(FakeAuthState());
-      registerFallbackValue(FakeAuthEvent());
-    });
+    int parts = 0;
+    final user1 = CustomUser(uid: 'a', name: 'John Doe');
+    final user2 = CustomUser(uid: 'b', name: 'Adam Smith');
+    final authService = AuthServiceMock();
 
     setUp(() {
-      parts = 0;
       item = Item(name: 'foo', value: 145);
-      groupCubit = MockGroupCubit();
-      when(() => groupCubit.state)
-          .thenReturn(GroupLoaded(group: Group.empty()));
-      authBloc = MockAuthBloc();
-      final fakeUser = MockUser();
-      when(() => fakeUser.uid).thenReturn('');
-      when(() => authBloc.state).thenReturn(AuthState.authenticated(fakeUser));
+      final user = MockUser();
+      when(user.uid).thenReturn('a');
+      when(authService.currentUser).thenReturn(user);
     });
 
     Future<void> buildItemListItem(tester) {
@@ -50,8 +51,22 @@ void main() {
           home: Scaffold(
             body: MultiProvider(
               providers: [
-                BlocProvider<AuthBloc>(create: (_) => authBloc),
-                BlocProvider<GroupCubit>(create: (_) => groupCubit)
+                BlocProvider<AuthBloc>(
+                  create: (_) => AuthBloc(
+                    authService,
+                    MockUserRepository(),
+                  ),
+                ),
+                BlocProvider<GroupCubit>(
+                  create: (_) => GroupCubit(
+                    MockGroupService(),
+                    MockExpenseService(),
+                    MockUserRepository(),
+                  )..loadGroup(Group(
+                      name: 'Example',
+                      members: [user1, user2],
+                    )),
+                )
               ],
               child: ItemListItem(
                 item: item,

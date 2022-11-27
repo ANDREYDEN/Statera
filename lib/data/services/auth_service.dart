@@ -7,8 +7,10 @@ import 'package:desktop_webview_auth/google.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mockito/annotations.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+@GenerateNiceMocks([MockSpec<AuthService>()])
 class AuthService {
   late FirebaseAuth _auth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -59,7 +61,8 @@ class AuthService {
   Future<UserCredential?> signInWithGoogleOnMobile() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-    if (googleUser == null) throw new Exception('Failed to sign in with Google');
+    if (googleUser == null)
+      throw new Exception('Failed to sign in with Google');
 
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
