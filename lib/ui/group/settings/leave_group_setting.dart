@@ -30,7 +30,7 @@ class LeaveGroupSetting extends StatelessWidget {
           valueName: 'group name',
           value: groupName,
           onConfirm: () {
-            groupCubit.removeUser(authBloc.uid);
+            groupCubit.removeMember(authBloc.uid);
             Navigator.pop(context);
           },
         ),

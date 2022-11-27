@@ -39,8 +39,8 @@ class GroupCubit extends Cubit<GroupState> {
     }).listen(emit);
   }
 
-  void empty() {
-    emit(GroupLoaded(group: Group.empty()));
+  void loadGroup(Group group) {
+    emit(GroupLoaded(group: group));
   }
 
   void loadFromExpense(String? expenseId) async {
@@ -48,12 +48,12 @@ class GroupCubit extends Cubit<GroupState> {
     load(expense.groupId);
   }
 
-  void removeUser(String uid) {
+  void removeMember(String uid) {
     final group = loadedState.group;
     emit(GroupLoading());
     if (group.members.every((member) => member.uid != uid)) return;
 
-    group.removeUser(uid);
+    group.removeMember(uid);
     if (group.members.isEmpty) {
       _groupService.deleteGroup(group.id);
     } else {
