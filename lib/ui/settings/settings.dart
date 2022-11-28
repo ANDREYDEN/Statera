@@ -9,6 +9,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/settings/username_setting.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
@@ -26,8 +27,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final _displayNameController = TextEditingController();
-  String? _displayNameErrorText = null;
   late bool _notifyWhenExpenseCreated;
   late bool _notifyWhenExpenseFinalized;
   late bool _notifyWhenExpenseCompleted;
@@ -42,7 +41,6 @@ class _SettingsState extends State<Settings> {
 
   @override
   void initState() {
-    _displayNameController.text = authBloc.user.displayName ?? 'anonymous';
     _notifyWhenExpenseCreated = false;
     _notifyWhenExpenseFinalized = true;
     _notifyWhenExpenseCompleted = false;
@@ -122,23 +120,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           SizedBox(height: 10),
-          TextField(
-            controller: _displayNameController,
-            decoration: InputDecoration(
-              label: Text('Display Name'),
-              errorText: _displayNameErrorText,
-            ),
-            onChanged: (value) {
-              setState(() {
-                _displayNameErrorText = value == '' ? 'Can not be empty' : null;
-              });
-            },
-            onEditingComplete: () {
-              if (_displayNameController.text == '') return;
-
-              authBloc.add(UserDataUpdated(name: _displayNameController.text));
-            },
-          ),
+          UsernameSetting(),
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
