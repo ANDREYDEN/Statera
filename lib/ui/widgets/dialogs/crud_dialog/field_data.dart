@@ -1,5 +1,7 @@
 part of 'crud_dialog.dart';
 
+typedef Validator = String Function(String);
+
 class FieldData {
   String id;
   String label;
@@ -7,7 +9,7 @@ class FieldData {
   late FocusNode focusNode;
   TextInputType inputType;
   dynamic initialData;
-  List<String Function(String)> validators;
+  List<Validator> validators;
   List<TextInputFormatter> formatters;
   bool isAdvanced;
 
@@ -34,8 +36,8 @@ class FieldData {
       int.tryParse(text) == null ? 'Must be a whole number' : '';
 
   String getError() {
-    for (final formatter in this.validators) {
-      var error = formatter(this.controller.text);
+    for (final validator in validators) {
+      var error = validator(controller.text);
       if (error.isNotEmpty) return error;
     }
     return '';
