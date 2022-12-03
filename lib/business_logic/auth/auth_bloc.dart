@@ -39,12 +39,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         : const AuthState.unauthenticated());
   }
 
-  void _onUserDataUpdated(UserDataUpdated event, Emitter<AuthState> emit) {
-    _userRepostiry.updateUser(
+  void _onUserDataUpdated(
+    UserDataUpdated event,
+    Emitter<AuthState> emit,
+  ) async {
+    await _userRepostiry.updateUser(
       uid: uid,
       name: event.name,
       photoURL: event.photoURL,
     );
+    await _authService.currentUser?.reload();
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {

@@ -65,6 +65,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    final authBloc = context.watch<AuthBloc>();
     final ImagePicker _picker = ImagePicker();
 
     return PageScaffold(
