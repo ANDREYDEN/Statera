@@ -10,6 +10,7 @@ import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
+import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class GroupSettings extends StatelessWidget {
@@ -22,13 +23,11 @@ class GroupSettings extends StatelessWidget {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     final currencyController = TextEditingController();
-    final nameController = TextEditingController();
     final debtThresholdController = TextEditingController();
 
     return GroupBuilder(
       builder: (context, group) {
         currencyController.text = group.currencySign;
-        nameController.text = group.name;
         debtThresholdController.text = group.debtThreshold.toString();
         final isAdmin = group.isAdmin(uid);
 
@@ -42,10 +41,10 @@ class GroupSettings extends StatelessWidget {
             if (isAdmin) ...[
               SectionTitle('General Settings'),
               // TODO: validate these fields the same way as in the CRUD Dialog
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-                onSubmitted: (value) {
+              SettingInput(
+                initialValue: group.name,
+                label: 'Name',
+                onPressed: (value) {
                   final groupCubit = context.read<GroupCubit>();
 
                   groupCubit.update((group) {
