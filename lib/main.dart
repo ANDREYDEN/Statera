@@ -59,11 +59,7 @@ class Statera extends StatelessWidget {
 
     return RepositoryRegistrant(
       child: BlocProvider(
-        create: (context) {
-          final authService = context.read<AuthService>();
-          final userRepository = context.read<UserRepository>();
-          return AuthBloc(authService, userRepository);
-        },
+        create: (context) => AuthBloc(context.read<AuthService>()),
         child: LayoutBuilder(
           builder: (context, constraints) {
             return Provider<LayoutState>.value(

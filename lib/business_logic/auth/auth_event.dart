@@ -19,13 +19,3 @@ class UserChanged extends AuthEvent {
   @override
   List<Object?> get props => [user];
 }
-
-class UserDataUpdated extends AuthEvent {
-  const UserDataUpdated({ this.name, this.photoURL });
-
-  final String? name;
-  final String? photoURL;
-
-  @override
-  List<Object?> get props => [name, photoURL];
-}

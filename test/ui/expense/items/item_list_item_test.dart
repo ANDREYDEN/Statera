@@ -51,12 +51,7 @@ void main() {
           home: Scaffold(
             body: MultiProvider(
               providers: [
-                BlocProvider<AuthBloc>(
-                  create: (_) => AuthBloc(
-                    authService,
-                    MockUserRepository(),
-                  ),
-                ),
+                BlocProvider<AuthBloc>(create: (_) => AuthBloc(authService)),
                 BlocProvider<GroupCubit>(
                   create: (_) => GroupCubit(
                     MockGroupService(),

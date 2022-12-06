@@ -10,41 +10,33 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late final AuthService _authService;
-  late final UserRepository _userRepostiry;
   late final StreamSubscription<User?> _userSubscription;
 
-  AuthBloc(AuthService authService, UserRepository userRepository)
+  AuthBloc(AuthService authService)
       : super(
           authService.currentUser != null
               ? AuthState.authenticated(authService.currentUser)
               : const AuthState.unauthenticated(),
         ) {
     _authService = authService;
-    _userRepostiry = userRepository;
-    on<UserChanged>(_onUserChanged);
-    on<LogoutRequested>(_onLogoutRequested);
-    on<AccountDeletionRequested>(_onAccountDeletionRequested);
-    on<UserDataUpdated>(_onUserDataUpdated);
     _userSubscription = authService.currentUserStream().listen(
           (user) => add(UserChanged(user)),
         );
+    on<UserChanged>(_onUserChanged);
+    on<LogoutRequested>(_onLogoutRequested);
+    on<AccountDeletionRequested>(_onAccountDeletionRequested);
   }
 
+  // TODO: use UserCubit UserLoaded.user where possible
+  @deprecated
   User get user => state.user!;
+
   String get uid => state.user!.uid;
 
   void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
     emit(event.user != null
         ? AuthState.authenticated(event.user)
         : const AuthState.unauthenticated());
-  }
-
-  void _onUserDataUpdated(UserDataUpdated event, Emitter<AuthState> emit) {
-    _userRepostiry.updateUser(
-      uid: uid,
-      name: event.name,
-      photoURL: event.photoURL,
-    );
   }
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
