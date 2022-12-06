@@ -22,17 +22,14 @@ class ItemListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.select((AuthBloc authBloc) => authBloc.state.user);
-
-    if (user == null) return Container();
+    final uid = context.select((AuthBloc authBloc) => authBloc.uid);
 
     return ListTile(
       title: Text(item.name),
-      subtitle: (!showDecisions ||
-              item.assignees.every((a) => a.parts == null || a.parts == 0))
+      subtitle: (!showDecisions || item.confirmedParts == 0)
           ? null
           : SizedBox(
-              height: 40,
+              height: 30,
               child: GroupBuilder(
                 builder: (_, group) => ListView(
                   shrinkWrap: true,
@@ -43,17 +40,27 @@ class ItemListItem extends StatelessWidget {
                       .map((assigneeDecision) {
                     if (!group.memberExists(assigneeDecision.uid))
                       return Icon(Icons.error);
+
                     var member = group.getMember(assigneeDecision.uid);
-                    return Row(
-                      children: [
-                        if (item.isPartitioned)
-                          Text('x${assigneeDecision.parts}'),
-                        UserAvatar(
-                          margin: const EdgeInsets.only(right: 4),
-                          author: member,
-                          dimension: 30,
+
+                    if (!item.isPartitioned)
+                      return UserAvatar(author: member, dimension: 30);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 2.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Row(
+                            children: [
+                              SizedBox(width: 4),
+                              Text(assigneeDecision.parts.toString()),
+                              UserAvatar(author: member, dimension: 30),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     );
                   }).toList(),
                 ),
@@ -69,49 +76,47 @@ class ItemListItem extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () =>
-                  this.onChangePartition(item.getAssigneeParts(user.uid) - 1),
+                  this.onChangePartition(item.getAssigneeParts(uid) - 1),
               style: ElevatedButton.styleFrom(
                 shape: CircleBorder(),
-                backgroundColor: !item.isMarkedBy(user.uid)
+                backgroundColor: !item.isMarkedBy(uid)
                     ? Colors.grey[300]
-                    : item.isMarkedBy(user.uid) &&
-                            item.getAssigneeParts(user.uid) == 0
+                    : item.isMarkedBy(uid) && item.getAssigneeParts(uid) == 0
                         ? Colors.red[400]
                         : Colors.grey[500],
                 padding: EdgeInsets.all(0),
               ),
               child: Icon(
-                !item.isMarkedBy(user.uid) || !item.isPartitioned
+                !item.isMarkedBy(uid) || !item.isPartitioned
                     ? Icons.close_rounded
-                    : item.isMarkedBy(user.uid) &&
-                            item.getAssigneeParts(user.uid) == 0
+                    : item.isMarkedBy(uid) && item.getAssigneeParts(uid) == 0
                         ? Icons.close_rounded
                         : Icons.remove_rounded,
                 color: Colors.white,
               ),
             ),
             Text(
-              "${item.isMarkedBy(user.uid) ? item.getAssigneeParts(user.uid) : '-'}/${item.partition}",
+              "${item.isMarkedBy(uid) ? item.getAssigneeParts(uid) : '-'}/${item.partition}",
             ),
             ElevatedButton(
               onPressed: () =>
-                  this.onChangePartition(item.getAssigneeParts(user.uid) + 1),
+                  this.onChangePartition(item.getAssigneeParts(uid) + 1),
               style: ElevatedButton.styleFrom(
                 shape: CircleBorder(),
-                backgroundColor: !item.isMarkedBy(user.uid)
+                backgroundColor: !item.isMarkedBy(uid)
                     ? Colors.grey[300]
                     : item.undefinedParts == 0 &&
-                            item.isMarkedBy(user.uid) &&
-                            item.getAssigneeParts(user.uid) > 0
+                            item.isMarkedBy(uid) &&
+                            item.getAssigneeParts(uid) > 0
                         ? Colors.green[400]
                         : Colors.grey[500],
               ),
               child: Icon(
-                !item.isMarkedBy(user.uid) || !item.isPartitioned
+                !item.isMarkedBy(uid) || !item.isPartitioned
                     ? Icons.check_rounded
                     : item.undefinedParts == 0 &&
-                            item.isMarkedBy(user.uid) &&
-                            item.getAssigneeParts(user.uid) > 0
+                            item.isMarkedBy(uid) &&
+                            item.getAssigneeParts(uid) > 0
                         ? Icons.check_rounded
                         : Icons.add_rounded,
                 color: Colors.white,
