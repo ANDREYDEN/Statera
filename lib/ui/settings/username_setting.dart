@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/user/user_cubit.dart';
+import 'package:statera/ui/authentication/user_builder.dart';
 
 class UsernameSetting extends StatefulWidget {
   const UsernameSetting({Key? key}) : super(key: key);
@@ -13,38 +14,31 @@ class _UsernameSettingState extends State<UsernameSetting> {
   late TextEditingController _usernameController;
   String? _displayNameErrorText = null;
 
-  AuthBloc get authBloc => context.read<AuthBloc>();
-
-  @override
-  void initState() {
-    _usernameController =
-        TextEditingController(text: authBloc.user.displayName);
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.watch<AuthBloc>();
+    final userCubit = context.watch<UserCubit>();
 
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, authState) {
+    return UserBuilder(
+      builder: (context, user) {
+        _usernameController = TextEditingController(text: user.name);
         return Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: _usernameController,
+              child: TextFormField(
+                initialValue: user.name,
                 decoration: InputDecoration(
                   label: Text('Display Name'),
                   errorText: _displayNameErrorText,
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _displayNameErrorText = value == '' ? 'Can not be empty' : null;
+                    _displayNameErrorText =
+                        value == '' ? 'Can not be empty' : null;
                   });
                 },
               ),
             ),
-            if (_usernameController.text != authState.user?.displayName) ...[
+            if (_usernameController.text != user.name) ...[
               SizedBox(width: 4),
               ElevatedButton(
                 child: Icon(Icons.check_rounded),
@@ -56,13 +50,13 @@ class _UsernameSettingState extends State<UsernameSetting> {
                 onPressed: () {
                   if (_usernameController.text == '') return;
 
-                  authBloc.add(UserDataUpdated(name: _usernameController.text));
+                  userCubit.updateName(user.uid, _usernameController.text);
                 },
               )
             ]
           ],
         );
-      }
+      },
     );
   }
 }
