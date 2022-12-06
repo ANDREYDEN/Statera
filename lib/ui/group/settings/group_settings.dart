@@ -10,6 +10,8 @@ import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
+import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class GroupSettings extends StatelessWidget {
@@ -18,17 +20,12 @@ class GroupSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layoutState = context.read<LayoutState>();
-    final groupCubit = context.read<GroupCubit>();
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
-    final currencyController = TextEditingController();
-    final nameController = TextEditingController();
     final debtThresholdController = TextEditingController();
 
     return GroupBuilder(
       builder: (context, group) {
-        currencyController.text = group.currencySign;
-        nameController.text = group.name;
         debtThresholdController.text = group.debtThreshold.toString();
         final isAdmin = group.isAdmin(uid);
 
@@ -41,11 +38,11 @@ class GroupSettings extends StatelessWidget {
           children: [
             if (isAdmin) ...[
               SectionTitle('General Settings'),
-              // TODO: validate these fields the same way as in the CRUD Dialog
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Name'),
-                onSubmitted: (value) {
+              SettingInput(
+                initialValue: group.name,
+                label: 'Name',
+                validators: [FieldData.requiredValidator],
+                onPressed: (value) {
                   final groupCubit = context.read<GroupCubit>();
 
                   groupCubit.update((group) {
@@ -53,22 +50,30 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
-              TextField(
-                controller: currencyController,
-                decoration: InputDecoration(labelText: 'Currency Sign'),
-                onSubmitted: (value) {
+              SettingInput(
+                initialValue: group.currencySign,
+                label: 'Currency Sign',
+                validators: [FieldData.requiredValidator],
+                formatters: [LengthLimitingTextInputFormatter(1)],
+                onPressed: (value) {
+                  final groupCubit = context.read<GroupCubit>();
+
                   groupCubit.update((group) {
                     group.currencySign = value;
                   });
                 },
               ),
-              TextField(
-                controller: debtThresholdController,
-                decoration: InputDecoration(labelText: 'Debt Threshold'),
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(RegExp('-'))
+              SettingInput(
+                initialValue: group.debtThreshold.toString(),
+                label: 'Debt Threshold',
+                validators: [
+                  FieldData.requiredValidator,
+                  FieldData.intValidator
                 ],
-                onSubmitted: (value) {
+                formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+                onPressed: (value) {
+                  final groupCubit = context.read<GroupCubit>();
+
                   groupCubit.update((group) {
                     group.debtThreshold = double.parse(value);
                   });

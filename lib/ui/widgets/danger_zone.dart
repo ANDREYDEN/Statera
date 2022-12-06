@@ -23,6 +23,7 @@ class DangerZone extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: children,
           ),
         ),
