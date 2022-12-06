@@ -22,7 +22,7 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> currentUserStream() {
-    return _auth.userChanges();
+    return _auth.authStateChanges();
   }
 
   Future<UserCredential> signIn(String email, String password) {

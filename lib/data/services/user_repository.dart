@@ -27,6 +27,11 @@ class UserRepository extends Firestore {
     await usersCollection.doc(uid).update(newUserData);
   }
 
+  Stream<CustomUser?> userStream(String? uid) {
+    return usersCollection.doc(uid).snapshots().map(
+        (docSnap) => docSnap.exists ? CustomUser.fromUserDoc(docSnap) : null);
+  }
+
   Future<CustomUser> getUser(String uid) async {
     final userDoc = await usersCollection.doc(uid).get();
 

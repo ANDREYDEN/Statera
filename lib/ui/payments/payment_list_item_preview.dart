@@ -65,10 +65,7 @@ class ListCover extends StatelessWidget {
               )),
           ),
           BlocProvider(
-            create: (_) => AuthBloc(
-              authService,
-              MockUserRepository(),
-            ),
+            create: (_) => AuthBloc(authService),
           )
         ],
         child: Scaffold(

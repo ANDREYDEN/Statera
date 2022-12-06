@@ -8,8 +8,17 @@ export async function updateUser(userId: string, oldUserData: UserData, newUserD
   const photoURLChanged = propertyChanged(oldUserData, newUserData, 'photoURL')
 
   if (nameChanged || photoURLChanged) {
-    await updateUsersInGroups(userId, newUserData)
-    await updateAuthUser(userId, newUserData)
+    try {
+      await updateUsersInGroups(userId, newUserData)
+    } catch (e: any) {
+      console.log(`Something went wrong while updating user in groups: ${e.toString()}`);
+    }
+
+    try {
+      await updateAuthUser(userId, newUserData)
+    } catch (e: any) {
+      console.log(`Something went wrong while updating user in Auth: ${e.toString()}`);
+    }
   }
 }
 
