@@ -15,9 +15,16 @@ class Item {
   int partition;
   List<AssigneeDecision> assignees = [];
 
-  Item({required this.name, required this.value, this.partition = 1}) {
+  Item({
+    required this.name,
+    required this.value,
+    this.partition = 1,
+    List<String>? assigneeUids,
+  }) {
     var uuid = Uuid();
     this.id = uuid.v1();
+    this.assignees =
+        (assigneeUids ?? []).map((uid) => AssigneeDecision(uid: uid)).toList();
   }
 
   Item.fake({this.partition = 1}) {
@@ -45,6 +52,7 @@ class Item {
       assignees.every((assignee) => assignee.madeDecision) &&
       (!isPartitioned || undefinedParts == 0);
 
+  /// The total number of parts that assignees already claimed
   int get confirmedParts => assignees.fold<int>(
         0,
         (acc, assignee) => acc + getAssigneeParts(assignee.uid),
