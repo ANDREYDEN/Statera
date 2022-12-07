@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/ui/expense/items/item_decisions.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 
 class ItemListItem extends StatelessWidget {
@@ -28,44 +27,7 @@ class ItemListItem extends StatelessWidget {
       title: Text(item.name),
       subtitle: (!showDecisions || item.confirmedParts == 0)
           ? null
-          : SizedBox(
-              height: 30,
-              child: GroupBuilder(
-                builder: (_, group) => ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: item.assignees
-                      .where((assigneeDecision) =>
-                          (assigneeDecision.parts ?? 0) > 0)
-                      .map((assigneeDecision) {
-                    if (!group.memberExists(assigneeDecision.uid))
-                      return Icon(Icons.error);
-
-                    var member = group.getMember(assigneeDecision.uid);
-
-                    if (!item.isPartitioned)
-                      return UserAvatar(author: member, dimension: 30);
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 2.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          color: Theme.of(context).colorScheme.surface,
-                          child: Row(
-                            children: [
-                              SizedBox(width: 4),
-                              Text(assigneeDecision.parts.toString()),
-                              UserAvatar(author: member, dimension: 30),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+          : ItemDecisions(item: item),
       trailing: IntrinsicWidth(
         child: Row(
           mainAxisSize: MainAxisSize.min,
