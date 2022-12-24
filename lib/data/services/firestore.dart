@@ -24,6 +24,7 @@ class Firestore {
     String? assigneeId,
     String? unmarkedAssigneeId,
     String? authorId,
+    bool? finalized,
   }) {
     var query = expensesCollection.where('groupId', isEqualTo: groupId);
 
@@ -38,6 +39,14 @@ class Firestore {
     if (unmarkedAssigneeId != null) {
       query =
           query.where('unmarkedAssigneeIds', arrayContains: unmarkedAssigneeId);
+    }
+
+    if (finalized != null) {
+      if (finalized) {
+        query = query.where('finalizedDate', isNotEqualTo: null);
+      } else {
+        query = query.where('finalizedDate', isEqualTo: null);
+      }
     }
 
     return query;

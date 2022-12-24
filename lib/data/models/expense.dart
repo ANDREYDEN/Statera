@@ -37,10 +37,7 @@ class Expense {
     this.settings = settings ?? ExpenseSettings();
   }
 
-  Expense.fake({
-    this.authorUid = 'foo',
-    this.name = 'foo'
-  }) {
+  Expense.fake({this.authorUid = 'foo', this.name = 'foo'}) {
     this.date = DateTime.now();
     this.settings = ExpenseSettings();
   }
@@ -62,9 +59,7 @@ class Expense {
   bool get completed =>
       items.isNotEmpty && items.every((item) => item.completed);
 
-  bool get canReceiveAssignees =>
-      (assigneeUids.length == 1 && this.isAuthoredBy(assigneeUids.first)) ||
-      !finalized;
+  bool get canReceiveAssignees => !finalized;
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
@@ -128,13 +123,18 @@ class Expense {
 
   get hasNoItems => this.items.isEmpty;
 
-  addAssignee(String newAssigneeUid) {
+  void addAssignee(String newAssigneeUid) {
     this.items.forEach((item) {
-      item.assignees.add(AssigneeDecision(
-        uid: newAssigneeUid,
-      ));
+      item.assignees.add(AssigneeDecision(uid: newAssigneeUid));
     });
     this.assigneeUids.add(newAssigneeUid);
+  }
+
+  void removeAssignee(String assigneeUid) {
+    this.items.forEach((item) {
+      item.assignees.removeWhere((a) => a.uid == assigneeUid);
+    });
+    this.assigneeUids.remove(assigneeUid);
   }
 
   void updateAssignees(List<String> selectedUids) {
@@ -189,7 +189,9 @@ class Expense {
         ? null
         : CustomUser.fromFirestore(data['author']);
     final authorUid = data['authorUid'] ?? author?.uid ?? '';
-    final settings = data['settings'] == null ? null : ExpenseSettings.fromFirestore(data['settings']);
+    final settings = data['settings'] == null
+        ? null
+        : ExpenseSettings.fromFirestore(data['settings']);
 
     var expense = new Expense(
       authorUid: authorUid,
