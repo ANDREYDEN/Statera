@@ -93,7 +93,7 @@ class Item {
 
   void resetAssigneeDecisions() {
     for (var assignee in assignees) {
-      assignee.parts = 0;
+      assignee.parts = null;
     }
   }
 

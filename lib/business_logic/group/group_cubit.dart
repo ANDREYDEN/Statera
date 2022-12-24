@@ -48,11 +48,12 @@ class GroupCubit extends Cubit<GroupState> {
     load(expense.groupId);
   }
 
-  void removeMember(String uid) {
+  Future<void> removeMember(String uid) async {
     final group = loadedState.group;
+    if (!group.memberExists(uid)) return;
     emit(GroupLoading());
-    if (group.members.every((member) => member.uid != uid)) return;
 
+    await _expenseService.removeAssigneeFromOutstandingExpenses(uid, group.id);
     group.removeMember(uid);
     if (group.members.isEmpty) {
       _groupService.deleteGroup(group.id);
@@ -85,7 +86,7 @@ class GroupCubit extends Cubit<GroupState> {
     try {
       final user = await _userRepository.getUser(uid);
       final group = await _groupService.joinGroup(code!, user);
-      await _expenseService.addUserToOutstandingExpenses(uid, group.id);
+      await _expenseService.addAssigneeToOutstandingExpenses(uid, group.id);
       emit(GroupJoinSuccess(group: group));
     } catch (e) {
       emit(GroupError(error: 'Error joining group: ${e.toString()}'));

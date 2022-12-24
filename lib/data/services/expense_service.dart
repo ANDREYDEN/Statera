@@ -34,23 +34,44 @@ class ExpenseService extends Firestore {
         .map((snap) => !snap.exists ? null : Expense.fromSnapshot(snap));
   }
 
-  Future<void> addUserToOutstandingExpenses(String uid, String? groupId) async {
-    var expensesSnap = await expensesQuery(groupId: groupId).get();
-    final expenses =
-        expensesSnap.docs.map((doc) => Expense.fromSnapshot(doc)).toList();
+  Future<void> addAssigneeToOutstandingExpenses(
+    String uid,
+    String? groupId,
+  ) async {
+    var outstandingExpensesSnap =
+        await expensesQuery(groupId: groupId, finalized: false).get();
+    final outstandingExpenses = outstandingExpensesSnap.docs
+        .map((doc) => Expense.fromSnapshot(doc))
+        .toList();
 
-    for (var expense in expenses) {
+    for (var expense in outstandingExpenses) {
       final containsUser = expense.assigneeUids.any((aUid) => aUid == uid);
-      if (expense.canReceiveAssignees &&
-          expense.settings.acceptNewMembers &&
-          !containsUser) {
+      if (expense.settings.acceptNewMembers && !containsUser) {
         expense.addAssignee(uid);
       }
     }
 
     await Future.wait(
-      expenses.map((expense) => updateExpense(expense)),
+      outstandingExpenses.map((expense) => updateExpense(expense)),
     );
+  }
+
+  Future<void> removeAssigneeFromOutstandingExpenses(
+    String uid,
+    String? groupId,
+  ) async {
+    final outstandingExpensesSnap =
+        await expensesQuery(groupId: groupId, finalized: false).get();
+    final outstandingExpenses =
+        outstandingExpensesSnap.docs.map(Expense.fromSnapshot).toList();
+
+    for (final expense in outstandingExpenses) {
+      if (expense.assigneeUids.contains(uid)) {
+        expense.removeAssignee(uid);
+      }
+    }
+
+    await Future.wait(outstandingExpenses.map(updateExpense));
   }
 
   Future<void> finalizeExpense(Expense expense) async {
