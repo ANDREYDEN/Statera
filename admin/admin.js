@@ -7,18 +7,22 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    // const groupId = 'jRiWZXKdAB7hdei0mQOi'
-    const groupId = 'mX6FbRb5do50QYzEAmoS'
+    // const groupId = '0i9Ni8Bz5qUk7yBIj5Cu'
+    const groupId = '34zsdaQ63veJqM35MmhQ'
     const groupReference = await db.collection('groups').doc(groupId).get()
     const group = groupReference.data()
 
-    // const expenseId = '0h614sCqU2dhBIeaGiTC'
-    const expenseId = 'aba7qqKHpRMlOeeWqCC8'
-    const expenseReference = await db.collection('expenses').doc(expenseId).get()
-    const expense = expenseReference.data()
+    // const userId = '92HncVCBiegd6rJP0Vt1gjVPz2cM'
+    const userId = 'PA0rrExN4ddCby2jeeTKlfwmmVg1'
+    const userReference = await db.collection('users').doc(userId).get()
+    const user = {
+        uid: userId,
+        ...userReference.data()
+    }
 
-    const newGroup = await finalizeExpense(group, expense)
-    await db.collection('groups').doc(groupId).set(newGroup)
+    // const newGroup = await addUserToGroup(group, user)
+    // await groupReference.ref.set(newGroup)
+    await removeUserFromAllFinalizedExpenses(groupId, user)
 })();
 
 function addUserToGroup(group, user) {
@@ -30,8 +34,52 @@ function addUserToGroup(group, user) {
 
     group.members.push(user)
     group.memberIds.push(user.uid)
+    console.log(group);
 
     return group
+}
+
+async function addUserToOutstandingExpenses(groupId, user) {
+    const allExpenses = await db
+        .collection('expenses')
+        .where('groupId', '==', groupId)
+        .get()
+
+    const outstandingExpenses = allExpenses.docs.filter(e => e.finalizedDate == null)
+
+    for (const expenseDoc of outstandingExpenses) {
+        const expense = expenseDoc.data()
+        expense.assigneeIds.push(user.uid)
+        expense.unmarkedAssigneeIds.push(user.uid)
+
+        for (const item of expense.items) {
+            item.assignees.push({
+                parts: null,
+                uid: user.uid
+            })
+        }
+        await expenseDoc.ref.set(expense)
+    }
+}
+
+async function removeUserFromAllFinalizedExpenses(groupId, user) {
+    const allExpenses = await db
+        .collection('expenses')
+        .where('groupId', '==', groupId)
+        .get()
+
+    const finalizedExpenses = allExpenses.docs.filter(e => e.data().finalizedDate != null)
+
+    for (const expenseDoc of finalizedExpenses) {
+        const expense = expenseDoc.data()
+        expense.assigneeIds = expense.assigneeIds.filter(uid => uid != user.uid)
+        expense.unmarkedAssigneeIds = expense.unmarkedAssigneeIds.filter(uid => uid != user.uid)
+
+        for (const item of expense.items) {
+            item.assignees = item.assignees.filter(a => a.uid != user.uid)
+        }
+        await expenseDoc.ref.set(expense)
+    }
 }
 
 function finalizeExpense(group, expense) {
@@ -50,11 +98,11 @@ function finalizeExpense(group, expense) {
 
 function getTotalDebt(expense, assigneeId) {
     const owage = expense.items.reduce(
-        (acc, item) => { 
+        (acc, item) => {
             const totalParts = item.assignees.reduce((acc, assignee) => acc + assignee.parts, 0)
             if (totalParts == 0) return acc
             return acc + item.value *
-            (item.assignees.find(a => a.uid === assigneeId).parts / totalParts)
+                (item.assignees.find(a => a.uid === assigneeId).parts / totalParts)
         },
         0
     );

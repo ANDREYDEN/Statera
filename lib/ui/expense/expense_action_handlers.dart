@@ -28,11 +28,12 @@ handleSettingsClick(BuildContext context) {
 handleItemUpsert(BuildContext context, {Item? intialItem}) {
   final authBloc = context.read<AuthBloc>();
   final expenseBloc = context.read<ExpenseBloc>();
+  final addingItem = intialItem == null;
 
   showDialog(
     context: context,
     builder: (context) => CRUDDialog(
-      title: intialItem == null ? 'Add Item' : 'Edit Item',
+      title: addingItem ? 'Add Item' : 'Edit Item',
       fields: [
         FieldData(
           id: 'item_name',
@@ -63,7 +64,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
         newItem.name = values['item_name']!;
         newItem.value = double.parse(values['item_value']!);
         var newPartition = int.parse(values['item_partition']!);
-        if (intialItem != null && newPartition != intialItem.partition) {
+        if (addingItem || newPartition != intialItem!.partition) {
           newItem.resetAssigneeDecisions();
           newItem.partition = newPartition;
         }
@@ -72,7 +73,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
           UpdateRequested(
             issuer: authBloc.user,
             update: (expense) {
-              if (intialItem == null) {
+              if (addingItem) {
                 expense.addItem(newItem);
               } else {
                 expense.updateItem(newItem);
@@ -81,7 +82,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
           ),
         );
       },
-      allowAddAnother: intialItem == null,
+      allowAddAnother: addingItem,
     ),
   );
 }
