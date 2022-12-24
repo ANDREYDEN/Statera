@@ -66,15 +66,12 @@ class ExpenseService extends Firestore {
         outstandingExpensesSnap.docs.map(Expense.fromSnapshot).toList();
 
     for (final expense in outstandingExpenses) {
-      final containsUser = expense.assigneeUids.any((aUid) => aUid == uid);
-      if (expense.settings.acceptNewMembers && containsUser) {
+      if (expense.assigneeUids.contains(uid)) {
         expense.removeAssignee(uid);
       }
     }
 
-    await Future.wait(
-      outstandingExpenses.map((expense) => updateExpense(expense)),
-    );
+    await Future.wait(outstandingExpenses.map(updateExpense));
   }
 
   Future<void> finalizeExpense(Expense expense) async {

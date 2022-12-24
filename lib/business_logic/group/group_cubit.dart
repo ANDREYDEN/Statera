@@ -50,8 +50,8 @@ class GroupCubit extends Cubit<GroupState> {
 
   Future<void> removeMember(String uid) async {
     final group = loadedState.group;
+    if (!group.memberExists(uid)) return;
     emit(GroupLoading());
-    if (group.members.every((member) => member.uid != uid)) return;
 
     await _expenseService.removeAssigneeFromOutstandingExpenses(uid, group.id);
     group.removeMember(uid);
