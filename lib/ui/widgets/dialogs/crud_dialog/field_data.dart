@@ -5,13 +5,13 @@ typedef Validator = String Function(String);
 class FieldData {
   String id;
   String label;
-  late TextEditingController controller;
   late FocusNode focusNode;
-  TextInputType inputType;
   dynamic initialData;
   List<Validator> validators;
   List<TextInputFormatter> formatters;
   bool isAdvanced;
+
+  dynamic _data;
 
   FieldData({
     required this.id,
@@ -20,10 +20,8 @@ class FieldData {
     TextEditingController? controller,
     this.validators = const [],
     this.formatters = const [],
-    this.inputType = TextInputType.text,
     this.isAdvanced = false,
   }) {
-    this.controller = controller ?? TextEditingController();
     resetController();
     this.focusNode = FocusNode(debugLabel: this.id);
   }
@@ -34,16 +32,25 @@ class FieldData {
       double.tryParse(text) == null ? 'Must be a number' : '';
   static String intValidator(String text) =>
       int.tryParse(text) == null ? 'Must be a whole number' : '';
+  static String Function(String) constrainedDoubleValidator(
+          double min, double max) =>
+      (String text) => double.parse(text) < min
+          ? 'The value should be larger than $min'
+          : double.parse(text) > max
+              ? 'The value should be smaller than $max'
+              : '';
+
+  dynamic get data => _data;
 
   String getError() {
     for (final validator in validators) {
-      var error = validator(controller.text);
+      var error = validator(_data);
       if (error.isNotEmpty) return error;
     }
     return '';
   }
 
   void resetController() {
-    controller.text = initialData?.toString() ?? '';
+    _data = initialData;
   }
 }

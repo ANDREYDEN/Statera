@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
-import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 
 class ExpenseSettingsDialog extends StatefulWidget {
   final Expense expense;
@@ -15,54 +15,40 @@ class ExpenseSettingsDialog extends StatefulWidget {
 }
 
 class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
-  late bool _automaticallyAddNewMembers;
-  late bool _showItemDecisions;
-
-  @override
-  void initState() {
-    _automaticallyAddNewMembers = widget.expense.settings.acceptNewMembers;
-    _showItemDecisions = widget.expense.settings.showItemDecisions;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SwitchListTile(
-            title: Text('Automatically add new members to this expense'),
-            value: _automaticallyAddNewMembers,
-            onChanged: (isOn) {
-              setState(() {
-                _automaticallyAddNewMembers = !_automaticallyAddNewMembers;
-              });
-            },
-          ),
-          SwitchListTile(
-            title: Text('Show how other people marked each item'),
-            value: _showItemDecisions,
-            onChanged: (isOn) {
-              setState(() {
-                _showItemDecisions = !_showItemDecisions;
-              });
-            },
-          ),
-        ],
-      ),
-      actions: [
-        CancelButton(),
-        ProtectedButton(
-          onPressed: () async {
-            widget.expense.settings.acceptNewMembers =
-                _automaticallyAddNewMembers;
-            widget.expense.settings.showItemDecisions = _showItemDecisions;
-            Navigator.pop(context, true);
-          },
-          child: Text('Save'),
+    return CRUDDialog(
+      title: 'Settings',
+      fields: [
+        FieldData(
+          id: 'automaticallyAddNewMembers',
+          label: 'Automatically add new members to this expense',
+          initialData: widget.expense.settings.acceptNewMembers,
+        ),
+        FieldData(
+          id: 'showItemDecisions',
+          label: 'Show how other people marked each item',
+          initialData: widget.expense.settings.showItemDecisions,
+        ),
+        FieldData(
+          id: 'tax',
+          label: 'Amount of tax to apply to each item',
+          initialData: widget.expense.settings.tax,
+          formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+          validators: [
+            FieldData.doubleValidator,
+            FieldData.constrainedDoubleValidator(0, 1)
+          ],
         ),
       ],
+      onSubmit: (values) async {
+        widget.expense.settings.acceptNewMembers =
+            values['automaticallyAddNewMembers'] == 'true';
+        widget.expense.settings.showItemDecisions =
+            values['showItemDecisions'] == 'true';
+        widget.expense.settings.tax = double.parse(values['tax']!);
+        Navigator.pop(context, true);
+      },
     );
   }
 }

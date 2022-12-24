@@ -20,8 +20,8 @@ class CRUDDialog extends StatefulWidget {
   const CRUDDialog({
     Key? key,
     required this.title,
-    required this.onSubmit,
     required this.fields,
+    required this.onSubmit,
     this.closeAfterSubmit = true,
     this.allowAddAnother = false,
   }) : super(key: key);
@@ -99,7 +99,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
-              children: [...getTextFields((f) => !f.isAdvanced)],
+              children: [...getFields((f) => !f.isAdvanced)],
             ),
             if (_advancedFieldsPresent)
               AdvancedDropdown(
@@ -109,7 +109,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
                 isCollapsed: _showAdvanced,
               ),
             if (_showAdvanced)
-              Column(children: [...getTextFields((f) => f.isAdvanced)]),
+              Column(children: [...getFields((f) => f.isAdvanced)]),
           ],
         ),
       ),
@@ -119,36 +119,53 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   bool get _advancedFieldsPresent => widget.fields.any((f) => f.isAdvanced);
 
-  Iterable<Widget> getTextFields(bool Function(FieldData) criteria) sync* {
+  Iterable<Widget> getFields(bool Function(FieldData) criteria) sync* {
     final selectedFields = widget.fields.where(criteria).toList();
     for (var i = 0; i < selectedFields.length; i++) {
       var field = selectedFields[i];
-      yield TextField(
-        autofocus: i == 0,
-        focusNode: field.focusNode,
-        controller: field.controller,
-        keyboardType: field.inputType,
-        inputFormatters: field.formatters,
-        decoration: InputDecoration(
-          labelText: field.label,
-          errorText: this._dirty && field.getError().isNotEmpty
-              ? field.getError()
-              : null,
-        ),
-        onChanged: (text) {
-          setState(() {
+      var isLastField = i == selectedFields.length - 1;
+      var isFirstField = i == 0;
+      if (field.initialData is String || field.initialData is num) {
+        yield TextFormField(
+          autofocus: isFirstField,
+          focusNode: field.focusNode,
+          initialValue: field.initialData.toString(),
+          keyboardType: field.initialData is String
+              ? TextInputType.text
+              : field.initialData is double
+                  ? TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.number,
+          inputFormatters: field.formatters,
+          decoration: InputDecoration(
+            labelText: field.label,
+            errorText: this._dirty && field.getError().isNotEmpty
+                ? field.getError()
+                : null,
+          ),
+          onChanged: (text) {
+            setState(() {
+              this._dirty = true;
+            });
+          },
+          onFieldSubmitted: (_) {
+            if (isLastField) {
+              submit(closeAfterSubmit: widget.closeAfterSubmit);
+            } else {
+              selectedFields[i + 1].focusNode.requestFocus();
+            }
+          },
+        );
+      } else if (field.initialData is bool) {
+        yield SwitchListTile(
+          value: field.initialData,
+          autofocus: isFirstField,
+          focusNode: field.focusNode,
+          onChanged: (_) => setState(() {
             this._dirty = true;
-          });
-        },
-        onSubmitted: (_) {
-          var isLastField = i == selectedFields.length - 1;
-          if (isLastField) {
-            submit(closeAfterSubmit: widget.closeAfterSubmit);
-          } else {
-            selectedFields[i + 1].focusNode.requestFocus();
-          }
-        },
-      );
+          }),
+          
+        );
+      }
     }
   }
 
@@ -162,10 +179,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
     await widget.onSubmit(
       Map.fromEntries(widget.fields.map(
-        (field) => MapEntry(
-          field.id,
-          field.controller.text,
-        ),
+        (field) => MapEntry(field.id, field.data),
       )),
     );
 

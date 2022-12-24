@@ -5,6 +5,9 @@ class ExpenseSettings {
   /// Controls wether to display individual item decisions made by expense asssignees.
   bool showItemDecisions;
 
+  /// Determines how much tax should be applied to the expense (0..1)
+  double? tax;
+
   ExpenseSettings({
     this.acceptNewMembers = true,
     this.showItemDecisions = true,
@@ -12,12 +15,14 @@ class ExpenseSettings {
 
   ExpenseSettings.fromFirestore(Map<String, dynamic> data)
       : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
-        this.showItemDecisions = data['showItemDecisions'] ?? true;
+        this.showItemDecisions = data['showItemDecisions'] ?? true,
+        this.tax = data['tax'];
 
   Map<String, dynamic> toFirestore() {
     return {
       'acceptNewMembers': acceptNewMembers,
       'showItemDecisions': showItemDecisions,
+      'tax': tax
     };
   }
 
@@ -27,11 +32,14 @@ class ExpenseSettings {
 
     return other is ExpenseSettings &&
         acceptNewMembers == other.acceptNewMembers &&
-        showItemDecisions == other.showItemDecisions;
+        showItemDecisions == other.showItemDecisions &&
+        tax == other.tax;
   }
 
   @override
   int get hashCode {
-    return acceptNewMembers.hashCode ^ showItemDecisions.hashCode;
+    return acceptNewMembers.hashCode ^
+        showItemDecisions.hashCode ^
+        tax.hashCode;
   }
 }
