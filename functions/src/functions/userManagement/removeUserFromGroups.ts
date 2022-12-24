@@ -23,8 +23,6 @@ export async function removeUserFromGroups(uid: string) {
 }
 
 async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot) {
-  const app = admin.app()
-
   const memberIds = groupDoc.data()['memberIds']
   const members = groupDoc.data()['members']
   const balance = groupDoc.data()['balance']
@@ -35,15 +33,11 @@ async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot)
     }
     const newMembers = members.filter((member: { uid: string }) => member.uid !== uid)
     const newMemberIds = memberIds.filter((id: string) => id !== uid)
-    await admin
-      .firestore(app)
-      .collection('groups')
-      .doc(groupDoc.id)
-      .update({
-        memberIds: newMemberIds,
-        members: newMembers,
-        balance,
-      })
+    groupDoc.ref.update({
+      memberIds: newMemberIds,
+      members: newMembers,
+      balance,
+    })
   } catch (e) {
     console.log(`Failed to remove user from group (${groupDoc.id}): ${e}`)
   }
@@ -66,7 +60,7 @@ async function removeUserFromOutstandingExpenses(uid: string, groupId: string) {
       item.assignees = item.assignees.filter((item: any) => item.uid != uid)
     }
 
-    expenseDoc.ref.set(expense)
+    await expenseDoc.ref.set(expense)
   }
 }
 
