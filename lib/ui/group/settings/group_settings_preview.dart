@@ -29,7 +29,8 @@ class GroupSettingsPreview extends StatelessWidget {
 
     final groupCubit = GroupCubitMock();
     when(() => groupCubit.update(any())).thenAnswer((_) async {});
-    when(() => groupCubit.removeMember(any())).thenAnswer((_) {});
+    when(() => groupCubit.removeMember(any()))
+        .thenAnswer((_) => Future.value(null));
     when(() => groupCubit.delete()).thenAnswer((_) {});
     when(() => groupCubit.stream).thenAnswer((_) => Stream.fromIterable([]));
     when(() => groupCubit.state).thenReturn(GroupLoaded(group: Group.empty()));
