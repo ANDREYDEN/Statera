@@ -2,21 +2,22 @@ part of 'crud_dialog.dart';
 
 typedef Validator = String Function(String);
 
-class FieldData {
+class FieldData<T> {
   String id;
   String label;
   late FocusNode focusNode;
-  dynamic initialData;
+  T initialData;
   List<Validator> validators;
   List<TextInputFormatter> formatters;
   bool isAdvanced;
 
-  dynamic _data;
+  T? _data;
+  String? fieldValue;
 
   FieldData({
     required this.id,
     required this.label,
-    this.initialData,
+    required this.initialData,
     TextEditingController? controller,
     this.validators = const [],
     this.formatters = const [],
@@ -40,26 +41,37 @@ class FieldData {
               ? 'The value should be smaller than $max'
               : '';
 
-  dynamic get data => _data;
+  T get data {
+    if (fieldValue == null) {
+      return _data!;
+    }
+    if (initialData is String) {
+      return fieldValue! as T;
+    }
+    if (initialData is int) {
+      return int.parse(fieldValue!) as T;
+    }
+    if (initialData is double) {
+      return double.parse(fieldValue!) as T;
+    }
 
-  void set data(dynamic value) {
+    return _data!;
+  }
+
+  void changeData(dynamic value) {
     if (value is String) {
-      if (_data is String) {
-        _data = value;
-      } else if (_data is int) {
-        _data = int.parse(value);
-      } else if (_data is double) {
-        _data = double.parse(value);
-      }
-    } else {
-      _data = value;
+      fieldValue = value;
+    } else if (value is bool && initialData is bool) {
+      _data = value as T;
     }
   }
 
   String getError() {
-    for (final validator in validators) {
-      var error = validator(_data);
-      if (error.isNotEmpty) return error;
+    if (fieldValue != null) {
+      for (final validator in validators) {
+        var error = validator(fieldValue!);
+        if (error.isNotEmpty) return error;
+      }
     }
     return '';
   }

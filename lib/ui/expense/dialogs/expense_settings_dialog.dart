@@ -31,6 +31,11 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
           initialData: widget.expense.settings.showItemDecisions,
         ),
         FieldData(
+          id: 'is_taxable',
+          label: 'Apply tax to each item',
+          initialData: widget.expense.settings.tax != null,
+        ),
+        FieldData(
           id: 'tax',
           label: 'Amount of tax to apply to each item',
           initialData: widget.expense.settings.tax,
@@ -46,7 +51,11 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
             values['automaticallyAddNewMembers'] == 'true';
         widget.expense.settings.showItemDecisions =
             values['showItemDecisions'] == 'true';
-        widget.expense.settings.tax = double.parse(values['tax']!);
+        if (values['is_taxable']) {
+          widget.expense.settings.tax = double.parse(values['tax']!);
+        } else {
+          widget.expense.settings.tax = null;
+        }
         Navigator.pop(context, true);
       },
     );

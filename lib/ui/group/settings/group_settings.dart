@@ -107,7 +107,7 @@ class GroupSettings extends StatelessWidget {
                 },
               ),
               SwitchListTile(
-                title: Text('Apply tax amount to selected items'),
+                title: Text('Apply tax to each item'),
                 value: group.defaultExpenseSettings.tax != null,
                 onChanged: (isOn) {
                   final groupCubit = context.read<GroupCubit>();

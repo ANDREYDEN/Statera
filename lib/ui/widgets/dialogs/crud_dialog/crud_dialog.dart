@@ -12,7 +12,7 @@ part 'field_data.dart';
 
 class CRUDDialog extends StatefulWidget {
   final String title;
-  final FutureOr<void> Function(Map<String, String>) onSubmit;
+  final FutureOr<void> Function(Map<String, dynamic>) onSubmit;
   final List<FieldData> fields;
   final bool closeAfterSubmit;
   final bool allowAddAnother;
@@ -145,7 +145,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
           onChanged: (text) {
             setState(() {
               this._dirty = true;
-              field.data = text;
+              field.changeData(text);
             });
           },
           onFieldSubmitted: (_) {
@@ -159,11 +159,12 @@ class _CRUDDialogState extends State<CRUDDialog> {
       } else if (field.initialData is bool) {
         yield SwitchListTile(
           title: Text(field.label),
-          value: field.initialData,
+          value: field.data,
           autofocus: isFirstField,
           focusNode: field.focusNode,
-          onChanged: (_) => setState(() {
+          onChanged: (newValue) => setState(() {
             this._dirty = true;
+            field.changeData(newValue);
           }),
         );
       }
