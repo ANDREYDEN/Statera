@@ -106,6 +106,34 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
+              SwitchListTile(
+                title: Text('Apply tax amount to selected items'),
+                value: group.defaultExpenseSettings.tax != null,
+                onChanged: (isOn) {
+                  final groupCubit = context.read<GroupCubit>();
+
+                  groupCubit.update((group) {
+                    group.defaultExpenseSettings.tax = isOn ? 0.13 : null;
+                  });
+                },
+              ),
+              if (group.defaultExpenseSettings.tax != null)
+                SettingInput(
+                  label: 'Amount of tax to apply to each item',
+                  initialValue: group.defaultExpenseSettings.tax.toString(),
+                  formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+                  validators: [
+                    FieldData.doubleValidator,
+                    FieldData.constrainedDoubleValidator(0, 1)
+                  ],
+                  onPressed: (value) {
+                    final groupCubit = context.read<GroupCubit>();
+
+                    groupCubit.update((group) {
+                      group.defaultExpenseSettings.tax = double.parse(value);
+                    });
+                  },
+                ),
               SizedBox(height: 40),
             ],
             DangerZone(

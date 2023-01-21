@@ -145,6 +145,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
           onChanged: (text) {
             setState(() {
               this._dirty = true;
+              field.data = text;
             });
           },
           onFieldSubmitted: (_) {
@@ -157,13 +158,13 @@ class _CRUDDialogState extends State<CRUDDialog> {
         );
       } else if (field.initialData is bool) {
         yield SwitchListTile(
+          title: Text(field.label),
           value: field.initialData,
           autofocus: isFirstField,
           focusNode: field.focusNode,
           onChanged: (_) => setState(() {
             this._dirty = true;
           }),
-          
         );
       }
     }

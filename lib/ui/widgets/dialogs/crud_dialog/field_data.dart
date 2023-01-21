@@ -42,6 +42,20 @@ class FieldData {
 
   dynamic get data => _data;
 
+  void set data(dynamic value) {
+    if (value is String) {
+      if (_data is String) {
+        _data = value;
+      } else if (_data is int) {
+        _data = int.parse(value);
+      } else if (_data is double) {
+        _data = double.parse(value);
+      }
+    } else {
+      _data = value;
+    }
+  }
+
   String getError() {
     for (final validator in validators) {
       var error = validator(_data);
