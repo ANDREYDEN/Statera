@@ -40,10 +40,7 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
           label: 'Amount of tax to apply to each item',
           initialData: widget.expense.settings.tax,
           formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
-          validators: [
-            FieldData.doubleValidator,
-            FieldData.constrainedDoubleValidator(0, 1)
-          ],
+          validators: [FieldData.constrainedDoubleValidator(0, 1)],
         ),
       ],
       onSubmit: (values) async {

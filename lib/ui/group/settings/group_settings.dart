@@ -122,10 +122,7 @@ class GroupSettings extends StatelessWidget {
                   label: 'Amount of tax to apply to each item',
                   initialValue: group.defaultExpenseSettings.tax.toString(),
                   formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
-                  validators: [
-                    FieldData.doubleValidator,
-                    FieldData.constrainedDoubleValidator(0, 1)
-                  ],
+                  validators: [FieldData.constrainedDoubleValidator(0, 1)],
                   onPressed: (value) {
                     final groupCubit = context.read<GroupCubit>();
 

@@ -129,10 +129,7 @@ class _GroupListState extends State<GroupList> {
             id: 'debt_threshold',
             label: 'Debt Threshold',
             initialData: newGroup.debtThreshold,
-            validators: [
-              FieldData.requiredValidator,
-              FieldData.doubleValidator
-            ],
+            validators: [FieldData.requiredValidator],
             formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
             isAdvanced: true,
           ),

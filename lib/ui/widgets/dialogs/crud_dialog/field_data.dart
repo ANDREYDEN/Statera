@@ -61,13 +61,23 @@ class FieldData<T> {
   void changeData(dynamic value) {
     if (value is String) {
       fieldValue = value;
-    } else if (value is bool && initialData is bool) {
+    } else if (T is bool) {
       _data = value as T;
     }
   }
 
   String getError() {
     if (fieldValue != null) {
+      if (T is int) {
+        final formatError = intValidator(fieldValue!);
+        if (formatError.isNotEmpty) return formatError;
+      }
+      
+      if (T is double) {
+        final formatError = doubleValidator(fieldValue!);
+        if (formatError.isNotEmpty) return formatError;
+      }
+      
       for (final validator in validators) {
         var error = validator(fieldValue!);
         if (error.isNotEmpty) return error;
