@@ -121,8 +121,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   Iterable<Widget> getFields(bool Function(FieldData) criteria) sync* {
     final selectedFields = widget.fields.where(criteria).toList();
+    final fieldValueMap = selectedFields.fold<Map<String, dynamic>>(
+      {},
+      (acc, cur) => {...acc, cur.id: cur.data},
+    );
+
     for (var i = 0; i < selectedFields.length; i++) {
       var field = selectedFields[i];
+      if (field.isVisible != null && !field.isVisible!(fieldValueMap)) continue;
       var isLastField = i == selectedFields.length - 1;
       var isFirstField = i == 0;
       if (field.initialData is String || field.initialData is num) {

@@ -10,9 +10,10 @@ class FieldData<T> {
   List<Validator> validators;
   List<TextInputFormatter> formatters;
   bool isAdvanced;
+  bool Function(Map<String, dynamic>)? isVisible;
 
   T? _data;
-  String? fieldValue;
+  String? _fieldValue;
 
   FieldData({
     required this.id,
@@ -22,6 +23,7 @@ class FieldData<T> {
     this.validators = const [],
     this.formatters = const [],
     this.isAdvanced = false,
+    this.isVisible,
   }) {
     resetController();
     this.focusNode = FocusNode(debugLabel: this.id);
@@ -42,17 +44,17 @@ class FieldData<T> {
               : '';
 
   T get data {
-    if (fieldValue == null) {
+    if (_fieldValue == null) {
       return _data!;
     }
     if (initialData is String) {
-      return fieldValue! as T;
+      return _fieldValue! as T;
     }
     if (initialData is int) {
-      return int.parse(fieldValue!) as T;
+      return (_fieldValue!.isEmpty ? 0 : int.parse(_fieldValue!)) as T;
     }
     if (initialData is double) {
-      return double.parse(fieldValue!) as T;
+      return (_fieldValue!.isEmpty ? 0 : double.parse(_fieldValue!)) as T;
     }
 
     return _data!;
@@ -60,26 +62,27 @@ class FieldData<T> {
 
   void changeData(dynamic value) {
     if (value is String) {
-      fieldValue = value;
-    } else if (T is bool) {
+      _fieldValue = value;
+    } else if (value is bool && initialData is bool) {
       _data = value as T;
     }
   }
 
   String getError() {
-    if (fieldValue != null) {
-      if (T is int) {
-        final formatError = intValidator(fieldValue!);
+    if (_fieldValue != null) {
+      // TODO: resolve types differently as T is dynamic
+      if (initialData is int) {
+        final formatError = intValidator(_fieldValue!);
         if (formatError.isNotEmpty) return formatError;
       }
-      
-      if (T is double) {
-        final formatError = doubleValidator(fieldValue!);
+
+      if (initialData is double) {
+        final formatError = doubleValidator(_fieldValue!);
         if (formatError.isNotEmpty) return formatError;
       }
-      
+
       for (final validator in validators) {
-        var error = validator(fieldValue!);
+        var error = validator(_fieldValue!);
         if (error.isNotEmpty) return error;
       }
     }
