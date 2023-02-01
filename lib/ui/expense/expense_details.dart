@@ -42,7 +42,7 @@ class ExpenseDetails extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      expense.getColor(authBloc.state.user!.uid),
+                      expense.getColor(authBloc.uid),
                       Theme.of(context).colorScheme.surface,
                     ],
                     stops: [0, 0.8],
@@ -133,6 +133,22 @@ class ExpenseDetails extends StatelessWidget {
                 label: Text('Upload receipt'),
                 icon: Icon(Icons.photo_camera),
               ),
+            if (expense.items.isNotEmpty && expense.hasTax) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Tax'),
+                    PriceText(
+                      value: expense.getConfirmedTaxForUser(authBloc.uid),
+                      textStyle: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ],
+                ),
+              ),
+              Divider()
+            ],
             Flexible(child: ItemsList()),
           ],
         );

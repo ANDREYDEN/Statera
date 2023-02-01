@@ -49,6 +49,8 @@ class Expense {
     return this.date!.compareTo(other.date!) < 0;
   }
 
+  bool get hasTax => settings.tax != null;
+
   double get total => items.fold<double>(
       0, (previousValue, item) => previousValue + item.value);
 
@@ -160,6 +162,16 @@ class Expense {
     return items.fold<double>(
       0,
       (previousValue, item) => previousValue + item.getSharedValueFor(uid),
+    );
+  }
+
+  double getConfirmedTaxForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+    if (!this.hasTax) return 0;
+
+    return items.fold<double>(
+      0,
+      (previousValue, item) => previousValue + item.getSharedValueFor(uid) * this.settings.tax!,
     );
   }
 
