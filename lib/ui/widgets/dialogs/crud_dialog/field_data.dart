@@ -14,18 +14,20 @@ class FieldData<T> {
 
   T? _data;
   String? _fieldValue;
+  late TextEditingController _controller;
 
   FieldData({
     required this.id,
     required this.label,
     required this.initialData,
-    TextEditingController? controller,
     this.validators = const [],
     this.formatters = const [],
     this.isAdvanced = false,
     this.isVisible,
   }) {
-    resetController();
+    initialData = (initialData ?? '') as T;
+    _data = initialData;
+    _controller = TextEditingController(text: initialData.toString());
     this.focusNode = FocusNode(debugLabel: this.id);
   }
 
@@ -43,6 +45,8 @@ class FieldData<T> {
               ? 'The value should be smaller than $max'
               : '';
 
+  TextEditingController get controller => _controller;
+
   T get data {
     if (_fieldValue == null) {
       return _data!;
@@ -51,10 +55,10 @@ class FieldData<T> {
       return _fieldValue! as T;
     }
     if (initialData is int) {
-      return (_fieldValue!.isEmpty ? 0 : int.parse(_fieldValue!)) as T;
+      return (int.tryParse(_fieldValue!) ?? 0) as T;
     }
     if (initialData is double) {
-      return (_fieldValue!.isEmpty ? 0 : double.parse(_fieldValue!)) as T;
+      return (double.tryParse(_fieldValue!) ?? 0) as T;
     }
 
     return _data!;
@@ -89,7 +93,8 @@ class FieldData<T> {
     return '';
   }
 
-  void resetController() {
+  void reset() {
     _data = initialData;
+    _controller.clear();
   }
 }

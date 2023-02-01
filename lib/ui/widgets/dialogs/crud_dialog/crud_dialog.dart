@@ -133,9 +133,9 @@ class _CRUDDialogState extends State<CRUDDialog> {
       var isFirstField = i == 0;
       if (field.initialData is String || field.initialData is num) {
         yield TextFormField(
+          controller: field.controller,
           autofocus: isFirstField,
           focusNode: field.focusNode,
-          initialValue: field.initialData.toString(),
           keyboardType: field.initialData is String
               ? TextInputType.text
               : field.initialData is double
@@ -198,7 +198,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
     }
 
     widget.fields.forEach((field) {
-      field.resetController();
+      field.reset();
     });
   }
 }
