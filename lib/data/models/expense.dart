@@ -161,7 +161,9 @@ class Expense {
 
     return items.fold<double>(
       0,
-      (previousValue, item) => previousValue + item.getSharedValueFor(uid),
+      (previousValue, item) =>
+          previousValue +
+          item.getSharedValueFor(uid: uid, tax: this.settings.tax),
     );
   }
 
@@ -171,7 +173,9 @@ class Expense {
 
     return items.fold<double>(
       0,
-      (previousValue, item) => previousValue + item.getSharedValueFor(uid) * this.settings.tax!,
+      (previousValue, item) =>
+          previousValue +
+          item.getTaxValueFor(uid: uid, tax: this.settings.tax),
     );
   }
 
