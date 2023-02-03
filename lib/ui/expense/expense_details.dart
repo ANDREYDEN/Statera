@@ -133,6 +133,24 @@ class ExpenseDetails extends StatelessWidget {
                 label: Text('Upload receipt'),
                 icon: Icon(Icons.photo_camera),
               ),
+            Flexible(child: ItemsList()),
+            Divider(thickness: 3),
+            if (expense.items.isNotEmpty && expense.hasTax) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Subtotal'),
+                    PriceText(
+                      value: expense.getConfirmedSubTotalForUser(authBloc.uid),
+                      textStyle: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ],
+                ),
+              ),
+              Divider()
+            ],
             if (expense.items.isNotEmpty && expense.hasTax) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -147,9 +165,30 @@ class ExpenseDetails extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider()
+              Divider(thickness: 3),
             ],
-            Flexible(child: ItemsList()),
+            if (expense.items.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    PriceText(
+                      value: expense.getConfirmedTotalForUser(authBloc.uid),
+                      textStyle: Theme.of(context)
+                          .textTheme
+                          .subtitle1!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10)
+            ],
           ],
         );
       },

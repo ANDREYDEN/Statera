@@ -156,6 +156,15 @@ class Expense {
     });
   }
 
+  double getConfirmedSubTotalForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+
+    return items.fold<double>(
+      0,
+      (previousValue, item) => previousValue + item.getSharedValueFor(uid: uid),
+    );
+  }
+
   double getConfirmedTotalForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 
@@ -174,8 +183,7 @@ class Expense {
     return items.fold<double>(
       0,
       (previousValue, item) =>
-          previousValue +
-          item.getTaxValueFor(uid: uid, tax: this.settings.tax),
+          previousValue + item.getTaxValueFor(uid: uid, tax: this.settings.tax),
     );
   }
 
