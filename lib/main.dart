@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -64,14 +65,34 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: MaterialApp(
-                title: kAppName,
-                theme: theme,
-                darkTheme: darkTheme,
-                themeMode: ThemeMode.system,
-                initialRoute: initialRoute ?? defaultRoute,
-                onGenerateRoute: onGenerateRoute,
-                debugShowCheckedModeBanner: false,
+              child: DynamicColorBuilder(
+                builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+                  ColorScheme lightColorScheme;
+                  ColorScheme darkColorScheme;
+
+                  if (lightDynamic != null && darkDynamic != null) {
+                    lightColorScheme = lightDynamic.harmonized();
+                    darkColorScheme = darkDynamic.harmonized();
+                  } else {
+                    lightColorScheme = ColorScheme.fromSeed(
+                      seedColor: Colors.white,
+                    );
+                    darkColorScheme = ColorScheme.fromSeed(
+                      seedColor: Colors.black,
+                      brightness: Brightness.dark,
+                    );
+                  }
+
+                  return MaterialApp(
+                    title: kAppName,
+                    theme: buildTheme(lightColorScheme),
+                    darkTheme: buildTheme(darkColorScheme),
+                    themeMode: ThemeMode.system,
+                    initialRoute: initialRoute ?? defaultRoute,
+                    onGenerateRoute: onGenerateRoute,
+                    debugShowCheckedModeBanner: false,
+                  );
+                },
               ),
             );
           },

@@ -48,3 +48,12 @@ final cardTheme = CardTheme(
     borderRadius: BorderRadius.all(Radius.circular(20)),
   ),
 );
+
+ThemeData buildTheme(ColorScheme colorScheme) => ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      primarySwatch: createMaterialColor(Colors.white),
+      textButtonTheme: textButtonTheme,
+      cardTheme: cardTheme,
+      fontFamily: 'Nunito',
+    );

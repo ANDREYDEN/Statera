@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +24,7 @@ class UnmarkedExpensesBadge extends StatelessWidget {
       stream: groupService.listenForUnmarkedExpenses(groupId, uid),
       builder: (context, snap) {
         var unmarkedExpenses = snap.data;
-        return Badge(
+        return badge.Badge(
           showBadge: unmarkedExpenses != null && unmarkedExpenses.isNotEmpty,
           badgeContent: Text(
             unmarkedExpenses?.length.toString() ?? '',
