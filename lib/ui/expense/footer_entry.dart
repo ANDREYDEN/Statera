@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:statera/ui/widgets/price_text.dart';
+part of 'expense_details.dart';
 
-class ExpenseFooterEntry extends StatelessWidget {
+class FooterEntry extends StatelessWidget {
   final String label;
   final double value;
   final bool bold;
 
-  const ExpenseFooterEntry({
+  const FooterEntry({
     Key? key,
     required this.label,
     required this.value,
