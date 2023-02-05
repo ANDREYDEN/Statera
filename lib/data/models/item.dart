@@ -50,12 +50,12 @@ class Item {
     double? tax,
     bool taxOnly = false,
   }) {
-    if (confirmedParts == 0) return 0;
-
     final baseValue = value * (taxOnly ? 0 : 1);
     final taxValue = value * (isTaxable && tax != null ? tax : 0);
     final totalValue = baseValue + taxValue;
     final confirmedPartition = isPartitioned ? partition : confirmedParts;
+
+    if (confirmedPartition == 0) return 0;
 
     return totalValue * getAssigneeParts(uid) / confirmedPartition;
   }
