@@ -8,6 +8,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/expense/expense_actions_wide.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
+import 'package:statera/ui/expense/expense_footer_entry.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
@@ -134,58 +135,24 @@ class ExpenseDetails extends StatelessWidget {
                 icon: Icon(Icons.photo_camera),
               ),
             Flexible(child: ItemsList()),
-            Divider(thickness: 3),
-            if (expense.items.isNotEmpty && expense.hasTax) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Subtotal'),
-                    PriceText(
-                      value: expense.getConfirmedSubTotalForUser(authBloc.uid),
-                      textStyle: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ],
-                ),
-              ),
-              Divider()
-            ],
-            if (expense.items.isNotEmpty && expense.hasTax) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Tax'),
-                    PriceText(
-                      value: expense.getConfirmedTaxForUser(authBloc.uid),
-                      textStyle: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ],
-                ),
-              ),
-              Divider(thickness: 3),
-            ],
             if (expense.items.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    PriceText(
-                      value: expense.getConfirmedTotalForUser(authBloc.uid),
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .subtitle1!
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+              Divider(thickness: 3),
+              if (expense.hasTax) ...[
+                ExpenseFooterEntry(
+                  label: 'Subtotal',
+                  value: expense.getConfirmedSubTotalForUser(authBloc.uid),
                 ),
+                Divider(),
+                ExpenseFooterEntry(
+                  label: 'Tax',
+                  value: expense.getConfirmedTaxForUser(authBloc.uid),
+                ),
+                Divider(thickness: 3),
+              ],
+              ExpenseFooterEntry(
+                label: 'Total',
+                value: expense.getConfirmedTotalForUser(authBloc.uid),
+                bold: true,
               ),
               SizedBox(height: 10)
             ],
