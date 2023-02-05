@@ -57,10 +57,17 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
           formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           isAdvanced: true,
         ),
+        FieldData(
+          id: 'item_taxable',
+          label: 'Apply tax to item',
+          initialData: item.isTaxable,
+          isAdvanced: true,
+        ),
       ],
       onSubmit: (values) {
         item.name = values['item_name']!;
         item.value = values['item_value']!;
+        item.isTaxable = values['item_taxable']!;
         var newPartition = values['item_partition']!;
         if (addingItem || newPartition != intialItem!.partition) {
           item.resetAssigneeDecisions();

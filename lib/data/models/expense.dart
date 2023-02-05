@@ -159,28 +159,33 @@ class Expense {
   }
 
   double getConfirmedSubTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid);
+    return _getConfirmedValueFor(uid: uid, tax: 0);
   }
 
   double getConfirmedTotalForUser(String uid) {
-    return _getConfirmedValueFor(
-      uid: uid,
-      multiplier: 1 + (this.settings.tax ?? 0),
-    );
+    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax ?? 0);
   }
 
   double getConfirmedTaxForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, multiplier: this.settings.tax);
+    return _getConfirmedValueFor(
+      uid: uid,
+      tax: this.settings.tax ?? 0,
+      taxOnly: true,
+    );
   }
 
-  double _getConfirmedValueFor({required String uid, double? multiplier}) {
+  double _getConfirmedValueFor({
+    required String uid,
+    double? tax,
+    bool taxOnly = false,
+  }) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
       0,
       (previousValue, item) =>
           previousValue +
-          item.getConfirmedValueFor(uid: uid, multiplier: multiplier),
+          item.getConfirmedValueFor(uid: uid, tax: tax, taxOnly: taxOnly),
     );
   }
 

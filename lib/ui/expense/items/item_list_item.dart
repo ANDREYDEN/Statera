@@ -35,6 +35,7 @@ class ItemListItem extends StatelessWidget {
             PriceText(
               value: item.value,
               textStyle: Theme.of(context).textTheme.subtitle1,
+              withTaxPostfix: item.isTaxable,
             ),
             ElevatedButton(
               onPressed: () =>

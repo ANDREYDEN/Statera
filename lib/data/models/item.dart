@@ -10,8 +10,10 @@ class Item {
   late String name;
   late double value;
 
-  // some items might consist of multiple equal parts
-  // that need to be treated separately
+  /// Whether tax should be added to the item value
+  bool isTaxable = false;
+
+  /// Some items might consist of multiple equal parts that need to be treated separately
   int partition;
   List<AssigneeDecision> assignees = [];
 
@@ -20,6 +22,7 @@ class Item {
     required this.value,
     this.partition = 1,
     List<String>? assigneeUids,
+    this.isTaxable = false,
   }) {
     var uuid = Uuid();
     this.id = uuid.v1();
@@ -42,10 +45,16 @@ class Item {
 
   bool get isPartitioned => partition > 1;
 
-  double getConfirmedValueFor({required String uid, double? multiplier}) {
+  double getConfirmedValueFor({
+    required String uid,
+    double? tax,
+    bool taxOnly = false,
+  }) {
     if (confirmedParts == 0) return 0;
 
-    final totalValue = value * (multiplier ?? 1);
+    final baseValue = value * (taxOnly ? 0 : 1);
+    final taxValue = value * (isTaxable && tax != null ? tax : 0);
+    final totalValue = baseValue + taxValue;
     final confirmedPartition = isPartitioned ? partition : confirmedParts;
 
     return totalValue * getAssigneeParts(uid) / confirmedPartition;
@@ -107,6 +116,7 @@ class Item {
       'value': value,
       'partition': partition,
       'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
+      'taxable': isTaxable,
     };
   }
 
@@ -116,6 +126,7 @@ class Item {
       name: data['name'],
       value: double.parse(data['value'].toString()),
       partition: data['partition'] ?? 1,
+      isTaxable: data['taxable'] ?? false,
     );
     item.id = data['id'] ?? uuid.v1();
     item.assignees = data['assignees']
@@ -134,7 +145,8 @@ class Item {
         other.name == name &&
         other.value == value &&
         other.partition == partition &&
-        listEquals(other.assignees, assignees);
+        listEquals(other.assignees, assignees) &&
+        other.isTaxable == isTaxable;
   }
 
   @override
@@ -146,6 +158,7 @@ class Item {
         assignees.fold(
           0,
           (previousValue, element) => previousValue ^ element.hashCode,
-        );
+        ) ^
+        isTaxable.hashCode;
   }
 }
