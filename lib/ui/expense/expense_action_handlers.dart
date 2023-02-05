@@ -29,7 +29,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
   final authBloc = context.read<AuthBloc>();
   final expenseBloc = context.read<ExpenseBloc>();
   final addingItem = intialItem == null;
-  final item = intialItem ?? Item(name: '', value: 0);
+  final item = intialItem ?? Item(name: '', value: 0, isTaxable: true);
 
   showDialog(
     context: context,
@@ -57,12 +57,14 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
           formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           isAdvanced: true,
         ),
-        FieldData(
-          id: 'item_taxable',
-          label: 'Apply tax to item',
-          initialData: item.isTaxable,
-          isAdvanced: true,
-        ),
+        if (expenseBloc.state is ExpenseLoaded &&
+            (expenseBloc.state as ExpenseLoaded).expense.hasTax)
+          FieldData(
+            id: 'item_taxable',
+            label: 'Apply tax to item',
+            initialData: item.isTaxable,
+            isAdvanced: true,
+          ),
       ],
       onSubmit: (values) {
         item.name = values['item_name']!;

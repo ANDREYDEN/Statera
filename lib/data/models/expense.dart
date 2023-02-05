@@ -163,13 +163,13 @@ class Expense {
   }
 
   double getConfirmedTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax ?? 0);
+    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax);
   }
 
   double getConfirmedTaxForUser(String uid) {
     return _getConfirmedValueFor(
       uid: uid,
-      tax: this.settings.tax ?? 0,
+      tax: this.settings.tax,
       taxOnly: true,
     );
   }
