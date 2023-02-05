@@ -52,7 +52,9 @@ class Expense {
   bool get hasTax => settings.tax != null;
 
   double get total => items.fold<double>(
-      0, (previousValue, item) => previousValue + item.value);
+      0,
+      (previousValue, item) =>
+          previousValue + item.value * (1 + (this.settings.tax ?? 0)));
 
   bool isIn(ExpenseStage stage) => stage.test(this);
 
@@ -157,33 +159,28 @@ class Expense {
   }
 
   double getConfirmedSubTotalForUser(String uid) {
-    if (!this.hasAssignee(uid)) return 0;
-
-    return items.fold<double>(
-      0,
-      (previousValue, item) => previousValue + item.getSharedValueFor(uid: uid),
-    );
+    return _getConfirmedValueFor(uid: uid);
   }
 
   double getConfirmedTotalForUser(String uid) {
+    return _getConfirmedValueFor(
+      uid: uid,
+      multiplier: 1 + (this.settings.tax ?? 0),
+    );
+  }
+
+  double getConfirmedTaxForUser(String uid) {
+    return _getConfirmedValueFor(uid: uid, multiplier: this.settings.tax);
+  }
+
+  double _getConfirmedValueFor({required String uid, double? multiplier}) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
       0,
       (previousValue, item) =>
           previousValue +
-          item.getSharedValueFor(uid: uid, tax: this.settings.tax),
-    );
-  }
-
-  double getConfirmedTaxForUser(String uid) {
-    if (!this.hasAssignee(uid)) return 0;
-    if (!this.hasTax) return 0;
-
-    return items.fold<double>(
-      0,
-      (previousValue, item) =>
-          previousValue + item.getTaxValueFor(uid: uid, tax: this.settings.tax),
+          item.getConfirmedValueFor(uid: uid, multiplier: multiplier),
     );
   }
 

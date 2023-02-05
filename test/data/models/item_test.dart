@@ -150,6 +150,6 @@ createSharedValueTest(
             ))
         .toList();
 
-    expect(item.getSharedValueFor('0'), expectedValue);
+    expect(item.getConfirmedValueFor('0'), expectedValue);
   });
 }

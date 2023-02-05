@@ -42,22 +42,13 @@ class Item {
 
   bool get isPartitioned => partition > 1;
 
-  double getSharedValueFor({required String uid, double? tax}) {
-    final valueWithTax = value * (1 + (tax ?? 0));
-    final confirmedPartition = isPartitioned ? partition : confirmedParts;
+  double getConfirmedValueFor({required String uid, double? multiplier}) {
     if (confirmedParts == 0) return 0;
 
-    return valueWithTax * getAssigneeParts(uid) / confirmedPartition;
-  }
-
-  double getTaxValueFor({required String uid, double? tax}) {
-    if (tax == null) return 0;
-
-    final taxValue = value * tax;
+    final totalValue = value * (multiplier ?? 1);
     final confirmedPartition = isPartitioned ? partition : confirmedParts;
-    if (confirmedParts == 0) return 0;
 
-    return taxValue * getAssigneeParts(uid) / confirmedPartition;
+    return totalValue * getAssigneeParts(uid) / confirmedPartition;
   }
 
   bool get completed =>
