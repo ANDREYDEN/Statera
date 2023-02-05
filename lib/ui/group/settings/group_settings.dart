@@ -107,7 +107,16 @@ class GroupSettings extends StatelessWidget {
                 },
               ),
               SwitchListTile(
-                title: Text('Apply tax to each item'),
+                title: Row(
+                  children: [
+                    Text('Apply tax to items'),
+                    SizedBox(width: 5),
+                    Tooltip(
+                      message: 'You can change this for each item',
+                      child: Icon(Icons.info, size: 20),
+                    )
+                  ],
+                ),
                 value: group.defaultExpenseSettings.tax != null,
                 onChanged: (isOn) {
                   final groupCubit = context.read<GroupCubit>();
@@ -119,7 +128,7 @@ class GroupSettings extends StatelessWidget {
               ),
               if (group.defaultExpenseSettings.tax != null)
                 SettingInput(
-                  label: 'Amount of tax to apply to each item',
+                  label: 'Amount of tax to apply',
                   initialValue: group.defaultExpenseSettings.tax.toString(),
                   formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
                   validators: [FieldData.constrainedDoubleValidator(0, 1)],

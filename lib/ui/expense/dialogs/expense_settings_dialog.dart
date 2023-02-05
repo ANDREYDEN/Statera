@@ -32,12 +32,12 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         ),
         FieldData(
           id: 'is_taxable',
-          label: 'Apply tax to each item',
+          label: 'Apply tax to items',
           initialData: widget.expense.settings.tax != null,
         ),
         FieldData(
             id: 'tax',
-            label: 'Amount of tax to apply to each item',
+            label: 'Amount of tax to apply',
             initialData: widget.expense.settings.tax ?? 0.13,
             formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
             validators: [FieldData.constrainedDoubleValidator(0, 1)],
