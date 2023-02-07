@@ -37,11 +37,6 @@ class Expense {
     this.settings = settings ?? ExpenseSettings();
   }
 
-  Expense.fake({this.authorUid = 'foo', this.name = 'foo'}) {
-    this.date = DateTime.now();
-    this.settings = ExpenseSettings();
-  }
-
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
     if (other.date == null) return false;
