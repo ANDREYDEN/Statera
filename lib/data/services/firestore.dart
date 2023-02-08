@@ -33,7 +33,7 @@ class Firestore {
     }
 
     if (authorId != null) {
-      query = query.where('author.uid', isEqualTo: authorId);
+      query = query.where('authorUid', isEqualTo: authorId);
     }
 
     if (unmarkedAssigneeId != null) {
