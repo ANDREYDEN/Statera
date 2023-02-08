@@ -3,8 +3,10 @@ import { getExpenseNotificationTokens } from './notificationUtils'
 
 export async function notifyWhenExpenseCreated(expenseSnap: firestore.QueryDocumentSnapshot) {
   const groupId = expenseSnap.data().groupId
-  const authorName = expenseSnap.data()?.author?.name ?? 'anonymous'
   const group = await firestore().collection('groups').doc(groupId).get()
+  const authorUid = expenseSnap.data()?.authorUid
+  const author = group.data()?.members.find((m: any) => m.uid === authorUid)
+  const authorName = author?.name || 'anonymous'
   const userTokens = await getExpenseNotificationTokens(expenseSnap)
   console.log('Retrieved tokens:', userTokens)
 
