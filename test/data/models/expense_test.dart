@@ -167,6 +167,14 @@ void main() {
       expect(expense.definedAssignees, 1);
     });
 
+    test('has tax when tax setting is set', () {
+      expect(expense.hasTax, isFalse);
+
+      expense.settings.tax = 0.1;
+
+      expect(expense.hasTax, isTrue);
+    });
+
     group('calculating totals', () {
       group('gets the total of its items', () {
         test('when no items have tax', () {
@@ -201,11 +209,12 @@ void main() {
         });
       });
 
-      group('gets confirmed total for assignees', () {
+      group('gets confirmed totals for assignees', () {
         var firstAssigneeUid = 'first';
         var secondAssigneeUid = 'second';
         var item1 = Item(name: 'big', value: 124);
         var item2 = Item(name: 'small', value: 42, partition: 3);
+
         setUp(() {
           expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
 
@@ -267,18 +276,60 @@ void main() {
           expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 0);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 0);
         });
-      });
 
-      group('gets confirmed subtotal for assignees', () {
-        var firstAssigneeUid = 'first';
-        var secondAssigneeUid = 'second';
-        var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42, partition: 3);
-        setUp(() {
-          expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
+        test('when expense has tax and no items are taxable', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
 
-          expense.addItem(item1);
-          expense.addItem(item2);
+          item1.setAssigneeDecision(firstAssigneeUid, 0);
+          item2.setAssigneeDecision(firstAssigneeUid, 1);
+
+          item2.setAssigneeDecision(secondAssigneeUid, 2);
+
+          expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 0);
+          expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 28);
+          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 28);
+          expect(expense.getConfirmedTaxForUser(secondAssigneeUid), 0);
+        });
+
+        test('when expense has tax and some items are taxable', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
+          item1.isTaxable = true;
+
+          item1.setAssigneeDecision(firstAssigneeUid, 0);
+          item2.setAssigneeDecision(firstAssigneeUid, 1);
+
+          item1.setAssigneeDecision(secondAssigneeUid, 1);
+
+          expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 0);
+          expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 136.4);
+          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 124);
+          expect(expense.getConfirmedTaxForUser(secondAssigneeUid), 12.4);
+        });
+
+        test('when expense has tax and all items are taxable', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
+          item1.isTaxable = true;
+          item2.isTaxable = true;
+
+          item1.setAssigneeDecision(firstAssigneeUid, 1);
+          item2.setAssigneeDecision(firstAssigneeUid, 1);
+
+          item2.setAssigneeDecision(secondAssigneeUid, 2);
+
+          expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 151.8);
+          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 138);
+          expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 13.8);
+          expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 30.8);
+          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 28);
+          expect(expense.getConfirmedTaxForUser(secondAssigneeUid),
+              closeTo(2.8, 0.01));
         });
       });
     });
@@ -346,21 +397,20 @@ void main() {
     });
 
     group('conversion', () {
-      test('expense can be converted to Firestore object', () {
+      test('expense can be converted to an from a Firestore object', () {
         var expense = Expense(
           name: 'foo',
           authorUid: authorUid,
           groupId: '123',
         );
+        expense.date = null;
 
-        var firestoreData = expense.toFirestore();
-
-        expect(firestoreData['name'], expense.name);
-        expect(firestoreData['authorUid'], expense.authorUid);
-        expect(
-          expense.date!.difference(firestoreData['date']),
-          lessThan(Duration(seconds: 1)),
+        var firestoreExpense = Expense.fromFirestore(
+          expense.toFirestore(),
+          expense.id,
         );
+        expect(expense, firestoreExpense);
+        expect(expense == firestoreExpense, isTrue);
       });
     });
   });

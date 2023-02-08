@@ -126,6 +126,7 @@ void main() {
           itemWithTax,
           condition: 'item has tax and calculating only tax',
           tax: 0.1,
+          taxOnly: true,
           partsList: [1, 1, 0],
           expectedValues: [
             item.value * 0.1 / 2,
@@ -190,6 +191,7 @@ void main() {
           partitionedItemWithTax,
           condition: 'item has tax and calculating only tax',
           tax: 0.1,
+          taxOnly: true,
           partsList: [1, 2, 0],
           expectedValues: [
             item.value * 0.1 / item.partition,
