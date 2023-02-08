@@ -10,13 +10,14 @@ class ItemListItem extends StatelessWidget {
   final bool showDecisions;
   final void Function(int) onChangePartition;
   final void Function()? onLongPress;
+  final double? expenseTax;
 
   const ItemListItem({
     Key? key,
     required this.item,
     this.showDecisions = false,
     required this.onChangePartition,
-    this.onLongPress,
+    this.onLongPress, this.expenseTax,
   }) : super(key: key);
 
   @override
@@ -35,6 +36,7 @@ class ItemListItem extends StatelessWidget {
             PriceText(
               value: item.value,
               textStyle: Theme.of(context).textTheme.subtitle1,
+              withTaxPostfix: expenseTax != null && item.isTaxable,
             ),
             ElevatedButton(
               onPressed: () =>
