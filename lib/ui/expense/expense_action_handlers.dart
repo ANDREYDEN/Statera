@@ -69,7 +69,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
       onSubmit: (values) {
         item.name = values['item_name']!;
         item.value = values['item_value']!;
-        item.isTaxable = values['item_taxable']!;
+        item.isTaxable = values['item_taxable'] ?? false;
         var newPartition = values['item_partition']!;
         if (addingItem || newPartition != intialItem!.partition) {
           item.resetAssigneeDecisions();

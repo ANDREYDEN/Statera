@@ -45,6 +45,12 @@ class Item {
 
   bool get isPartitioned => partition > 1;
 
+  double getValueWithTax(double? tax) {
+    if (tax == null || !isTaxable) return value;
+
+    return value * (1 + tax);
+  }
+
   double getConfirmedValueFor({
     required String uid,
     double? tax,

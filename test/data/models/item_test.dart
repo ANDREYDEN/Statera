@@ -64,7 +64,10 @@ void main() {
           for (var i = 0; i < partsList.length; i++) {
             expect(
               item.getConfirmedValueFor(
-                  uid: i.toString(), tax: tax, taxOnly: taxOnly),
+                uid: i.toString(),
+                tax: tax,
+                taxOnly: taxOnly,
+              ),
               expectedValues[i],
             );
           }
@@ -115,6 +118,18 @@ void main() {
           expectedValues: [
             item.value * (1 + 0.1) / 2,
             item.value * (1 + 0.1) / 2,
+            0.0
+          ],
+        );
+
+        createSharedValueTest(
+          itemWithTax,
+          condition: 'item has tax and calculating only tax',
+          tax: 0.1,
+          partsList: [1, 1, 0],
+          expectedValues: [
+            item.value * 0.1 / 2,
+            item.value * 0.1 / 2,
             0.0
           ],
         );
@@ -170,6 +185,18 @@ void main() {
             0.0
           ],
         );
+
+        createSharedValueTest(
+          partitionedItemWithTax,
+          condition: 'item has tax and calculating only tax',
+          tax: 0.1,
+          partsList: [1, 2, 0],
+          expectedValues: [
+            item.value * 0.1 / item.partition,
+            item.value * 0.1 * 2 / item.partition,
+            0.0
+          ],
+        );
       });
     });
 
@@ -209,9 +236,7 @@ void main() {
 
       var originalParts = 1;
       var assignee = AssigneeDecision(uid: '1', parts: originalParts);
-      item.assignees = [
-        assignee
-      ];
+      item.assignees = [assignee];
 
       item.setAssigneeDecision(assignee.uid, 4);
 

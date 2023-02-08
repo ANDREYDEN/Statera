@@ -109,22 +109,19 @@ void main() {
       });
     });
 
-    test(
-      'is completed when all assignees have completed their markings',
-      () {
-        var firstAssigneeUid = 'first';
-        var secondAssigneeUid = 'second';
-        expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
+    test('is completed when all assignees have completed their markings', () {
+      var firstAssigneeUid = 'first';
+      var secondAssigneeUid = 'second';
+      expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
 
-        var item = Item(name: 'asd', value: 123);
-        expense.addItem(item);
+      var item = Item(name: 'asd', value: 123);
+      expense.addItem(item);
 
-        item.setAssigneeDecision(firstAssigneeUid, 1);
-        item.setAssigneeDecision(secondAssigneeUid, 0);
+      item.setAssigneeDecision(firstAssigneeUid, 1);
+      item.setAssigneeDecision(secondAssigneeUid, 0);
 
-        expect(expense.completed, isTrue);
-      },
-    );
+      expect(expense.completed, isTrue);
+    });
 
     test('is marked by an assignee if all products are marked', () {
       expense.assigneeUids = [assigneeUid];
@@ -171,13 +168,37 @@ void main() {
     });
 
     group('calculating totals', () {
-      test('gets the total of its items', () {
-        var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42);
-        expense.addItem(item1);
-        expense.addItem(item2);
+      group('gets the total of its items', () {
+        test('when no items have tax', () {
+          var item1 = Item(name: 'big', value: 124);
+          var item2 = Item(name: 'small', value: 42);
+          expense.addItem(item1);
+          expense.addItem(item2);
 
-        expect(expense.total, item1.value + item2.value);
+          expect(expense.total, item1.value + item2.value);
+        });
+
+        test('when some items have tax', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
+          var item1 = Item(name: 'big', value: 124);
+          var item2 = Item(name: 'small', value: 42, isTaxable: true);
+          expense.addItem(item1);
+          expense.addItem(item2);
+
+          expect(expense.total, item1.value + item2.value * (1 + tax));
+        });
+
+        test('when all items have tax', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
+          var item1 = Item(name: 'big', value: 124, isTaxable: true);
+          var item2 = Item(name: 'small', value: 42, isTaxable: true);
+          expense.addItem(item1);
+          expense.addItem(item2);
+
+          expect(expense.total, (item1.value + item2.value) * (1 + tax));
+        });
       });
 
       group('gets confirmed total for assignees', () {
@@ -245,6 +266,19 @@ void main() {
 
           expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 0);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 0);
+        });
+      });
+
+      group('gets confirmed subtotal for assignees', () {
+        var firstAssigneeUid = 'first';
+        var secondAssigneeUid = 'second';
+        var item1 = Item(name: 'big', value: 124);
+        var item2 = Item(name: 'small', value: 42, partition: 3);
+        setUp(() {
+          expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
+
+          expense.addItem(item1);
+          expense.addItem(item2);
         });
       });
     });

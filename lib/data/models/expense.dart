@@ -49,7 +49,7 @@ class Expense {
   double get total => items.fold<double>(
       0,
       (previousValue, item) =>
-          previousValue + item.value * (1 + (this.settings.tax ?? 0)));
+          previousValue + item.getValueWithTax(this.settings.tax));
 
   bool isIn(ExpenseStage stage) => stage.test(this);
 
