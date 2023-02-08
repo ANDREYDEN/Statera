@@ -11,6 +11,7 @@ class ExpenseSettings {
   ExpenseSettings({
     this.acceptNewMembers = true,
     this.showItemDecisions = true,
+    this.tax,
   });
 
   ExpenseSettings.fromFirestore(Map<String, dynamic> data)
