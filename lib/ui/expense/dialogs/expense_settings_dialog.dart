@@ -52,7 +52,6 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         } else {
           widget.expense.settings.tax = null;
         }
-        Navigator.pop(context, true);
       },
     );
   }
