@@ -129,10 +129,7 @@ class _GroupListState extends State<GroupList> {
             id: 'debt_threshold',
             label: 'Debt Threshold',
             initialData: newGroup.debtThreshold,
-            validators: [
-              FieldData.requiredValidator,
-              FieldData.doubleValidator
-            ],
+            validators: [FieldData.requiredValidator],
             formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
             isAdvanced: true,
           ),
@@ -140,7 +137,7 @@ class _GroupListState extends State<GroupList> {
         onSubmit: (values) async {
           newGroup.name = values['name']!;
           newGroup.currencySign = values['currency']!;
-          newGroup.debtThreshold = double.parse(values['debt_threshold']!);
+          newGroup.debtThreshold = values['debt_threshold']!;
 
           groupsCubit.addGroup(newGroup, authBloc.uid);
         },

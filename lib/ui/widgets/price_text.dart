@@ -6,9 +6,14 @@ import 'package:statera/ui/widgets/loader.dart';
 class PriceText extends StatelessWidget {
   final double value;
   final TextStyle? textStyle;
+  final bool withTaxPostfix;
 
-  const PriceText({Key? key, required this.value, this.textStyle})
-      : super(key: key);
+  const PriceText({
+    Key? key,
+    required this.value,
+    this.textStyle,
+    this.withTaxPostfix = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,8 @@ class PriceText extends StatelessWidget {
 
         if (groupState is GroupLoaded) {
           return Text(
-            groupState.group.renderPrice(value),
+            groupState.group.renderPrice(value) +
+                (withTaxPostfix ? ' + tax' : ''),
             style: textStyle,
           );
         }

@@ -29,6 +29,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
   final authBloc = context.read<AuthBloc>();
   final expenseBloc = context.read<ExpenseBloc>();
   final addingItem = intialItem == null;
+  final item = intialItem ?? Item(name: '', value: 0, isTaxable: true);
 
   showDialog(
     context: context,
@@ -38,35 +39,41 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
         FieldData(
           id: 'item_name',
           label: 'Item Name',
-          initialData: intialItem?.name,
+          initialData: item.name,
           validators: [FieldData.requiredValidator],
         ),
         FieldData(
           id: 'item_value',
           label: 'Item Value',
-          initialData: intialItem?.value,
-          inputType: TextInputType.numberWithOptions(decimal: true),
-          validators: [FieldData.requiredValidator, FieldData.doubleValidator],
+          initialData: item.value,
+          validators: [FieldData.requiredValidator],
           formatters: [CommaReplacerTextInputFormatter()],
         ),
         FieldData(
           id: 'item_partition',
           label: 'Item Parts',
-          inputType: TextInputType.number,
-          initialData: intialItem?.partition ?? 1,
-          validators: [FieldData.requiredValidator, FieldData.intValidator],
+          initialData: item.partition,
+          validators: [FieldData.requiredValidator],
           formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
           isAdvanced: true,
         ),
+        if (expenseBloc.state is ExpenseLoaded &&
+            (expenseBloc.state as ExpenseLoaded).expense.hasTax)
+          FieldData(
+            id: 'item_taxable',
+            label: 'Apply tax to item',
+            initialData: item.isTaxable,
+            isAdvanced: true,
+          ),
       ],
       onSubmit: (values) {
-        final newItem = intialItem ?? Item(name: '', value: 0);
-        newItem.name = values['item_name']!;
-        newItem.value = double.parse(values['item_value']!);
-        var newPartition = int.parse(values['item_partition']!);
+        item.name = values['item_name']!;
+        item.value = values['item_value']!;
+        item.isTaxable = values['item_taxable'] ?? false;
+        var newPartition = values['item_partition']!;
         if (addingItem || newPartition != intialItem!.partition) {
-          newItem.resetAssigneeDecisions();
-          newItem.partition = newPartition;
+          item.resetAssigneeDecisions();
+          item.partition = newPartition;
         }
 
         expenseBloc.add(
@@ -74,9 +81,9 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
             issuer: authBloc.user,
             update: (expense) {
               if (addingItem) {
-                expense.addItem(newItem);
+                expense.addItem(item);
               } else {
-                expense.updateItem(newItem);
+                expense.updateItem(item);
               }
             },
           ),

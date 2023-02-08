@@ -37,11 +37,6 @@ class Expense {
     this.settings = settings ?? ExpenseSettings();
   }
 
-  Expense.fake({this.authorUid = 'foo', this.name = 'foo'}) {
-    this.date = DateTime.now();
-    this.settings = ExpenseSettings();
-  }
-
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
     if (other.date == null) return false;
@@ -49,8 +44,12 @@ class Expense {
     return this.date!.compareTo(other.date!) < 0;
   }
 
+  bool get hasTax => settings.tax != null;
+
   double get total => items.fold<double>(
-      0, (previousValue, item) => previousValue + item.value);
+      0,
+      (previousValue, item) =>
+          previousValue + item.getValueWithTax(this.settings.tax));
 
   bool isIn(ExpenseStage stage) => stage.test(this);
 
@@ -154,12 +153,34 @@ class Expense {
     });
   }
 
+  double getConfirmedSubTotalForUser(String uid) {
+    return _getConfirmedValueFor(uid: uid, tax: 0);
+  }
+
   double getConfirmedTotalForUser(String uid) {
+    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax);
+  }
+
+  double getConfirmedTaxForUser(String uid) {
+    return _getConfirmedValueFor(
+      uid: uid,
+      tax: this.settings.tax,
+      taxOnly: true,
+    );
+  }
+
+  double _getConfirmedValueFor({
+    required String uid,
+    double? tax,
+    bool taxOnly = false,
+  }) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
       0,
-      (previousValue, item) => previousValue + item.getSharedValueFor(uid),
+      (previousValue, item) =>
+          previousValue +
+          item.getConfirmedValueFor(uid: uid, tax: tax, taxOnly: taxOnly),
     );
   }
 

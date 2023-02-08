@@ -4,7 +4,7 @@ import 'package:statera/data/models/item.dart';
 
 void main() {
   group('Item', () {
-    late Item item = Item(name: "foo", value: 145.0);
+    late Item item = Item(name: 'foo', value: 145.0);
 
     test('gets the number of assignees that confirmed the item', () {
       var assignee1 = AssigneeDecision(uid: '1');
@@ -33,123 +33,216 @@ void main() {
       expect(item.completed, isTrue);
     });
 
-    group('calculates the shared value for not partitioned item', () {
-      var item = Item(name: "foo", value: 145.0);
+    group('calculates the shared value', () {
+      var item = Item(name: 'foo', value: 145.0);
+      var itemWithTax = Item(name: 'foo', value: 145.0, isTaxable: true);
+      var partitionedItem = Item(name: 'foo', value: 145.0, partition: 3);
+      var partitionedItemWithTax = Item(
+        name: 'foo',
+        value: 145.0,
+        partition: 3,
+        isTaxable: true,
+      );
 
-      createSimpleSharedValueTest(
-          {condition, partsList, value, expectedValue}) {
-        createSharedValueTest(
-          item,
-          condition: condition,
-          partsList: partsList,
-          value: value,
-          expectedValue: expectedValue,
-        );
+      createSharedValueTest(
+        Item item, {
+        required String condition,
+        required List<int?> partsList,
+        required List<double> expectedValues,
+        double? tax,
+        bool taxOnly = false,
+      }) {
+        test('when $condition', () {
+          item.assignees = [];
+          for (var i = 0; i < partsList.length; i++) {
+            item.assignees.add(AssigneeDecision(
+              uid: i.toString(),
+              parts: partsList[i],
+            ));
+          }
+
+          for (var i = 0; i < partsList.length; i++) {
+            expect(
+              item.getConfirmedValueFor(
+                uid: i.toString(),
+                tax: tax,
+                taxOnly: taxOnly,
+              ),
+              expectedValues[i],
+            );
+          }
+        });
       }
 
-      createSimpleSharedValueTest(
-        condition: "accepted together with someone else",
-        partsList: [1, 0, 1],
-        value: item.value,
-        expectedValue: item.value / 2,
-      );
-
-      createSimpleSharedValueTest(
-        condition: "accepted and everyone else is undefined",
-        partsList: [1, null, null],
-        value: item.value,
-        expectedValue: item.value,
-      );
-
-      createSimpleSharedValueTest(
-        condition: "everybody denied",
-        partsList: [0, 0, 0],
-        value: item.value,
-        expectedValue: 0.0,
-      );
-
-      createSimpleSharedValueTest(
-        condition: "undefined and everybody else denied",
-        partsList: [null, 0, 0],
-        value: item.value,
-        expectedValue: 0.0,
-      );
-
-      createSimpleSharedValueTest(
-        condition: "denied but others did something else",
-        partsList: [0, 0, 0],
-        value: item.value,
-        expectedValue: 0.0,
-      );
-    });
-
-    group('calculates the shared value for partitioned item', () {
-      var item = Item(name: "foo", value: 145.0, partition: 3);
-
-      createPartitionedSharedValueTest(
-          {condition, partsList, value, expectedValue}) {
+      group('when not partitioned', () {
         createSharedValueTest(
           item,
-          condition: condition,
-          partsList: partsList,
-          value: value,
-          expectedValue: expectedValue,
+          condition: 'noone marked',
+          partsList: [null, null, null],
+          expectedValues: [0.0, 0.0, 0.0],
         );
-      }
 
-      createPartitionedSharedValueTest(
-        condition: "everybody accepted 1 part",
-        partsList: [1, 1, 1],
-        value: item.value,
-        expectedValue: item.value / 3,
-      );
+        createSharedValueTest(
+          item,
+          condition: '2 peope accepted and 1 denied',
+          partsList: [1, 0, 1],
+          expectedValues: [item.value / 2, 0.0, item.value / 2],
+        );
 
-      createPartitionedSharedValueTest(
-        condition: "accepted 2 and everyone else undefined",
-        partsList: [2, null, null],
-        value: item.value,
-        expectedValue: item.value * 2 / 3,
-      );
+        createSharedValueTest(
+          item,
+          condition: 'someone accepted and everyone else did not mark',
+          partsList: [1, null, null],
+          expectedValues: [item.value, 0.0, 0.0],
+        );
 
-      createPartitionedSharedValueTest(
-        condition: "accepted all and everyone else denied",
-        partsList: [3, 0, 0],
-        value: item.value,
-        expectedValue: item.value,
-      );
+        createSharedValueTest(
+          item,
+          condition: 'someone accepted more than 1 part',
+          partsList: [2, 1, null],
+          expectedValues: [item.value / 2, item.value / 2, 0.0],
+        );
 
-      createPartitionedSharedValueTest(
-        condition: "everyone denied",
-        partsList: [0, 0, 0],
-        value: item.value,
-        expectedValue: 0.0,
-      );
+        createSharedValueTest(
+          item,
+          condition: 'everybody denied',
+          partsList: [0, 0, 0],
+          expectedValues: [0.0, 0.0, 0.0],
+        );
 
-      createPartitionedSharedValueTest(
-        condition: "undefined and everybody else did something else",
-        partsList: [null, 0, 2],
-        value: item.value,
-        expectedValue: 0.0,
-      );
+        createSharedValueTest(
+          itemWithTax,
+          condition: 'item has tax',
+          tax: 0.1,
+          partsList: [1, 1, 0],
+          expectedValues: [
+            item.value * (1 + 0.1) / 2,
+            item.value * (1 + 0.1) / 2,
+            0.0
+          ],
+        );
+
+        createSharedValueTest(
+          itemWithTax,
+          condition: 'item has tax and calculating only tax',
+          tax: 0.1,
+          taxOnly: true,
+          partsList: [1, 1, 0],
+          expectedValues: [
+            item.value * 0.1 / 2,
+            item.value * 0.1 / 2,
+            0.0
+          ],
+        );
+      });
+
+      group('when partitioned', () {
+        var item = Item(name: 'foo', value: 145.0, partition: 3);
+
+        createSharedValueTest(
+          partitionedItem,
+          condition: 'noone marked',
+          partsList: [null, null, null],
+          expectedValues: [0.0, 0.0, 0.0],
+        );
+
+        createSharedValueTest(
+          partitionedItem,
+          condition: 'everybody accepted 1 part',
+          partsList: [1, 1, 1],
+          expectedValues:
+              List<double>.generate(3, (_) => item.value / item.partition),
+        );
+
+        createSharedValueTest(
+          partitionedItem,
+          condition: 'someone accepted 2 parts and everyone else did not mark',
+          partsList: [2, null, null],
+          expectedValues: [item.value * 2 / item.partition, 0.0, 0.0],
+        );
+
+        createSharedValueTest(
+          partitionedItem,
+          condition: 'someone accepted all parts and everyone else denied',
+          partsList: [3, 0, 0],
+          expectedValues: [item.value, 0.0, 0.0],
+        );
+
+        createSharedValueTest(
+          partitionedItem,
+          condition: 'everyone denied',
+          partsList: [0, 0, 0],
+          expectedValues: [0.0, 0.0, 0.0],
+        );
+
+        createSharedValueTest(
+          partitionedItemWithTax,
+          condition: 'item has tax',
+          tax: 0.1,
+          partsList: [1, 2, 0],
+          expectedValues: [
+            item.value * (1 + 0.1) / item.partition,
+            item.value * (1 + 0.1) * 2 / item.partition,
+            0.0
+          ],
+        );
+
+        createSharedValueTest(
+          partitionedItemWithTax,
+          condition: 'item has tax and calculating only tax',
+          tax: 0.1,
+          taxOnly: true,
+          partsList: [1, 2, 0],
+          expectedValues: [
+            item.value * 0.1 / item.partition,
+            item.value * 0.1 * 2 / item.partition,
+            0.0
+          ],
+        );
+      });
     });
-  });
-}
 
-createSharedValueTest(
-  Item item, {
-  required String condition,
-  required List<int?> partsList,
-  required double value,
-  required double expectedValue,
-}) {
-  test('when $condition', () {
-    item.assignees = partsList
-        .map((parts) => AssigneeDecision(
-              uid: partsList.indexOf(parts).toString(),
-              parts: parts,
-            ))
-        .toList();
+    test('can be converted to and from a firestore object', () {
+      var item = Item(
+        name: 'foo',
+        value: 145.0,
+        partition: 3,
+        isTaxable: true,
+        assigneeUids: ['1', '2', '3'],
+      );
 
-    expect(item.getSharedValueFor('0'), expectedValue);
+      var firestoreItem = Item.fromFirestore(item.toFirestore());
+
+      expect(firestoreItem, item);
+      expect(firestoreItem == item, true);
+    });
+
+    test('can reset its assignee desicions', () {
+      var item = Item(name: 'foo', value: 145.0, assigneeUids: ['1', '2', '3']);
+
+      item.assignees = [
+        AssigneeDecision(uid: '1', parts: 1),
+        AssigneeDecision(uid: '2', parts: 2),
+        AssigneeDecision(uid: '3', parts: 0),
+      ];
+
+      item.resetAssigneeDecisions();
+
+      for (var assignee in item.assignees) {
+        expect(assignee.parts, isNull);
+      }
+    });
+
+    test('can not set assignee decision higher than remaining partition', () {
+      var item = Item(name: 'foo', value: 145.0, partition: 3);
+
+      var originalParts = 1;
+      var assignee = AssigneeDecision(uid: '1', parts: originalParts);
+      item.assignees = [assignee];
+
+      item.setAssigneeDecision(assignee.uid, 4);
+
+      expect(assignee.parts, originalParts);
+    });
   });
 }
