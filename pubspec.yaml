@@ -55,6 +55,7 @@ dependencies:
   package_info_plus: ^1.4.3
   flutter_dotenv: ^5.0.2
   app_settings: ^4.1.8
+  dynamic_color: ^1.6.2
 
 dev_dependencies:
   flutter_test:
