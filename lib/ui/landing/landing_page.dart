@@ -1,20 +1,25 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main(List<String> args) {
-  runApp(MaterialApp(
-    title: kAppName,
-    theme: theme,
-    darkTheme: darkTheme,
-    themeMode: ThemeMode.system,
-    initialRoute: GroupList.route,
-    debugShowCheckedModeBanner: false,
-    home: LandingPage(),
+  runApp(CustomThemeBuilder(
+    builder: (lightTheme, darkTheme) {
+      return MaterialApp(
+        title: kAppName,
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
+        initialRoute: GroupList.route,
+        debugShowCheckedModeBanner: false,
+        home: LandingPage(),
+      );
+    },
   ));
 }
 
