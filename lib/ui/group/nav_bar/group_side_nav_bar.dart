@@ -15,34 +15,16 @@ class GroupSideNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 50,
-      child: ListView(
-        children: [
-          for (var i = 0; i < items.length; i++)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: () => onItemSelected(i),
-                  icon: items[i].wrapper(
-                    Icon(
-                      i == selectedItem ? items[i].activeIcon : items[i].icon,
-                      color:
-                          i == selectedItem ? Colors.black : Colors.grey[600],
-                    ),
-                  ),
-                ),
-                Text(
-                  items[i].label,
-                  style: TextStyle(
-                      color:
-                          i == selectedItem ? Colors.black : Colors.grey[600]),
-                ),
-              ],
-            ),
-        ],
-      ),
+    return NavigationRail(
+      destinations: items
+          .map((item) => NavigationRailDestination(
+                icon: item.wrapper(Icon(item.icon)),
+                label: item.wrapper(Text(item.label)),
+                selectedIcon: Icon(item.activeIcon),
+              ))
+          .toList(),
+      selectedIndex: selectedItem,
+      onDestinationSelected: onItemSelected,
     );
   }
 }
