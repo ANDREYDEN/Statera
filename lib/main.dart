@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
@@ -64,14 +65,18 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: MaterialApp(
-                title: kAppName,
-                theme: theme,
-                darkTheme: darkTheme,
-                themeMode: ThemeMode.system,
-                initialRoute: initialRoute ?? defaultRoute,
-                onGenerateRoute: onGenerateRoute,
-                debugShowCheckedModeBanner: false,
+              child: CustomThemeBuilder(
+                builder: (lightTheme, darkTheme) {
+                  return MaterialApp(
+                    title: kAppName,
+                    theme: lightTheme,
+                    darkTheme: darkTheme,
+                    themeMode: ThemeMode.system,
+                    initialRoute: initialRoute ?? defaultRoute,
+                    onGenerateRoute: onGenerateRoute,
+                    debugShowCheckedModeBanner: false,
+                  );
+                },
               ),
             );
           },
