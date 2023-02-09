@@ -154,7 +154,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
   }
 
   return MaterialPageRoute(
-    settings: RouteSettings(arguments: settings.arguments, name: route),
+    settings: RouteSettings(name: route, arguments: settings.arguments),
     builder: builder,
   );
 }

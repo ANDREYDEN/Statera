@@ -66,6 +66,7 @@ class ItemsList extends StatelessWidget {
                                         index,
                                       )
                                   : (p) {},
+                              expenseTax: expense.settings.tax,
                             ),
                           );
                         },
