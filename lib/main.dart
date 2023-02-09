@@ -1,4 +1,3 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
@@ -65,28 +65,12 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: DynamicColorBuilder(
-                builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-                  ColorScheme lightColorScheme;
-                  ColorScheme darkColorScheme;
-
-                  if (lightDynamic != null && darkDynamic != null) {
-                    lightColorScheme = lightDynamic.harmonized();
-                    darkColorScheme = darkDynamic.harmonized();
-                  } else {
-                    lightColorScheme = ColorScheme.fromSeed(
-                      seedColor: Colors.white,
-                    );
-                    darkColorScheme = ColorScheme.fromSeed(
-                      seedColor: Colors.black,
-                      brightness: Brightness.dark,
-                    );
-                  }
-
+              child: CustomThemeBuilder(
+                builder: (lightTheme, darkTheme) {
                   return MaterialApp(
                     title: kAppName,
-                    theme: buildTheme(lightColorScheme),
-                    darkTheme: buildTheme(darkColorScheme),
+                    theme: lightTheme,
+                    darkTheme: darkTheme,
                     themeMode: ThemeMode.system,
                     initialRoute: initialRoute ?? defaultRoute,
                     onGenerateRoute: onGenerateRoute,

@@ -4,13 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
-import 'package:statera/utils/theme.dart';
 
 class MockUser extends Mock implements User {
   String get uid =>
@@ -59,65 +59,69 @@ class ItemListItemPreview extends StatelessWidget {
       assigneeUids: [me.uid, other.uid, another.uid],
     );
 
-    return MaterialApp(
-      theme: theme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.light,
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => GroupCubit(
-              MockGroupService(),
-              MockExpenseService(),
-              MockUserRepository(),
-            )..loadGroup(Group(
-                name: 'Example',
-                members: [me, other, another],
-              )),
-          ),
-          BlocProvider(
-            create: (_) => AuthBloc(authService),
-          )
-        ],
-        child: Scaffold(
-          body: ListView(
-            children: [
-              ItemListItem(
-                item: simpleItem,
-                onChangePartition: (_) {},
+    return CustomThemeBuilder(
+      builder: (lightTheme, darkTheme) {
+        return MaterialApp(
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: ThemeMode.light,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => GroupCubit(
+                  MockGroupService(),
+                  MockExpenseService(),
+                  MockUserRepository(),
+                )..loadGroup(Group(
+                    name: 'Example',
+                    members: [me, other, another],
+                  )),
               ),
-              ItemListItem(
-                item: simpleItem
-                  ..setAssigneeDecision(me.uid, 0)
-                  ..setAssigneeDecision(other.uid, 1),
-                onChangePartition: (_) {},
-              ),
-              ItemListItem(
-                item: simpleItem
-                  ..setAssigneeDecision(me.uid, 1)
-                  ..setAssigneeDecision(other.uid, 1),
-                onChangePartition: (_) {},
-              ),
-              ItemListItem(
-                item: simpleItem
-                  ..setAssigneeDecision(me.uid, 1)
-                  ..setAssigneeDecision(other.uid, 1)
-                  ..setAssigneeDecision(another.uid, 1),
-                onChangePartition: (_) {},
-                showDecisions: true,
-              ),
-              ItemListItem(
-                item: partitionedItem
-                  ..setAssigneeDecision(me.uid, 2)
-                  ..setAssigneeDecision(other.uid, 1)
-                  ..setAssigneeDecision(another.uid, 2),
-                onChangePartition: (_) {},
-                showDecisions: true,
+              BlocProvider(
+                create: (_) => AuthBloc(authService),
               )
             ],
+            child: Scaffold(
+              body: ListView(
+                children: [
+                  ItemListItem(
+                    item: simpleItem,
+                    onChangePartition: (_) {},
+                  ),
+                  ItemListItem(
+                    item: simpleItem
+                      ..setAssigneeDecision(me.uid, 0)
+                      ..setAssigneeDecision(other.uid, 1),
+                    onChangePartition: (_) {},
+                  ),
+                  ItemListItem(
+                    item: simpleItem
+                      ..setAssigneeDecision(me.uid, 1)
+                      ..setAssigneeDecision(other.uid, 1),
+                    onChangePartition: (_) {},
+                  ),
+                  ItemListItem(
+                    item: simpleItem
+                      ..setAssigneeDecision(me.uid, 1)
+                      ..setAssigneeDecision(other.uid, 1)
+                      ..setAssigneeDecision(another.uid, 1),
+                    onChangePartition: (_) {},
+                    showDecisions: true,
+                  ),
+                  ItemListItem(
+                    item: partitionedItem
+                      ..setAssigneeDecision(me.uid, 2)
+                      ..setAssigneeDecision(other.uid, 1)
+                      ..setAssigneeDecision(another.uid, 2),
+                    onChangePartition: (_) {},
+                    showDecisions: true,
+                  )
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
