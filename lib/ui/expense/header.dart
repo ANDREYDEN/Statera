@@ -59,13 +59,14 @@ class Header extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Icon(Icons.schedule, size: 20),
+                      Icon(Icons.schedule, size: 20, color: Colors.black),
                       TextButton(
                         onPressed: expenseCanBeUpdated
                             ? () => _handleDateClick(context)
                             : null,
                         child: Text(
                           toStringDate(expense.date) ?? 'Not set',
+                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ],
@@ -81,7 +82,7 @@ class Header extends StatelessWidget {
                               : null,
                         );
                       }),
-                      Icon(Icons.arrow_forward),
+                      Icon(Icons.arrow_forward, color: Colors.black),
                       Expanded(
                         child: GestureDetector(
                           onTap: expenseCanBeUpdated

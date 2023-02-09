@@ -16,7 +16,12 @@ class DangerButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.error,
       ),
-      child: Text(text),
+      child: Text(
+        text,
+        style: DefaultTextStyle.of(context).style.copyWith(
+              color: Theme.of(context).colorScheme.onError,
+            ),
+      ),
       onPressed: onPressed,
     );
   }

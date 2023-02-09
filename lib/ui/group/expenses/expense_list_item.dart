@@ -40,7 +40,7 @@ class ExpenseListItem extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 expense.getColor(authBloc.state.user!.uid),
-                Theme.of(context).colorScheme.surface,
+                Theme.of(context).cardColor,
               ],
               stops: [0, 0.8],
             ),
@@ -72,7 +72,10 @@ class ExpenseListItem extends StatelessWidget {
                                 Flexible(
                                   child: Text(
                                     this.expense.name,
-                                    style: TextStyle(fontSize: 20),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                                 Text(
@@ -80,6 +83,7 @@ class ExpenseListItem extends StatelessWidget {
                                       (toStringDate(this.expense.date) == null
                                           ? ''
                                           : ' on ${toStringDate(this.expense.date)!}'),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ],
                             ),
