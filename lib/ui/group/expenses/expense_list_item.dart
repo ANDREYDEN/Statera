@@ -27,99 +27,103 @@ class ExpenseListItem extends StatelessWidget {
     final expenseBloc = context.read<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
 
-    return GestureDetector(
-      onTap: () => isWide
-          ? expenseBloc.load(expense.id)
-          : Navigator.of(context)
-              .pushNamed(ExpensePage.route + '/${expense.id}'),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        margin: EdgeInsets.all(5),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                expense.getColor(authBloc.state.user!.uid),
-                Theme.of(context).cardColor,
-              ],
-              stops: [0, 0.8],
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => isWide
+            ? expenseBloc.load(expense.id)
+            : Navigator.of(context)
+                .pushNamed(ExpensePage.route + '/${expense.id}'),
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          margin: EdgeInsets.all(5),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  expense.getColor(authBloc.state.user!.uid),
+                  Theme.of(context).cardColor,
+                ],
+                stops: [0, 0.8],
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GroupBuilder(builder: (context, group) {
-                            return UserAvatar(
-                              author: group.getMember(expense.authorUid),
-                            );
-                          }),
-                          SizedBox(width: 15),
-                          Flexible(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    this.expense.name,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GroupBuilder(builder: (context, group) {
+                              return UserAvatar(
+                                author: group.getMember(expense.authorUid),
+                              );
+                            }),
+                            SizedBox(width: 15),
+                            Flexible(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      this.expense.name,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  pluralize('item', this.expense.items.length) +
-                                      (toStringDate(this.expense.date) == null
-                                          ? ''
-                                          : ' on ${toStringDate(this.expense.date)!}'),
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ],
+                                  Text(
+                                    pluralize(
+                                            'item', this.expense.items.length) +
+                                        (toStringDate(this.expense.date) == null
+                                            ? ''
+                                            : ' on ${toStringDate(this.expense.date)!}'),
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          PriceText(
+                            value: this.expense.getConfirmedTotalForUser(
+                                authBloc.state.user!.uid),
+                            textStyle: TextStyle(fontSize: 24),
+                          ),
+                          PriceText(
+                            value: this.expense.total,
+                            textStyle: TextStyle(fontSize: 12),
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        PriceText(
-                          value: this.expense.getConfirmedTotalForUser(
-                              authBloc.state.user!.uid),
-                          textStyle: TextStyle(fontSize: 24),
-                        ),
-                        PriceText(
-                          value: this.expense.total,
-                          textStyle: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                if (expense.canBeFinalizedBy(authBloc.uid))
-                  ProtectedButton(
-                    onPressed: () {
-                      snackbarCatch(
-                        GroupPage.scaffoldKey.currentContext!,
-                        () => _handleFinalizeExpense(context),
-                        successMessage:
-                            "The expense is now finalized. Participants' balances updated.",
-                      );
-                    },
-                    child: Text('Finalize'),
+                    ],
                   ),
-              ],
+                  if (expense.canBeFinalizedBy(authBloc.uid))
+                    ProtectedButton(
+                      onPressed: () {
+                        snackbarCatch(
+                          GroupPage.scaffoldKey.currentContext!,
+                          () => _handleFinalizeExpense(context),
+                          successMessage:
+                              "The expense is now finalized. Participants' balances updated.",
+                        );
+                      },
+                      child: Text('Finalize'),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
