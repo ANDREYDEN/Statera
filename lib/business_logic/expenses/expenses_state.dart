@@ -12,16 +12,27 @@ class ExpensesLoading extends ExpensesState {}
 
 class ExpensesLoaded extends ExpensesState {
   final List<Expense> expenses;
+  final List<ExpenseStage> stages;
 
-  const ExpensesLoaded({required this.expenses});
+  ExpensesLoaded({required expenses, required List<ExpenseStage> this.stages})
+      : expenses = expenses;
+
+  List<Expense> get filteredExpenses => expenses
+      .where((expense) => stages.any((stage) => expense.isIn(stage)))
+      .toList();
 
   @override
-  List<Object> get props => [expenses];
+  List<Object> get props => [filteredExpenses];
 }
 
 /// After the expenses were loaded; whenever the list is changing (creates, updates)
 class ExpensesProcessing extends ExpensesLoaded {
-  ExpensesProcessing({required List<Expense> expenses}) : super(expenses: expenses);
+  ExpensesProcessing(
+      {required List<Expense> expenses, required List<ExpenseStage> stages})
+      : super(expenses: expenses, stages: stages);
+
+  ExpensesProcessing.fromLoaded(ExpensesLoaded loaded)
+      : super(expenses: loaded.filteredExpenses, stages: loaded.stages);
 }
 
 class ExpensesError extends ExpensesState {

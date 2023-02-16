@@ -36,7 +36,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
         return 0;
       });
 
-      return ExpensesLoaded(expenses: expenses);
+      return ExpensesLoaded(
+        expenses: expenses,
+        stages: Expense.expenseStages(userId),
+      );
     }).listen(
       emit,
       onError: (error) {
@@ -47,14 +50,14 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
   void updateExpense(Expense expense) async {
     if (state is ExpensesLoaded) {
-      emit(ExpensesProcessing(expenses: (state as ExpensesLoaded).expenses));
+      emit(ExpensesProcessing.fromLoaded((state as ExpensesLoaded)));
       await _expenseService.updateExpense(expense);
     }
   }
 
   Future<String?> addExpense(Expense expense, String? groupId) async {
     if (state is ExpensesLoaded) {
-      emit(ExpensesProcessing(expenses: (state as ExpensesLoaded).expenses));
+      emit(ExpensesProcessing.fromLoaded((state as ExpensesLoaded)));
       return await _groupService.addExpense(groupId, expense);
     }
     return null;
@@ -71,11 +74,11 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   void selectExpenseStages(String uid, List<String> stageNames) {
     if (state is ExpensesLoaded) {
       final stages = Expense.expenseStages(uid)
-          .where((es) => stageNames.contains(es.name));
+          .where((es) => stageNames.contains(es.name))
+          .toList();
       emit(ExpensesLoaded(
-        expenses: (state as ExpensesLoaded).expenses.where((expense) {
-          return stages.any((stage) => expense.isIn(stage));
-        }).toList(),
+        expenses: (state as ExpensesLoaded).expenses,
+        stages: stages,
       ));
     }
   }
