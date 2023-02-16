@@ -28,28 +28,20 @@ void main() {
     });
 
     group('filtering', () {
-      final finalizedExpense = Expense(
-        name: 'finalized',
+      final finalizedExpense = createFinalizedExpense(
         authorUid: defaultCurrentUserId,
+        name: 'filnalized',
       );
-      finalizedExpense.finalizedDate = DateTime.now();
 
-      final pendingExpense = Expense(
+      final pendingExpense = createPendingExpense(
+        authorUid: defaultCurrentUserId,
         name: 'pending',
-        authorUid: defaultCurrentUserId,
       );
-      final completeItem = Item(name: 'Banana', value: 0.5);
-      completeItem.assignees
-          .add(AssigneeDecision(uid: defaultCurrentUserId, parts: 1));
-      pendingExpense.items.add(completeItem);
 
-      final notMarkedExpense = Expense(
-        name: 'not_marked',
+      final notMarkedExpense = createNotMarkedExpense(
         authorUid: defaultCurrentUserId,
+        name: 'not marked',
       );
-      final incompleteItem = Item(name: 'Apple', value: 0.5);
-      incompleteItem.assignees.add(AssigneeDecision(uid: defaultCurrentUserId));
-      notMarkedExpense.items.add(incompleteItem);
 
       final expenses = [finalizedExpense, pendingExpense, notMarkedExpense];
 

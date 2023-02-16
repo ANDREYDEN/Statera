@@ -32,12 +32,12 @@ final defaultAuthService = MockAuthService();
 final defaultCurrentUser = MockUser();
 final defaultCurrentUserId = 'foo';
 final defaultGroup = Group(
-      id: 'group_foo',
-      name: 'Group Foo',
-      members: [
-        CustomUser(uid: defaultCurrentUserId, name: 'Foo'),
-      ],
-    );
+  id: 'group_foo',
+  name: 'Group Foo',
+  members: [
+    CustomUser(uid: defaultCurrentUserId, name: 'Foo'),
+  ],
+);
 
 Future<void> customPump(
   Widget widget,
@@ -75,7 +75,8 @@ Future<void> customPump(
           create: (context) => ExpensesCubit(
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
-          )..load(currentUserId ?? defaultCurrentUserId, (group ?? defaultGroup).id),
+          )..load(currentUserId ?? defaultCurrentUserId,
+              (group ?? defaultGroup).id),
         ),
         BlocProvider(
             create: (context) => AuthBloc(authService ?? defaultAuthService))
@@ -83,4 +84,35 @@ Future<void> customPump(
       child: MaterialApp(home: Scaffold(body: ExpenseList())),
     ),
   );
+}
+
+Expense createFinalizedExpense({
+  required String authorUid,
+  required String name,
+}) {
+  final finalizedExpense = Expense(name: name, authorUid: authorUid);
+  finalizedExpense.finalizedDate = DateTime.now();
+  return finalizedExpense;
+}
+
+Expense createPendingExpense({
+  required String authorUid,
+  required String name,
+}) {
+  final pendingExpense = Expense(name: 'pending', authorUid: authorUid);
+  final completeItem = Item(name: 'Banana', value: 0.5);
+  completeItem.assignees.add(AssigneeDecision(uid: authorUid, parts: 1));
+  pendingExpense.items.add(completeItem);
+  return pendingExpense;
+}
+
+Expense createNotMarkedExpense({
+  required String authorUid,
+  required String name,
+}) {
+  final notMarkedExpense = Expense(name: name, authorUid: authorUid);
+  final incompleteItem = Item(name: 'Apple', value: 0.5);
+  incompleteItem.assignees.add(AssigneeDecision(uid: authorUid));
+  notMarkedExpense.items.add(incompleteItem);
+  return notMarkedExpense;
 }
