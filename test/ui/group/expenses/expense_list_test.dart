@@ -126,6 +126,13 @@ void main() {
         expect(find.text(finalizedExpense.name), findsNothing);
         expect(find.text(pendingExpense.name), findsOneWidget);
         expect(find.text(notMarkedExpense.name), findsOneWidget);
+
+        await tester.tap(find.text('Finalized'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(finalizedExpense.name), findsOneWidget);
+        expect(find.text(pendingExpense.name), findsOneWidget);
+        expect(find.text(notMarkedExpense.name), findsOneWidget);
       });
 
       testWidgets(
@@ -164,6 +171,13 @@ void main() {
           expect(find.text(finalizedExpense.name), findsOneWidget);
           expect(find.text(pendingExpense.name), findsNothing);
           expect(find.text(notMarkedExpense.name), findsOneWidget);
+
+          await tester.tap(find.text('Pending'));
+          await tester.pumpAndSettle();
+
+          expect(find.text(finalizedExpense.name), findsOneWidget);
+          expect(find.text(pendingExpense.name), findsOneWidget);
+          expect(find.text(notMarkedExpense.name), findsOneWidget);
         },
       );
 
@@ -197,6 +211,13 @@ void main() {
           expect(find.text(finalizedExpense.name), findsOneWidget);
           expect(find.text(pendingExpense.name), findsOneWidget);
           expect(find.text(notMarkedExpense.name), findsNothing);
+
+          await tester.tap(find.text('Not Marked'));
+          await tester.pumpAndSettle();
+
+          expect(find.text(finalizedExpense.name), findsOneWidget);
+          expect(find.text(pendingExpense.name), findsOneWidget);
+          expect(find.text(notMarkedExpense.name), findsOneWidget);
         },
       );
     });
