@@ -6,4 +6,12 @@ class LayoutState {
   LayoutState(BoxConstraints constraints) {
     isWide = constraints.maxWidth > 1000;
   }
+
+  LayoutState.wide() {
+    isWide = true;
+  }
+
+  LayoutState.narrow() {
+    isWide = false;
+  }
 }
