@@ -79,22 +79,125 @@ void main() {
     });
 
     group('filtering', () {
-      testWidgets(
-        'can select finalized expenses',
-        (WidgetTester tester) async {},
-        skip: true,
-      );
+      final finalizedExpense =
+          Expense(name: 'finalized', authorUid: currentUserId);
+      finalizedExpense.finalizedDate = DateTime.now();
+
+      final pendingExpense = Expense(name: 'pending', authorUid: currentUserId);
+      final completeItem = Item(name: 'Banana', value: 0.5);
+      completeItem.assignees
+          .add(AssigneeDecision(uid: currentUserId, parts: 1));
+      pendingExpense.items.add(completeItem);
+
+      final notMarkedExpense =
+          Expense(name: 'not_marked', authorUid: currentUserId);
+      final incompleteItem = Item(name: 'Apple', value: 0.5);
+      incompleteItem.assignees.add(AssigneeDecision(uid: currentUserId));
+      notMarkedExpense.items.add(incompleteItem);
+
+      final expenses = [finalizedExpense, pendingExpense, notMarkedExpense];
+      when(expenseService.listenForRelatedExpenses(any, any))
+          .thenAnswer((_) => Stream.fromIterable([expenses]));
+
+      testWidgets('can select finalized expenses', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              Provider<LayoutState>(create: (_) => LayoutState.narrow()),
+              BlocProvider(create: (context) => ExpenseBloc(expenseService)),
+              BlocProvider(
+                  create: (context) =>
+                      GroupCubit(groupService, expenseService, userRepository)
+                        ..load(groupId)),
+              BlocProvider(
+                create: (context) => ExpensesCubit(expenseService, groupService)
+                  ..load(currentUserId, groupId),
+              ),
+              BlocProvider(create: (context) => AuthBloc(authService))
+            ],
+            child: MaterialApp(home: Scaffold(body: ExpenseList())),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Finalized'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(finalizedExpense.name), findsNothing);
+        expect(find.text(pendingExpense.name), findsOneWidget);
+        expect(find.text(notMarkedExpense.name), findsOneWidget);
+      });
 
       testWidgets(
         'can select pending expenses',
-        (WidgetTester tester) async {},
-        skip: true,
+        (WidgetTester tester) async {
+          expect(notMarkedExpense.isIn(Expense.expenseStages(currentUserId)[0]),
+              true);
+          expect(pendingExpense.isIn(Expense.expenseStages(currentUserId)[1]),
+              true);
+          expect(finalizedExpense.isIn(Expense.expenseStages(currentUserId)[2]),
+              true);
+          await tester.pumpWidget(
+            MultiProvider(
+              providers: [
+                Provider<LayoutState>(create: (_) => LayoutState.narrow()),
+                BlocProvider(create: (context) => ExpenseBloc(expenseService)),
+                BlocProvider(
+                    create: (context) =>
+                        GroupCubit(groupService, expenseService, userRepository)
+                          ..load(groupId)),
+                BlocProvider(
+                  create: (context) =>
+                      ExpensesCubit(expenseService, groupService)
+                        ..load(currentUserId, groupId),
+                ),
+                BlocProvider(create: (context) => AuthBloc(authService))
+              ],
+              child: MaterialApp(home: Scaffold(body: ExpenseList())),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(find.text('Pending'));
+          await tester.pumpAndSettle();
+
+          expect(find.text(finalizedExpense.name), findsOneWidget);
+          expect(find.text(pendingExpense.name), findsNothing);
+          expect(find.text(notMarkedExpense.name), findsOneWidget);
+        },
       );
 
       testWidgets(
         'can select not marked expenses',
-        (WidgetTester tester) async {},
-        skip: true,
+        (WidgetTester tester) async {
+          await tester.pumpWidget(
+            MultiProvider(
+              providers: [
+                Provider<LayoutState>(create: (_) => LayoutState.narrow()),
+                BlocProvider(create: (context) => ExpenseBloc(expenseService)),
+                BlocProvider(
+                    create: (context) =>
+                        GroupCubit(groupService, expenseService, userRepository)
+                          ..load(groupId)),
+                BlocProvider(
+                  create: (context) =>
+                      ExpensesCubit(expenseService, groupService)
+                        ..load(currentUserId, groupId),
+                ),
+                BlocProvider(create: (context) => AuthBloc(authService))
+              ],
+              child: MaterialApp(home: Scaffold(body: ExpenseList())),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(find.text('Not Marked'));
+          await tester.pumpAndSettle();
+
+          expect(find.text(finalizedExpense.name), findsOneWidget);
+          expect(find.text(pendingExpense.name), findsOneWidget);
+          expect(find.text(notMarkedExpense.name), findsNothing);
+        },
       );
     });
   });
