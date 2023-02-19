@@ -169,11 +169,9 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
     dynamicLinkRepository.listen(context);
   }
 
-  return SafeArea(
-    child: path.isPublic
-        ? path.builder(context, matches)
-        : AuthGuard(
-            builder: () => path.builder(context, matches),
-          ),
-  );
+  return path.isPublic
+      ? path.builder(context, matches)
+      : AuthGuard(
+          builder: () => path.builder(context, matches),
+        );
 }
