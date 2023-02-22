@@ -36,3 +36,6 @@ Full list of commands can be found in the `pubspec.yaml` file
 
 ## Development
 
+## References & useful links
+
+- icons generated through [Icon Kitchen](https://icon.kitchen)
