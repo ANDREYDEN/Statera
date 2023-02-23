@@ -29,7 +29,16 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
   final authBloc = context.read<AuthBloc>();
   final expenseBloc = context.read<ExpenseBloc>();
   final addingItem = intialItem == null;
-  final item = intialItem ?? Item(name: '', value: 0, isTaxable: true);
+  final item = intialItem ??
+      Item(
+        name: '',
+        value: 0,
+        isTaxable: expenseBloc.state is ExpenseLoaded &&
+            (expenseBloc.state as ExpenseLoaded)
+                .expense
+                .settings
+                .itemsAreTaxableByDefault,
+      );
 
   showDialog(
     context: context,
