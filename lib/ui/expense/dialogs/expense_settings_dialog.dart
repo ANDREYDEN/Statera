@@ -36,12 +36,19 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
           initialData: widget.expense.settings.tax != null,
         ),
         FieldData(
-            id: 'tax',
-            label: 'Amount of tax to apply',
-            initialData: widget.expense.settings.tax ?? 0.13,
-            formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
-            validators: [FieldData.constrainedDoubleValidator(0, 1)],
-            isVisible: (fields) => fields['is_taxable'] as bool),
+          id: 'tax',
+          label: 'Amount of tax to apply',
+          initialData: widget.expense.settings.tax ?? 0.13,
+          formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+          validators: [FieldData.constrainedDoubleValidator(0, 1)],
+          isVisible: (fields) => fields['is_taxable'] as bool,
+        ),
+        FieldData(
+          id: 'itemsAreTaxableByDefault',
+          label: 'Items are taxable by default',
+          initialData: false,
+          isVisible: (fields) => fields['is_taxable'] as bool,
+        ),
       ],
       onSubmit: (values) async {
         widget.expense.settings.acceptNewMembers =
@@ -49,6 +56,8 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         widget.expense.settings.showItemDecisions = values['showItemDecisions'];
         if (values['is_taxable']) {
           widget.expense.settings.tax = values['tax']!;
+          widget.expense.settings.itemsAreTaxableByDefault =
+              values['itemsAreTaxableByDefault']!;
         } else {
           widget.expense.settings.tax = null;
         }
