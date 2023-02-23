@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
@@ -64,9 +63,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
             controller: _balanceController,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(labelText: 'Value to $actionWord'),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[\.\d]'))
-            ],
           ),
           SizedBox(height: 10),
           Text(
