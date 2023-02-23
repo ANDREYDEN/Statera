@@ -46,7 +46,7 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         FieldData(
           id: 'itemsAreTaxableByDefault',
           label: 'Items are taxable by default',
-          initialData: false,
+          initialData: widget.expense.settings.itemsAreTaxableByDefault,
           isVisible: (fields) => fields['is_taxable'] as bool,
         ),
       ],
