@@ -53,7 +53,7 @@ Future<bool> snackbarCatch(
       context,
       errorOccured ? errorMessage! : successMessage!,
       color: errorOccured
-          ? Theme.of(context).errorColor
+          ? Theme.of(context).colorScheme.error
           : Theme.of(context).colorScheme.secondary,
     );
   }
@@ -105,8 +105,9 @@ MaterialColor createMaterialColor(Color color) {
 }
 
 isMobilePlatform() {
-  return defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.android;
+  return (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android) &&
+      !kIsWeb;
 }
 
 isApplePlatform() {
@@ -114,4 +115,5 @@ isApplePlatform() {
       defaultTargetPlatform == TargetPlatform.macOS;
 }
 
-String currentPlatformName = kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];
+String currentPlatformName =
+    kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];

@@ -161,23 +161,12 @@ class _LandingPageState extends State<LandingPage>
                   }
 
                   return ElevatedButton(
-                    style: ButtonStyle(
+                    style: ElevatedButton.styleFrom(
                       visualDensity: VisualDensity(
                         horizontal: VisualDensity.maximumDensity,
                         vertical: VisualDensity.maximumDensity,
                       ),
-                      foregroundColor:
-                          MaterialStateProperty.resolveWith((states) {
-                        if (states.contains(MaterialState.disabled)) {
-                          return Colors.grey;
-                        }
-
-                        return Theme.of(context).colorScheme.onSecondary;
-                      }),
-                      textStyle: MaterialStateProperty.all(Theme.of(context)
-                          .textTheme
-                          .button!
-                          .copyWith(fontSize: 20)),
+                      textStyle: TextStyle(fontSize: 20),
                     ),
                     onPressed: _selectedOption.url == null &&
                             _selectedOption.platform != null
