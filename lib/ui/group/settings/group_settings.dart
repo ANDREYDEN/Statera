@@ -126,7 +126,7 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
-              if (group.defaultExpenseSettings.tax != null)
+              if (group.defaultExpenseSettings.tax != null) ...[
                 SettingInput(
                   label: 'Amount of tax to apply',
                   initialValue: group.defaultExpenseSettings.tax.toString(),
@@ -140,6 +140,19 @@ class GroupSettings extends StatelessWidget {
                     });
                   },
                 ),
+                SwitchListTile(
+                  title: Text('Items are taxable by default'),
+                  value: group.defaultExpenseSettings.itemsAreTaxableByDefault,
+                  onChanged: (isOn) {
+                    final groupCubit = context.read<GroupCubit>();
+
+                    groupCubit.update((group) {
+                      group.defaultExpenseSettings.itemsAreTaxableByDefault =
+                          isOn;
+                    });
+                  },
+                ),
+              ],
               SizedBox(height: 40),
             ],
             DangerZone(
