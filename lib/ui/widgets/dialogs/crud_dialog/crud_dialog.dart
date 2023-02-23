@@ -132,37 +132,35 @@ class _CRUDDialogState extends State<CRUDDialog> {
       var isLastField = i == selectedFields.length - 1;
       var isFirstField = i == 0;
       if (field.initialData is String || field.initialData is num) {
-        yield ListTile(
-          title: TextFormField(
-            controller: field.controller,
-            autofocus: isFirstField,
-            focusNode: field.focusNode,
-            keyboardType: field.initialData is String
-                ? TextInputType.text
-                : field.initialData is double
-                    ? TextInputType.numberWithOptions(decimal: true)
-                    : TextInputType.number,
-            inputFormatters: field.formatters,
-            decoration: InputDecoration(
-              labelText: field.label,
-              errorText: this._dirty && field.getError().isNotEmpty
-                  ? field.getError()
-                  : null,
-            ),
-            onChanged: (text) {
-              setState(() {
-                this._dirty = true;
-                field.changeData(text);
-              });
-            },
-            onFieldSubmitted: (_) {
-              if (isLastField) {
-                submit(closeAfterSubmit: widget.closeAfterSubmit);
-              } else {
-                selectedFields[i + 1].focusNode.requestFocus();
-              }
-            },
+        yield TextFormField(
+          controller: field.controller,
+          autofocus: isFirstField,
+          focusNode: field.focusNode,
+          keyboardType: field.initialData is String
+              ? TextInputType.text
+              : field.initialData is double
+                  ? TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.number,
+          inputFormatters: field.formatters,
+          decoration: InputDecoration(
+            labelText: field.label,
+            errorText: this._dirty && field.getError().isNotEmpty
+                ? field.getError()
+                : null,
           ),
+          onChanged: (text) {
+            setState(() {
+              this._dirty = true;
+              field.changeData(text);
+            });
+          },
+          onFieldSubmitted: (_) {
+            if (isLastField) {
+              submit(closeAfterSubmit: widget.closeAfterSubmit);
+            } else {
+              selectedFields[i + 1].focusNode.requestFocus();
+            }
+          },
         );
       } else if (field.initialData is bool) {
         yield SwitchListTile(
