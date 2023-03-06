@@ -1,7 +1,7 @@
 name: Build artifact and create draft release
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
      
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
