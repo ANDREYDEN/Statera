@@ -71,8 +71,8 @@ jobs:
       - name: Create Draft Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.read-version.outputs.data }}
-          name: Release ${{ steps.read-version.outputs.data }}
+          tag_name: ${{ steps.read-version.outputs.data }}_${{ github.run_number }}
+          name: Release ${{ steps.read-version.outputs.data }} (from run ${{ github.run_number }})
           body: |
             ## Release Notes
             
