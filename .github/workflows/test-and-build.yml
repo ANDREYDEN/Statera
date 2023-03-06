@@ -2,7 +2,7 @@ name: Test and build
 
 on:
   pull_request:
-    branches: [development, master]
+    branches: [main]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
