@@ -72,7 +72,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.read-version.outputs.data }}
-          name: Release ${{ steps.read-version.outputs.data }}
+          name: Release ${{ steps.read-version.outputs.data }} (from run ${{ GITHUB_RUN_NUMBER }})
           body: |
             ## Release Notes
             
