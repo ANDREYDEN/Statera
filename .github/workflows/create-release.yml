@@ -59,8 +59,8 @@ jobs:
       - name: Read Version
         id: read-version
         uses: jbutcher5/read-yaml@1.6
-        file: pubspec.yaml
         with:
+          file: pubspec.yaml
           key-path: '["version"]'
 
       - name: Create Draft Release
