@@ -1,14 +1,14 @@
-name: Bump version, build, deploy web and release apk
+name: Build artifact and create draft release
 
 on:
-  push:
-    branches: [master]
+  workflow_dispatch
      
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  deploy-web:
+  web-build-artifact:
+    name: Build Web Artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -29,24 +29,51 @@ jobs:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
 
-      - name: Copy google-services.json
-        env:
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-        run: echo $FIREBASE_CONFIG > android/app/google-services.json
-
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build project
         run: flutter build web
-
-      - name: Deploy to Firebase hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
-          projectId: statera-0
-          channelId: live
+          name: web-out
+          path: build/web
+  
+  web-create-release:
+    name: Create Web Release
+    runs-on: ubuntu-latest
+    needs: web-build-artifact
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: web-out
+          path: web.out
+
+      - name: Zip Artifact
+        run: |
+          zip -r web.out.zip web.out
+
+      - name: Read Version
+        id: read-version
+        uses: jbutcher5/read-yaml@1.6
+        file: pubspec.yaml
+        with:
+          key-path: '["version"]'
+
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.read-version.outputs.data }}
+          name: Release ${{ steps.read-version.outputs.data }}
+          body: |
+            ## Release Notes
+            
+            <Please provie release notes here>
+          draft: true
+          files: web.out.zip
   
   # deploy-android:
   #   runs-on: ubuntu-latest

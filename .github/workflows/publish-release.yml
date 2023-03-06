@@ -1,0 +1,31 @@
+name: Publish release
+
+on:
+  release:
+    types: [published]
+     
+jobs:
+  web-publish:
+    name: Publish Web Release
+    environment: web-production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Get Artifact from Release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          version: ${{ github.event.release.id }}
+          file: web.out.zip
+
+      - name: Unzip Artifact
+        run: unzip web.out.zip -d build/web
+
+      - name: Deploy to Firebase hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
+          projectId: statera-0
+          channelId: live
