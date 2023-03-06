@@ -20,7 +20,7 @@ jobs:
           file: web.out.zip
 
       - name: Unzip Artifact
-        run: unzip web.out.zip -d build/web
+        run: mkdir build/web && unzip web.out.zip -d build/web
 
       - name: Deploy to Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
