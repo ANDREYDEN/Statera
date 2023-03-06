@@ -43,8 +43,8 @@ jobs:
           name: web-out
           path: build/web
   
-  web-create-release:
-    name: Create Web Release
+  create-release:
+    name: Create Release
     runs-on: ubuntu-latest
     needs: web-build-artifact
     steps:
