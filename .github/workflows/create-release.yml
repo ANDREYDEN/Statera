@@ -122,8 +122,8 @@ jobs:
       - name: Download Android Artifact
         uses: actions/download-artifact@v3
         with:
-          name: android.aab
-          path: android.out.aab
+          name: android.out.aab
+          path: android.aab
 
       - name: Read Version
         id: read-version
