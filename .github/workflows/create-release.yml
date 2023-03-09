@@ -2,7 +2,7 @@ name: Build artifact and create draft release
 
 on:
   workflow_dispatch:
-     
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -17,14 +17,14 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
       - name: Copy .env
         env:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Build project
         run: flutter build web
-        
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -53,14 +53,14 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v1
         with:
-          java-version: '12.x'
+          java-version: "12.x"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
       - name: Copy .env
         env:
@@ -101,7 +101,9 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: web-build-artifact
+    needs:
+      - web-build-artifact
+      - android-build-artifact
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -131,7 +133,7 @@ jobs:
           name: Release ${{ steps.read-version.outputs.data }} (from run ${{ github.run_number }})
           body: |
             ## Release Notes
-            
+
             <Please provie release notes here>
           draft: true
           files: web.out.zip
