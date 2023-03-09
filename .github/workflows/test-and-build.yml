@@ -68,46 +68,54 @@ jobs:
       - name: Run functions tests
         run: npm test
 
-  # build_android:
-  #   name: Build Android App
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v2
+  build_android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
-  #     - name: Download Java
-  #       uses: actions/setup-java@v1
-  #       with:
-  #         java-version: '12.x'
+      - name: Download Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
 
-  #     - name: Download Flutter
-  #       uses: subosito/flutter-action@v1
-  #       with:
-  #         channel: 'stable'
+      - name: Download Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
-  #     - name: Copy google-services.json
-  #       env:
-  #         FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-  #       run: echo $FIREBASE_CONFIG > android/app/google-services.json
+      - name: Copy .env
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
 
-  #     - name: Copy keystore
-  #       env: 
-  #         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-  #       run: echo $KEYSTORE_BASE64 | base64 -d > android/app/upload-keystore.jks
+      - name: Get dependencies
+        run: flutter pub get
 
-  #     - name: Copy keystore properties
-  #       env:
-  #         KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
-  #       run: echo $KEY_PROPERTIES > android/key.properties
+      - name: Copy google-services.json
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: echo $FIREBASE_CONFIG > android/app/google-services.json
 
-  #     - name: Print files
-  #       run: cd android && ls -R
+      - name: Configure Keystore
+        run: |
+          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" >> key.properties
+          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
+          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
+          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
+        env:
+          PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+        working-directory: android
 
-  #     - name: Get dependencies
-  #       run: flutter pub get
-
-  #     - name: Build Android app
-  #       run: flutter build apk -v
+      - name: Build App bundle
+        run: flutter build appbundle
 
   build_web:
     name: Build Web App

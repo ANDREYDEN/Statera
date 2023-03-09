@@ -108,16 +108,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Download Artifact
+      - name: Download Web Artifact
         uses: actions/download-artifact@v3
         with:
           name: web-out
           path: web.out
 
-      - name: Zip Artifact
+      - name: Zip Web Artifact
         run: |
           cd web.out
-          zip -r ../web.out.zip .
+          zip -r ../web.zip .
+
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: android.aab
+          path: android.out.aab
 
       - name: Read Version
         id: read-version
@@ -134,6 +140,8 @@ jobs:
           body: |
             ## Release Notes
 
-            <Please provie release notes here>
+            <Please provide release notes here>
           draft: true
-          files: web.out.zip
+          files: |
+            web.zip
+            android.aab
