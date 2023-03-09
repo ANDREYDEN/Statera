@@ -112,18 +112,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: web-out
-          path: web.out
 
       - name: Zip Web Artifact
-        run: |
-          cd web.out
-          zip -r ../web.zip .
+        run: zip -r web.zip web-out
 
       - name: Download Android Artifact
         uses: actions/download-artifact@v3
         with:
           name: android.out.aab
-          path: android.aab
+      
+      - name: Rename Android Artifact
+        run: mv android.out.aab android.aab
 
       - name: Read Version
         id: read-version
