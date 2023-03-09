@@ -112,9 +112,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: web-out
+          path: web-out
 
       - name: Zip Web Artifact
-        run: zip -r web.zip web-out
+        run: cd web-out && zip -r ../web.zip .
 
       - name: Download Android Artifact
         uses: actions/download-artifact@v3
