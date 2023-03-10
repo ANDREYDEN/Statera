@@ -18,7 +18,7 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: "14.x"
 
       - name: Download Flutter
@@ -79,7 +79,7 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: "14.x"
 
       - name: Download Flutter
@@ -129,7 +129,7 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: "14.x"
 
       - name: Download Flutter
