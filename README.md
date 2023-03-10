@@ -39,3 +39,4 @@ Full list of commands can be found in the `pubspec.yaml` file
 ## References & useful links
 
 - icons generated through [Icon Kitchen](https://icon.kitchen)
+- Trunk Based Development deployments with GitHub actions [article](https://blog.jannikwempe.com/github-actions-trunk-based-development)

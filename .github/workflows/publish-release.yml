@@ -3,7 +3,7 @@ name: Publish release
 on:
   release:
     types: [published]
-     
+
 jobs:
   web-publish:
     name: Publish Web Release
@@ -11,21 +11,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get Artifact from Release
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           version: ${{ github.event.release.id }}
-          file: web.out.zip
+          file: web.zip
 
       - name: Unzip Artifact
-        run: mkdir -p build/web && unzip web.out.zip -d build/web
+        run: mkdir -p build/web && unzip web.zip -d build/web
 
       - name: Deploy to Firebase hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}'
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_STATERA_0 }}"
           projectId: statera-0
           channelId: live
+
+  android-publish:
+    name: Publish Android Release
+    environment: android-production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Get Artifact from Release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          version: ${{ github.event.release.id }}
+          file: android.aab
+
+      - name: Setup Fastlane
+        uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
+        with:
+          ruby-version: "3.0.2"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Create Draft Play Store Release
+        run: bundle exec fastlane release version_name:${{ github.event.release.id }} aab:../android.aab
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        working-directory: android
