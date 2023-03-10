@@ -52,7 +52,5 @@ jobs:
           working-directory: android
 
       - name: Create Draft Play Store Release
-        run: bundle exec fastlane release version_name:${{ github.event.release.id }} aab:../android.aab
-        env:
-          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: bundle exec fastlane run upload_to_play_store aab:../android.aab release_status:draft json_key_data:${{ secrets.PLAY_STORE_CONFIG_JSON }}}
         working-directory: android

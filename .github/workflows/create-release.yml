@@ -135,11 +135,15 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.read-version.outputs.data }}_${{ github.run_number }}
-          name: Release ${{ steps.read-version.outputs.data }} (from run ${{ github.run_number }})
+          name: Release ${{ steps.read-version.outputs.data }}
           body: |
             ## Release Notes
 
             <Please provide release notes here>
+
+            Android App: https://play.google.com/store/apps/details?id=com.statera.statera&pli=1
+            iOS App: https://apps.apple.com/us/app/statera/id1609503817?platform=iphone
+            Web App: https://statera-0.web.app/
           draft: true
           files: |
             web.zip
