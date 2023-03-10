@@ -1,4 +1,4 @@
-name: Build artifact and create draft release
+name: Build artifacts and create draft release
 
 on:
   workflow_dispatch:
@@ -17,6 +17,7 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: "14.x"
 
       - name: Download Flutter
@@ -53,6 +54,7 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: "14.x"
 
       - name: Download Flutter
@@ -95,7 +97,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: android.out.aab
+          name: android-out
           path: build/app/outputs/bundle/release/app-release.aab
 
   create-release:
@@ -108,11 +110,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Download Web Artifact
+      - name: Download All Artifacts
         uses: actions/download-artifact@v3
-        with:
-          name: web-out
-          path: web-out
+
+      - run: ls -R
 
       - name: Zip Web Artifact
         run: |
@@ -120,13 +121,8 @@ jobs:
           zip -r ../web.zip .
           cd ..
 
-      - name: Download Android Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: android.out.aab
-
       - name: Rename Android Artifact
-        run: mv android.out.aab android.aab
+        run: mv android-out/app-release.aab ./android.aab
 
       - name: Read Version
         id: read-version
