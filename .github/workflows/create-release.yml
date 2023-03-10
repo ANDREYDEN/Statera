@@ -17,8 +17,8 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
-          distribution: oracle
-          java-version: "14.x"
+          distribution: temurin
+          java-version: 17
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -54,8 +54,8 @@ jobs:
       - name: Download Java
         uses: actions/setup-java@v3
         with:
-          distribution: oracle
-          java-version: "14.x"
+          distribution: temurin
+          java-version: 17
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
