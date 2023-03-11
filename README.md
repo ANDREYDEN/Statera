@@ -19,7 +19,7 @@ An expense tracking app with granular price distribution.
 ### Firebase
 
 - Create an iOS/Android app in the Firebase console
-- Include your `google-services.json` and `GoogleService-Info.plist` to the proper places as described in the [docs](https://firebase.google.com/docs/flutter/setup?platform=android)
+- Run `flutterfire configure` to connect with your Firebase project and get configuration files for your apps
 
 ### Environment
 
@@ -27,14 +27,22 @@ An expense tracking app with granular price distribution.
 - Copy the `.env.example` file and fill in the values
 
 ### Commands
-- `flutter run` - runs the project
-- `flutterfire configure` - initializes the connection between you Firebase project and this Flutter project
 - `derry emulate` - runs Firebase emulators fr local development
 - `derry test` - runs the tests
 
 Full list of commands can be found in the `pubspec.yaml` file
 
 ## Development
+
+## Deployment
+
+This project uses Fastlane for deployment to App Store and Play Store
+
+### Screenshots
+
+**iOS**
+- `cd ios`
+- `fastlane snapshot`
 
 ## References & useful links
 
