@@ -27,6 +27,7 @@ class FieldData<T> {
   }) {
     initialData = (initialData ?? '') as T;
     _data = initialData;
+    _fieldValue = initialData.toString();
     _controller = TextEditingController(text: initialData.toString());
     this.focusNode = FocusNode(debugLabel: this.id);
   }
@@ -95,6 +96,7 @@ class FieldData<T> {
 
   void reset() {
     _data = initialData;
+    _fieldValue = initialData.toString();
     _controller.clear();
   }
 }

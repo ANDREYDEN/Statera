@@ -27,8 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AccountDeletionRequested>(_onAccountDeletionRequested);
   }
 
-  // TODO: use UserCubit UserLoaded.user where possible
-  @deprecated
+  @Deprecated('Use UserCubit UserLoaded.user where possible')
   User get user => state.user!;
 
   String get uid => state.user!.uid;
