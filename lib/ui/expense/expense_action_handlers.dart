@@ -4,7 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/dialogs/expense_dialogs.dart';
-import 'package:statera/ui/widgets/dialogs/new_item.dialog.dart';
+import 'package:statera/ui/widgets/dialogs/new_item_dialog.dart';
 
 handleSettingsClick(BuildContext context) {
   final authBloc = context.read<AuthBloc>();
