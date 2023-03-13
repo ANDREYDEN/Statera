@@ -42,9 +42,9 @@ class Firestore {
 
     if (finalized != null) {
       if (finalized) {
-        query = query.where('finalizedDate', isNotEqualTo: null);
+        query = query.where('finalizedDate', isNull: false);
       } else {
-        query = query.where('finalizedDate', isEqualTo: null);
+        query = query.where('finalizedDate', isNull: true);
       }
     }
 
