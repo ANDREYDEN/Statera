@@ -7,18 +7,18 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
-class NewItemDialog extends StatefulWidget {
+class UpsertItemDialog extends StatefulWidget {
   final Item? intialItem;
   final ExpenseBloc expenseBloc;
 
-  NewItemDialog({Key? key, this.intialItem, required this.expenseBloc})
+  UpsertItemDialog({Key? key, this.intialItem, required this.expenseBloc})
       : super(key: key);
 
   @override
-  State<NewItemDialog> createState() => _NewItemDialogState();
+  State<UpsertItemDialog> createState() => _UpsertItemDialogState();
 }
 
-class _NewItemDialogState extends State<NewItemDialog> {
+class _UpsertItemDialogState extends State<UpsertItemDialog> {
   bool get addingItem => widget.intialItem == null;
 
   AuthBloc get authBloc => context.read<AuthBloc>();
@@ -40,10 +40,10 @@ class _NewItemDialogState extends State<NewItemDialog> {
           initialData: widget.intialItem?.name ?? '',
           validators: [FieldData.requiredValidator],
         ),
-        FieldData(
+        FieldData<double>(
           id: 'item_value',
           label: 'Item Value',
-          initialData: widget.intialItem?.value ?? 0,
+          initialData: widget.intialItem?.value ?? (0 as double),
           validators: [FieldData.requiredValidator],
           formatters: [CommaReplacerTextInputFormatter()],
         ),
