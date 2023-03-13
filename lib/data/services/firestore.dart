@@ -4,9 +4,8 @@ import 'package:statera/data/models/models.dart';
 class Firestore {
   late FirebaseFirestore _firestore;
 
-  Firestore() {
-    // FirebaseGroupService.instance.settings = Settings(host: '10.0.2.2:9099');
-    _firestore = FirebaseFirestore.instance;
+  Firestore(FirebaseFirestore firestoreInstance) {
+    _firestore = firestoreInstance;
   }
 
   CollectionReference get expensesCollection =>

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/expense.dart';
@@ -8,7 +9,7 @@ import 'package:statera/data/services/services.dart';
 class GroupService extends Firestore {
   late final DynamicLinkService _dynamicLinkRepository;
 
-  GroupService() : super() {
+  GroupService(FirebaseFirestore firestoreInstance) : super(firestoreInstance) {
     _dynamicLinkRepository = DynamicLinkService();
   }
 
@@ -85,7 +86,7 @@ class GroupService extends Firestore {
     return groupReference.id;
   }
 
-  Future<Group> joinGroup(String groupCode, CustomUser user) async {
+  Future<Group> addMember(String groupCode, CustomUser user) async {
     var group = await getGroup(groupCode);
     if (group.members.any((member) => member.uid == user.uid)) {
       throw Exception('Member ${user.uid} already exists');

@@ -6,6 +6,8 @@ import 'package:statera/utils/utils.dart';
 
 @GenerateNiceMocks([MockSpec<UserRepository>()])
 class UserRepository extends Firestore {
+  UserRepository(FirebaseFirestore firestoreInstance) : super(firestoreInstance);
+
   /// Updates user data in `/users/{uid}`.
   /// Auth data and related group user information will be updated by the changeUser Firebase Function
   Future<void> updateUser({

@@ -85,7 +85,7 @@ class GroupCubit extends Cubit<GroupState> {
     emit(GroupLoading());
     try {
       final user = await _userRepository.getUser(uid);
-      final group = await _groupService.joinGroup(code!, user);
+      final group = await _groupService.addMember(code!, user);
       await _expenseService.addAssigneeToOutstandingExpenses(uid, group.id);
       emit(GroupJoinSuccess(group: group));
     } catch (e) {

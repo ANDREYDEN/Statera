@@ -26,7 +26,7 @@ void main() {
       groupCubit = GroupCubit(groupService, expenseService, userRepository);
       when(groupService.groupStream(testGroup.id))
           .thenAnswer((_) => Stream.fromIterable([testGroup]));
-      when(groupService.joinGroup(testGroup.code!, testUser))
+      when(groupService.addMember(testGroup.code!, testUser))
           .thenAnswer((_) async => testGroup);
       when(userRepository.getUser(testUserId))
           .thenAnswer((realInvocation) async => testUser);
@@ -54,7 +54,7 @@ void main() {
         act: (cubit) => cubit.addMember(testCode, testUserId),
         expect: () => [GroupLoading(), GroupJoinSuccess(group: testGroup)],
         verify: (_) {
-          verify(groupService.joinGroup(testCode, testUser)).called(1);
+          verify(groupService.addMember(testCode, testUser)).called(1);
         },
       );
 
@@ -70,7 +70,7 @@ void main() {
           )
         ],
         verify: (_) {
-          verifyNever(groupService.joinGroup(testGroup.code!, testUser));
+          verifyNever(groupService.addMember(testGroup.code!, testUser));
         },
       );
 
@@ -86,7 +86,7 @@ void main() {
         expect: () =>
             [GroupError(error: 'You are already a member of this group')],
         verify: (_) {
-          verifyNever(groupService.joinGroup(testGroup.code!, testUser));
+          verifyNever(groupService.addMember(testGroup.code!, testUser));
         },
       );
     });
