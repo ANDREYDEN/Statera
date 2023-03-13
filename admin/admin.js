@@ -8,21 +8,20 @@ const auth = admin.auth();
 
 (async () => {
     // const groupId = '0i9Ni8Bz5qUk7yBIj5Cu'
-    const groupId = '34zsdaQ63veJqM35MmhQ'
+    const groupId = 'YRhfpXAsOiRH9eOvFpBr'
     const groupReference = await db.collection('groups').doc(groupId).get()
     const group = groupReference.data()
 
-    // const userId = '92HncVCBiegd6rJP0Vt1gjVPz2cM'
-    const userId = 'PA0rrExN4ddCby2jeeTKlfwmmVg1'
-    const userReference = await db.collection('users').doc(userId).get()
-    const user = {
-        uid: userId,
-        ...userReference.data()
-    }
+    const userId = 'L3sRVHQZaeM77iFUgmq0PrxNFO73'
+    // const userId = 'VVcVfnsRNqbZtvW4NG173yMfxd72'
+    // const userReference = await db.collection('users').doc(userId).get()
+    // const user = {
+    //     uid: userId,
+    //     ...userReference.data()
+    // }
 
-    // const newGroup = await addUserToGroup(group, user)
-    // await groupReference.ref.set(newGroup)
-    await removeUserFromAllFinalizedExpenses(groupId, user)
+    console.log(await getUserExpenses(groupId, userId));
+    // await removeUserFromAllFinalizedExpenses(groupId, userId)
 })();
 
 function addUserToGroup(group, user) {
@@ -39,7 +38,7 @@ function addUserToGroup(group, user) {
     return group
 }
 
-async function addUserToOutstandingExpenses(groupId, user) {
+async function addUserToOutstandingExpenses(groupId, userId) {
     const allExpenses = await db
         .collection('expenses')
         .where('groupId', '==', groupId)
@@ -49,20 +48,20 @@ async function addUserToOutstandingExpenses(groupId, user) {
 
     for (const expenseDoc of outstandingExpenses) {
         const expense = expenseDoc.data()
-        expense.assigneeIds.push(user.uid)
-        expense.unmarkedAssigneeIds.push(user.uid)
+        expense.assigneeIds.push(userId)
+        expense.unmarkedAssigneeIds.push(userId)
 
         for (const item of expense.items) {
             item.assignees.push({
                 parts: null,
-                uid: user.uid
+                uid: userId
             })
         }
         await expenseDoc.ref.set(expense)
     }
 }
 
-async function removeUserFromAllFinalizedExpenses(groupId, user) {
+async function removeUserFromAllFinalizedExpenses(groupId, userId) {
     const allExpenses = await db
         .collection('expenses')
         .where('groupId', '==', groupId)
@@ -72,12 +71,14 @@ async function removeUserFromAllFinalizedExpenses(groupId, user) {
 
     for (const expenseDoc of finalizedExpenses) {
         const expense = expenseDoc.data()
-        expense.assigneeIds = expense.assigneeIds.filter(uid => uid != user.uid)
-        expense.unmarkedAssigneeIds = expense.unmarkedAssigneeIds.filter(uid => uid != user.uid)
+        // console.log('BEFORE: ', expense);
+        expense.assigneeIds = expense.assigneeIds.filter(uid => uid != userId)
+        expense.unmarkedAssigneeIds = expense.unmarkedAssigneeIds.filter(uid => uid != userId)
 
         for (const item of expense.items) {
-            item.assignees = item.assignees.filter(a => a.uid != user.uid)
+            item.assignees = item.assignees.filter(a => a.uid != userId)
         }
+        // console.log('AFTER: ', expense);
         await expenseDoc.ref.set(expense)
     }
 }
@@ -94,6 +95,19 @@ function finalizeExpense(group, expense) {
     }
 
     return group
+}
+
+async function getUserExpenses(groupId, userId) {
+    const userExpenses = await db
+        .collection('expenses')
+        .where('groupId', '==', groupId)
+        .where('assigneeIds', 'array-contains', userId)
+        .get()
+
+    return userExpenses.docs.map(e => ({
+        name: e.data().name,
+        finalizedDate: e.data().finalizedDate,
+    }))
 }
 
 function getTotalDebt(expense, assigneeId) {

@@ -5,7 +5,7 @@ import 'package:statera/data/services/firestore.dart';
 
 @GenerateNiceMocks([MockSpec<ExpenseService>()])
 class ExpenseService extends Firestore {
-  ExpenseService() : super();
+  ExpenseService(FirebaseFirestore firestoreInstance) : super(firestoreInstance);
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return queryToExpensesStream(

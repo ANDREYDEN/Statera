@@ -4,9 +4,8 @@ import 'package:statera/data/models/models.dart';
 class Firestore {
   late FirebaseFirestore _firestore;
 
-  Firestore() {
-    // FirebaseGroupService.instance.settings = Settings(host: '10.0.2.2:9099');
-    _firestore = FirebaseFirestore.instance;
+  Firestore(FirebaseFirestore firestoreInstance) {
+    _firestore = firestoreInstance;
   }
 
   CollectionReference get expensesCollection =>
@@ -43,9 +42,9 @@ class Firestore {
 
     if (finalized != null) {
       if (finalized) {
-        query = query.where('finalizedDate', isNotEqualTo: null);
+        query = query.where('finalizedDate', isNull: false);
       } else {
-        query = query.where('finalizedDate', isEqualTo: null);
+        query = query.where('finalizedDate', isNull: true);
       }
     }
 

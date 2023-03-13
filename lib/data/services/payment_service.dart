@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment.dart';
 import 'package:statera/data/services/firestore.dart';
@@ -6,7 +7,7 @@ import 'package:statera/data/services/group_service.dart';
 class PaymentService extends Firestore {
   final GroupService _groupService;
 
-  PaymentService(this._groupService) : super();
+  PaymentService(this._groupService, FirebaseFirestore firestoreInstance) : super(firestoreInstance);
 
   /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({
