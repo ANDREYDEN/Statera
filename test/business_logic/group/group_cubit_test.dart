@@ -51,7 +51,7 @@ void main() {
         'can successfully join a group',
         build: () => groupCubit,
         seed: () => GroupLoaded(group: testGroup),
-        act: (cubit) => cubit.join(testCode, testUserId),
+        act: (cubit) => cubit.addMember(testCode, testUserId),
         expect: () => [GroupLoading(), GroupJoinSuccess(group: testGroup)],
         verify: (_) {
           verify(groupService.joinGroup(testCode, testUser)).called(1);
@@ -62,7 +62,7 @@ void main() {
         'emmits an error state if the code does not match the group code',
         build: () => groupCubit,
         seed: () => GroupLoaded(group: testGroup),
-        act: (cubit) => cubit.join('some other code', testUserId),
+        act: (cubit) => cubit.addMember('some other code', testUserId),
         expect: () => [
           GroupError(
             error:
@@ -82,7 +82,7 @@ void main() {
           testGroup.addMember(CustomUser(uid: testUserId, name: 'Foo'));
           return GroupLoaded(group: testGroup);
         },
-        act: (GroupCubit cubit) => cubit.join('qwe123', testUserId),
+        act: (GroupCubit cubit) => cubit.addMember('qwe123', testUserId),
         expect: () =>
             [GroupError(error: 'You are already a member of this group')],
         verify: (_) {

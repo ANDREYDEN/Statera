@@ -20,7 +20,7 @@ class GroupJoiningActions extends StatelessWidget {
       children: [
         Expanded(
           child: ProtectedButton(
-            onPressed: () => groupCubit.join(code, uid),
+            onPressed: () => groupCubit.addMember(code, uid),
             child: Text('Join'),
           ),
         ),

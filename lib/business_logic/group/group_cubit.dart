@@ -48,6 +48,13 @@ class GroupCubit extends Cubit<GroupState> {
     load(expense.groupId);
   }
 
+  void update(Function(Group) updater) {
+    final group = loadedState.group;
+    emit(GroupLoading());
+    updater(group);
+    _groupService.saveGroup(group);
+  }
+
   Future<void> removeMember(String uid) async {
     final group = loadedState.group;
     if (!group.memberExists(uid)) return;
@@ -62,14 +69,7 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
-  void update(Function(Group) updater) {
-    final group = loadedState.group;
-    emit(GroupLoading());
-    updater(group);
-    _groupService.saveGroup(group);
-  }
-
-  Future<void> join(String? code, String uid) async {
+  Future<void> addMember(String? code, String uid) async {
     if (code != loadedState.group.code) {
       emit(GroupError(
           error:
