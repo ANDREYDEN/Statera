@@ -43,7 +43,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
         FieldData<double>(
           id: 'item_value',
           label: 'Item Value',
-          initialData: widget.intialItem?.value ?? (0 as double),
+          initialData: widget.intialItem?.value ?? 0.0,
           validators: [FieldData.requiredValidator],
           formatters: [CommaReplacerTextInputFormatter()],
         ),
