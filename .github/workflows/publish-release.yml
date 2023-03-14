@@ -45,7 +45,9 @@ jobs:
           file: android.aab
 
       - name: Create fastlane-service-account.json
-        run: echo "${{ secrets.PLAY_STORE_CONFIG_JSON }}" > fastlane-service-account.json
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: echo $PLAY_STORE_CONFIG_JSON > fastlane-service-account.json
         working-directory: android
 
       - name: Setup Fastlane
