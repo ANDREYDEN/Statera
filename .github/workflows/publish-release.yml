@@ -44,6 +44,10 @@ jobs:
           version: ${{ github.event.release.id }}
           file: android.aab
 
+      - name: Create fastlane-service-account.json
+        run: echo "${{ secrets.PLAY_STORE_CONFIG_JSON }}" > fastlane-service-account.json
+        working-directory: android
+
       - name: Setup Fastlane
         uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
         with:
@@ -52,5 +56,5 @@ jobs:
           working-directory: android
 
       - name: Create Draft Play Store Release
-        run: bundle exec fastlane run upload_to_play_store aab:../android.aab release_status:draft json_key_data:${{ secrets.PLAY_STORE_CONFIG_JSON }}}
+        run: bundle exec fastlane run upload_to_play_store aab:../android.aab release_status:draft
         working-directory: android
