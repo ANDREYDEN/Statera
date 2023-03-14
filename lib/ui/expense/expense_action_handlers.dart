@@ -4,7 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/dialogs/expense_dialogs.dart';
-import 'package:statera/ui/widgets/dialogs/new_item_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/upsert_item_dialog.dart';
 
 handleSettingsClick(BuildContext context) {
   final authBloc = context.read<AuthBloc>();
@@ -28,7 +28,7 @@ handleItemUpsert(BuildContext context, {Item? intialItem}) {
 
   showDialog(
     context: context,
-    builder: (context) => NewItemDialog(
+    builder: (context) => UpsertItemDialog(
       intialItem: intialItem,
       expenseBloc: expenseBloc,
     ),

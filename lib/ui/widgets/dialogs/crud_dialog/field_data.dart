@@ -52,6 +52,18 @@ class FieldData<T> {
     if (_fieldValue == null) {
       return _data!;
     }
+
+    // check for explicit type first
+    if (T == String) {
+      return _fieldValue! as T;
+    }
+    if (T == int) {
+      return (int.tryParse(_fieldValue!) ?? 0) as T;
+    }
+    if (T == double) {
+      return (double.tryParse(_fieldValue!) ?? 0) as T;
+    }
+
     if (initialData is String) {
       return _fieldValue! as T;
     }
@@ -75,8 +87,7 @@ class FieldData<T> {
 
   String getError() {
     if (_fieldValue != null) {
-      // TODO: resolve types differently as T is dynamic
-      if (initialData is int) {
+      if (initialData is int && T != double) {
         final formatError = intValidator(_fieldValue!);
         if (formatError.isNotEmpty) return formatError;
       }

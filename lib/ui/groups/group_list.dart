@@ -125,7 +125,7 @@ class _GroupListState extends State<GroupList> {
             formatters: [SingleCharacterTextInputFormatter()],
             isAdvanced: true,
           ),
-          FieldData(
+          FieldData<double>(
             id: 'debt_threshold',
             label: 'Debt Threshold',
             initialData: newGroup.debtThreshold,
