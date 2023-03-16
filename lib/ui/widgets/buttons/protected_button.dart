@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 enum ButtonType { elevated, text }
 
 class ProtectedButton extends StatefulWidget {
-  final Function? onPressed;
+  final FutureOr<void> Function()? onPressed;
   final ButtonType buttonType;
 
   final Widget child;

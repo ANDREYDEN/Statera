@@ -5,9 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/ui/groups/greeting_dialog.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
@@ -32,21 +34,14 @@ class _GroupListState extends State<GroupList> {
     final message = FirebaseRemoteConfig.instance.getString('greeting_message');
     final showGreetingDialog =
         FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
+    final prefs = await SharedPreferences.getInstance();
+    final messageSeen = await prefs.getBool(message.hashCode.toString());
 
-    if (!showGreetingDialog) return;
+    if (!showGreetingDialog || messageSeen == true) return;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Welcome back!'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
+      builder: (_) => GreetingDialog(message: message),
     );
   }
 
