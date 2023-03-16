@@ -26,13 +26,27 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  @override
-  void initState() {
-    super.initState();
+  void _showGreetingDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Welcome to Statera!'),
+        content: Text(
+            'This is a beta version of the app. Please report any bugs you find.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, _showGreetingDialog);
+
     return PageScaffold(
       title: kAppName,
       actions: [
