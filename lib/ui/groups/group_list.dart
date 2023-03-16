@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,13 +27,14 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  void _showGreetingDialog() {
+  Future<void> _showGreetingDialog() async {
+    await FirebaseRemoteConfig.instance.fetchAndActivate();
+    final message = FirebaseRemoteConfig.instance.getString('greeting_message');
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Welcome to Statera!'),
-        content: Text(
-            'This is a beta version of the app. Please report any bugs you find.'),
+        title: Text('Welcome back!'),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
