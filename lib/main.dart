@@ -31,6 +31,7 @@ Future<void> main() async {
   FirebaseAnalytics.instance;
   await FirebaseRemoteConfig.instance.setDefaults(<String, dynamic>{
     'greeting_message': 'Welcome to Statera!',
+    'show_greeting_dialog': false,
   });
 
   configureEmulators();

@@ -30,6 +30,11 @@ class _GroupListState extends State<GroupList> {
   Future<void> _showGreetingDialog() async {
     await FirebaseRemoteConfig.instance.fetchAndActivate();
     final message = FirebaseRemoteConfig.instance.getString('greeting_message');
+    final showGreetingDialog =
+        FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
+
+    if (!showGreetingDialog) return;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
