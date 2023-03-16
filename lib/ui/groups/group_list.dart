@@ -1,12 +1,15 @@
 import 'dart:developer' as developer;
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/ui/groups/greeting_dialog.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
@@ -26,13 +29,26 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  @override
-  void initState() {
-    super.initState();
+  Future<void> _showGreetingDialog() async {
+    await FirebaseRemoteConfig.instance.fetchAndActivate();
+    final message = FirebaseRemoteConfig.instance.getString('greeting_message');
+    final showGreetingDialog =
+        FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
+    final prefs = await SharedPreferences.getInstance();
+    final messageSeen = await prefs.getBool(message.hashCode.toString());
+
+    if (!showGreetingDialog || messageSeen == true) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => GreetingDialog(message: message),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, _showGreetingDialog);
+
     return PageScaffold(
       title: kAppName,
       actions: [

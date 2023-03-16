@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,12 @@ configureEmulators() async {
     FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
     FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
   }
+
+  await FirebaseRemoteConfig.instance.setConfigSettings(RemoteConfigSettings(
+    fetchTimeout: const Duration(seconds: 10),
+    minimumFetchInterval: const Duration(seconds: 30),
+  ));
+
   print('Talking to Firebase ' +
       (useEmulators ? 'via EMULATORS' : 'in PRODUCTION'));
 }

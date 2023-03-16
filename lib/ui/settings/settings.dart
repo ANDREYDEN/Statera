@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
@@ -11,7 +12,9 @@ import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
+import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
@@ -64,6 +67,27 @@ class _SettingsState extends State<Settings> {
           _authBloc.add(AccountDeletionRequested());
           Navigator.pop(context);
         },
+      ),
+    );
+  }
+
+  void _handleClearPreferences() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Clear preferences'),
+        content: Text('You are about to CLEAR your app preferences'),
+        actions: [
+          CancelButton(),
+          ProtectedButton(
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear();
+              Navigator.pop(context);
+            },
+            child: Text('Clear'),
+          ),
+        ],
       ),
     );
   }
@@ -178,6 +202,16 @@ class _SettingsState extends State<Settings> {
                       _authBloc.add(LogoutRequested());
                       Navigator.pop(context);
                     },
+                  ),
+                ),
+                ListTile(
+                  title: Text('Clear Preferences'),
+                  subtitle: Text(
+                    'This will clear all your preferences and reset the app to its default state.',
+                  ),
+                  trailing: DangerButton(
+                    text: 'Clear',
+                    onPressed: () => _handleClearPreferences(),
                   ),
                 ),
                 ListTile(
