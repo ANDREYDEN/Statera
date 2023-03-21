@@ -66,3 +66,7 @@ receipts
 
 .env
 *.mocks.dart
+
+# testing
+screenshots/
+failed_screenshots/
