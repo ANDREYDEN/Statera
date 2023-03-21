@@ -30,7 +30,6 @@ class UnmarkedExpensesBadge extends StatelessWidget {
             unmarkedExpenses?.length.toString() ?? '',
             style: TextStyle(color: Colors.white),
           ),
-          toAnimate: false,
           child: this.child,
         );
       },
