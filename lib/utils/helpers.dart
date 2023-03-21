@@ -11,21 +11,21 @@ import 'package:intl/intl.dart';
 
 configureEmulators() async {
   const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
+  debugPrint(
+    'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
+  );
+  if (!useEmulators) return;
+
   final host = 'localhost';
-  if (useEmulators) {
-    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
-    await FirebaseStorage.instance.useStorageEmulator(host, 9199);
-    FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
-    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
-  }
+  await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+  await FirebaseStorage.instance.useStorageEmulator(host, 9199);
+  FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
+  FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
 
   await FirebaseRemoteConfig.instance.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(seconds: 10),
     minimumFetchInterval: const Duration(seconds: 30),
   ));
-
-  print('Talking to Firebase ' +
-      (useEmulators ? 'via EMULATORS' : 'in PRODUCTION'));
 }
 
 String getRandomLetter() {
