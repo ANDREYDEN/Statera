@@ -27,13 +27,23 @@ void main() {
     await tester.tap(find.text('Home'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Tester'), findsOneWidget);
+    expect(find.text('Isabel'), findsOneWidget);
     await binding.takeScreenshot('debts');
+    
+    await tester.tap(find.text('Isabel'));
+    await tester.pumpAndSettle();
+    await binding.takeScreenshot('payments');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.receipt_long_outlined));
     await tester.pumpAndSettle();
 
-    expect(find.text('Pizza Party'), findsOneWidget);
+    expect(find.text('Groceries'), findsOneWidget);
     await binding.takeScreenshot('expenses');
+
+    await tester.tap(find.text('Groceries'));
+    await tester.pumpAndSettle();
+    await binding.takeScreenshot('expense');
   });
 }

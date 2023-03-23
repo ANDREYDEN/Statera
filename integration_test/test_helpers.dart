@@ -8,7 +8,7 @@ Future<void> trySignIn(WidgetTester tester) async {
     );
     if (emailField.evaluate().isEmpty) return;
 
-    await tester.enterText(emailField, 'admin@example.com');
+    await tester.enterText(emailField, 'john@example.com');
     var passwordField = find.ancestor(
       of: find.text('Password'),
       matching: find.byType(TextField),
