@@ -36,6 +36,38 @@ Full list of commands can be found in the `pubspec.yaml` file
 
 ## Development
 
+## Testing
+
+### Unit & Widget tests
+
+These are fast tests that verify business logic functionality and behaviour of separate widgets.
+Unit tests are contained under the `test` directory. 
+
+Run unit tests:
+```
+flutter test
+```
+
+Include coverage report:
+```
+flutter test --coverage
+```
+
+### Integration tests
+
+These tests run on a simulator while talking to an emulator version of Firebase.
+Integration tests are contained under the `integration_test` directory while the driver is defined under the `test_driver` directory.
+
+Run integration tests:
+1. Start the Firebase emulators
+    ```
+    firebase emulators:start --import ./emulator_data_testing
+    ```
+2. Start the test driver
+    ```
+    ./integration_test_runner.sh
+    ```
+
 ## References & useful links
 
 - icons generated through [Icon Kitchen](https://icon.kitchen)
