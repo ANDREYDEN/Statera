@@ -1,4 +1,4 @@
-package com.example.statera
+package com.statera.statera
 
 import io.flutter.embedding.android.FlutterActivity
 
