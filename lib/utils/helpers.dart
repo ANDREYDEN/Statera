@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +15,10 @@ configureEmulators() async {
   debugPrint(
     'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
   );
-  if (!useEmulators) return;
+  if (!useEmulators) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    return;
+  };
 
   final host = 'localhost';
   await FirebaseAuth.instance.useAuthEmulator(host, 9099);

@@ -65,8 +65,10 @@ Run integration tests:
     ```
 2. Start the test driver
     ```
-    ./integration_test_runner.sh
+    ./scripts/take_screenshots.sh
     ```
+
+Currently, there is an issue with [taking screenshots on iOS](https://github.com/flutter/flutter/issues/51890). There exists [a workaround](https://github.com/flutter/flutter/issues/91668#issuecomment-1132381182) and an [open PR](https://github.com/flutter/flutter/pull/116539).
 
 ## References & useful links
 

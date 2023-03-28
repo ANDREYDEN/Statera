@@ -10,7 +10,7 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-  testWidgets('Screenshot flow', (WidgetTester tester) async {
+  testWidgets('Screenshot test', (WidgetTester tester) async {
     await app.main();
     await tester.pumpWidget(app.Statera());
     await tester.pumpAndSettle();
@@ -22,17 +22,17 @@ void main() {
     await trySignIn(tester);
 
     expect(find.text('Home'), findsOneWidget);
-    await binding.takeScreenshot('home');
+    await binding.takeScreenshot('1_home');
 
     await tester.tap(find.text('Home'));
     await tester.pumpAndSettle();
 
     expect(find.text('Isabel'), findsOneWidget);
-    await binding.takeScreenshot('debts');
+    await binding.takeScreenshot('2_debts');
     
     await tester.tap(find.text('Isabel'));
     await tester.pumpAndSettle();
-    await binding.takeScreenshot('payments');
+    await binding.takeScreenshot('5_payments');
     await tester.pageBack();
     await tester.pumpAndSettle();
 
@@ -40,10 +40,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Groceries'), findsOneWidget);
-    await binding.takeScreenshot('expenses');
+    await binding.takeScreenshot('3_expenses');
 
     await tester.tap(find.text('Groceries'));
     await tester.pumpAndSettle();
-    await binding.takeScreenshot('expense');
+    await binding.takeScreenshot('4_expense');
   });
 }
