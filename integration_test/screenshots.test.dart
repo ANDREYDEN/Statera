@@ -9,6 +9,9 @@ import 'test_helpers.dart';
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
+  const deviceName = const String.fromEnvironment('DEVICE_NAME');
+  final isWide =
+      WidgetsBinding.instance.renderView.configuration.size.width > 1000;
 
   testWidgets('Screenshot test', (WidgetTester tester) async {
     await app.main();
@@ -22,28 +25,35 @@ void main() {
     await trySignIn(tester);
 
     expect(find.text('Home'), findsOneWidget);
-    await binding.takeScreenshot('1_home');
+    await binding.takeScreenshot('${deviceName}_1_home');
 
     await tester.tap(find.text('Home'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
 
     expect(find.text('Isabel'), findsOneWidget);
-    await binding.takeScreenshot('2_debts');
-    
+    if (!isWide) {
+      await binding.takeScreenshot('${deviceName}_2_debts');
+    }
+
     await tester.tap(find.text('Isabel'));
-    await tester.pumpAndSettle();
-    await binding.takeScreenshot('5_payments');
-    await tester.pageBack();
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 1));
+    await binding.takeScreenshot('${deviceName}_5_payments');
+
+    if (!isWide) {
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
 
     await tester.tap(find.byIcon(Icons.receipt_long_outlined));
     await tester.pumpAndSettle();
 
     expect(find.text('Groceries'), findsOneWidget);
-    await binding.takeScreenshot('3_expenses');
+    if (!isWide) {
+      await binding.takeScreenshot('${deviceName}_3_expenses');
+    }
 
     await tester.tap(find.text('Groceries'));
-    await tester.pumpAndSettle();
-    await binding.takeScreenshot('4_expense');
+    await tester.pumpAndSettle(Duration(seconds: 1));
+    await binding.takeScreenshot('${deviceName}_4_expense');
   });
 }
