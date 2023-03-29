@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -11,21 +12,24 @@ import 'package:intl/intl.dart';
 
 configureEmulators() async {
   const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
+  debugPrint(
+    'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
+  );
+  if (!useEmulators) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    return;
+  };
+
   final host = 'localhost';
-  if (useEmulators) {
-    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
-    await FirebaseStorage.instance.useStorageEmulator(host, 9199);
-    FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
-    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
-  }
+  await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+  await FirebaseStorage.instance.useStorageEmulator(host, 9199);
+  FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
+  FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
 
   await FirebaseRemoteConfig.instance.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(seconds: 10),
     minimumFetchInterval: const Duration(seconds: 30),
   ));
-
-  print('Talking to Firebase ' +
-      (useEmulators ? 'via EMULATORS' : 'in PRODUCTION'));
 }
 
 String getRandomLetter() {

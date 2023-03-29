@@ -36,6 +36,57 @@ Full list of commands can be found in the `pubspec.yaml` file
 
 ## Development
 
+## Testing
+
+### Unit & Widget tests
+
+These are fast tests that verify business logic functionality and behaviour of separate widgets.
+Unit tests are contained under the `test` directory. 
+
+Run unit tests:
+```
+flutter test
+```
+
+Include coverage report:
+```
+flutter test --coverage
+```
+
+### Integration tests
+
+These tests run on a simulator while talking to an emulator version of Firebase.
+Integration tests are contained under the `integration_test` directory while the driver is defined under the `test_driver` directory.
+
+Run integration tests:
+1. Start the Firebase emulators
+    ```
+    firebase emulators:start --import ./emulator_data_testing
+    ```
+2. Start the test driver
+    ```
+    ./scripts/take_screenshots.sh
+    ```
+
+### Atomated screenshots
+
+1. Configure the `scripts/take_screenshots_on_all_devices.sh` file to contain the devices you want to take screenshots on:
+    ```
+    ./scripts/take_screenshots.sh <device_id> <device_name>
+    ```
+    You can get the device id by running `flutter devices`
+
+2. Start the desired simulators (make sure that the user is logged out if the device was used to run the app previously)
+
+3. Run the script
+    ```
+    ./scripts/take_screenshots_on_all_devices.sh
+    ```
+4. The screenshots will be saved in the `screenshots` directory
+
+
+Currently, there is an issue with [taking screenshots on iOS](https://github.com/flutter/flutter/issues/51890). There exists [a workaround](https://github.com/flutter/flutter/issues/91668#issuecomment-1132381182) and an [open PR](https://github.com/flutter/flutter/pull/116539).
+
 ## References & useful links
 
 - icons generated through [Icon Kitchen](https://icon.kitchen)
