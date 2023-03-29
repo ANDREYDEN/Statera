@@ -10,6 +10,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
+import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
@@ -29,16 +30,6 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
-  String? newerVersion = null;
-
-  @override
-  initState() {
-    super.initState();
-    Future.delayed(Duration(seconds: 1)).then((value) => setState(() {
-          newerVersion = '1.0.0';
-        }));
-  }
-
   Future<void> _showGreetingDialog() async {
     try {
       await FirebaseRemoteConfig.instance.fetchAndActivate();
@@ -80,20 +71,7 @@ class _GroupListState extends State<GroupList> {
           defaultTargetPlatform == TargetPlatform.windows ? null : createGroup,
       child: Column(
         children: [
-          Visibility(
-            child: Container(
-              color: Colors.green,
-              padding: EdgeInsets.all(8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Version $newerVersion is available'),
-                  ElevatedButton(onPressed: () {}, child: Text('Update'))
-                ],
-              ),
-            ),
-            visible: newerVersion != null,
-          ),
+          UpdateBanner(),
           Expanded(
             child: defaultTargetPlatform == TargetPlatform.windows
                 ? Center(
