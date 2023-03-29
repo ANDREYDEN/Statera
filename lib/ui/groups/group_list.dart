@@ -29,10 +29,21 @@ class GroupList extends StatefulWidget {
 }
 
 class _GroupListState extends State<GroupList> {
+  String? newerVersion = null;
+
+  @override
+  initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 1)).then((value) => setState(() {
+          newerVersion = '1.0.0';
+        }));
+  }
+
   Future<void> _showGreetingDialog() async {
     try {
       await FirebaseRemoteConfig.instance.fetchAndActivate();
-      final message = FirebaseRemoteConfig.instance.getString('greeting_message');
+      final message =
+          FirebaseRemoteConfig.instance.getString('greeting_message');
       final showGreetingDialog =
           FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
       final prefs = await SharedPreferences.getInstance();
@@ -67,56 +78,77 @@ class _GroupListState extends State<GroupList> {
       ],
       onFabPressed:
           defaultTargetPlatform == TargetPlatform.windows ? null : createGroup,
-      child: defaultTargetPlatform == TargetPlatform.windows
-          ? Center(
-              child:
-                  Text('Main app functionality is currently in development...'),
-            )
-          : BlocBuilder<GroupsCubit, GroupsState>(
-              builder: (context, groupsState) {
-                if (groupsState is GroupsLoading) {
-                  return Center(child: Loader());
-                }
-
-                if (groupsState is GroupsError) {
-                  developer.log(
-                    'Failed loading groups',
-                    error: groupsState.error,
-                  );
-
-                  return Center(child: Text(groupsState.error.toString()));
-                }
-
-                if (groupsState is GroupsLoaded) {
-                  final groups = groupsState.groups;
-
-                  return Column(
-                    children: [
-                      SizedBox.square(
-                        dimension: 16,
-                        child: Visibility(
-                          visible: groupsState is GroupsProcessing,
-                          child: Loader(),
-                        ),
-                      ),
-                      Expanded(
-                        child: groups.isEmpty
-                            ? ListEmpty(text: 'Join or create a group!')
-                            : ListView.builder(
-                                itemCount: groups.length,
-                                itemBuilder: (context, index) {
-                                  var group = groups[index];
-                                  return GroupListItem(group: group);
-                                },
-                              ),
-                      ),
-                    ],
-                  );
-                }
-
-                return Container();
-              },
+      child: Column(
+        children: [
+          Visibility(
+            child: Container(
+              color: Colors.green,
+              padding: EdgeInsets.all(8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Version $newerVersion is available'),
+                  ElevatedButton(onPressed: () {}, child: Text('Update'))
+                ],
+              ),
             ),
+            visible: newerVersion != null,
+          ),
+          Expanded(
+            child: defaultTargetPlatform == TargetPlatform.windows
+                ? Center(
+                    child: Text(
+                        'Main app functionality is currently in development...'),
+                  )
+                : BlocBuilder<GroupsCubit, GroupsState>(
+                    builder: (context, groupsState) {
+                      if (groupsState is GroupsLoading) {
+                        return Center(child: Loader());
+                      }
+
+                      if (groupsState is GroupsError) {
+                        developer.log(
+                          'Failed loading groups',
+                          error: groupsState.error,
+                        );
+
+                        return Center(
+                            child: Text(groupsState.error.toString()));
+                      }
+
+                      if (groupsState is GroupsLoaded) {
+                        final groups = groupsState.groups;
+
+                        return Column(
+                          children: [
+                            SizedBox.square(
+                              dimension: 16,
+                              child: Visibility(
+                                visible: groupsState is GroupsProcessing,
+                                child: Loader(),
+                              ),
+                            ),
+                            Expanded(
+                              child: groups.isEmpty
+                                  ? ListEmpty(text: 'Join or create a group!')
+                                  : ListView.builder(
+                                      itemCount: groups.length,
+                                      itemBuilder: (context, index) {
+                                        var group = groups[index];
+                                        return GroupListItem(group: group);
+                                      },
+                                    ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Container();
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
