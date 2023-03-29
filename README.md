@@ -68,6 +68,23 @@ Run integration tests:
     ./scripts/take_screenshots.sh
     ```
 
+### Atomated screenshots
+
+1. Configure the `scripts/take_screenshots_on_all_devices.sh` file to contain the devices you want to take screenshots on:
+    ```
+    ./scripts/take_screenshots.sh <device_id> <device_name>
+    ```
+    You can get the device id by running `flutter devices`
+
+2. Start the desired simulators (make sure that the user is logged out if the device was used to run the app previously)
+
+3. Run the script
+    ```
+    ./scripts/take_screenshots_on_all_devices.sh
+    ```
+4. The screenshots will be saved in the `screenshots` directory
+
+
 Currently, there is an issue with [taking screenshots on iOS](https://github.com/flutter/flutter/issues/51890). There exists [a workaround](https://github.com/flutter/flutter/issues/91668#issuecomment-1132381182) and an [open PR](https://github.com/flutter/flutter/pull/116539).
 
 ## References & useful links
