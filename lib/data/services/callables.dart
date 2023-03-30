@@ -46,13 +46,12 @@ class Callables {
   }
 
   static Future<String> getLatestAndroidVersion() async {
-    var response =
-        await _getLatestVersion({'appId': dotenv.env['ANDROID_APP_ID']});
+    var response = await _getLatestVersion({'platform': 'android'});
     return response.data;
   }
 
   static Future<String> getLatestIOSVersion() async {
-    var response = await _getLatestVersion({'appId': dotenv.env['IOS_APP_ID']});
+    var response = await _getLatestVersion({'platform': 'ios'});
     return response.data;
   }
 }

@@ -11,6 +11,7 @@ import { notifyWhenExpenseCompleted } from './src/functions/notifications/notify
 import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
 import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
 import { createUserDoc } from './src/functions/userManagement/createUserDoc'
+import fetch from 'node-fetch'
 
 admin.initializeApp()
 
@@ -82,3 +83,31 @@ export const notifyWhenExpenseIsFinalized = functions.https
     if (!data.expenseId) throw new Error('parameter expenseId is required')
     return notifyWhenExpenseFinalized(data.expenseId)
   })
+
+export const getLatestAppVersion = functions.https.onCall(async (data, _) => {
+  const platform = data.platform
+  const listApps = platform == 'android'
+    ? admin.projectManagement().listAndroidApps()
+    : admin.projectManagement().listIosApps()
+  const apps = await listApps
+  if (!apps || apps.length === 0) throw new Error(`No ${platform} apps found`)
+
+  const app = apps[0]
+  const appId = app.appId
+  const projectNumber = app.appId.split(':')[1]
+
+  const accessToken = await admin.app().options.credential?.getAccessToken()
+  const response = await fetch(
+    `https://firebaseappdistribution.googleapis.com/v1/projects/${projectNumber}/apps/${appId}/releases`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken?.access_token}`,
+      }
+    })
+  const result = await response.json()
+  const releases = result.releases
+  if (!releases || releases.length === 0) throw new Error(`No ${platform} releases found`)
+
+  const latestAppVersion = result.releases[0].displayVersion
+  return latestAppVersion
+})
