@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:statera/data/services/callables.dart';
+import 'package:statera/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UpdateBanner extends StatelessWidget {
   const UpdateBanner({Key? key}) : super(key: key);
@@ -25,6 +27,16 @@ class UpdateBanner extends StatelessWidget {
     return null;
   }
 
+  void _handleUpdate() {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      launchUrl(Uri.parse(PlatformOption.android.url!));
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      launchUrl(Uri.parse(PlatformOption.ios.url!));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
@@ -44,7 +56,10 @@ class UpdateBanner extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Version $newerVersion is available'),
-              ElevatedButton(onPressed: () {}, child: Text('Update'))
+              ElevatedButton(
+                onPressed: _handleUpdate,
+                child: Text('Update'),
+              )
             ],
           ),
         );

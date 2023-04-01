@@ -108,6 +108,6 @@ export const getLatestAppVersion = functions.https.onCall(async (data, _) => {
   const releases = result.releases
   if (!releases || releases.length === 0) throw new Error(`No ${platform} releases found`)
 
-  const latestAppVersion = result.releases[0].displayVersion
+  const latestAppVersion = releases[0].displayVersion
   return latestAppVersion
 })

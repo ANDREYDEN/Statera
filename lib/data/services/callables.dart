@@ -1,5 +1,4 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:statera/data/models/models.dart';
 
 class Callables {
