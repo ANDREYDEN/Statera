@@ -10,11 +10,12 @@ class UpdateBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getNewerVersionIfExists(),
+    print('Building UpdateBanner');
+
+    return StreamBuilder<String?>(
+      stream: _getNewerVersionsStream(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done ||
-            snapshot.data == null) {
+        if (snapshot.data == null) {
           return SizedBox.shrink();
         }
 
@@ -41,7 +42,19 @@ class UpdateBanner extends StatelessWidget {
     );
   }
 
+  Stream<String?> _getNewerVersionsStream() async* {
+    while (true) {
+      await Future.delayed(Duration(minutes: 1));
+      try {
+        yield await _getNewerVersionIfExists();
+      } catch (e) {
+        yield null;
+      }
+    }
+  }
+
   Future<String?> _getNewerVersionIfExists() async {
+    print('Checking for newer version...');
     String? newerVersion;
     if (defaultTargetPlatform == TargetPlatform.android) {
       newerVersion = await Callables.getLatestAndroidVersion();
