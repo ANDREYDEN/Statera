@@ -8,6 +8,39 @@ import 'package:url_launcher/url_launcher.dart';
 class UpdateBanner extends StatelessWidget {
   const UpdateBanner({Key? key}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _getNewerVersionIfExists(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done ||
+            snapshot.data == null) {
+          return SizedBox.shrink();
+        }
+
+        var newerVersion = snapshot.data!;
+
+        return Container(
+          color: Colors.green,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Version $newerVersion is available',
+                style: TextStyle(color: Colors.white),
+              ),
+              ElevatedButton(
+                onPressed: _handleUpdate,
+                child: Text('Update'),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<String?> _getNewerVersionIfExists() async {
     String? newerVersion;
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -35,35 +68,5 @@ class UpdateBanner extends StatelessWidget {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       launchUrl(Uri.parse(PlatformOption.ios.url!));
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getNewerVersionIfExists(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done ||
-            snapshot.data == null) {
-          return SizedBox.shrink();
-        }
-
-        var newerVersion = snapshot.data!;
-
-        return Container(
-          color: Colors.green,
-          padding: EdgeInsets.all(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Version $newerVersion is available'),
-              ElevatedButton(
-                onPressed: _handleUpdate,
-                child: Text('Update'),
-              )
-            ],
-          ),
-        );
-      },
-    );
   }
 }
