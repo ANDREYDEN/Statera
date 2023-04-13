@@ -14,7 +14,7 @@
     "listen-emulate": "npm run listen & npm run emulate"
   },
   "engines": {
-    "node": "14"
+    "node": "16"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -28,6 +28,7 @@
     "ts-jest": "^27.1.4"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.6.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",

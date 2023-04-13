@@ -11,6 +11,7 @@ import { notifyWhenExpenseCompleted } from './src/functions/notifications/notify
 import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
 import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
 import { createUserDoc } from './src/functions/userManagement/createUserDoc'
+import { getLatestRelease } from './src/functions/getLatestRelease'
 
 admin.initializeApp()
 
@@ -82,3 +83,11 @@ export const notifyWhenExpenseIsFinalized = functions.https
     if (!data.expenseId) throw new Error('parameter expenseId is required')
     return notifyWhenExpenseFinalized(data.expenseId)
   })
+
+export const getLatestAppVersion = functions.https.onCall(async (data, _) => {
+  if (!data.platform) throw new Error('parameter platform is required')
+
+  const latestRelease = await getLatestRelease(data.platform)
+
+  return latestRelease.displayVersion
+})

@@ -23,20 +23,6 @@ void main(List<String> args) {
   ));
 }
 
-class PlatformOption {
-  String name;
-  IconData icon;
-  TargetPlatform? platform;
-  String? url;
-
-  PlatformOption({
-    required this.name,
-    required this.icon,
-    required this.platform,
-    this.url,
-  });
-}
-
 class LandingPage extends StatefulWidget {
   static const String route = '/';
 
@@ -50,49 +36,11 @@ class _LandingPageState extends State<LandingPage>
     with TickerProviderStateMixin {
   String? _windowsDownloadUrl;
 
-  List<PlatformOption> _platformOptions = [
-    PlatformOption(
-      name: 'iOS',
-      platform: TargetPlatform.iOS,
-      icon: Icons.phone_iphone,
-      url: 'https://apps.apple.com/us/app/statera/id1609503817?platform=iphone',
-    ),
-    PlatformOption(
-      name: 'Android',
-      platform: TargetPlatform.android,
-      icon: Icons.phone_android,
-      url: 'https://play.google.com/store/apps/details?id=com.statera.statera',
-    ),
-    PlatformOption(
-      name: 'Web',
-      platform: null,
-      icon: Icons.web,
-      url: 'https://statera-0.web.app',
-    ),
-    PlatformOption(
-      name: 'MacOS',
-      platform: TargetPlatform.macOS,
-      icon: Icons.desktop_mac,
-      url: 'https://apps.apple.com/ca/app/statera/id1609503817',
-    ),
-    PlatformOption(
-      name: 'Windows',
-      platform: TargetPlatform.windows,
-      icon: Icons.desktop_windows,
-      // url gets assigned later
-    ),
-    PlatformOption(
-      name: 'Linux',
-      platform: TargetPlatform.linux,
-      icon: Icons.desktop_windows,
-    ),
-  ];
-
   late PlatformOption _selectedOption;
 
   @override
   void initState() {
-    _selectedOption = _platformOptions
+    _selectedOption = PlatformOption.all
         .firstWhere((po) => po.platform == defaultTargetPlatform);
     super.initState();
   }
@@ -127,7 +75,7 @@ class _LandingPageState extends State<LandingPage>
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: _platformOptions
+                  children: PlatformOption.all
                       .map((po) => Padding(
                             padding: EdgeInsets.only(right: 4),
                             child: ChoiceChip(
@@ -155,9 +103,7 @@ class _LandingPageState extends State<LandingPage>
                 builder: (context, snap) {
                   if (_windowsDownloadUrl == null && snap.data != null) {
                     _windowsDownloadUrl = snap.data;
-                    final windowsOption = _platformOptions.firstWhere(
-                        (p) => p.platform == TargetPlatform.windows);
-                    windowsOption.url = _windowsDownloadUrl;
+                    PlatformOption.windows.url = _windowsDownloadUrl;
                   }
 
                   return ElevatedButton(

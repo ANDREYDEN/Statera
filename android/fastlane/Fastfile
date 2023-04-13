@@ -24,4 +24,15 @@ platform :android do
       aab: options[:aab],
     )
   end
+
+  desc "Create App Distribution release"
+  lane :distribute do
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      # release_notes_file: "release_notes.txt",
+      apk_path: "../build/outputs/apk/release/app-release.apk",
+      groups: "friends",
+      debug: true
+    )
+  end
 end
