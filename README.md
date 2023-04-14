@@ -1,10 +1,38 @@
 # Statera
 
-An expense tracking app with granular price distribution.
+**An expense tracking app with granular price distribution.**
 
-![image](https://user-images.githubusercontent.com/25109066/125558203-e66178cd-00da-4e88-b219-09e136576b08.png)
-![image](https://user-images.githubusercontent.com/25109066/125557693-e5ae08ab-ad88-4d5b-8480-8bc5e0202a3a.png)
+Splitting the bill with your friends?
+Paying for food and drinks on a Friday night?
+Going on a trip together?
 
+Statera helps you organize your expenses and does the math for you. Scan receipts, mark your items, finalize expenses and equalize your group's debts.
+
+<img 
+    src="https://user-images.githubusercontent.com/25109066/231919733-32627768-36be-4f28-b32b-f79850817cd0.png" 
+    alt="home screen" 
+    width="200"
+/>
+<img 
+    src="https://user-images.githubusercontent.com/25109066/231919806-5400754b-055e-4c67-af29-7f3d9b8892d8.png" 
+    alt="expenses" 
+    width="200"
+/>
+<img 
+    src="https://user-images.githubusercontent.com/25109066/231919825-2c28c104-d4bd-4bff-866b-f1b16ae4be7b.png" 
+    alt="expense items" 
+    width="200"
+/>
+<img 
+    src="https://user-images.githubusercontent.com/25109066/231919917-779a31a9-d1bd-45aa-bbab-d177b3cf1a93.png" 
+    alt="group members" 
+    width="200"
+/>
+<img 
+    src="https://user-images.githubusercontent.com/25109066/231919927-f85e830f-c214-4daa-a1e6-21eb8f0bd789.png" 
+    alt="payments" 
+    width="200"
+/>
 
 ## Set up
 
