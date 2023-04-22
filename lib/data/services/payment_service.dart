@@ -7,7 +7,8 @@ import 'package:statera/data/services/group_service.dart';
 class PaymentService extends Firestore {
   final GroupService _groupService;
 
-  PaymentService(this._groupService, FirebaseFirestore firestoreInstance) : super(firestoreInstance);
+  PaymentService(this._groupService, FirebaseFirestore firestoreInstance)
+      : super(firestoreInstance);
 
   /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({
@@ -28,6 +29,42 @@ class PaymentService extends Firestore {
                   Payment.fromFirestore(doc.data() as Map<String, dynamic>))
               .toList(),
         );
+  }
+
+  Future<List<String>> getUidsByMostRecentPayment(
+      Group group, String userId) async {
+    final userDates = [];
+    var otherMemberIds =
+        group.members.map((m) => m.uid).where((m) => m != userId);
+    for (final memberId in otherMemberIds) {
+      final mostRecentPaymentSnapshot = await paymentsCollection
+          .where('groupId', isEqualTo: group.id)
+          .where('payerReceiverId', whereIn: [
+            '${userId}_$memberId',
+            '${memberId}_$userId',
+          ])
+          .orderBy('timeCreated', descending: true)
+          .limit(1)
+          .get();
+
+      final mostRecentPaymentDocs = mostRecentPaymentSnapshot.docs;
+
+      if (mostRecentPaymentDocs.isEmpty) {
+        userDates.add([memberId, DateTime(0)]);
+        continue;
+      }
+
+      final mostRecentPayment = Payment.fromFirestore(
+          mostRecentPaymentSnapshot.docs.first.data() as Map<String, dynamic>);
+      userDates.add([memberId, mostRecentPayment.timeCreated]);
+    }
+
+    userDates.sort((a, b) {
+      final timeComparison = (b[1] as DateTime).compareTo(a[1] as DateTime);
+      if (timeComparison != 0) return timeComparison;
+      return b[0].compareTo(a[0]);
+    });
+    return userDates.map<String>((e) => e[0]).toList();
   }
 
   Future<void> addPayment(Payment payment) async {
