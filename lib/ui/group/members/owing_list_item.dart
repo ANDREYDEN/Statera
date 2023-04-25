@@ -5,6 +5,7 @@ import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/group/members/new_payments_badge.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
@@ -56,9 +57,12 @@ class OwingListItem extends StatelessWidget {
                     iconBackgroudColor: isAdmin ? Colors.black : null,
                   ),
                 ),
-                PriceText(
-                  value: this.owing,
-                  textStyle: TextStyle(fontSize: 18, color: owingColor),
+                NewPaymentsBadge(
+                  memberId: member.uid,
+                  child: PriceText(
+                    value: this.owing,
+                    textStyle: TextStyle(fontSize: 18, color: owingColor),
+                  ),
                 ),
               ],
             ),
