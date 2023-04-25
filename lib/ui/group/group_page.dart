@@ -14,7 +14,7 @@ import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
-import 'package:statera/ui/payments/payment_list_body.dart';
+import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
@@ -142,7 +142,7 @@ class _GroupPageState extends State<GroupPage> {
       case 0:
         return [
           Flexible(flex: 1, child: OwingsList()),
-          Flexible(flex: 2, child: PaymentListBody())
+          Flexible(flex: 2, child: PaymentList())
         ];
       case 1:
         return [

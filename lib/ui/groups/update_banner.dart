@@ -10,8 +10,6 @@ class UpdateBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Building UpdateBanner');
-
     return StreamBuilder<String?>(
       stream: _getNewerVersionsStream(),
       builder: (context, snapshot) {
