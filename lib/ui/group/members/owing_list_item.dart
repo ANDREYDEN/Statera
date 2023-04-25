@@ -36,7 +36,7 @@ class OwingListItem extends StatelessWidget {
 
         return InkWell(
           onTap: () => isWide
-              ? owingCubit.load(member.uid)
+              ? owingCubit.select(member.uid)
               : Navigator.of(context).pushNamed(paymentPageRoute),
           child: Container(
             padding: const EdgeInsets.all(8.0),

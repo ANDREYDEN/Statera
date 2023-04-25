@@ -5,31 +5,25 @@ import 'package:statera/ui/widgets/loader.dart';
 
 class OwingBuilder extends StatelessWidget {
   final Widget Function(BuildContext, String) builder;
-  final Widget Function(BuildContext, OwingError)? errorBuilder;
-  final Widget? loadingWidget;
+  
+  /// The widget to show when there is no selected member
+  final Widget? noneWidget;
 
   const OwingBuilder({
     Key? key,
     required this.builder,
-    this.errorBuilder,
-    this.loadingWidget,
+    this.noneWidget,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OwingCubit, OwingState>(
       builder: (groupContext, state) {
-        if (state is OwingLoading) {
-          return Center(child: loadingWidget ?? Loader());
+        if (state is OwingNone) {
+          return Center(child: noneWidget ?? Loader());
         }
 
-        if (state is OwingError) {
-          return errorBuilder == null
-              ? Center(child: Text(state.error.toString()))
-              : errorBuilder!(groupContext, state);
-        }
-
-        if (state is OwingLoaded) {
+        if (state is OwingSelected) {
           return builder(groupContext, state.memberId);
         }
 

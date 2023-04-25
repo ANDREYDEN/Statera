@@ -121,7 +121,7 @@ final List<PagePath> _paths = [
           )..load(matches?[0]),
         ),
         BlocProvider<OwingCubit>(
-          create: (context) => OwingCubit()..load(matches?[1] ?? ''),
+          create: (context) => OwingCubit()..select(matches?[1] ?? ''),
         ),
         BlocProvider(
           create: (context) => PaymentsCubit(context.read<PaymentService>())

@@ -12,7 +12,7 @@ class PaymentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OwingBuilder(
-      loadingWidget: ListEmpty(text: 'Pick a group member first'),
+      noneWidget: ListEmpty(text: 'Pick a group member first'),
       builder: (context, otherMemberId) {
         return Column(
           children: [
