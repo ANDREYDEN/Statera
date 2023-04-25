@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,14 +23,9 @@ class UnmarkedExpensesBadge extends StatelessWidget {
       stream: groupService.listenForUnmarkedExpenses(groupId, uid),
       builder: (context, snap) {
         var unmarkedExpenses = snap.data;
-        return badges.Badge(
-          showBadge: unmarkedExpenses != null && unmarkedExpenses.isNotEmpty,
-          badgeContent: Text(
-            unmarkedExpenses?.length.toString() ?? '',
-            style: TextStyle(color: Colors.white),
-          ),
-          child: this.child,
-        );
+        if (unmarkedExpenses == null || unmarkedExpenses.isEmpty) return child;
+
+        return Badge.count(count: unmarkedExpenses.length, child: child);
       },
     );
   }

@@ -39,7 +39,6 @@ dependencies:
   google_sign_in: ^6.0.2
   sign_in_with_apple: ^4.0.0
   build_runner: ^2.0.6
-  badges: ^3.0.2
   uuid: ^3.0.4
   image_picker: ^0.8.3
   flutter_bloc: ^8.0.0
