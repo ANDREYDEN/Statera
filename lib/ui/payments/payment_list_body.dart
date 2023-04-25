@@ -26,7 +26,15 @@ class PaymentListBody extends StatelessWidget {
           key: Key(otherMemberId),
           create: (context) => PaymentsCubit(context.read<PaymentService>())
             ..load(groupId: group.id!, uid: uid, otherUid: otherMemberId),
-          child: BlocBuilder<PaymentsCubit, PaymentsState>(
+          child: BlocConsumer<PaymentsCubit, PaymentsState>(
+            listener: (context, state) {
+              if (state is PaymentsLoaded) {
+                Future.delayed(Duration(milliseconds: 500), () async {
+                  final paymentsCubit = context.read<PaymentsCubit>();
+                  await paymentsCubit.view(uid);
+                });
+              }
+            },
             builder: (context, state) {
               if (state is PaymentsLoading) {
                 return Center(child: CircularProgressIndicator());

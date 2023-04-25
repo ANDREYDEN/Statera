@@ -70,8 +70,10 @@ class PaymentListItem extends StatelessWidget {
           onTap: () => _handleTap(context, group),
         );
 
-        if (!payment.viewedBy.contains(uid)) {
-          return paymentItem.animate().fadeIn(duration: Duration(seconds: 1));
+        if (payment.newFor.contains(uid)) {
+          return paymentItem
+              .animate()
+              .fadeIn(duration: Duration(milliseconds: 500));
         }
 
         return paymentItem;

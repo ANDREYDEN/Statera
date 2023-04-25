@@ -15,37 +15,37 @@ class PaymentService extends Firestore {
     String? groupId,
     String? userId1,
     String? userId2,
-    bool? viewed
+    String? newFor,
   }) {
-    var paymentsQuery = paymentsCollection.where('groupId', isEqualTo: groupId);
-    
+    var paymentsFilter = Filter('groupId', isEqualTo: groupId);
+
+    if (newFor != null) {
+      paymentsFilter =
+          Filter.and(paymentsFilter, Filter('newFor', arrayContains: newFor));
+    }
+
     if (userId1 != null) {
-      paymentsQuery = paymentsQuery.where(
+      paymentsFilter = Filter.and(
+        paymentsFilter,
         Filter.or(
           Filter('payerId', isEqualTo: userId1),
           Filter('receiverId', isEqualTo: userId1),
         ),
       );
     }
-    
+
     if (userId2 != null) {
-      paymentsQuery = paymentsQuery.where(
+      paymentsFilter = Filter.and(
+        paymentsFilter,
         Filter.or(
           Filter('payerId', isEqualTo: userId2),
           Filter('receiverId', isEqualTo: userId2),
         ),
       );
     }
-    
-    if (viewed != null) {
-      paymentsQuery = paymentsQuery.where('viewed', isEqualTo: viewed);
-    }
 
-    return paymentsQuery.snapshots().map(
-          (snap) => snap.docs
-              .map((doc) =>
-                  Payment.fromFirestore(doc.data() as Map<String, dynamic>))
-              .toList(),
+    return paymentsCollection.where(paymentsFilter).snapshots().map(
+          (snap) => snap.docs.map(Payment.fromFirestore).toList(),
         );
   }
 
@@ -72,8 +72,8 @@ class PaymentService extends Firestore {
         continue;
       }
 
-      final mostRecentPayment = Payment.fromFirestore(
-          mostRecentPaymentSnapshot.docs.first.data() as Map<String, dynamic>);
+      final mostRecentPayment =
+          Payment.fromFirestore(mostRecentPaymentSnapshot.docs.first);
       userDates.add([memberId, mostRecentPayment.timeCreated]);
     }
 
@@ -94,5 +94,21 @@ class PaymentService extends Firestore {
     group.payOffBalance(payment: payment);
     await paymentsCollection.add(payment.toFirestore());
     await _groupService.saveGroup(group);
+  }
+
+  Future<void> view(List<Payment> payments, String userId) {
+    final newPayments = payments.where((p) => p.newFor.contains(userId));
+    if (newPayments.isEmpty) return Future.value();
+
+    final batch = firestore.batch();
+    for (final payment in newPayments) {
+      batch.update(
+        paymentsCollection.doc(payment.id),
+        {
+          'newFor': FieldValue.arrayRemove([userId])
+        },
+      );
+    }
+    return batch.commit();
   }
 }

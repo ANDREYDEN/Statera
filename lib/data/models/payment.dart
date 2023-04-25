@@ -1,13 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/expense.dart';
 
 class Payment implements Comparable {
+  String? id;
   String? groupId;
   String payerId;
   String receiverId;
   double value;
 
   /// List of uids of users who have seen this payment. Might be either payer or receiver.
-  List<String> viewedBy;
+  List<String> newFor;
 
   PaymentExpenseInfo? relatedExpense;
   DateTime? timeCreated;
@@ -15,11 +17,12 @@ class Payment implements Comparable {
   double? oldPayerBalance;
 
   Payment({
+    this.id,
     required this.groupId,
     required this.payerId,
     required this.receiverId,
     required this.value,
-    this.viewedBy = const [],
+    this.newFor = const [],
     this.relatedExpense,
     this.timeCreated,
     this.reason,
@@ -43,12 +46,15 @@ class Payment implements Comparable {
       'payerReceiverId': '${payerId}_$receiverId',
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
-      'viewedBy': viewedBy,
+      'newFor': newFor,
     };
   }
 
-  factory Payment.fromFirestore(Map<String, dynamic> map) {
+  factory Payment.fromFirestore(QueryDocumentSnapshot doc) {
+    final map = doc.data() as Map<String, dynamic>;
+
     return Payment(
+      id: doc.id,
       groupId: map['groupId'],
       payerId: map['payerId'],
       receiverId: map['receiverId'],
@@ -61,7 +67,7 @@ class Payment implements Comparable {
           : DateTime.parse(map['timeCreated'].toDate().toString()),
       reason: map['reason'],
       oldPayerBalance: map['oldPayerBalance'],
-      viewedBy: List<String>.from(map['viewedBy'] ?? []),
+      newFor: List<String>.from(map['newFor'] ?? []),
     );
   }
 

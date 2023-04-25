@@ -22,7 +22,10 @@ class NewPaymentsLoaded extends NewPaymentsState {
   const NewPaymentsLoaded({required this.payments});
 
   int countForMember(String memberId) {
-    return payments.where((payment) => payment.receiverId == memberId).length;
+    return payments
+        .where((payment) =>
+            payment.receiverId == memberId || payment.payerId == memberId)
+        .length;
   }
 
   @override

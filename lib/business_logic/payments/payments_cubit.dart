@@ -41,4 +41,10 @@ class PaymentsCubit extends Cubit<PaymentsState> {
       },
     );
   }
+
+  Future<void> view(String uid) {
+    if (!(state is PaymentsLoaded)) return Future.value();
+
+    return _paymentService.view((state as PaymentsLoaded).payments, uid);
+  }
 }

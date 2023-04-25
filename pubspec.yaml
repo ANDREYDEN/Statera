@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.6.5+16
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.15.0 <3.0.0"
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="USE_EMULATORS=true"

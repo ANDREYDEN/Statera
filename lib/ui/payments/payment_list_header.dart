@@ -54,6 +54,7 @@ class PaymentListHeader extends StatelessWidget {
                             value: balance.abs(),
                             oldPayerBalance: group.balance[authBloc.uid]
                                 ?[otherMemberId],
+                            newFor: [otherMemberId],
                           ),
                         ),
                       ),
@@ -75,6 +76,7 @@ class PaymentListHeader extends StatelessWidget {
                             value: balance.abs(),
                             oldPayerBalance: group.balance[otherMemberId]
                                 ?[authBloc.uid],
+                            newFor: [otherMemberId],
                           ),
                         ),
                       ),

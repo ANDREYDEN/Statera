@@ -12,7 +12,8 @@ class NewPaymentsCubit extends Cubit<NewPaymentsState> {
   late final PaymentService _paymentService;
   StreamSubscription? _paymentsSubscription;
 
-  NewPaymentsCubit(PaymentService paymentService) : super(NewPaymentsLoading()) {
+  NewPaymentsCubit(PaymentService paymentService)
+      : super(NewPaymentsLoading()) {
     _paymentService = paymentService;
   }
 
@@ -22,11 +23,9 @@ class NewPaymentsCubit extends Cubit<NewPaymentsState> {
   }) {
     _paymentsSubscription?.cancel();
     _paymentsSubscription = _paymentService
-        .paymentsStream(groupId: groupId, userId1: uid, viewed: true)
-        .map((payments) {
-      payments.sort();
-      return NewPaymentsLoaded(payments: payments);
-    }).listen(
+        .paymentsStream(groupId: groupId, userId1: uid, newFor: uid)
+        .map((payments) => NewPaymentsLoaded(payments: payments))
+        .listen(
       emit,
       onError: (error) {
         if (error is Exception) {
