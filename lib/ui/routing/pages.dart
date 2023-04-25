@@ -8,6 +8,7 @@ import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
@@ -64,7 +65,14 @@ final List<PagePath> _paths = [
             context.read<ExpenseService>(),
             context.read<GroupService>(),
           )..load(context.read<AuthBloc>().uid, matches?[0]),
-        )
+        ),
+        BlocProvider(
+            create: (context) =>
+                NewPaymentsCubit(context.read<PaymentService>())
+                  ..load(
+                    groupId: matches?[0],
+                    uid: context.read<AuthBloc>().uid,
+                  )),
       ],
       child: GroupPage(groupId: matches?[0]),
     ),

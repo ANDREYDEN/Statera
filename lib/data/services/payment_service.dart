@@ -15,15 +15,33 @@ class PaymentService extends Firestore {
     String? groupId,
     String? userId1,
     String? userId2,
+    bool? viewed
   }) {
-    return paymentsCollection
-        .where('groupId', isEqualTo: groupId)
-        .where('payerReceiverId', whereIn: [
-          '${userId1}_$userId2',
-          '${userId2}_$userId1',
-        ])
-        .snapshots()
-        .map(
+    var paymentsQuery = paymentsCollection.where('groupId', isEqualTo: groupId);
+    
+    if (userId1 != null) {
+      paymentsQuery = paymentsQuery.where(
+        Filter.or(
+          Filter('payerId', isEqualTo: userId1),
+          Filter('receiverId', isEqualTo: userId1),
+        ),
+      );
+    }
+    
+    if (userId2 != null) {
+      paymentsQuery = paymentsQuery.where(
+        Filter.or(
+          Filter('payerId', isEqualTo: userId2),
+          Filter('receiverId', isEqualTo: userId2),
+        ),
+      );
+    }
+    
+    if (viewed != null) {
+      paymentsQuery = paymentsQuery.where('viewed', isEqualTo: viewed);
+    }
+
+    return paymentsQuery.snapshots().map(
           (snap) => snap.docs
               .map((doc) =>
                   Payment.fromFirestore(doc.data() as Map<String, dynamic>))

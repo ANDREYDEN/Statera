@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
@@ -23,50 +24,65 @@ class OwingsList extends StatelessWidget {
         SizedBox(height: 20),
         SectionTitle('Your Owings'),
         Flexible(
-          child: GroupBuilder(
-            builder: (context, group) {
-              final owings = group.getOwingsForUser(authBloc.uid);
-              if (owings.isEmpty) {
-                return ListEmpty(
-                  text: 'Start by inviting people to your group...',
-                  action: GroupQRButton(),
-                );
-              }
+          child: BlocBuilder<NewPaymentsCubit, NewPaymentsState>(
+              builder: (context, newPaymentsState) {
+            if (newPaymentsState is NewPaymentsLoading) {
+              return Center(child: Loader());
+            }
 
-              return FutureBuilder<List<String>>(
-                  future: paymentService.getUidsByMostRecentPayment(
-                      group, authBloc.uid),
-                  builder: (context, snap) {
-                    if (!snap.hasData) {
-                      return Center(child: Loader());
-                    }
+            if (newPaymentsState is NewPaymentsError) {
+              return Center(child: Text('Error'));
+            }
 
-                    if (snap.hasError) {
-                      debugPrint(snap.error.toString());
-                      debugPrintStack(stackTrace: snap.stackTrace);
-                      return Center(child: Text('Error'));
-                    }
+            return GroupBuilder(
+              builder: (context, group) {
+                final owings = group.getOwingsForUser(authBloc.uid);
+                if (owings.isEmpty) {
+                  return ListEmpty(
+                    text: 'Start by inviting people to your group...',
+                    action: GroupQRButton(),
+                  );
+                }
 
-                    final order = snap.data!;
+                return FutureBuilder<List<String>>(
+                    future: paymentService.getUidsByMostRecentPayment(
+                        group, authBloc.uid),
+                    builder: (context, snap) {
+                      if (!snap.hasData) {
+                        return Center(child: Loader());
+                      }
 
-                    final userOwings = owings.entries.toList();
-                    userOwings.sort((a, b) {
-                      final aIndex = order.indexOf(a.key.uid);
-                      final bIndex = order.indexOf(b.key.uid);
-                      return aIndex.compareTo(bIndex);
+                      if (snap.hasError) {
+                        debugPrint(snap.error.toString());
+                        debugPrintStack(stackTrace: snap.stackTrace);
+                        return Center(child: Text('Error'));
+                      }
+
+                      final order = snap.data!;
+
+                      final userOwings = owings.entries.toList();
+                      userOwings.sort((a, b) {
+                        final aIndex = order.indexOf(a.key.uid);
+                        final bIndex = order.indexOf(b.key.uid);
+                        return aIndex.compareTo(bIndex);
+                      });
+
+                      return ListView(
+                        children: userOwings
+                            .map((userOwing) => Badge.count(
+                                  count: (newPaymentsState as NewPaymentsLoaded)
+                                      .countForMember(userOwing.key.uid),
+                                  child: OwingListItem(
+                                    member: userOwing.key,
+                                    owing: userOwing.value,
+                                  ),
+                                ))
+                            .toList(),
+                      );
                     });
-
-                    return ListView(
-                      children: userOwings
-                          .map((userOwing) => OwingListItem(
-                                member: userOwing.key,
-                                owing: userOwing.value,
-                              ))
-                          .toList(),
-                    );
-                  });
-            },
-          ),
+              },
+            );
+          }),
         ),
       ],
     );

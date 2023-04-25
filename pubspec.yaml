@@ -33,7 +33,7 @@ dependencies:
   firebase_messaging: ^14.3.0
   firebase_analytics: ^10.1.0
   firebase_remote_config: ^3.0.0
-  cloud_firestore: ^4.4.0
+  cloud_firestore: ^4.5.0
   cloud_functions: ^4.0.0
   fake_cloud_firestore: ^2.4.0
   google_sign_in: ^6.0.2
