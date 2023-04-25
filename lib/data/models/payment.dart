@@ -5,22 +5,25 @@ class Payment {
   String payerId;
   String receiverId;
   double value;
+
+  /// List of uids of users who have seen this payment. Might be either payer or receiver.
+  List<String> viewedBy;
+
   PaymentExpenseInfo? relatedExpense;
   DateTime? timeCreated;
   String? reason;
   double? oldPayerBalance;
-  bool viewed = false;
 
   Payment({
     required this.groupId,
     required this.payerId,
     required this.receiverId,
     required this.value,
+    this.viewedBy = const [],
     this.relatedExpense,
     this.timeCreated,
     this.reason,
     this.oldPayerBalance,
-    this.viewed = false,
   });
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
@@ -40,7 +43,7 @@ class Payment {
       'payerReceiverId': '${payerId}_$receiverId',
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
-      'viewed': viewed,
+      'viewedBy': viewedBy,
     };
   }
 
@@ -58,7 +61,7 @@ class Payment {
           : DateTime.parse(map['timeCreated'].toDate().toString()),
       reason: map['reason'],
       oldPayerBalance: map['oldPayerBalance'],
-      viewed: map['viewed'] ?? false,
+      viewedBy: map['viewedBy'] ?? [],
     );
   }
 

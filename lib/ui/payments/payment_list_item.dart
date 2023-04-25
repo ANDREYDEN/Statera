@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
@@ -33,7 +33,7 @@ class PaymentListItem extends StatelessWidget {
 
     return GroupBuilder(
       builder: (context, group) {
-        return ListTile(
+        final paymentItem = ListTile(
           isThreeLine: payment.hasRelatedExpense,
           leading: Icon(
             payment.isAdmin
@@ -69,6 +69,12 @@ class PaymentListItem extends StatelessWidget {
           ),
           onTap: () => _handleTap(context, group),
         );
+
+        if (!payment.viewedBy.contains(uid)) {
+          return paymentItem.animate().fadeIn(duration: Duration(seconds: 1));
+        }
+
+        return paymentItem;
       },
     );
   }

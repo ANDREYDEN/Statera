@@ -80,6 +80,7 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 123,
                       timeCreated: DateTime.now(),
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -92,6 +93,7 @@ class ListCover extends StatelessWidget {
                         id: 'dummy_expense',
                         name: 'Some Expense',
                       ),
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -101,6 +103,7 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 123,
                       reason: 'There was a malfunction in the system',
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -111,6 +114,7 @@ class ListCover extends StatelessWidget {
                       value: 123,
                       reason:
                           'This is a very long and unneeded explanation that there was a malfunction in the system',
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -120,6 +124,7 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 123,
                       oldPayerBalance: 33,
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -129,6 +134,7 @@ class ListCover extends StatelessWidget {
                       receiverId: 'b',
                       value: 50,
                       oldPayerBalance: 10,
+                      viewedBy: ['a', 'b'],
                     ),
                   ),
                   PaymentListItem(
@@ -138,8 +144,19 @@ class ListCover extends StatelessWidget {
                       receiverId: 'a',
                       value: 30,
                       oldPayerBalance: -40,
+                      viewedBy: ['a', 'b'],
                     ),
-                  )
+                  ),
+                  PaymentListItem(
+                    payment: Payment(
+                      groupId: 'asd',
+                      payerId: 'a',
+                      receiverId: 'b',
+                      value: 123,
+                      timeCreated: DateTime.now(),
+                      viewedBy: [],
+                    ),
+                  ),
                 ],
               ),
             ),
