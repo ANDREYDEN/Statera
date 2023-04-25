@@ -24,8 +24,10 @@ class PaymentsCubit extends Cubit<PaymentsState> {
     _paymentsSubscription?.cancel();
     _paymentsSubscription = _paymentService
         .paymentsStream(groupId: groupId, userId1: uid, userId2: otherUid)
-        .map((payments) => PaymentsLoaded(payments: payments))
-        .listen(
+        .map((payments) {
+      payments.sort();
+      return PaymentsLoaded(payments: payments);
+    }).listen(
       emit,
       onError: (error) {
         if (error is Exception) {

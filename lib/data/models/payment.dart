@@ -1,6 +1,6 @@
 import 'package:statera/data/models/expense.dart';
 
-class Payment {
+class Payment implements Comparable {
   String? groupId;
   String payerId;
   String receiverId;
@@ -77,6 +77,21 @@ class Payment {
 
   @override
   int get hashCode => payerId.hashCode ^ receiverId.hashCode ^ value.hashCode;
+
+  @override
+  int compareTo(other) {
+    if (other is Payment) {
+      if (timeCreated == null) {
+        return 1;
+      }
+      if (other.timeCreated == null) {
+        return -1;
+      }
+      return timeCreated!.isAfter(other.timeCreated!) ? -1 : 1;
+    }
+
+    return -1;
+  }
 }
 
 class PaymentExpenseInfo {
