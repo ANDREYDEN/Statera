@@ -1,133 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
-import 'package:statera/ui/widgets/user_avatar.dart';
-import 'package:statera/ui/widgets/custom_stream_builder.dart';
-import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
-import 'package:statera/ui/widgets/price_text.dart';
-
-import '../../data/models/models.dart';
 
 class PaymentListBody extends StatelessWidget {
-  const PaymentListBody({Key? key}) : super(key: key);
+  final String otherMemberId;
+
+  const PaymentListBody({
+    Key? key,
+    required this.otherMemberId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.watch<AuthBloc>();
-    final paymentService = context.watch<PaymentService>();
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
-    return OwingBuilder(
-      loadingWidget: ListEmpty(text: 'Pick a group member first'),
-      builder: (context, otherMemberId) {
-        return GroupBuilder(
-          builder: (context, group) {
-            final otherMember = group.getMember(otherMemberId);
-            final balance = group.balance[authBloc.uid]![otherMemberId]!;
+    return GroupBuilder(builder: (context, group) {
+      return OwingBuilder(builder: (context, otherMemberId) {
+        return BlocProvider<PaymentsCubit>(
+          key: Key(otherMemberId),
+          create: (context) => PaymentsCubit(context.read<PaymentService>())
+            ..load(groupId: group.id!, uid: uid, otherUid: otherMemberId),
+          child: BlocConsumer<PaymentsCubit, PaymentsState>(
+            listener: (context, state) {
+              if (state is PaymentsLoaded) {
+                Future.delayed(Duration(milliseconds: 500), () async {
+                  final paymentsCubit = context.read<PaymentsCubit>();
+                  await paymentsCubit.view(uid);
+                });
+              }
+            },
+            builder: (context, state) {
+              if (state is PaymentsLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                UserAvatar(
-                  author: otherMember,
-                  dimension: 100,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                ),
-                SizedBox(height: 8),
-                PriceText(value: balance, textStyle: TextStyle(fontSize: 32)),
-                Text('You owe'),
-                SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => PaymentDialog(
-                              group: group,
-                              currentUid: authBloc.uid,
-                              payment: Payment(
-                                groupId: group.id,
-                                payerId: authBloc.uid,
-                                receiverId: otherMemberId,
-                                value: balance.abs(),
-                                oldPayerBalance: group.balance[authBloc.uid]
-                                    ?[otherMemberId],
-                              ),
-                            ),
-                          ),
-                          child: Text('Pay'),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => PaymentDialog(
-                              group: group,
-                              currentUid: authBloc.uid,
-                              payment: Payment(
-                                groupId: group.id,
-                                payerId: otherMemberId,
-                                receiverId: authBloc.uid,
-                                value: balance.abs(),
-                                oldPayerBalance: group.balance[otherMemberId]
-                                    ?[authBloc.uid],
-                              ),
-                            ),
-                          ),
-                          child: Text('Receive'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  child: CustomStreamBuilder<List<Payment>>(
-                    stream: paymentService.paymentsStream(
-                      groupId: group.id,
-                      userId1: otherMemberId,
-                      userId2: authBloc.uid,
-                    ),
-                    builder: (context, payments) {
-                      if (payments.isEmpty) {
-                        return ListEmpty(text: 'Payment History is empty');
-                      }
+              if (state is PaymentsError) {
+                return Center(child: Text(state.error));
+              }
 
-                      payments.sort((Payment payment1, Payment payment2) {
-                        if (payment1.timeCreated == null) {
-                          return 1;
-                        }
-                        if (payment2.timeCreated == null) {
-                          return -1;
-                        }
-                        return payment1.timeCreated!
-                                .isAfter(payment2.timeCreated!)
-                            ? -1
-                            : 1;
-                      });
+              if (state is PaymentsLoaded) {
+                final payments = state.payments;
 
-                      return ListView.builder(
-                        itemCount: payments.length,
-                        itemBuilder: (context, index) {
-                          return PaymentListItem(payment: payments[index]);
-                        },
-                      );
-                    },
-                  ),
-                )
-              ],
-            );
-          },
+                if (payments.isEmpty) {
+                  return ListEmpty(text: 'Payment History is empty');
+                }
+
+                return ListView.builder(
+                  itemCount: payments.length,
+                  itemBuilder: (context, index) {
+                    return PaymentListItem(payment: payments[index]);
+                  },
+                );
+              }
+
+              return Container();
+            },
+          ),
         );
-      },
-    );
+      });
+    });
   }
 }

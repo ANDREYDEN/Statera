@@ -7,22 +7,13 @@ abstract class OwingState extends Equatable {
   List<Object> get props => [];
 }
 
-class OwingLoading extends OwingState {}
+class OwingNone extends OwingState {}
 
-class OwingLoaded extends OwingState {
+class OwingSelected extends OwingState {
   final String memberId;
 
-  const OwingLoaded({required this.memberId});
+  const OwingSelected({required this.memberId});
 
   @override
   List<Object> get props => [memberId];
-}
-
-class OwingError extends OwingState {
-  final Object error;
-
-  OwingError({required this.error});
-
-  @override
-  List<Object> get props => [error];
 }

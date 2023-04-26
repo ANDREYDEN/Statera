@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'owing_state.dart';
 
 class OwingCubit extends Cubit<OwingState> {
-  OwingCubit() : super(OwingLoading());
+  OwingCubit() : super(OwingNone());
 
-  void load(String memberId) {
-      emit(OwingLoaded(memberId: memberId));
+  void select(String memberId) {
+    emit(OwingSelected(memberId: memberId));
   }
 }

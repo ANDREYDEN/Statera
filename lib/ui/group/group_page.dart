@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -14,7 +16,7 @@ import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
-import 'package:statera/ui/payments/payment_list_body.dart';
+import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
@@ -36,7 +38,6 @@ class _GroupPageState extends State<GroupPage> {
 
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
-    final expenseService = context.watch<ExpenseService>();
 
     if (_pageController.hasClients) {
       _pageController.animateToPage(
@@ -96,7 +97,7 @@ class _GroupPageState extends State<GroupPage> {
             ),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => ExpenseBloc(expenseService)),
+          BlocProvider(create: (context) => ExpenseBloc(context.read<ExpenseService>())),
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide
@@ -127,7 +128,7 @@ class _GroupPageState extends State<GroupPage> {
                 children: [
                   OwingsList(),
                   BlocProvider(
-                    create: (context) => ExpenseBloc(expenseService),
+                    create: (context) => ExpenseBloc(context.read<ExpenseService>()),
                     child: ExpenseList(),
                   ),
                   GroupSettings()
@@ -142,7 +143,7 @@ class _GroupPageState extends State<GroupPage> {
       case 0:
         return [
           Flexible(flex: 1, child: OwingsList()),
-          Flexible(flex: 2, child: PaymentListBody())
+          Flexible(flex: 2, child: PaymentList())
         ];
       case 1:
         return [

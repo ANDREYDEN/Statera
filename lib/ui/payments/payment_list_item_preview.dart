@@ -139,7 +139,17 @@ class ListCover extends StatelessWidget {
                       value: 30,
                       oldPayerBalance: -40,
                     ),
-                  )
+                  ),
+                  PaymentListItem(
+                    payment: Payment(
+                      groupId: 'asd',
+                      payerId: 'a',
+                      receiverId: 'b',
+                      value: 123,
+                      timeCreated: DateTime.now(),
+                      newFor: ['a', 'b'],
+                    ),
+                  ),
                 ],
               ),
             ),

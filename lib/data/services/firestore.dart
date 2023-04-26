@@ -2,21 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/models.dart';
 
 class Firestore {
-  late FirebaseFirestore _firestore;
+  late FirebaseFirestore firestore;
 
   Firestore(FirebaseFirestore firestoreInstance) {
-    _firestore = firestoreInstance;
+    firestore = firestoreInstance;
   }
 
   CollectionReference get expensesCollection =>
-      _firestore.collection('expenses');
+      firestore.collection('expenses');
 
-  CollectionReference get groupsCollection => _firestore.collection('groups');
+  CollectionReference get groupsCollection => firestore.collection('groups');
 
   CollectionReference get paymentsCollection =>
-      _firestore.collection('payments');
+      firestore.collection('payments');
 
-  CollectionReference get usersCollection => _firestore.collection('users');
+  CollectionReference get usersCollection => firestore.collection('users');
 
   Query expensesQuery({
     String? groupId,

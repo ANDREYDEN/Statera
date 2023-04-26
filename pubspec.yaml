@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.6.5+16
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.15.0 <3.0.0"
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="USE_EMULATORS=true"
@@ -33,13 +33,12 @@ dependencies:
   firebase_messaging: ^14.3.0
   firebase_analytics: ^10.1.0
   firebase_remote_config: ^3.0.0
-  cloud_firestore: ^4.4.0
+  cloud_firestore: ^4.5.0
   cloud_functions: ^4.0.0
   fake_cloud_firestore: ^2.4.0
   google_sign_in: ^6.0.2
   sign_in_with_apple: ^4.0.0
   build_runner: ^2.0.6
-  badges: ^3.0.2
   uuid: ^3.0.4
   image_picker: ^0.8.3
   flutter_bloc: ^8.0.0
@@ -55,6 +54,7 @@ dependencies:
   app_settings: ^4.1.8
   dynamic_color: ^1.6.2
   shared_preferences: ^2.0.18
+  flutter_animate: ^4.1.1+1
 
 dev_dependencies:
   integration_test:
