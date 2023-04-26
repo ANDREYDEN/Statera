@@ -49,9 +49,11 @@ class PaymentService extends Firestore {
         );
   }
 
-  Future<List<String>> getUidsByMostRecentPayment(
-      Group group, String userId) async {
-    final userDates = [];
+  Future<Map<String, DateTime>> getMostRecentPaymentDateForMembers(
+    Group group,
+    String userId,
+  ) async {
+    final Map<String, DateTime> userDates = {};
     var otherMemberIds =
         group.members.map((m) => m.uid).where((m) => m != userId);
     for (final memberId in otherMemberIds) {
@@ -67,22 +69,17 @@ class PaymentService extends Firestore {
 
       final mostRecentPaymentDocs = mostRecentPaymentSnapshot.docs;
 
-      if (mostRecentPaymentDocs.isEmpty) {
-        userDates.add([memberId, DateTime(0)]);
-        continue;
-      }
+      if (mostRecentPaymentDocs.isEmpty) continue;
 
       final mostRecentPayment =
           Payment.fromFirestore(mostRecentPaymentSnapshot.docs.first);
-      userDates.add([memberId, mostRecentPayment.timeCreated]);
+
+      if (mostRecentPayment.timeCreated == null) continue;
+
+      userDates[memberId] = mostRecentPayment.timeCreated!;
     }
 
-    userDates.sort((a, b) {
-      final timeComparison = (b[1] as DateTime).compareTo(a[1] as DateTime);
-      if (timeComparison != 0) return timeComparison;
-      return b[0].compareTo(a[0]);
-    });
-    return userDates.map<String>((e) => e[0]).toList();
+    return userDates;
   }
 
   Future<void> addPayment(Payment payment) async {

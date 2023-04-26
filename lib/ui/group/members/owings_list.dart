@@ -32,28 +32,33 @@ class OwingsList extends StatelessWidget {
               );
             }
 
-            return FutureBuilder<List<String>>(
-                future: paymentService.getUidsByMostRecentPayment(
+            return FutureBuilder<Map<String, DateTime>>(
+                future: paymentService.getMostRecentPaymentDateForMembers(
                     group, authBloc.uid),
                 builder: (context, snap) {
-                  if (!snap.hasData) {
+                  if (snap.connectionState != ConnectionState.done) {
                     return Center(child: Loader());
                   }
 
                   if (snap.hasError) {
                     debugPrint(snap.error.toString());
                     debugPrintStack(stackTrace: snap.stackTrace);
-                    return Center(child: Text('Error'));
                   }
 
-                  final order = snap.data!;
+                  final order = snap.data;
 
                   final userOwings = owings.entries.toList();
-                  userOwings.sort((a, b) {
-                    final aIndex = order.indexOf(a.key.uid);
-                    final bIndex = order.indexOf(b.key.uid);
-                    return aIndex.compareTo(bIndex);
-                  });
+                  if (order != null) {
+                    userOwings.sort((a, b) {
+                      final aDate = order[a.key.uid];
+                      final bDate = order[b.key.uid];
+                      if (aDate == null && bDate == null) return 0;
+                      if (aDate == null && bDate != null) return 1;
+                      if (aDate != null && bDate == null) return -1;
+
+                      return bDate!.compareTo(aDate!);
+                    });
+                  }
 
                   return ListView(
                     children: userOwings
