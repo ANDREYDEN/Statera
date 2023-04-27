@@ -161,8 +161,8 @@ jobs:
       - name: Rename Android Artifact
         run: mv android-out/app-release.aab ./android.aab
 
-      - name: Rename iOS Artifact
-        run: mv ios-out/Runner.ipa ./ios.ipa
+      # - name: Rename iOS Artifact
+      #   run: mv ios-out/Runner.ipa ./ios.ipa
 
       - name: Read Version
         id: read-version
@@ -188,4 +188,3 @@ jobs:
           files: |
             web.zip
             android.aab
-            ios.ipa
