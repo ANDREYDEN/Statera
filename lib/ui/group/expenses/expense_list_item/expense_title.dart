@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/widgets/warning_icon.dart';
 
 class ExpenseTitle extends StatelessWidget {
   final Expense expense;
@@ -13,19 +14,7 @@ class ExpenseTitle extends StatelessWidget {
           Tooltip(
             message:
                 'This expense contains items that were not marked by any of the assignees',
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 2, left: 4, right: 4),
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  size: 20,
-                ),
-              ),
-            ),
+            child: WarningIcon(),
           ),
           SizedBox(width: 5),
         ],

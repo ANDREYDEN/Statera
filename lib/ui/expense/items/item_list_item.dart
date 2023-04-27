@@ -4,6 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/expense/items/item_decisions.dart';
 import 'package:statera/ui/widgets/price_text.dart';
+import 'package:statera/ui/widgets/warning_icon.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
@@ -31,21 +32,7 @@ class ItemListItem extends StatelessWidget {
           leading: item.isDeniedByAll
               ? Tooltip(
                   message: 'This item was not marked by any of the assignees',
-                  // child: Icon(Icons.warning_amber_rounded, color: Colors.amber),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(bottom: 2, left: 4, right: 4),
-                      child: Icon(
-                        Icons.warning_amber_rounded,
-                        size: 20,
-                      ),
-                    ),
-                  ),
+                  child: WarningIcon(),
                 )
               : null,
           title: Text(item.name),
