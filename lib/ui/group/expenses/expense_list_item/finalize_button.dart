@@ -6,6 +6,7 @@ import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/utils/utils.dart';
 
 class FinalizeButton extends StatelessWidget {
@@ -44,7 +45,21 @@ class FinalizeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProtectedButton(
-      onPressed: () {
+      onPressed: () async {
+        bool accepted = true;
+        if (expense.hasItemsDeniedByAll) {
+          accepted = await showDialog<bool>(
+                context: context,
+                builder: (context) => OKCancelDialog(
+                  text:
+                      'This expense contains items that were not marked by any of the assignees. This means that you will not be reimbursed for these items from anyone in the group. Are you sure you still want to finalize the expense?',
+                ),
+              ) ??
+              false;
+        }
+
+        if (!accepted) return;
+
         snackbarCatch(
           GroupPage.scaffoldKey.currentContext!,
           () => _handleFinalizeExpense(context),

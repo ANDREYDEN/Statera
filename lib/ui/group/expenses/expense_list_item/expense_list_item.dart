@@ -36,7 +36,7 @@ class ExpenseListItem extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  expense.getColor(authBloc.state.user!.uid),
+                  expense.getColor(authBloc.uid),
                   Theme.of(context).cardColor,
                 ],
                 stops: [0, 0.8],
@@ -86,8 +86,9 @@ class ExpenseListItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           PriceText(
-                            value: this.expense.getConfirmedTotalForUser(
-                                authBloc.state.user!.uid),
+                            value: this
+                                .expense
+                                .getConfirmedTotalForUser(authBloc.uid),
                             textStyle: TextStyle(fontSize: 24),
                           ),
                           PriceText(

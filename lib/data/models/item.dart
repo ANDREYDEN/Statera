@@ -115,9 +115,7 @@ class Item {
     }
   }
 
-  bool deniedByAll() {
-    return assignees.every((assignee) => assignee.parts == 0);
-  }
+  bool get isDeniedByAll => assignees.every((assignee) => assignee.parts == 0);
 
   Map<String, dynamic> toFirestore() {
     return {

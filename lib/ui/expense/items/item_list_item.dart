@@ -28,7 +28,7 @@ class ItemListItem extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: item.deniedByAll()
+          leading: item.isDeniedByAll
               ? Tooltip(
                   message: 'This item was not marked by any of the assignees',
                   child:

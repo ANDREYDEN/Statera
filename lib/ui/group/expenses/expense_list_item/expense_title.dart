@@ -9,7 +9,7 @@ class ExpenseTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (expense.items.any((i) => i.deniedByAll())) ...[
+        if (expense.hasItemsDeniedByAll) ...[
           Tooltip(
             message:
                 'This expense contains items that were not marked by any of the assignees',
