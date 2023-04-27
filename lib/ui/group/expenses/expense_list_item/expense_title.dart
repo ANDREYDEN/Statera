@@ -13,10 +13,18 @@ class ExpenseTitle extends StatelessWidget {
           Tooltip(
             message:
                 'This expense contains items that were not marked by any of the assignees',
-            child: Icon(
-              Icons.warning_amber_rounded,
-              color: Colors.yellow,
-              size: 20,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.amber,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 2, left: 4, right: 4),
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  size: 20,
+                ),
+              ),
             ),
           ),
           SizedBox(width: 5),

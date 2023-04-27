@@ -31,8 +31,21 @@ class ItemListItem extends StatelessWidget {
           leading: item.isDeniedByAll
               ? Tooltip(
                   message: 'This item was not marked by any of the assignees',
-                  child:
-                      Icon(Icons.warning_amber_rounded, color: Colors.yellow),
+                  // child: Icon(Icons.warning_amber_rounded, color: Colors.amber),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: 2, left: 4, right: 4),
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 )
               : null,
           title: Text(item.name),

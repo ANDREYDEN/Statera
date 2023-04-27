@@ -3,12 +3,18 @@ import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class OKCancelDialog extends StatelessWidget {
   final String text;
+  final String? title;
 
-  const OKCancelDialog({Key? key, required this.text}) : super(key: key);
+  const OKCancelDialog({
+    Key? key,
+    required this.text,
+    this.title,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      title: title == null ? null : Text(title!),
       content: Text(this.text),
       actions: [
         CancelButton(),
@@ -16,7 +22,7 @@ class OKCancelDialog extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: Text("Yes"),
+          child: Text('Yes'),
         ),
       ],
     );

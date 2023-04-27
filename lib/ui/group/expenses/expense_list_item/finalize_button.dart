@@ -51,6 +51,7 @@ class FinalizeButton extends StatelessWidget {
           accepted = await showDialog<bool>(
                 context: context,
                 builder: (context) => OKCancelDialog(
+                  title: 'Some items require attention',
                   text:
                       'This expense contains items that were not marked by any of the assignees. This means that you will not be reimbursed for these items from anyone in the group. Are you sure you still want to finalize the expense?',
                 ),
