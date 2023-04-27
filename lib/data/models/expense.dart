@@ -188,6 +188,8 @@ class Expense {
     return this.assigneeUids.contains(uid);
   }
 
+  bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
+
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,

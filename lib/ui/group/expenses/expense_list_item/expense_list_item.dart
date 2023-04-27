@@ -1,20 +1,15 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/callables.dart';
-import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/group/expenses/expense_list_item/expense_title.dart';
+import 'package:statera/ui/group/expenses/expense_list_item/finalize_button.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/widgets/user_avatar.dart';
-import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/utils/helpers.dart';
 
 class ExpenseListItem extends StatelessWidget {
@@ -41,7 +36,7 @@ class ExpenseListItem extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  expense.getColor(authBloc.state.user!.uid),
+                  expense.getColor(authBloc.uid),
                   Theme.of(context).cardColor,
                 ],
                 stops: [0, 0.8],
@@ -72,14 +67,7 @@ class ExpenseListItem extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Flexible(
-                                    child: Text(
-                                      this.expense.name,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
+                                      child: ExpenseTitle(expense: expense)),
                                   Text(
                                     pluralize(
                                             'item', this.expense.items.length) +
@@ -98,8 +86,9 @@ class ExpenseListItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           PriceText(
-                            value: this.expense.getConfirmedTotalForUser(
-                                authBloc.state.user!.uid),
+                            value: this
+                                .expense
+                                .getConfirmedTotalForUser(authBloc.uid),
                             textStyle: TextStyle(fontSize: 24),
                           ),
                           PriceText(
@@ -110,18 +99,10 @@ class ExpenseListItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (expense.canBeFinalizedBy(authBloc.uid))
-                    ProtectedButton(
-                      onPressed: () {
-                        snackbarCatch(
-                          GroupPage.scaffoldKey.currentContext!,
-                          () => _handleFinalizeExpense(context),
-                          successMessage:
-                              "The expense is now finalized. Participants' balances updated.",
-                        );
-                      },
-                      child: Text('Finalize'),
-                    ),
+                  if (expense.canBeFinalizedBy(authBloc.uid)) ...[
+                    SizedBox(height: 5),
+                    FinalizeButton(expense: expense)
+                  ]
                 ],
               ),
             ),
@@ -129,35 +110,5 @@ class ExpenseListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _handleFinalizeExpense(BuildContext context) async {
-    final groupCubit = context.read<GroupCubit>();
-    final expenseService = context.read<ExpenseService>();
-    final paymentService = context.read<PaymentService>();
-
-    // TODO: use transaction
-    await expenseService.finalizeExpense(expense);
-    // add expense payments from author to all assignees
-    await Future.wait(
-      expense.assigneeUids.map((assigneeUid) => paymentService.addPayment(
-            Payment(
-              groupId: expense.groupId,
-              payerId: expense.authorUid,
-              receiverId: assigneeUid,
-              value: expense.getConfirmedTotalForUser(assigneeUid),
-              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-              oldPayerBalance: groupCubit
-                  .loadedState.group.balance[expense.authorUid]?[assigneeUid],
-                  newFor: [assigneeUid]
-            ),
-          )),
-    );
-    try {
-      Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
-    } catch (e) {
-      log(e.toString());
-    }
-    groupCubit.update((group) => group.updateBalance(expense));
   }
 }
