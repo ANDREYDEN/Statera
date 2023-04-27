@@ -18,11 +18,13 @@ class ExpenseTitle extends StatelessWidget {
           ),
           SizedBox(width: 5),
         ],
-        Text(
-          this.expense.name,
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.black,
+        Expanded(
+          child: Text(
+            this.expense.name,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+            ),
           ),
         ),
       ],
