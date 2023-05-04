@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:statera/data/dtos/version.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,7 +11,7 @@ class UpdateBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<String?>(
+    return StreamBuilder<Version?>(
       stream: _getNewerVersionsStream(),
       builder: (context, snapshot) {
         if (snapshot.data == null) {
@@ -40,20 +41,26 @@ class UpdateBanner extends StatelessWidget {
     );
   }
 
-  Stream<String?> _getNewerVersionsStream() async* {
+  Stream<Version?> _getNewerVersionsStream() async* {
+    const DEBUG_FREQUENCY = Duration(minutes: 1);
+    // const PROD_FREQUENCY = Duration(hours: 1);
+    // final frequency =
+    //     bool.fromEnvironment(kEmulatorFlag) ? DEBUG_FREQUENCY : PROD_FREQUENCY;
+    final frequency = DEBUG_FREQUENCY;
+
     while (true) {
-      await Future.delayed(Duration(minutes: 1));
       try {
         yield await _getNewerVersionIfExists();
       } catch (e) {
         yield null;
       }
+      await Future.delayed(frequency);
     }
   }
 
-  Future<String?> _getNewerVersionIfExists() async {
+  Future<Version?> _getNewerVersionIfExists() async {
     print('Checking for newer version...');
-    String? newerVersion;
+    Version? newerVersion;
     if (defaultTargetPlatform == TargetPlatform.android) {
       newerVersion = await Callables.getLatestAndroidVersion();
     }
@@ -62,9 +69,11 @@ class UpdateBanner extends StatelessWidget {
       newerVersion = await Callables.getLatestIOSVersion();
     }
 
+    if (newerVersion == null) return null;
+
     final currentVersion = await PackageInfo.fromPlatform();
-    final currentVersionNumber = currentVersion.version;
-    if (newerVersion != currentVersionNumber) {
+    final currentVersionNumber = Version.fromString(currentVersion.version);
+    if (newerVersion > currentVersionNumber) {
       return newerVersion;
     }
 

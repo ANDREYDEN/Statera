@@ -9,9 +9,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:statera/utils/utils.dart';
 
 configureEmulators() async {
-  const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
+  const useEmulators = const bool.fromEnvironment(kEmulatorFlag);
   debugPrint(
     'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
   );

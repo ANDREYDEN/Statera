@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:statera/data/dtos/version.dart';
 import 'package:statera/data/models/models.dart';
 
 class Callables {
@@ -44,13 +45,13 @@ class Callables {
     await _notifyWhenExpenseFinalized({'expenseId': expenseId});
   }
 
-  static Future<String> getLatestAndroidVersion() async {
+  static Future<Version> getLatestAndroidVersion() async {
     var response = await _getLatestVersion({'platform': 'android'});
-    return response.data;
+    return Version.fromString(response.data);
   }
 
-  static Future<String> getLatestIOSVersion() async {
+  static Future<Version> getLatestIOSVersion() async {
     var response = await _getLatestVersion({'platform': 'ios'});
-    return response.data;
+    return Version.fromString(response.data);
   }
 }
