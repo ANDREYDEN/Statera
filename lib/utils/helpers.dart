@@ -12,11 +12,10 @@ import 'package:intl/intl.dart';
 import 'package:statera/utils/utils.dart';
 
 configureEmulators() async {
-  const useEmulators = const bool.fromEnvironment(kEmulatorFlag);
   debugPrint(
-    'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
+    'Talking to Firebase using ${kIsModeDebug ? 'EMULATOR' : 'PRODUCTION'} data',
   );
-  if (!useEmulators) {
+  if (!kIsModeDebug) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     return;
   };

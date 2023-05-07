@@ -43,10 +43,8 @@ class UpdateBanner extends StatelessWidget {
 
   Stream<Version?> _getNewerVersionsStream() async* {
     const DEBUG_FREQUENCY = Duration(minutes: 1);
-    // const PROD_FREQUENCY = Duration(hours: 1);
-    // final frequency =
-    //     bool.fromEnvironment(kEmulatorFlag) ? DEBUG_FREQUENCY : PROD_FREQUENCY;
-    final frequency = DEBUG_FREQUENCY;
+    const PROD_FREQUENCY = Duration(hours: 1);
+    final frequency = kIsModeDebug ? DEBUG_FREQUENCY : PROD_FREQUENCY;
 
     while (true) {
       try {

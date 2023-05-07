@@ -6,7 +6,7 @@
       "name": "Flutter: emulate",
       "type": "dart",
       "request": "launch",
-      "args": ["--dart-define=USE_EMULATORS=true"],
+      "args": ["--dart-define=MODE=debug"],
     },
     {
       "name": "Flutter: Run all Tests",
