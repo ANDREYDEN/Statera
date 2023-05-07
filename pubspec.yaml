@@ -9,8 +9,8 @@ environment:
   sdk: ">=2.15.0 <3.0.0"
 
 scripts:
-  run-web-emulate: flutter run -d chrome --dart-define="USE_EMULATORS=true"
-  run-emulate: flutter run --dart-define="USE_EMULATORS=true"
+  run-web-emulate: flutter run -d chrome --dart-define="MODE=debug"
+  run-emulate: flutter run --dart-define="MODE=debug"
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
   create-mocks: flutter pub run build_runner build

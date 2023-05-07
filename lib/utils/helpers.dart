@@ -9,13 +9,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:statera/utils/utils.dart';
 
 configureEmulators() async {
-  const useEmulators = const bool.fromEnvironment('USE_EMULATORS');
   debugPrint(
-    'Talking to Firebase using ${useEmulators ? 'EMULATOR' : 'PRODUCTION'} data',
+    'Talking to Firebase using ${kIsModeDebug ? 'EMULATOR' : 'PRODUCTION'} data',
   );
-  if (!useEmulators) {
+  if (!kIsModeDebug) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     return;
   };

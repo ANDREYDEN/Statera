@@ -1,5 +1,8 @@
 const kAppName = 'Statera';
 
+const kEmulatorFlag = 'MODE';
+const kIsModeDebug = String.fromEnvironment(kEmulatorFlag) == 'debug';
+
 const kSignInMessages = {
   'user-not-found': 'There is no user associated with this email address',
   'invalid-email': 'The provided email is not valid',
