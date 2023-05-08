@@ -5,15 +5,27 @@ import 'package:statera/data/services/firestore.dart';
 
 @GenerateNiceMocks([MockSpec<ExpenseService>()])
 class ExpenseService extends Firestore {
-  ExpenseService(FirebaseFirestore firestoreInstance) : super(firestoreInstance);
+  ExpenseService(FirebaseFirestore firestoreInstance)
+      : super(firestoreInstance);
 
-  Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
-    return queryToExpensesStream(
-            expensesCollection.where('groupId', isEqualTo: groupId))
-        .map((expenses) => expenses
-            .where((expense) =>
-                expense.hasAssignee(uid) || expense.isAuthoredBy(uid))
-            .toList());
+  Stream<List<Expense>> listenForRelatedExpenses(
+    String uid,
+    String? groupId, {
+    int? quantity,
+  }) {
+    var query = expensesCollection.where(
+      Filter.and(
+        Filter('groupId', isEqualTo: groupId),
+        Filter.or(
+          Filter('authorUid', isEqualTo: uid),
+          Filter('assigneeIds', arrayContains: uid),
+        ),
+      ),
+    );
+    if (quantity != null) {
+      query = query.limit(quantity);
+    }
+    return queryToExpensesStream(query);
   }
 
   Future<Expense> getExpense(String? expenseId) async {

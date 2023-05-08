@@ -11,6 +11,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
+  static const int _expensesPerPage = 10;
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -18,10 +19,11 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _groupService = groupService;
   }
 
-  void load(String userId, String? groupId) {
+  void load(String userId, String? groupId,
+      {int numberOfExpenses = _expensesPerPage}) {
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
-        .listenForRelatedExpenses(userId, groupId)
+        .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
         .map((expenses) {
       expenses.sort((firstExpense, secondExpense) {
         final expenseStages = Expense.expenseStages(userId);
@@ -46,6 +48,14 @@ class ExpensesCubit extends Cubit<ExpensesState> {
         emit(ExpensesError(error: error));
       },
     );
+  }
+
+  void loadMore(String userId, String? groupId) {
+    if (state is ExpensesLoaded) {
+      final currentState = state as ExpensesLoaded;
+      load(userId, groupId,
+          numberOfExpenses: currentState.expenses.length + _expensesPerPage);
+    }
   }
 
   void updateExpense(Expense expense) async {
