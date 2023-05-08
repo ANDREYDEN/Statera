@@ -11,7 +11,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
-  static const int _expensesPerPage = 10;
+  static const int _expensesPerPage = 1;
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -50,9 +50,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     );
   }
 
-  void loadMore(String userId, String? groupId) {
+  void loadMore(String userId) {
     if (state is ExpensesLoaded) {
       final currentState = state as ExpensesLoaded;
+      final groupId = currentState.expenses.first.groupId;
       load(userId, groupId,
           numberOfExpenses: currentState.expenses.length + _expensesPerPage);
     }
