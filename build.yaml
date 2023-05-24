@@ -9,4 +9,4 @@ targets:
       mockito|mockBuilder:
         generate_for:
           - test/**.dart
-          - lib/**.dart
+          - lib/**.dart # this is needed as per https://stackoverflow.com/questions/68275811/is-there-a-way-to-let-mockito-generate-mocks-for-integration-tests-in-a-flutter
