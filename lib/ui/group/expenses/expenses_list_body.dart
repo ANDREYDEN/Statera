@@ -14,45 +14,50 @@ class ExpensesListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Building ExpensesListBody');
     final authBloc = context.read<AuthBloc>();
-    final expensesCubit = context.read<ExpensesCubit>();
+    final scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        context.read<ExpensesCubit>().loadMore(authBloc.uid);
+      }
+    });
 
     return ExpensesBuilder(
       builder: (context, expenses) {
-        return expenses.isEmpty
-            ? ListEmpty(text: 'Start by adding an expense')
-            : Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: expenses.length,
-                      itemBuilder: (context, index) {
-                        var expense = expenses[index];
+        print('Got expenses: ${expenses.length}');
+        if (expenses.isEmpty) {
+          return ListEmpty(text: 'Start by adding an expense');
+        }
 
-                        return OptionallyDismissible(
-                          key: Key(expense.id!),
-                          isDismissible: expense.canBeUpdatedBy(authBloc.uid),
-                          confirmation:
-                              'Are you sure you want to delete this expense and all of its items?',
-                          onDismissed: (_) =>
-                              expensesCubit.deleteExpense(expense),
-                          child: GestureDetector(
-                            onLongPress: () =>
-                                _handleEditExpense(context, expense),
-                            child: ExpenseListItem(expense: expense),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      expensesCubit.loadMore(authBloc.uid);
-                    },
-                    child: Text('Load more'),
-                  ),
-                ],
+        return ListView.builder(
+          itemCount: expenses.length + 1,
+          controller: scrollController,
+          itemBuilder: (context, index) {
+            if (index == expenses.length) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: CircularProgressIndicator()),
               );
+            }
+
+            var expense = expenses[index];
+
+            return OptionallyDismissible(
+              key: Key(expense.id!),
+              isDismissible: expense.canBeUpdatedBy(authBloc.uid),
+              confirmation:
+                  'Are you sure you want to delete this expense and all of its items?',
+              onDismissed: (_) =>
+                  context.read<ExpensesCubit>().deleteExpense(expense),
+              child: GestureDetector(
+                onLongPress: () => _handleEditExpense(context, expense),
+                child: ExpenseListItem(expense: expense),
+              ),
+            );
+          },
+        );
       },
     );
   }

@@ -57,7 +57,10 @@ class _GroupPageState extends State<GroupPage> {
         label: 'Expenses',
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        wrapper: (child) => UnmarkedExpensesBadge(child: child),
+        wrapper: (child) => UnmarkedExpensesBadge(
+          child: child,
+          groupId: widget.groupId,
+        ),
       ),
       NavBarItemData(
         label: 'Settings',
@@ -90,14 +93,15 @@ class _GroupPageState extends State<GroupPage> {
                   duration: Duration(milliseconds: 500),
                   curve: Curves.ease,
                 );
-                setState(() {
-                  this._selectedNavBarItemIndex = index;
-                });
+                // setState(() {
+                //   this._selectedNavBarItemIndex = index;
+                // });
               },
             ),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => ExpenseBloc(context.read<ExpenseService>())),
+          BlocProvider(
+              create: (context) => ExpenseBloc(context.read<ExpenseService>())),
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide
@@ -125,14 +129,7 @@ class _GroupPageState extends State<GroupPage> {
                     this._selectedNavBarItemIndex = index;
                   });
                 },
-                children: [
-                  OwingsList(),
-                  BlocProvider(
-                    create: (context) => ExpenseBloc(context.read<ExpenseService>()),
-                    child: ExpenseList(),
-                  ),
-                  GroupSettings()
-                ],
+                children: [OwingsList(), ExpenseList(), GroupSettings()],
               ),
       ),
     );

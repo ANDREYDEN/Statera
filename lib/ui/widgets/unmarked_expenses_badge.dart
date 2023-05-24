@@ -1,12 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/services/services.dart';
 
-class UnmarkedExpensesBadge extends StatelessWidget {
+class UnmarkedExpensesBadge extends StatefulWidget {
   final Widget child;
   final String? groupId;
 
@@ -16,39 +15,26 @@ class UnmarkedExpensesBadge extends StatelessWidget {
     this.groupId,
   }) : super(key: key);
 
-  _badgeBuilder(BuildContext context, String? groupId, String uid) {
-    final groupService = context.read<GroupService>();
+  @override
+  State<UnmarkedExpensesBadge> createState() => _UnmarkedExpensesBadgeState();
+}
 
-    return StreamBuilder<List<Expense>>(
-      stream: groupService.listenForUnmarkedExpenses(groupId, uid),
-      builder: (context, snap) {
-        var unmarkedExpenses = snap.data;
-        if (unmarkedExpenses == null || unmarkedExpenses.isEmpty) return child;
-
-        return Badge.count(count: unmarkedExpenses.length, child: child);
-      },
-    );
-  }
-
+class _UnmarkedExpensesBadgeState extends State<UnmarkedExpensesBadge> {
   @override
   Widget build(BuildContext context) {
-    User? user = context.select((AuthBloc auth) => auth.state.user);
+    GroupService groupService = context.read<GroupService>();
+    String uid = context.read<AuthBloc>().uid;
 
-    if (user == null) return Container();
+    return StreamBuilder<List<Expense>>(
+      stream: groupService.listenForUnmarkedExpenses(widget.groupId, uid),
+      builder: (context, snap) {
+        print('Got unmarked expenses: ${snap.data?.length}');
+        var unmarkedExpenses = snap.data;
+        if (unmarkedExpenses == null || unmarkedExpenses.isEmpty)
+          return widget.child;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: groupId != null
-              ? _badgeBuilder(context, groupId, user.uid)
-              : BlocBuilder<GroupCubit, GroupState>(
-                  builder: (context, groupState) => groupState is GroupLoaded
-                      ? _badgeBuilder(context, groupState.group.id, user.uid)
-                      : Container(),
-                ),
-        )
-      ],
+        return Badge.count(count: unmarkedExpenses.length, child: widget.child);
+      },
     );
   }
 }

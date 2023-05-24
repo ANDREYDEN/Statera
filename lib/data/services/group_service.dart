@@ -131,9 +131,14 @@ class GroupService extends Firestore {
   }
 
   Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
-    return queryToExpensesStream(expensesQuery(
+    return expensesQuery(
       groupId: groupId,
       unmarkedAssigneeId: uid,
-    ));
+    )
+    // return FirebaseFirestore.instance
+    //     .collection('expenses')
+        .snapshots()
+        .map<List<Expense>>((snap) =>
+            snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
   }
 }
