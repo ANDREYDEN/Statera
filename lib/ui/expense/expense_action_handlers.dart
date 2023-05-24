@@ -12,7 +12,7 @@ handleSettingsClick(BuildContext context) {
 
   expenseBloc.add(
     UpdateRequested(
-      issuer: authBloc.user,
+      issuerUid: authBloc.uid,
       update: (expense) async {
         await showDialog(
           context: context,

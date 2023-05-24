@@ -84,7 +84,7 @@ class ItemsList extends StatelessWidget {
     final expenseBloc = context.read<ExpenseBloc>();
     expenseBloc.add(
       UpdateRequested(
-        issuer: authBloc.user,
+        issuerUid: authBloc.uid,
         update: (expense) => expense.items.removeAt(index),
       ),
     );
@@ -95,7 +95,7 @@ class ItemsList extends StatelessWidget {
     final expenseBloc = context.read<ExpenseBloc>();
     expenseBloc.add(
       UpdateRequested(
-        issuer: authBloc.user,
+        issuerUid: authBloc.uid,
         update: (expense) {
           expense.items[index].setAssigneeDecision(authBloc.uid, parts);
         },

@@ -108,7 +108,7 @@ class Header extends StatelessWidget {
 
     expenseBloc.add(
       UpdateRequested(
-        issuer: authBloc.state.user!,
+        issuerUid: authBloc.uid,
         update: (expense) async {
           DateTime? newDate = await showDatePicker(
             context: context,
@@ -130,7 +130,7 @@ class Header extends StatelessWidget {
 
     expenseBloc.add(
       UpdateRequested(
-        issuer: authBloc.state.user!,
+        issuerUid: authBloc.uid,
         update: (expense) async {
           final newAuthorUid = await showDialog<String?>(
             context: context,
@@ -157,7 +157,7 @@ class Header extends StatelessWidget {
 
     expenseBloc.add(
       UpdateRequested(
-        issuer: authBloc.state.user!,
+        issuerUid: authBloc.uid,
         update: (expense) async {
           final newAssigneeIds = await showDialog<List<String>>(
             context: context,
