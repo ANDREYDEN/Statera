@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
 import 'package:statera/ui/groups/update_banner.dart';
@@ -15,6 +16,8 @@ import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/dialogs/ok_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -55,77 +58,88 @@ class _GroupListState extends State<GroupList> {
   Widget build(BuildContext context) {
     Future.delayed(Duration.zero, _showGreetingDialog);
 
-    return PageScaffold(
-      title: kAppName,
-      actions: [
-        IconButton(
-          onPressed: () => Navigator.pushNamed(context, SupportPage.route),
-          icon: Icon(Icons.info_outline_rounded),
+    return BlocListener<NotificationsCubit, NotificationsState>(
+      listenWhen: (previous, current) => !current.allowed,
+      listener: (context, state) => showDialog(
+        context: context,
+        builder: (_) => OKDialog(
+          title: 'Notifications',
+          text: 'Head over to Settings to enable app notification permissions',
         ),
-        IconButton(
-          onPressed: () => Navigator.pushNamed(context, Settings.route),
-          icon: Icon(Icons.settings_outlined),
-        ),
-      ],
-      onFabPressed:
-          defaultTargetPlatform == TargetPlatform.windows ? null : createGroup,
-      child: Column(
-        children: [
-          UpdateBanner(),
-          Expanded(
-            child: defaultTargetPlatform == TargetPlatform.windows
-                ? Center(
-                    child: Text(
-                        'Main app functionality is currently in development...'),
-                  )
-                : BlocBuilder<GroupsCubit, GroupsState>(
-                    builder: (context, groupsState) {
-                      if (groupsState is GroupsLoading) {
-                        return Center(child: Loader());
-                      }
-
-                      if (groupsState is GroupsError) {
-                        developer.log(
-                          'Failed loading groups',
-                          error: groupsState.error,
-                        );
-
-                        return Center(
-                            child: Text(groupsState.error.toString()));
-                      }
-
-                      if (groupsState is GroupsLoaded) {
-                        final groups = groupsState.groups;
-
-                        return Column(
-                          children: [
-                            SizedBox.square(
-                              dimension: 16,
-                              child: Visibility(
-                                visible: groupsState is GroupsProcessing,
-                                child: Loader(),
-                              ),
-                            ),
-                            Expanded(
-                              child: groups.isEmpty
-                                  ? ListEmpty(text: 'Join or create a group!')
-                                  : ListView.builder(
-                                      itemCount: groups.length,
-                                      itemBuilder: (context, index) {
-                                        var group = groups[index];
-                                        return GroupListItem(group: group);
-                                      },
-                                    ),
-                            ),
-                          ],
-                        );
-                      }
-
-                      return Container();
-                    },
-                  ),
+      ),
+      child: PageScaffold(
+        title: kAppName,
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, SupportPage.route),
+            icon: Icon(Icons.info_outline_rounded),
+          ),
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, Settings.route),
+            icon: Icon(Icons.settings_outlined),
           ),
         ],
+        onFabPressed: defaultTargetPlatform == TargetPlatform.windows
+            ? null
+            : createGroup,
+        child: Column(
+          children: [
+            UpdateBanner(),
+            Expanded(
+              child: defaultTargetPlatform == TargetPlatform.windows
+                  ? Center(
+                      child: Text(
+                          'Main app functionality is currently in development...'),
+                    )
+                  : BlocBuilder<GroupsCubit, GroupsState>(
+                      builder: (context, groupsState) {
+                        if (groupsState is GroupsLoading) {
+                          return Center(child: Loader());
+                        }
+
+                        if (groupsState is GroupsError) {
+                          developer.log(
+                            'Failed loading groups',
+                            error: groupsState.error,
+                          );
+
+                          return Center(
+                              child: Text(groupsState.error.toString()));
+                        }
+
+                        if (groupsState is GroupsLoaded) {
+                          final groups = groupsState.groups;
+
+                          return Column(
+                            children: [
+                              SizedBox.square(
+                                dimension: 16,
+                                child: Visibility(
+                                  visible: groupsState is GroupsProcessing,
+                                  child: Loader(),
+                                ),
+                              ),
+                              Expanded(
+                                child: groups.isEmpty
+                                    ? ListEmpty(text: 'Join or create a group!')
+                                    : ListView.builder(
+                                        itemCount: groups.length,
+                                        itemBuilder: (context, index) {
+                                          var group = groups[index];
+                                          return GroupListItem(group: group);
+                                        },
+                                      ),
+                              ),
+                            ],
+                          );
+                        }
+
+                        return Container();
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
