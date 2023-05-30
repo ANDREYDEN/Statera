@@ -1,17 +1,15 @@
-import 'package:app_settings/app_settings.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
+import 'package:statera/ui/settings/notifications_setting.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
@@ -31,16 +29,10 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   late ImagePicker _picker;
-  late bool _notifyWhenExpenseCreated;
-  late bool _notifyWhenExpenseFinalized;
-  late bool _notifyWhenExpenseCompleted;
-  late bool _notifyWhenGroupOwageThresholdReached;
 
   AuthBloc get _authBloc => context.read<AuthBloc>();
-  NotificationsCubit get _notificationsCubit =>
-      context.read<NotificationsCubit>();
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
   LayoutState get _layoutState => context.read<LayoutState>();
@@ -48,11 +40,9 @@ class _SettingsState extends State<Settings> {
 
   @override
   void initState() {
-    _notifyWhenExpenseCreated = false;
-    _notifyWhenExpenseFinalized = true;
-    _notifyWhenExpenseCompleted = false;
-    _notifyWhenGroupOwageThresholdReached = false;
     _picker = ImagePicker();
+
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
@@ -154,40 +144,7 @@ class _SettingsState extends State<Settings> {
               },
             ),
             SizedBox(height: 40),
-            BlocBuilder<NotificationsCubit, NotificationsState>(
-              builder: (context, state) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SectionTitle('Notifications Preferences'),
-                    if (!state.allowed)
-                      ElevatedButton(
-                        onPressed: () {
-                          if (kIsWeb) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Please turn on notifications for this website',
-                                ),
-                              ),
-                            );
-                            return;
-                          }
-
-                          AppSettings.openNotificationSettings();
-                        },
-                        child: Text('Enable notifications'),
-                      )
-                    else
-                      Column(
-                        children: [
-                          Text('Coming Soon...')
-                        ], //notificationPermissionToggles
-                      )
-                  ],
-                );
-              },
-            ),
+            NotificationsSetting(),
             SizedBox(height: 40),
             DangerZone(
               children: [
@@ -229,51 +186,5 @@ class _SettingsState extends State<Settings> {
         );
       }),
     );
-  }
-
-  // TODO: use this
-  List<Widget> get notificationPermissionToggles {
-    return [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('New expense was created'),
-          Switch(
-            value: _notifyWhenExpenseCreated,
-            onChanged: _notificationsCubit.state.allowed ? (newValue) {} : null,
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Expense was finalized by its author'),
-          Switch(
-            value: _notifyWhenExpenseFinalized,
-            onChanged: _notificationsCubit.state.allowed ? (newValue) {} : null,
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Expense is ready to be finalized'),
-          Switch(
-            value: _notifyWhenExpenseCompleted,
-            onChanged: _notificationsCubit.state.allowed ? (newValue) {} : null,
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Reached group owage threshold'),
-          Switch(
-            value: _notifyWhenGroupOwageThresholdReached,
-            onChanged: _notificationsCubit.state.allowed ? (newValue) {} : null,
-          ),
-        ],
-      ),
-    ];
   }
 }
