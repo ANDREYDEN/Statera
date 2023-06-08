@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:statera/utils/utils.dart';
 
 class PreferencesService {
   Future<bool> checkGreetingMessageSeen(String message) async {
@@ -19,12 +20,21 @@ class PreferencesService {
 
   Future<bool> checkNotificationsReminderShown() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('notifications_reminder_shown') ?? false;
+    final lastTimestamp = prefs.getInt('notifications_reminder_shown_at');
+    if (lastTimestamp == null) return false;
+
+    final lastShown = DateTime.fromMillisecondsSinceEpoch(lastTimestamp);
+    final now = DateTime.now();
+
+    return now.difference(lastShown) < kNotificationsReminderCooldown;
   }
 
   Future<void> recordNotificationsReminderShown() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_reminder_shown', true);
+    await prefs.setInt(
+      'notifications_reminder_shown_at',
+      DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
   Future<void> clear() async {

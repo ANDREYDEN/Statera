@@ -24,3 +24,5 @@ const kSignInWithGoogleMessages = {
 };
 
 const kRequiredValidationMessage = "Can't be empty";
+
+const kNotificationsReminderCooldown = Duration(days: 2);
