@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +12,13 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
+import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/settings/settings.dart';
-import 'package:statera/ui/groups/group_list_item.dart';
 import 'package:statera/ui/support/support.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
-import 'package:statera/ui/widgets/dialogs/ok_dialog.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -62,9 +63,19 @@ class _GroupListState extends State<GroupList> {
       listenWhen: (previous, current) => !current.allowed,
       listener: (context, state) => showDialog(
         context: context,
-        builder: (_) => OKDialog(
-          title: 'Notifications',
-          text: 'Head over to Settings to enable app notification permissions',
+        builder: (_) => AlertDialog(
+          title: Text('Notifications'),
+          content: Text(
+              'Head over to Settings to enable app notification permissions'),
+          actions: [
+            CancelButton(),
+            ElevatedButton(
+              onPressed: () {
+                AppSettings.openNotificationSettings();
+              },
+              child: Text('Open Settings'),
+            )
+          ],
         ),
       ),
       child: PageScaffold(
