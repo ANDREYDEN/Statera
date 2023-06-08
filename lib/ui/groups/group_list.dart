@@ -1,22 +1,20 @@
 import 'dart:developer' as developer;
 
-import 'package:app_settings/app_settings.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/groups/notifications_reminder.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -41,10 +39,12 @@ class _GroupListState extends State<GroupList> {
           FirebaseRemoteConfig.instance.getString('greeting_message');
       final showGreetingDialog =
           FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
-      final prefs = await SharedPreferences.getInstance();
-      final messageSeen = await prefs.getBool(message.hashCode.toString());
 
-      if (!showGreetingDialog || messageSeen == true) return;
+      final prefecesService = context.read<PreferencesService>();
+      final messageSeen =
+          await prefecesService.checkGreetingMessageSeen(message);
+
+      if (!showGreetingDialog || messageSeen) return;
 
       showDialog(
         context: context,
@@ -59,25 +59,7 @@ class _GroupListState extends State<GroupList> {
   Widget build(BuildContext context) {
     Future.delayed(Duration.zero, _showGreetingDialog);
 
-    return BlocListener<NotificationsCubit, NotificationsState>(
-      listenWhen: (previous, current) => !current.allowed,
-      listener: (context, state) => showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Notifications'),
-          content: Text(
-              'Head over to Settings to enable app notification permissions'),
-          actions: [
-            CancelButton(),
-            ElevatedButton(
-              onPressed: () {
-                AppSettings.openNotificationSettings();
-              },
-              child: Text('Open Settings'),
-            )
-          ],
-        ),
-      ),
+    return NotificationsReminder(
       child: PageScaffold(
         title: kAppName,
         actions: [

@@ -2,7 +2,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
@@ -62,6 +61,8 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   }
 
   void _handleClearPreferences() {
+    final preferencesService = context.read<PreferencesService>();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -71,8 +72,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
           CancelButton(),
           ProtectedButton(
             onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
+              await preferencesService.clear();
               Navigator.pop(context);
             },
             child: Text('Clear'),

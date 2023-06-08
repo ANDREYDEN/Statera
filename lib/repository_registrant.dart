@@ -20,6 +20,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => DynamicLinkService()),
         RepositoryProvider(create: (_) => FirebaseStorageRepository()),
         RepositoryProvider(create: (_) => NotificationService()),
+        RepositoryProvider(create: (_) => PreferencesService()),
         RepositoryProvider(create: (_) => groupService),
         RepositoryProvider(
             create: (_) =>
