@@ -25,26 +25,24 @@ class _GreetingDialogState extends State<GreetingDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Welcome back!'),
-      content: Text(widget.message),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(widget.message),
+          SizedBox(height: 10),
+          CheckboxListTile(
+            title: Text("Don't show this again"),
+            value: _nextTimeGone,
+            onChanged: (_) {
+              setState(() {
+                _nextTimeGone = !_nextTimeGone;
+              });
+            },
+          ),
+        ],
+      ),
       actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: CheckboxListTile(
-                title: Text("Don't show this again"),
-                value: _nextTimeGone,
-                onChanged: (_) {
-                  setState(() {
-                    _nextTimeGone = !_nextTimeGone;
-                  });
-                },
-              ),
-            ),
-            Spacer(),
-            ElevatedButton(onPressed: _handleConfirm, child: Text('OK')),
-          ],
-        ),
+        ElevatedButton(onPressed: _handleConfirm, child: Text('OK')),
       ],
     );
   }

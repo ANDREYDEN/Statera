@@ -40,9 +40,9 @@ class _GroupListState extends State<GroupList> {
       final showGreetingDialog =
           FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
 
-      final prefecesService = context.read<PreferencesService>();
+      final preferencesService = context.read<PreferencesService>();
       final messageSeen =
-          await prefecesService.checkGreetingMessageSeen(message);
+          await preferencesService.checkGreetingMessageSeen(message);
 
       if (!showGreetingDialog || messageSeen) return;
 

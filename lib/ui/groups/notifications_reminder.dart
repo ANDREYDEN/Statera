@@ -23,7 +23,7 @@ class NotificationsReminder extends StatelessWidget {
 
         if (notificationsReminderShown) return;
 
-        showDialog(
+        await showDialog(
           context: context,
           builder: (_) => AlertDialog(
             title: Text('Notifications'),
@@ -41,6 +41,8 @@ class NotificationsReminder extends StatelessWidget {
             ],
           ),
         );
+
+        await preferencesService.recordNotificationsReminderShown();
       },
       child: child,
     );
