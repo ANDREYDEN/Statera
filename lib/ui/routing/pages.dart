@@ -189,6 +189,7 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   return path.isPublic
       ? path.builder(context, matches)
       : AuthGuard(
+        isHomePage: path == _groupsPagePath,
           builder: () => path.builder(context, matches),
         );
 }

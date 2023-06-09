@@ -66,7 +66,7 @@ class Payment implements Comparable {
           ? null
           : DateTime.parse(map['timeCreated'].toDate().toString()),
       reason: map['reason'],
-      oldPayerBalance: map['oldPayerBalance'],
+      oldPayerBalance: double.parse(map['oldPayerBalance'].toString()),
       newFor: List<String>.from(map['newFor'] ?? []),
     );
   }
