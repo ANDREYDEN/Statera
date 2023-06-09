@@ -25,4 +25,6 @@ const kSignInWithGoogleMessages = {
 
 const kRequiredValidationMessage = "Can't be empty";
 
+const kUpdateBannerRefreshFrequency = Duration(hours: 1);
+
 const kNotificationsReminderCooldown = Duration(days: 2);
