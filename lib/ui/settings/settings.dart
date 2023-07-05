@@ -5,15 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
+import 'package:statera/ui/settings/delete_account_button.dart';
 import 'package:statera/ui/settings/notifications_setting.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
-import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -43,21 +42,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
     super.initState();
-  }
-
-  void _handleDeleteAccount(CustomUser user) {
-    showDialog<bool>(
-      context: context,
-      builder: (context) => DangerDialog(
-        title: 'You are about to DELETE you account',
-        valueName: 'username',
-        value: user.name,
-        onConfirm: () {
-          _authBloc.add(AccountDeletionRequested());
-          Navigator.pop(context);
-        },
-      ),
-    );
   }
 
   void _handleClearPreferences() {
@@ -171,15 +155,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                     onPressed: () => _handleClearPreferences(),
                   ),
                 ),
-                ListTile(
-                  title: Text('Delete your Account'),
-                  subtitle: Text(
-                      'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
-                  trailing: DangerButton(
-                    text: 'Delete Account',
-                    onPressed: () => _handleDeleteAccount(user),
-                  ),
-                )
+                DeleteAccountButton(),
               ],
             ),
           ],
