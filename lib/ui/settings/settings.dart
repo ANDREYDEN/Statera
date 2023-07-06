@@ -7,11 +7,10 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
+import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
 import 'package:statera/ui/settings/notifications_setting.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
-import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -42,28 +41,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
     super.initState();
-  }
-
-  void _handleClearPreferences() {
-    final preferencesService = context.read<PreferencesService>();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Clear preferences'),
-        content: Text('You are about to CLEAR your app preferences'),
-        actions: [
-          CancelButton(),
-          ProtectedButton(
-            onPressed: () async {
-              await preferencesService.clear();
-              Navigator.pop(context);
-            },
-            child: Text('Clear'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _handlePickPhoto() async {
@@ -145,16 +122,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                     },
                   ),
                 ),
-                ListTile(
-                  title: Text('Clear Preferences'),
-                  subtitle: Text(
-                    'This will clear all your preferences and reset the app to its default state.',
-                  ),
-                  trailing: DangerButton(
-                    text: 'Clear',
-                    onPressed: () => _handleClearPreferences(),
-                  ),
-                ),
+                ClearPreferencesButton(),
                 DeleteAccountButton(),
               ],
             ),
