@@ -10,6 +10,7 @@ import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
 import 'package:statera/ui/settings/notifications_setting.dart';
+import 'package:statera/ui/settings/primary_color_picker.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
@@ -106,6 +107,9 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
             ),
             SizedBox(height: 40),
             NotificationsSetting(),
+            SizedBox(height: 40),
+            SectionTitle('General'),
+            PrimaryColorPicker(),
             SizedBox(height: 40),
             DangerZone(
               children: [
