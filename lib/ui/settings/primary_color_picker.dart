@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/ui/color/color_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class PrimaryColorPicker extends StatefulWidget {
@@ -11,11 +12,11 @@ class PrimaryColorPicker extends StatefulWidget {
 }
 
 class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
-  late final Color _newColor;
+  late Color _newColor;
 
   @override
   void initState() {
-    _newColor = Theme.of(context).primaryColor;
+    _newColor = context.read<ColorState>().color;
     super.initState();
   }
 
@@ -27,7 +28,7 @@ class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
         width: 30,
         height: 30,
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
+          color: _newColor,
           borderRadius: BorderRadius.circular(15),
         ),
       ),
@@ -48,7 +49,11 @@ class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
             actions: [
               CancelButton(),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Provider.of<ColorState>(context, listen: false)
+                      .setColor(_newColor);
+                  Navigator.pop(context);
+                },
                 child: Text('Set'),
               )
             ],

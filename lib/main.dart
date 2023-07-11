@@ -14,6 +14,7 @@ import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
+import 'package:statera/ui/color/color_state.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -67,18 +68,21 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: CustomThemeBuilder(
-                builder: (lightTheme, darkTheme) {
-                  return MaterialApp(
-                    title: kAppName,
-                    theme: lightTheme,
-                    darkTheme: darkTheme,
-                    themeMode: ThemeMode.system,
-                    initialRoute: initialRoute ?? defaultRoute,
-                    onGenerateRoute: onGenerateRoute,
-                    debugShowCheckedModeBanner: false,
-                  );
-                },
+              child: ChangeNotifierProvider<ColorState>(
+                create: (context) => ColorState(),
+                child: CustomThemeBuilder(
+                  builder: (lightTheme, darkTheme) {
+                    return MaterialApp(
+                      title: kAppName,
+                      theme: lightTheme,
+                      darkTheme: darkTheme,
+                      themeMode: ThemeMode.system,
+                      initialRoute: initialRoute ?? defaultRoute,
+                      onGenerateRoute: onGenerateRoute,
+                      debugShowCheckedModeBanner: false,
+                    );
+                  },
+                ),
               ),
             );
           },

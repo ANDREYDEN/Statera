@@ -1,5 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/ui/color/color_state.dart';
 
 import 'utils/utils.dart';
 
@@ -28,11 +30,11 @@ class CustomThemeBuilder extends StatelessWidget {
           lightColorScheme = lightDynamic.harmonized();
           darkColorScheme = darkDynamic.harmonized();
         } else {
-          lightColorScheme = ColorScheme.fromSeed(
-            seedColor: Color(0xFFffd100),
-          );
+          var seedColor = context.watch<ColorState>().color;
+
+          lightColorScheme = ColorScheme.fromSeed(seedColor: seedColor);
           darkColorScheme = ColorScheme.fromSeed(
-            seedColor: Color(0xFFffd100),
+            seedColor: seedColor,
             brightness: Brightness.dark,
           );
         }
