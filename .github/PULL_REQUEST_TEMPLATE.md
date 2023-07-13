@@ -4,7 +4,7 @@ Please provide a description for this PR
 
 # Issue
 
-This PR addresses #
+This PR closes #
 
 # Checklist
 
