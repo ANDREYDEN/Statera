@@ -68,22 +68,18 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: BlocProvider<SeedColorCubit>(
-                create: (context) =>
-                    SeedColorCubit(context.read<PreferencesService>())..load(),
-                child: CustomThemeBuilder(
-                  builder: (lightTheme, darkTheme) {
-                    return MaterialApp(
-                      title: kAppName,
-                      theme: lightTheme,
-                      darkTheme: darkTheme,
-                      themeMode: ThemeMode.system,
-                      initialRoute: initialRoute ?? defaultRoute,
-                      onGenerateRoute: onGenerateRoute,
-                      debugShowCheckedModeBanner: false,
-                    );
-                  },
-                ),
+              child: CustomThemeBuilder(
+                builder: (lightTheme, darkTheme) {
+                  return MaterialApp(
+                    title: kAppName,
+                    theme: lightTheme,
+                    darkTheme: darkTheme,
+                    themeMode: ThemeMode.system,
+                    initialRoute: initialRoute ?? defaultRoute,
+                    onGenerateRoute: onGenerateRoute,
+                    debugShowCheckedModeBanner: false,
+                  );
+                },
               ),
             );
           },
