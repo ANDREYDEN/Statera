@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/ui/color/color_state.dart';
+import 'package:statera/ui/color/seed_color_cubit.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 
 class PrimaryColorPicker extends StatefulWidget {
@@ -14,9 +14,11 @@ class PrimaryColorPicker extends StatefulWidget {
 class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
   late Color _newColor;
 
+  SeedColorCubit get _seedColorCubit => context.read<SeedColorCubit>();
+
   @override
   void initState() {
-    _newColor = context.read<ColorState>().color;
+    _newColor = _seedColorCubit.state;
     super.initState();
   }
 
@@ -50,8 +52,7 @@ class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
               CancelButton(),
               ElevatedButton(
                 onPressed: () {
-                  Provider.of<ColorState>(context, listen: false)
-                      .setColor(_newColor);
+                  _seedColorCubit.setColor(_newColor);
                   Navigator.pop(context);
                 },
                 child: Text('Set'),

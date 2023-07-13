@@ -14,7 +14,7 @@ import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
-import 'package:statera/ui/color/color_state.dart';
+import 'package:statera/ui/color/seed_color_cubit.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -68,8 +68,9 @@ class Statera extends StatelessWidget {
           builder: (context, constraints) {
             return Provider<LayoutState>.value(
               value: LayoutState(constraints),
-              child: ChangeNotifierProvider<ColorState>(
-                create: (context) => ColorState(),
+              child: BlocProvider<SeedColorCubit>(
+                create: (context) =>
+                    SeedColorCubit(context.read<PreferencesService>())..load(),
                 child: CustomThemeBuilder(
                   builder: (lightTheme, darkTheme) {
                     return MaterialApp(
