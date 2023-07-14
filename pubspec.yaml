@@ -55,6 +55,7 @@ dependencies:
   dynamic_color: ^1.6.2
   shared_preferences: ^2.0.18
   flutter_animate: ^4.1.1+1
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   integration_test:
