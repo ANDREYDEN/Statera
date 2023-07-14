@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/ui/expense/expense_action_handlers.dart';
+import 'package:statera/ui/expense/actions/expense_action_handlers.dart';
+import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/expense_details.dart';
-import 'package:statera/ui/expense/expense_share_button.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
@@ -39,14 +39,7 @@ class ExpensePage extends StatelessWidget {
             fabText: 'New Item',
             onFabPressed:
                 expenseCanBeUpdated ? () => handleItemUpsert(context) : null,
-            actions: [
-              ExpenseShareButton(),
-              if (expense.canBeUpdatedBy(authBloc.uid))
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () => handleSettingsClick(context),
-                )
-            ],
+            actions: [ExpenseActionsButton(expense: expense)],
             child: ExpenseDetails(),
           );
         }
