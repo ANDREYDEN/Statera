@@ -88,6 +88,7 @@ class DeleteExpenseAction extends ExpenseAction {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => OKCancelDialog(
+        title: 'Delete expense',
         text:
             'Are you sure you want to delete this expense and all of its items?',
       ),
@@ -115,6 +116,7 @@ class RevertExpenseAction extends ExpenseAction {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => OKCancelDialog(
+        title: 'Revert expense',
         text:
             'Are you sure you want to revert this expense? All members that took part in this expense will be refunded and the expense will become active again.',
       ),

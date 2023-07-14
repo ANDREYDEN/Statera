@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 class DangerDialog extends StatefulWidget {
   final String title;
@@ -28,8 +27,6 @@ class _DangerDialogState extends State<DangerDialog> {
   final TextEditingController _confirmController = TextEditingController();
   bool _confirmed = false;
 
-  bool get isWide => context.read<LayoutState>().isWide;
-
   @override
   void initState() {
     _confirmController.addListener(() {
@@ -47,8 +44,7 @@ class _DangerDialogState extends State<DangerDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
-      content: SizedBox(
-        width: isWide ? 400 : 200,
+      content: DialogWidth(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
