@@ -36,6 +36,7 @@ class ExpensePage extends StatelessWidget {
           final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
 
           return PageScaffold(
+            fabText: 'New Item',
             onFabPressed:
                 expenseCanBeUpdated ? () => handleItemUpsert(context) : null,
             actions: [

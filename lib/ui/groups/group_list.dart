@@ -72,6 +72,7 @@ class _GroupListState extends State<GroupList> {
             icon: Icon(Icons.settings_outlined),
           ),
         ],
+        fabText: 'New Group',
         onFabPressed: defaultTargetPlatform == TargetPlatform.windows
             ? null
             : createGroup,
