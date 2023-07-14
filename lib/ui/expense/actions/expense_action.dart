@@ -6,7 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
-import 'package:statera/data/models/expense.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/dialogs/expense_dialogs.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
@@ -94,5 +95,53 @@ class DeleteExpenseAction extends ExpenseAction {
 
     final expensesCubit = context.read<ExpensesCubit>();
     if (confirmed == true) expensesCubit.deleteExpense(expense);
+  }
+}
+
+class RevertExpenseAction extends ExpenseAction {
+  @override
+  IconData get icon => Icons.undo;
+
+  @override
+  String get name => 'Revert';
+
+  @override
+  Color? getIconColor(BuildContext context) {
+    return Theme.of(context).colorScheme.error;
+  }
+
+  @override
+  handle(BuildContext context, Expense expense) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => OKCancelDialog(
+        text:
+            'Are you sure you want to revert this expense? All members that took part in this expense will be refunded and the expense will become active again.',
+      ),
+    );
+
+    if (confirmed == false) return;
+
+    final groupCubit = context.read<GroupCubit>();
+    final expenseService = context.read<ExpenseService>();
+    final paymentService = context.read<PaymentService>();
+
+    // TODO: use transaction
+    await expenseService.revertExpense(expense);
+    // add expense payments from author to all assignees
+    await Future.wait(
+      expense.assigneeUids.map((assigneeUid) => paymentService.addPayment(
+            Payment(
+              groupId: expense.groupId,
+              payerId: assigneeUid,
+              receiverId: expense.authorUid,
+              value: expense.getConfirmedTotalForUser(assigneeUid),
+              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
+              oldPayerBalance: groupCubit
+                  .loadedState.group.balance[expense.authorUid]?[assigneeUid],
+              newFor: [assigneeUid],
+            ),
+          )),
+    );
   }
 }

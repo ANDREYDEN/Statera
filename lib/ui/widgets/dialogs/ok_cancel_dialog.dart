@@ -15,7 +15,7 @@ class OKCancelDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: title == null ? null : Text(title!),
-      content: Text(this.text),
+      content: SizedBox(width: child: Text(this.text)),
       actions: [
         CancelButton(),
         ElevatedButton(

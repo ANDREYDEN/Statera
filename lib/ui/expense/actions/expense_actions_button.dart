@@ -20,8 +20,12 @@ class ExpenseActionsButton extends StatelessWidget {
 
     final actions = [
       ShareExpenseAction(),
-      if (expense.canBeUpdatedBy(authBloc.uid)) SettingsExpenseAction(),
-      if (isWide && expense.canBeUpdatedBy(authBloc.uid)) DeleteExpenseAction(),
+      if (expense.canBeUpdatedBy(authBloc.uid)) ...[
+        SettingsExpenseAction(),
+        if (isWide) DeleteExpenseAction(),
+      ],
+      if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
+        RevertExpenseAction()
     ];
 
     return Padding(
