@@ -149,21 +149,6 @@ class Group {
         this.balance[payment.receiverId]![payment.payerId]! + payment.value;
   }
 
-  void updateBalance(Expense expense) {
-    expense.assigneeUids
-        .where((assigneeUid) => assigneeUid != expense.authorUid)
-        .forEach((assigneeUid) {
-      this.payOffBalance(
-        payment: Payment(
-          groupId: this.id,
-          payerId: expense.authorUid,
-          receiverId: assigneeUid,
-          value: expense.getConfirmedTotalForUser(assigneeUid),
-        ),
-      );
-    });
-  }
-
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,

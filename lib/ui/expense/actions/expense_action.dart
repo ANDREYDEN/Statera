@@ -129,21 +129,33 @@ class RevertExpenseAction extends ExpenseAction {
     final paymentService = context.read<PaymentService>();
 
     // TODO: use transaction
+    final group = groupCubit.loadedState.group;
+
     await expenseService.revertExpense(expense);
-    // add expense payments from author to all assignees
-    await Future.wait(
-      expense.assigneeUids.map((assigneeUid) => paymentService.addPayment(
-            Payment(
-              groupId: expense.groupId,
-              payerId: assigneeUid,
-              receiverId: expense.authorUid,
-              value: expense.getConfirmedTotalForUser(assigneeUid),
-              relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-              oldPayerBalance: groupCubit
-                  .loadedState.group.balance[expense.authorUid]?[assigneeUid],
-              newFor: [assigneeUid],
-            ),
-          )),
-    );
+    // add expense payments from all assignees to author
+    final payments = expense.assigneeUids
+        .where((assigneeUid) => assigneeUid != expense.authorUid)
+        .map(
+          (assigneeUid) => Payment(
+            groupId: expense.groupId,
+            payerId: assigneeUid,
+            receiverId: expense.authorUid,
+            value: expense.getConfirmedTotalForUser(assigneeUid),
+            relatedExpense: PaymentExpenseInfo.fromExpense(expense),
+            oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
+            newFor: [assigneeUid],
+          ),
+        );
+    await Future.wait(payments.map(paymentService.addPayment));
+    // try {
+    //   Callables.notifyWhenExpenseReverted(expenseId: expense.id);
+    // } catch (e) {
+    //   debugPrint(e.toString());
+    // }
+    groupCubit.update((group) {
+      for (var payment in payments) {
+        group.payOffBalance(payment: payment);
+      }
+    });
   }
 }

@@ -19,27 +19,36 @@ class FinalizeButton extends StatelessWidget {
     final paymentService = context.read<PaymentService>();
 
     // TODO: use transaction
+    var group = groupCubit.loadedState.group;
+
     await expenseService.finalizeExpense(expense);
     // add expense payments from author to all assignees
-    await Future.wait(
-      expense.assigneeUids.map((assigneeUid) => paymentService.addPayment(
-            Payment(
-                groupId: expense.groupId,
-                payerId: expense.authorUid,
-                receiverId: assigneeUid,
-                value: expense.getConfirmedTotalForUser(assigneeUid),
-                relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-                oldPayerBalance: groupCubit
-                    .loadedState.group.balance[expense.authorUid]?[assigneeUid],
-                newFor: [assigneeUid]),
-          )),
+    final payments = expense.assigneeUids
+        .where((assigneeUid) => assigneeUid != expense.authorUid)
+        .map(
+      (assigneeUid) {
+        return Payment(
+          groupId: expense.groupId,
+          payerId: expense.authorUid,
+          receiverId: assigneeUid,
+          value: expense.getConfirmedTotalForUser(assigneeUid),
+          relatedExpense: PaymentExpenseInfo.fromExpense(expense),
+          oldPayerBalance: group.balance[expense.authorUid]?[assigneeUid],
+          newFor: [assigneeUid],
+        );
+      },
     );
+    await Future.wait(payments.map(paymentService.addPayment));
     try {
       Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
     } catch (e) {
       debugPrint(e.toString());
     }
-    groupCubit.update((group) => group.updateBalance(expense));
+    groupCubit.update((group) {
+      for (var payment in payments) {
+        group.payOffBalance(payment: payment);
+      }
+    });
   }
 
   @override
