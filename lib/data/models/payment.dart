@@ -43,7 +43,6 @@ class Payment implements Comparable {
       'value': value,
       'relatedExpense':
           relatedExpense == null ? null : relatedExpense!.toFirestore(),
-      'payerReceiverId': '${payerId}_$receiverId',
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
       'newFor': newFor,
