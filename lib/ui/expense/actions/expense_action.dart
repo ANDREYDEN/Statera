@@ -136,14 +136,10 @@ class RevertExpenseAction extends ExpenseAction {
     final payments = expense.assigneeUids
         .where((assigneeUid) => assigneeUid != expense.authorUid)
         .map(
-          (assigneeUid) => Payment(
-            groupId: expense.groupId,
+          (assigneeUid) => Payment.fromRevertedExpense(
+            expense: expense,
             payerId: assigneeUid,
-            receiverId: expense.authorUid,
-            value: expense.getConfirmedTotalForUser(assigneeUid),
-            relatedExpense: PaymentExpenseInfo.fromExpense(expense),
             oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
-            newFor: [assigneeUid],
           ),
         );
     await Future.wait(payments.map(paymentService.addPayment));

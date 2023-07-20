@@ -27,14 +27,10 @@ class FinalizeButton extends StatelessWidget {
         .where((assigneeUid) => assigneeUid != expense.authorUid)
         .map(
       (assigneeUid) {
-        return Payment(
-          groupId: expense.groupId,
-          payerId: expense.authorUid,
+        return Payment.fromFinalizedExpense(
+          expense: expense,
           receiverId: assigneeUid,
-          value: expense.getConfirmedTotalForUser(assigneeUid),
-          relatedExpense: PaymentExpenseInfo.fromExpense(expense),
-          oldPayerBalance: group.balance[expense.authorUid]?[assigneeUid],
-          newFor: [assigneeUid],
+          oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
         );
       },
     );
