@@ -9,9 +9,6 @@ class Callables {
   static HttpsCallable _notifyWhenExpenseCompleted =
       FirebaseFunctions.instance.httpsCallable('notifyWhenExpenseIsCompleted');
 
-  static HttpsCallable _notifyWhenExpenseFinalized =
-      FirebaseFunctions.instance.httpsCallable('notifyWhenExpenseIsFinalized');
-
   static HttpsCallable _getLatestVersion =
       FirebaseFunctions.instance.httpsCallable('getLatestAppVersion');
 
@@ -39,10 +36,6 @@ class Callables {
 
   static Future<void> notifyWhenExpenseCompleted({required expenseId}) async {
     await _notifyWhenExpenseCompleted({'expenseId': expenseId});
-  }
-
-  static Future<void> notifyWhenExpenseFinalized({required expenseId}) async {
-    await _notifyWhenExpenseFinalized({'expenseId': expenseId});
   }
 
   static Future<Version> getLatestAndroidVersion() async {

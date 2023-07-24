@@ -35,11 +35,7 @@ class FinalizeButton extends StatelessWidget {
       },
     );
     await Future.wait(payments.map(paymentService.addPayment));
-    try {
-      Callables.notifyWhenExpenseFinalized(expenseId: expense.id);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
+
     groupCubit.update((group) {
       for (var payment in payments) {
         group.payOffBalance(payment: payment);

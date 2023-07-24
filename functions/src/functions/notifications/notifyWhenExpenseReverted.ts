@@ -2,7 +2,7 @@ import { messaging } from 'firebase-admin'
 import { getExpenseNotificationTokens } from './notificationUtils'
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
-export async function notifyWhenExpenseFinalized(expenseSnap: QueryDocumentSnapshot) {
+export async function notifyWhenExpenseReverted(expenseSnap: QueryDocumentSnapshot) {
   if (!expenseSnap.exists) {
     console.log(`Expense ${expenseSnap.id} no longer exists`)
     return
@@ -18,11 +18,11 @@ export async function notifyWhenExpenseFinalized(expenseSnap: QueryDocumentSnaps
   return messaging().sendMulticast({
     tokens: authorTokens as string[],
     notification: {
-      title: 'Expense finalized',
-      body: `Expense "${expenseSnap.data()?.name}" was finalized`,
+      title: 'Expense Reverted',
+      body: `Expense "${expenseSnap.data()?.name}" was reverted`,
     },
     data: {
-      type: 'expense_finalized',
+      type: 'expense_reverted',
       groupId,
     },
   })

@@ -1,17 +1,18 @@
-import 'firebase-functions'
 import * as admin from 'firebase-admin'
+import 'firebase-functions'
 import * as functions from 'firebase-functions'
 import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { getLatestRelease } from './src/functions/getLatestRelease'
+import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
+import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
+import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
+import { notifyWhenExpenseReverted } from './src/functions/notifications/notifyWhenExpenseReverted'
+import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
+import { createUserDoc } from './src/functions/userManagement/createUserDoc'
 import { removeUserFromGroups } from './src/functions/userManagement/removeUserFromGroups'
 import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
-import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
-import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
-import { notifyWhenExpenseFinalized } from './src/functions/notifications/notifyWhenExpenseFinalized'
-import { notifyWhenGroupDebtThresholdReached } from './src/functions/notifications/notifyWhenGroupDebtThresholdReached'
-import { createUserDoc } from './src/functions/userManagement/createUserDoc'
-import { getLatestRelease } from './src/functions/getLatestRelease'
 
 admin.initializeApp()
 
@@ -22,6 +23,23 @@ export const setTimestampOnPaymentCreation = functions.firestore
   .onCreate(async (snap, _) => {
     await snap.ref.update({ timeCreated: snap.createTime })
   })
+
+export const handleExpenseUpdate = functions.firestore
+.document('expenses/{expenseId}')
+.onUpdate(async (change, _) => {
+  const oldExpense = change.before.data()
+  const newExpense = change.after.data()
+
+  if (!newExpense || !oldExpense) return
+
+  if (oldExpense.finalizedDate !== newExpense.finalizedDate) {
+    if (newExpense.finalizedDate) {
+      await notifyWhenExpenseFinalized(change.after)
+    } else {
+      await notifyWhenExpenseReverted(change.after)
+    }
+  }
+})
 
 export const getReceiptData = functions
   .runWith({
@@ -76,12 +94,6 @@ export const notifyWhenExpenseIsCompleted = functions.https
   .onCall((data, _) => {
     if (!data.expenseId) throw new Error('parameter expenseId is required')
     return notifyWhenExpenseCompleted(data.expenseId)
-  })
-
-export const notifyWhenExpenseIsFinalized = functions.https
-  .onCall((data, _) => {
-    if (!data.expenseId) throw new Error('parameter expenseId is required')
-    return notifyWhenExpenseFinalized(data.expenseId)
   })
 
 export const getLatestAppVersion = functions.https.onCall(async (data, _) => {

@@ -143,11 +143,7 @@ class RevertExpenseAction extends ExpenseAction {
           ),
         );
     await Future.wait(payments.map(paymentService.addPayment));
-    // try {
-    //   Callables.notifyWhenExpenseReverted(expenseId: expense.id);
-    // } catch (e) {
-    //   debugPrint(e.toString());
-    // }
+
     groupCubit.update((group) {
       for (var payment in payments) {
         group.payOffBalance(payment: payment);
