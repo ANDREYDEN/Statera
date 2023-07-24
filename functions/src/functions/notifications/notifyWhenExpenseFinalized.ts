@@ -10,8 +10,8 @@ export async function notifyWhenExpenseFinalized(expenseSnap: QueryDocumentSnaps
 
   const groupId = expenseSnap.data()?.groupId
 
+  console.log('Sending Notification', expenseSnap.id, 'expense_finalized');
   const authorTokens = await getExpenseNotificationTokens(expenseSnap, false)
-  console.log('Retrieved tokens:', authorTokens)
 
   if (authorTokens.length === 0) return null
 
