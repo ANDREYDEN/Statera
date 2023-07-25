@@ -11,19 +11,13 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/dialogs/expense_dialogs.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/entity_action.dart';
 import 'package:statera/utils/utils.dart';
 
-abstract class ExpenseAction {
+abstract class ExpenseAction extends EntityAction {
   final Expense expense;
 
   ExpenseAction(this.expense);
-
-  IconData get icon;
-  String get name;
-
-  Color? getIconColor(BuildContext context) => null;
-
-  FutureOr<void> handle(BuildContext context);
 }
 
 class ShareExpenseAction extends ExpenseAction {
