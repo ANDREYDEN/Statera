@@ -19,13 +19,13 @@ class ExpenseActionsButton extends StatelessWidget {
     final isWide = context.select((LayoutState state) => state.isWide);
 
     final actions = [
-      ShareExpenseAction(),
+      ShareExpenseAction(expense),
       if (expense.canBeUpdatedBy(authBloc.uid)) ...[
-        SettingsExpenseAction(),
-        if (isWide) DeleteExpenseAction(),
+        SettingsExpenseAction(expense),
+        if (isWide) DeleteExpenseAction(expense),
       ],
       if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
-        RevertExpenseAction()
+        RevertExpenseAction(expense)
     ];
 
     return Padding(
@@ -51,7 +51,7 @@ class ExpenseActionsButton extends StatelessWidget {
             ),
           );
         }).toList(),
-        onSelected: (action) => action.handle(context, expense),
+        onSelected: (action) => action.handle(context),
       ),
     );
   }
