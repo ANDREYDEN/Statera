@@ -100,7 +100,9 @@ jobs:
         run: firebase emulators:start --only functions,firestore,auth --import ./emulator_data_testing & sleep 10
 
       - name: Run integration tests
-        run: ./scripts/run_integration_tests.sh
+        run: |
+          chmod +x ./scripts/run_integration_tests.sh
+          ./scripts/run_integration_tests.sh
 
   build_and_test_functions:
     name: Run tests and build Firebase Functions
