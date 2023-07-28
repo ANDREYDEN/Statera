@@ -68,6 +68,11 @@ jobs:
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
       - name: Copy .env
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
@@ -88,6 +93,9 @@ jobs:
           dart pub get
           dart lib/web_driver_installer.dart & sleep 20
       
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: Start emulators
         run: firebase emulators:start --only functions,firestore,auth --import ./emulator_data_testing & sleep 10
 
