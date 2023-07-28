@@ -10,13 +10,14 @@ abstract class ExpenseEvent extends Equatable {
 class LoadRequested extends ExpenseEvent {}
 
 class UpdateRequested extends ExpenseEvent {
-  final User issuer;
+  final String issuerUid;
   final FutureOr<void> Function(Expense) update;
 
-  const UpdateRequested({required this.issuer, required this.update}) : super();
+  const UpdateRequested({required this.issuerUid, required this.update})
+      : super();
 
   @override
-  List<Object> get props => [issuer];
+  List<Object> get props => [issuerUid];
 }
 
 class ExpenseChanged extends ExpenseEvent {

@@ -59,10 +59,16 @@ class PaymentService extends Firestore {
     for (final memberId in otherMemberIds) {
       final mostRecentPaymentSnapshot = await paymentsCollection
           .where('groupId', isEqualTo: group.id)
-          .where('payerReceiverId', whereIn: [
-            '${userId}_$memberId',
-            '${memberId}_$userId',
-          ])
+          .where(Filter.or(
+            Filter.and(
+              Filter('payerId', isEqualTo: userId),
+              Filter('receiverId', isEqualTo: memberId),
+            ),
+            Filter.and(
+              Filter('payerId', isEqualTo: memberId),
+              Filter('receiverId', isEqualTo: userId),
+            ),
+          ))
           .orderBy('timeCreated', descending: true)
           .limit(1)
           .get();

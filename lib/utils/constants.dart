@@ -1,7 +1,10 @@
 const kAppName = 'Statera';
 
 const kEmulatorFlag = 'MODE';
+const kCheckNotificationsFlag = 'CHECK_NOTIFICATIONS';
 const kIsModeDebug = String.fromEnvironment(kEmulatorFlag) == 'debug';
+const kCheckNotifications =
+    bool.fromEnvironment(kCheckNotificationsFlag, defaultValue: true);
 
 const kSignInMessages = {
   'user-not-found': 'There is no user associated with this email address',
@@ -24,3 +27,7 @@ const kSignInWithGoogleMessages = {
 };
 
 const kRequiredValidationMessage = "Can't be empty";
+
+const kUpdateBannerRefreshFrequency = Duration(hours: 1);
+
+const kNotificationsReminderCooldown = Duration(days: 2);

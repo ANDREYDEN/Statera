@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -61,6 +62,7 @@ class Statera extends StatelessWidget {
         : GroupList.route.replaceFirst('/', '');
 
     return RepositoryRegistrant(
+      firestore: FirebaseFirestore.instance,
       child: BlocProvider(
         create: (context) => AuthBloc(context.read<AuthService>()),
         child: LayoutBuilder(

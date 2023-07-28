@@ -71,9 +71,12 @@ class PaymentListItem extends StatelessWidget {
         );
 
         if (payment.newFor.contains(uid)) {
-          return paymentItem
-              .animate()
-              .fadeIn(duration: Duration(milliseconds: 500));
+          return paymentItem.animate().slideX(
+                duration: Duration(milliseconds: 1000),
+                curve: Curves.easeOutExpo,
+                begin: 1,
+                end: 0,
+              );
         }
 
         return paymentItem;

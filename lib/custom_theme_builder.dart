@@ -1,5 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/color/seed_color_cubit.dart';
 
 import 'utils/utils.dart';
 
@@ -19,29 +22,35 @@ class CustomThemeBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        ColorScheme lightColorScheme;
-        ColorScheme darkColorScheme;
+    return BlocProvider<SeedColorCubit>(
+      create: (context) =>
+          SeedColorCubit(context.read<PreferencesService>())..load(),
+      child: Builder(builder: (context) {
+        return DynamicColorBuilder(
+          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+            ColorScheme lightColorScheme;
+            ColorScheme darkColorScheme;
 
-        if (lightDynamic != null && darkDynamic != null) {
-          lightColorScheme = lightDynamic.harmonized();
-          darkColorScheme = darkDynamic.harmonized();
-        } else {
-          lightColorScheme = ColorScheme.fromSeed(
-            seedColor: Color(0xFFffd100),
-          );
-          darkColorScheme = ColorScheme.fromSeed(
-            seedColor: Color(0xFFffd100),
-            brightness: Brightness.dark,
-          );
-        }
+            if (lightDynamic != null && darkDynamic != null) {
+              lightColorScheme = lightDynamic.harmonized();
+              darkColorScheme = darkDynamic.harmonized();
+            } else {
+              var seedColor = context.watch<SeedColorCubit>().state;
 
-        return builder(
-          _buildTheme(lightColorScheme),
-          _buildTheme(darkColorScheme),
+              lightColorScheme = ColorScheme.fromSeed(seedColor: seedColor);
+              darkColorScheme = ColorScheme.fromSeed(
+                seedColor: seedColor,
+                brightness: Brightness.dark,
+              );
+            }
+
+            return builder(
+              _buildTheme(lightColorScheme),
+              _buildTheme(darkColorScheme),
+            );
+          },
         );
-      },
+      }),
     );
   }
 }

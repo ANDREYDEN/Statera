@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/callables.dart';
@@ -38,7 +37,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       if (!wasCompleted &&
           expense.completed &&
-          event.issuer.uid != expense.authorUid) {
+          event.issuerUid != expense.authorUid) {
         Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
       }
     }

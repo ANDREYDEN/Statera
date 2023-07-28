@@ -81,7 +81,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
 
         widget.expenseBloc.add(
           UpdateRequested(
-            issuer: authBloc.user,
+            issuerUid: authBloc.uid,
             update: (expense) {
               if (addingItem) {
                 expense.addItem(item);

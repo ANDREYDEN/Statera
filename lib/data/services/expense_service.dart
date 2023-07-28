@@ -93,6 +93,10 @@ class ExpenseService extends Firestore {
         .update({'finalizedDate': Timestamp.now()});
   }
 
+  Future<void> revertExpense(Expense expense) async {
+    await expensesCollection.doc(expense.id).update({'finalizedDate': null});
+  }
+
   Future<void> deleteExpense(Expense expense) {
     return expensesCollection.doc(expense.id).delete();
   }

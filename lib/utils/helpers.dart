@@ -18,7 +18,8 @@ configureEmulators() async {
   if (!kIsModeDebug) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     return;
-  };
+  }
+  ;
 
   final host = 'localhost';
   await FirebaseAuth.instance.useAuthEmulator(host, 9099);
@@ -51,21 +52,32 @@ Future<bool> snackbarCatch(
   String? successMessage,
   String? errorMessage,
 }) async {
-  bool errorOccured = false;
+  dynamic exception;
   try {
     await operation();
   } catch (e) {
-    errorOccured = true;
-    errorMessage = errorMessage ?? e.toString();
+    exception = e;
   }
 
-  if (errorOccured || (successMessage != null && successMessage.isNotEmpty)) {
+  final errorOccured = exception != null;
+
+  if (errorOccured) {
+    print(exception);
+    FirebaseCrashlytics.instance.recordError(
+      exception,
+      null,
+      reason: 'Something went wrong',
+    );
     showSnackBar(
       context,
-      errorOccured ? errorMessage! : successMessage!,
-      color: errorOccured
-          ? Theme.of(context).colorScheme.error
-          : Theme.of(context).colorScheme.secondary,
+      errorMessage ?? exception.toString(),
+      color: Theme.of(context).colorScheme.error,
+    );
+  } else if (successMessage != null && successMessage.isNotEmpty) {
+    showSnackBar(
+      context,
+      successMessage,
+      color: Theme.of(context).colorScheme.secondary,
     );
   }
 

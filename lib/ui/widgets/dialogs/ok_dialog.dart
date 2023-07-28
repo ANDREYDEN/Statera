@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
-class OKCancelDialog extends StatelessWidget {
+class OKDialog extends StatelessWidget {
   final String text;
   final String? title;
 
-  const OKCancelDialog({
+  const OKDialog({
     Key? key,
     required this.text,
     this.title,
@@ -18,12 +17,11 @@ class OKCancelDialog extends StatelessWidget {
       title: title == null ? null : Text(title!),
       content: DialogWidth(child: Text(this.text)),
       actions: [
-        CancelButton(),
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: Text('Yes'),
+          child: Text('Ok'),
         ),
       ],
     );

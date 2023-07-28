@@ -8,7 +8,6 @@ export async function notifyWhenExpenseCreated(expenseSnap: firestore.QueryDocum
   const author = group.data()?.members.find((m: any) => m.uid === authorUid)
   const authorName = author?.name || 'anonymous'
   const userTokens = await getExpenseNotificationTokens(expenseSnap)
-  console.log('Retrieved tokens:', userTokens)
 
   if (userTokens.length === 0) return null
 

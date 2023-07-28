@@ -5,11 +5,17 @@ import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/sign_in.dart';
+import 'package:statera/utils/utils.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget Function() builder;
+  final bool isHomePage;
 
-  const AuthGuard({Key? key, required this.builder}) : super(key: key);
+  const AuthGuard({
+    Key? key,
+    required this.builder,
+    required this.isHomePage,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +26,7 @@ class AuthGuard extends StatelessWidget {
       userRepository: userRepository,
     )..load(context);
 
-    return BlocConsumer<AuthBloc, AuthState>(
-      listenWhen: (previousState, currentState) =>
-          previousState.status == AuthStatus.unauthenticated &&
-          currentState.status == AuthStatus.authenticated,
-      listener: (context, state) =>
-          notificationsCubit.updateToken(uid: state.user!.uid),
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         if (authState.status == AuthStatus.unauthenticated) {
           return BlocProvider<SignInCubit>(
@@ -34,7 +35,23 @@ class AuthGuard extends StatelessWidget {
           );
         }
 
-        notificationsCubit.requestPermission(uid: authState.user!.uid);
+        if (!kCheckNotifications) {
+          return BlocProvider<NotificationsCubit>(
+            create: (context) => NotificationsCubit(
+              notificationsRepository: notificationsRepository,
+              userRepository: userRepository,
+              allowed: true,
+            )..load(context),
+            child: this.builder(),
+          );
+        }
+
+        final uid = authState.user!.uid;
+        notificationsCubit.requestPermission(uid: uid);
+
+        if (isHomePage) {
+          notificationsCubit.updateToken(uid: uid);
+        }
 
         return BlocProvider<NotificationsCubit>(
           create: (context) => notificationsCubit,
