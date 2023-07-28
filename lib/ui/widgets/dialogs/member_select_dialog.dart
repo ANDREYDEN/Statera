@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 
 /// Shows all group members to select from.
@@ -37,14 +36,11 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
     super.initState();
   }
 
-  bool get isWide => context.read<LayoutState>().isWide;
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(this.widget.title),
-      content: SizedBox(
-        width: isWide ? 400 : 200,
+      content: DialogWidth(
         child: MemberPicker(
           value: _selectedMemberUids,
           singleSelection: widget.singleSelection,

@@ -5,7 +5,8 @@ import 'package:statera/data/services/firestore.dart';
 
 @GenerateNiceMocks([MockSpec<ExpenseService>()])
 class ExpenseService extends Firestore {
-  ExpenseService(FirebaseFirestore firestoreInstance) : super(firestoreInstance);
+  ExpenseService(FirebaseFirestore firestoreInstance)
+      : super(firestoreInstance);
 
   Stream<List<Expense>> listenForRelatedExpenses(String uid, String? groupId) {
     return queryToExpensesStream(
@@ -78,6 +79,10 @@ class ExpenseService extends Firestore {
     await expensesCollection
         .doc(expense.id)
         .update({'finalizedDate': Timestamp.now()});
+  }
+
+  Future<void> revertExpense(Expense expense) async {
+    await expensesCollection.doc(expense.id).update({'finalizedDate': null});
   }
 
   Future<void> deleteExpense(Expense expense) {

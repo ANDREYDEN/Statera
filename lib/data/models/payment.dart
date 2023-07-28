@@ -29,6 +29,38 @@ class Payment implements Comparable {
     this.oldPayerBalance,
   });
 
+  Payment.fromFinalizedExpense({
+    required Expense expense,
+    required String receiverId,
+    required double? oldAuthorBalance,
+  })  : id = null,
+        groupId = expense.groupId,
+        payerId = expense.authorUid,
+        receiverId = receiverId,
+        value = expense.getConfirmedTotalForUser(receiverId),
+        newFor = [receiverId],
+        relatedExpense = PaymentExpenseInfo.fromExpense(
+          expense,
+          action: PaymentExpenseAction.finalize,
+        ),
+        oldPayerBalance = oldAuthorBalance;
+
+  Payment.fromRevertedExpense({
+    required Expense expense,
+    required String payerId,
+    required double? oldPayerBalance,
+  })  : id = null,
+        groupId = expense.groupId,
+        payerId = payerId,
+        receiverId = expense.authorUid,
+        value = expense.getConfirmedTotalForUser(payerId),
+        newFor = [payerId],
+        relatedExpense = PaymentExpenseInfo.fromExpense(
+          expense,
+          action: PaymentExpenseAction.revert,
+        ),
+        oldPayerBalance = oldPayerBalance;
+
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
   bool get hasRelatedExpense => relatedExpense != null;
@@ -43,7 +75,6 @@ class Payment implements Comparable {
       'value': value,
       'relatedExpense':
           relatedExpense == null ? null : relatedExpense!.toFirestore(),
-      'payerReceiverId': '${payerId}_$receiverId',
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
       'newFor': newFor,
@@ -66,7 +97,9 @@ class Payment implements Comparable {
           ? null
           : DateTime.parse(map['timeCreated'].toDate().toString()),
       reason: map['reason'],
-      oldPayerBalance: double.parse(map['oldPayerBalance'].toString()),
+      oldPayerBalance: map['oldPayerBalance'] == null
+          ? null
+          : double.parse(map['oldPayerBalance'].toString()),
       newFor: List<String>.from(map['newFor'] ?? []),
     );
   }
@@ -100,19 +133,35 @@ class Payment implements Comparable {
   }
 }
 
+enum PaymentExpenseAction {
+  revert('reverted'),
+  finalize('finalized');
+
+  final String name;
+
+  const PaymentExpenseAction(this.name);
+
+  factory PaymentExpenseAction.fromFirestore(String action) {
+    return values.firstWhere((e) => e.name == action, orElse: () => finalize);
+  }
+}
+
 class PaymentExpenseInfo {
   String? id;
   String name;
+  PaymentExpenseAction? action;
 
   PaymentExpenseInfo({
     required this.id,
     required this.name,
+    this.action,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'name': name,
+      'action': action == null ? null : action!.name,
     };
   }
 
@@ -120,13 +169,20 @@ class PaymentExpenseInfo {
     return PaymentExpenseInfo(
       id: map['id'],
       name: map['name'],
+      action: map['action'] == null
+          ? PaymentExpenseAction.finalize
+          : PaymentExpenseAction.fromFirestore(map['action']),
     );
   }
 
-  factory PaymentExpenseInfo.fromExpense(Expense expense) {
+  factory PaymentExpenseInfo.fromExpense(
+    Expense expense, {
+    required PaymentExpenseAction action,
+  }) {
     return PaymentExpenseInfo(
       id: expense.id,
       name: expense.name,
+      action: action,
     );
   }
 }

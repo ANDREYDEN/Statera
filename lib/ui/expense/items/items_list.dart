@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/ui/expense/expense_action_handlers.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
+import 'package:statera/ui/expense/items/item_action.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
@@ -31,7 +31,7 @@ class ItemsList extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
                   child: ElevatedButton(
-                    onPressed: () => handleItemUpsert(context),
+                    onPressed: () => UpsertItemAction().handle(context),
                     child: Icon(Icons.add),
                   ),
                 ),
@@ -54,10 +54,7 @@ class ItemsList extends StatelessWidget {
                               item: item,
                               showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)
-                                  ? () => handleItemUpsert(
-                                        context,
-                                        intialItem: item,
-                                      )
+                                  ? () => UpsertItemAction(item: item).handle(context)
                                   : null,
                               onChangePartition: !expense.finalized
                                   ? (partition) => _handleItemPartitionChange(

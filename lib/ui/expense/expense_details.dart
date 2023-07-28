@@ -6,7 +6,7 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
-import 'package:statera/ui/expense/expense_actions_wide.dart';
+import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/group/group_builder.dart';
@@ -38,7 +38,11 @@ class ExpenseDetails extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isWide) ExpenseActionsWide(expense: expense),
+            if (isWide)
+              Align(
+                alignment: Alignment.centerRight,
+                child: ExpenseActionsButton(expense: expense),
+              ),
             Header(),
             if (expense.hasNoItems &&
                 expenseCanBeUpdated &&

@@ -1,12 +1,12 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/sign_in.dart';
+
+import '../../../integration_test/test_helpers.dart';
 
 class MockSignInCubit extends MockCubit<SignInState> implements SignInCubit {
   MockSignInCubit() : super();
@@ -18,11 +18,10 @@ class MockUserCredential extends Mock implements UserCredential {}
 
 class FakeSignInLoaded extends Fake implements SignInLoaded {}
 
-
 final userCredential = MockUserCredential();
 
 void main() {
-  group("Sign In", () {
+  group('Sign In', () {
     late MockSignInCubit signInCubit;
 
     setUpAll(() {
@@ -41,20 +40,11 @@ void main() {
     });
 
     Future<void> buildSignIn(WidgetTester tester) {
-      return tester.pumpWidget(
-        MaterialApp(
-          home: SafeArea(
-            child: BlocProvider<SignInCubit>(
-              create: (_) => signInCubit,
-              child: SignIn(),
-            ),
-          ),
-        ),
-      );
+      return pumpPage(SignIn(), tester, signInCubit: signInCubit);
     }
 
     testWidgets(
-      "loads into the sign in state",
+      'loads into the sign in state',
       (WidgetTester tester) async {
         await buildSignIn(tester);
 
@@ -67,7 +57,7 @@ void main() {
     );
 
     testWidgets(
-      "clicking Sign In calls the signIn method",
+      'clicking Sign In calls the signIn method',
       (WidgetTester tester) async {
         await buildSignIn(tester);
 
@@ -79,11 +69,11 @@ void main() {
     );
 
     testWidgets(
-      "can switch to the sign up state",
+      'can switch to the sign up state',
       (WidgetTester tester) async {
         await buildSignIn(tester);
 
-        await tester.tap(find.text("Create an account"));
+        await tester.tap(find.text('Create an account'));
         await tester.pumpAndSettle();
 
         var signInFinder = find.text('Sign In');
@@ -95,10 +85,10 @@ void main() {
     );
 
     testWidgets(
-      "clicking Sign In calls the signIn method",
+      'clicking Sign In calls the signIn method',
       (WidgetTester tester) async {
         await buildSignIn(tester);
-        await tester.tap(find.text("Create an account"));
+        await tester.tap(find.text('Create an account'));
         await tester.pumpAndSettle();
 
         var signUpButton = find.text('Sign Up');
