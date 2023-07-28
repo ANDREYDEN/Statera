@@ -91,7 +91,7 @@ jobs:
         working-directory: web_installers/packages/web_drivers/
         run: |
           dart pub get
-          dart lib/web_driver_installer.dart & sleep 20
+          dart lib/web_driver_installer.dart chromedriver --driver-version="114.0.5735.90" & sleep 20
       
       - name: Install Firebase CLI
         run: npm install -g firebase-tools

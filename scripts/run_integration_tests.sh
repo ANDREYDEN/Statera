@@ -1,7 +1,7 @@
 flutter drive \
   --driver=test_driver/integration_test.dart \
-  --target=integration_test/screenshots.test.dart \
+  --target=integration_test/e2e.test.dart \
   --dart-define=MODE=debug \
-  --screenshot=./failed_screenshots \
-  -d web-server
+  --dart-define=CHECK_NOTIFICATIONS=false \
+  -d web-server \
   --browser-name=chrome

@@ -5,6 +5,7 @@ import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/sign_in.dart';
+import 'package:statera/utils/utils.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget Function() builder;
@@ -31,6 +32,17 @@ class AuthGuard extends StatelessWidget {
           return BlocProvider<SignInCubit>(
             create: (_) => SignInCubit(context.read<AuthService>()),
             child: SignIn(),
+          );
+        }
+
+        if (!kCheckNotifications) {
+          return BlocProvider<NotificationsCubit>(
+            create: (context) => NotificationsCubit(
+              notificationsRepository: notificationsRepository,
+              userRepository: userRepository,
+              allowed: true,
+            )..load(context),
+            child: this.builder(),
           );
         }
 

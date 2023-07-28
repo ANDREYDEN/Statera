@@ -13,7 +13,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   NotificationsCubit({
     required UserRepository userRepository,
     required NotificationService notificationsRepository,
-  }) : super(NotificationsState(false)) {
+    bool allowed = false,
+  }) : super(NotificationsState(allowed)) {
     _notificationService = notificationsRepository;
     _userRepostiry = userRepository;
   }
