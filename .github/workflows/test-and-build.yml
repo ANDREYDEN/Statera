@@ -65,6 +65,9 @@ jobs:
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
       - name: Copy .env
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
@@ -82,7 +85,7 @@ jobs:
       - name: Install and Start Chrome
         working-directory: web_installers/packages/web_drivers/
         run: |
-          pub get
+          dart pub get
           dart lib/web_driver_installer.dart & sleep 20
       
       - name: Start emulators
