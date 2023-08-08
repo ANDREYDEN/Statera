@@ -1,39 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/services/services.dart';
+import 'package:statera/business_logic/expenses/unmarked_expenses_cubit.dart';
 
-class UnmarkedExpensesBadge extends StatefulWidget {
+class UnmarkedExpensesBadge extends StatelessWidget {
   final Widget child;
-  final String? groupId;
 
-  const UnmarkedExpensesBadge({
-    Key? key,
-    required this.child,
-    this.groupId,
-  }) : super(key: key);
+  const UnmarkedExpensesBadge({Key? key, required this.child})
+      : super(key: key);
 
-  @override
-  State<UnmarkedExpensesBadge> createState() => _UnmarkedExpensesBadgeState();
-}
-
-class _UnmarkedExpensesBadgeState extends State<UnmarkedExpensesBadge> {
-  @override
   Widget build(BuildContext context) {
-    GroupService groupService = context.read<GroupService>();
-    String uid = context.read<AuthBloc>().uid;
+    return BlocBuilder<UnmarkedExpensesCubit, int?>(
+      bloc: context.read<UnmarkedExpensesCubit>(),
+      builder: (context, numberOfExpenses) {
+        print('Got unmarked expenses: $numberOfExpenses');
+        if (numberOfExpenses == null) return child;
 
-    return StreamBuilder<List<Expense>>(
-      stream: groupService.listenForUnmarkedExpenses(widget.groupId, uid),
-      builder: (context, snap) {
-        print('Got unmarked expenses: ${snap.data?.length}');
-        var unmarkedExpenses = snap.data;
-        if (unmarkedExpenses == null || unmarkedExpenses.isEmpty)
-          return widget.child;
-
-        return Badge.count(count: unmarkedExpenses.length, child: widget.child);
+        return Badge.count(count: numberOfExpenses, child: child);
       },
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expenses/unmarked_expenses_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
@@ -55,9 +57,13 @@ class _GroupPageState extends State<GroupPage> {
         label: 'Expenses',
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        wrapper: (child) => UnmarkedExpensesBadge(
-          child: child,
-          groupId: widget.groupId,
+        wrapper: (child) => BlocProvider<UnmarkedExpensesCubit>(
+          create: (context) => UnmarkedExpensesCubit(
+            context.read<GroupService>(),
+            groupId: widget.groupId!,
+            uid: context.read<AuthBloc>().uid,
+          ),
+          child: UnmarkedExpensesBadge(child: child),
         ),
       ),
       NavBarItemData(

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expenses/unmarked_expenses_cubit.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
@@ -18,11 +22,17 @@ class GroupListItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            child: UnmarkedExpensesBadge(
-              groupId: this.group.id,
-              child: Text(
-                this.group.name,
-                overflow: TextOverflow.ellipsis,
+            child: BlocProvider<UnmarkedExpensesCubit>(
+              create: (context) => UnmarkedExpensesCubit(
+                context.read<GroupService>(),
+                groupId: this.group.id,
+                uid: context.read<AuthBloc>().uid,
+              ),
+              child: UnmarkedExpensesBadge(
+                child: Text(
+                  this.group.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           )

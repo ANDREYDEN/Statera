@@ -135,8 +135,6 @@ class GroupService extends Firestore {
       groupId: groupId,
       unmarkedAssigneeId: uid,
     )
-    // return FirebaseFirestore.instance
-    //     .collection('expenses')
         .snapshots()
         .map<List<Expense>>((snap) =>
             snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
