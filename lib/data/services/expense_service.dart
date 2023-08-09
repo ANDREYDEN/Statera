@@ -13,16 +13,17 @@ class ExpenseService extends Firestore {
     String? groupId, {
     int? quantity,
   }) {
-    var query = expensesCollection.where(
-      Filter.and(
-        Filter('groupId', isEqualTo: groupId),
-        Filter.or(
-          Filter('authorUid', isEqualTo: uid),
-          Filter('assigneeIds', arrayContains: uid),
-        ),
-      ),
-    );
-    // .orderBy('date', descending: true);
+    var query = expensesCollection
+        .where(
+          Filter.and(
+            Filter('groupId', isEqualTo: groupId),
+            Filter.or(
+              Filter('authorUid', isEqualTo: uid),
+              Filter('assigneeIds', arrayContains: uid),
+            ),
+          ),
+        )
+        .orderBy('date', descending: true);
     if (quantity != null) {
       query = query.limit(quantity);
     }

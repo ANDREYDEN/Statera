@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
@@ -12,7 +11,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
-  static const int _expensesPerPage = 2;
+  static const int _expensesPerPage = 5;
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -26,29 +25,26 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
         .map((expenses) {
-      // expenses.sort((firstExpense, secondExpense) {
-      //   final expenseStages = Expense.expenseStages(userId);
-      //   for (var stage in expenseStages) {
-      //     if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-      //       return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-      //     }
-      //     if (firstExpense.isIn(stage)) return -1;
-      //     if (secondExpense.isIn(stage)) return 1;
-      //   }
+      expenses.sort((firstExpense, secondExpense) {
+        final expenseStages = Expense.expenseStages(userId);
+        for (var stage in expenseStages) {
+          if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
+            return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
+          }
+          if (firstExpense.isIn(stage)) return -1;
+          if (secondExpense.isIn(stage)) return 1;
+        }
 
-      //   return 0;
-      // });
+        return 0;
+      });
 
       return ExpensesLoaded(
         expenses: expenses,
         stages: Expense.expenseStages(userId),
       );
-    }).listen(
-      emit,
-      onError: (error) {
-        emit(ExpensesError(error: error));
-      },
-    );
+    })
+        // .where((event) => event.expenses.length == numberOfExpenses)
+        .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
   void loadMore(String userId) {

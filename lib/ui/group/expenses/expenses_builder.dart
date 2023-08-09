@@ -26,7 +26,7 @@ class ExpensesBuilder extends StatelessWidget {
 
         if (state is ExpensesError) {
           return errorBuilder == null
-              ? Center(child: Text(state.error.toString()))
+              ? Center(child: SelectableText(state.error.toString()))
               : errorBuilder!(groupContext, state);
         }
 

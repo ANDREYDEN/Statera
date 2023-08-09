@@ -13,7 +13,7 @@ class UnmarkedExpensesBadge extends StatelessWidget {
       bloc: context.read<UnmarkedExpensesCubit>(),
       builder: (context, numberOfExpenses) {
         print('Got unmarked expenses: $numberOfExpenses');
-        if (numberOfExpenses == null) return child;
+        if (numberOfExpenses == null || numberOfExpenses == 0) return child;
 
         return Badge.count(count: numberOfExpenses, child: child);
       },
