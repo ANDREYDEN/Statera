@@ -5,7 +5,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class ExpensesBuilder extends StatelessWidget {
-  final Widget Function(BuildContext, List<Expense>) builder;
+  final Widget Function(BuildContext, List<Expense>, bool) builder;
   final Widget Function(BuildContext, ExpensesError)? errorBuilder;
   final Widget? loadingWidget;
 
@@ -38,7 +38,7 @@ class ExpensesBuilder extends StatelessWidget {
                   dimension: 16,
                   child: Loader(),
                 ),
-              Expanded(child: builder(groupContext, state.filteredExpenses))
+              Expanded(child: builder(groupContext, state.filteredExpenses, state.allLoaded))
             ],
           );
         }

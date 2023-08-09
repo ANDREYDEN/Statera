@@ -13,9 +13,13 @@ class ExpensesLoading extends ExpensesState {}
 class ExpensesLoaded extends ExpensesState {
   final List<Expense> expenses;
   final List<ExpenseStage> stages;
+  final bool allLoaded;
 
-  ExpensesLoaded({required expenses, required List<ExpenseStage> this.stages})
-      : expenses = expenses;
+  ExpensesLoaded({
+    required expenses,
+    required List<ExpenseStage> this.stages,
+    this.allLoaded = false,
+  }) : expenses = expenses;
 
   List<Expense> get filteredExpenses => expenses
       .where((expense) => stages.any((stage) => expense.isIn(stage)))

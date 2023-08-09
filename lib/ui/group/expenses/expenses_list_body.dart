@@ -25,7 +25,7 @@ class ExpensesListBody extends StatelessWidget {
     });
 
     return ExpensesBuilder(
-      builder: (context, expenses) {
+      builder: (context, expenses, allLoaded) {
         print('Got expenses: ${expenses.length}');
         if (expenses.isEmpty) {
           return ListEmpty(text: 'Start by adding an expense');
@@ -36,6 +36,8 @@ class ExpensesListBody extends StatelessWidget {
           controller: scrollController,
           itemBuilder: (context, index) {
             if (index == expenses.length) {
+              if (allLoaded) return SizedBox.shrink();
+
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: CircularProgressIndicator()),

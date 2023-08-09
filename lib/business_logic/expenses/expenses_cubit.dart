@@ -21,6 +21,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
   void load(String userId, String? groupId,
       {int numberOfExpenses = _expensesPerPage}) {
+    print('Requesting $numberOfExpenses expenses');
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
@@ -41,6 +42,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       return ExpensesLoaded(
         expenses: expenses,
         stages: Expense.expenseStages(userId),
+        allLoaded: expenses.length < numberOfExpenses,
       );
     })
         // .where((event) => event.expenses.length == numberOfExpenses)
@@ -50,6 +52,8 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   void loadMore(String userId) {
     final currentState = state;
     if (currentState is ExpensesLoaded) {
+      if (currentState.allLoaded) return;
+
       final groupId = currentState.expenses.first.groupId;
       load(
         userId,

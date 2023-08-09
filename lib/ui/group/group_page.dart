@@ -55,8 +55,8 @@ class _GroupPageState extends State<GroupPage> {
         label: 'Expenses',
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        wrapper: (child) =>
-            UnmarkedExpensesBadge(groupId: widget.groupId, child: child),
+        // wrapper: (child) =>
+        //     UnmarkedExpensesBadge(groupId: widget.groupId, child: child),
       ),
       NavBarItemData(
         label: 'Settings',
