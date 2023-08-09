@@ -65,11 +65,7 @@ class Statera extends StatelessWidget {
       firestore: FirebaseFirestore.instance,
       child: BlocProvider(
         create: (context) => AuthBloc(context.read<AuthService>()),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Provider<LayoutState>.value(
-              value: LayoutState(constraints),
-              child: CustomThemeBuilder(
+        child: CustomThemeBuilder(
                 builder: (lightTheme, darkTheme) {
                   return MaterialApp(
                     title: kAppName,
@@ -82,9 +78,6 @@ class Statera extends StatelessWidget {
                   );
                 },
               ),
-            );
-          },
-        ),
       ),
     );
   }

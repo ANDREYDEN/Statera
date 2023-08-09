@@ -13,6 +13,7 @@ import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/auth_guard.dart';
+import 'package:statera/ui/custom_layout_builder.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
@@ -186,10 +187,12 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
     dynamicLinkRepository.listen(context);
   }
 
-  return path.isPublic
-      ? path.builder(context, matches)
-      : AuthGuard(
-        isHomePage: path == _groupsPagePath,
-          builder: () => path.builder(context, matches),
-        );
+  return CustomLayoutBuilder(
+    child: path.isPublic
+        ? path.builder(context, matches)
+        : AuthGuard(
+            isHomePage: path == _groupsPagePath,
+            builder: () => path.builder(context, matches),
+          ),
+  );
 }

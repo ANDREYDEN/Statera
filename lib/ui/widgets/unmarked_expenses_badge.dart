@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/expenses/unmarked_expenses_cubit.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/data/services/services.dart';
 
-class UnmarkedExpensesBadge extends StatelessWidget {
+class UnmarkedExpensesBadge extends StatefulWidget {
   final Widget child;
+  final String? groupId;
 
-  const UnmarkedExpensesBadge({Key? key, required this.child})
+  const UnmarkedExpensesBadge(
+      {Key? key, required this.child, required this.groupId})
       : super(key: key);
 
-  Widget build(BuildContext context) {
-    return BlocBuilder<UnmarkedExpensesCubit, int?>(
-      bloc: context.read<UnmarkedExpensesCubit>(),
-      builder: (context, numberOfExpenses) {
-        print('Got unmarked expenses: $numberOfExpenses');
-        if (numberOfExpenses == null || numberOfExpenses == 0) return child;
+  @override
+  State<UnmarkedExpensesBadge> createState() => _UnmarkedExpensesBadgeState();
+}
 
-        return Badge.count(count: numberOfExpenses, child: child);
+class _UnmarkedExpensesBadgeState extends State<UnmarkedExpensesBadge> {
+  late Stream<int> unmarkedExpensesStream;
+
+  @override
+  void initState() {
+    final groupService = context.read<GroupService>();
+    final uid = context.read<AuthBloc>().uid;
+    unmarkedExpensesStream = groupService
+        .listenForUnmarkedExpenses(widget.groupId, uid)
+        .map((unmarkedExpenses) => unmarkedExpenses.length);
+    super.initState();
+  }
+
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: unmarkedExpensesStream,
+      builder: (context, snap) {
+        if (!snap.hasData) return widget.child;
+
+        final numberOfExpenses = snap.data!;
+        print('Got unmarked expenses: $numberOfExpenses');
+        if (numberOfExpenses == 0) return widget.child;
+
+        return Badge.count(count: numberOfExpenses, child: widget.child);
       },
     );
   }
