@@ -11,7 +11,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
-  static const int _expensesPerPage = 5;
+  static const int _expensesPerPage = 10;
   ExpensesState? _lastLoadedState;
   Timer? _loadThrottleTimer;
   static const _throttleDuration = Duration(milliseconds: 200);
