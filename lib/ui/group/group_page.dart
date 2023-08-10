@@ -90,9 +90,6 @@ class _GroupPageState extends State<GroupPage> {
                   duration: Duration(milliseconds: 500),
                   curve: Curves.ease,
                 );
-                // setState(() {
-                //   this._selectedNavBarItemIndex = index;
-                // });
               },
             ),
       child: MultiBlocProvider(
