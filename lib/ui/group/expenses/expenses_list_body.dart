@@ -14,7 +14,6 @@ class ExpensesListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Building ExpensesListBody');
     final authBloc = context.read<AuthBloc>();
     final scrollController = ScrollController();
     scrollController.addListener(() {
@@ -26,7 +25,6 @@ class ExpensesListBody extends StatelessWidget {
 
     return ExpensesBuilder(
       builder: (context, expenses, allLoaded) {
-        print('Got expenses: ${expenses.length}');
         if (expenses.isEmpty) {
           return ListEmpty(text: 'Start by adding an expense');
         }

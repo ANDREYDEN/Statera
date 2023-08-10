@@ -35,7 +35,6 @@ class _UnmarkedExpensesBadgeState extends State<UnmarkedExpensesBadge> {
         if (!snap.hasData) return widget.child;
 
         final numberOfExpenses = snap.data!;
-        print('Got unmarked expenses: $numberOfExpenses');
         if (numberOfExpenses == 0) return widget.child;
 
         return Badge.count(count: numberOfExpenses, child: widget.child);

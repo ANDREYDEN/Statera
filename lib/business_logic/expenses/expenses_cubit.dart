@@ -22,10 +22,11 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _groupService = groupService;
   }
 
-  void load(String userId, String? groupId,
-      {int numberOfExpenses = _expensesPerPage}) {
-    print('Requesting $numberOfExpenses expenses');
-
+  void load(
+    String userId,
+    String? groupId, {
+    int numberOfExpenses = _expensesPerPage,
+  }) {
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
