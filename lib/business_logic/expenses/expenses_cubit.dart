@@ -12,6 +12,9 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
   static const int _expensesPerPage = 5;
+  ExpensesState? _lastLoadedState;
+  Timer? _loadThrottleTimer;
+  static const _throttleDuration = Duration(milliseconds: 200);
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -22,6 +25,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   void load(String userId, String? groupId,
       {int numberOfExpenses = _expensesPerPage}) {
     print('Requesting $numberOfExpenses expenses');
+
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
@@ -44,9 +48,24 @@ class ExpensesCubit extends Cubit<ExpensesState> {
         stages: Expense.expenseStages(userId),
         allLoaded: expenses.length < numberOfExpenses,
       );
-    })
-        // .where((event) => event.expenses.length == numberOfExpenses)
-        .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
+    }).listen(
+      (state) {
+        _lastLoadedState = state;
+        if (_loadThrottleTimer == null) {
+          _loadThrottleTimer = Timer(
+            _throttleDuration,
+            () {
+              _loadThrottleTimer = null;
+              if (_lastLoadedState != null) {
+                emit(_lastLoadedState!);
+                _lastLoadedState = null;
+              }
+            },
+          );
+        }
+      },
+      onError: (error) => emit(ExpensesError(error: error)),
+    );
   }
 
   void loadMore(String userId) {
