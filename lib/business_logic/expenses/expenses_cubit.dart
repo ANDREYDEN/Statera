@@ -12,7 +12,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
-  static const int _expensesPerPage = 10;
+  static const int expensesPerPage = 10;
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -23,7 +23,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   void load(
     String userId,
     String? groupId, {
-    int numberOfExpenses = _expensesPerPage,
+    int numberOfExpenses = expensesPerPage,
   }) {
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
@@ -61,7 +61,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       load(
         userId,
         groupId,
-        numberOfExpenses: currentState.expenses.length + _expensesPerPage,
+        numberOfExpenses: currentState.expenses.length + expensesPerPage,
       );
     }
   }

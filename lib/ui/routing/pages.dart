@@ -1,3 +1,4 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,31 +52,42 @@ final List<PagePath> _paths = [
   _groupsPagePath,
   PagePath(
     pattern: '^${GroupPage.route}/([\\w-]+)\$',
-    builder: (context, matches) => MultiProvider(
-      providers: [
-        BlocProvider<GroupCubit>(
-          create: (context) => GroupCubit(
-            context.read<GroupService>(),
-            context.read<ExpenseService>(),
-            context.read<UserRepository>(),
-          )..load(matches?[0]),
-        ),
-        BlocProvider(
-          create: (context) => ExpensesCubit(
-            context.read<ExpenseService>(),
-            context.read<GroupService>(),
-          )..load(context.read<AuthBloc>().uid, matches?[0]),
-        ),
-        BlocProvider(
-          create: (context) => NewPaymentsCubit(context.read<PaymentService>())
-            ..load(
-              groupId: matches?[0],
-              uid: context.read<AuthBloc>().uid,
-            ),
-        ),
-      ],
-      child: GroupPage(groupId: matches?[0]),
-    ),
+    builder: (context, matches) {
+      final useDynamicExpenseLoading = FirebaseRemoteConfig.instance
+          .getBool('dynamic_expense_loading_feature_flag');
+      return MultiProvider(
+        providers: [
+          BlocProvider<GroupCubit>(
+            create: (context) => GroupCubit(
+              context.read<GroupService>(),
+              context.read<ExpenseService>(),
+              context.read<UserRepository>(),
+            )..load(matches?[0]),
+          ),
+          BlocProvider(
+            create: (context) => ExpensesCubit(
+              context.read<ExpenseService>(),
+              context.read<GroupService>(),
+            )..load(
+                context.read<AuthBloc>().uid,
+                matches?[0],
+                numberOfExpenses: useDynamicExpenseLoading
+                    ? ExpensesCubit.expensesPerPage
+                    : 10000,
+              ),
+          ),
+          BlocProvider(
+            create: (context) =>
+                NewPaymentsCubit(context.read<PaymentService>())
+                  ..load(
+                    groupId: matches?[0],
+                    uid: context.read<AuthBloc>().uid,
+                  ),
+          ),
+        ],
+        child: GroupPage(groupId: matches?[0]),
+      );
+    },
   ),
   PagePath(
     pattern: '^${Settings.route}\$',
