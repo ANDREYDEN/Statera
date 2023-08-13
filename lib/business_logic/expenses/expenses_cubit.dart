@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/utils/stream_extensions.dart';
 
 part 'expenses_state.dart';
 
@@ -12,9 +13,6 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
   static const int _expensesPerPage = 10;
-  ExpensesState? _lastLoadedState;
-  Timer? _loadThrottleTimer;
-  static const _throttleDuration = Duration(milliseconds: 200);
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -31,42 +29,27 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
         .map((expenses) {
-      expenses.sort((firstExpense, secondExpense) {
-        final expenseStages = Expense.expenseStages(userId);
-        for (var stage in expenseStages) {
-          if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-            return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-          }
-          if (firstExpense.isIn(stage)) return -1;
-          if (secondExpense.isIn(stage)) return 1;
-        }
-
-        return 0;
-      });
-
-      return ExpensesLoaded(
-        expenses: expenses,
-        stages: Expense.expenseStages(userId),
-        allLoaded: expenses.length < numberOfExpenses,
-      );
-    }).listen(
-      (state) {
-        _lastLoadedState = state;
-        if (_loadThrottleTimer == null) {
-          _loadThrottleTimer = Timer(
-            _throttleDuration,
-            () {
-              _loadThrottleTimer = null;
-              if (_lastLoadedState != null) {
-                emit(_lastLoadedState!);
-                _lastLoadedState = null;
+          expenses.sort((firstExpense, secondExpense) {
+            final expenseStages = Expense.expenseStages(userId);
+            for (var stage in expenseStages) {
+              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
+                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
               }
-            },
+              if (firstExpense.isIn(stage)) return -1;
+              if (secondExpense.isIn(stage)) return 1;
+            }
+
+            return 0;
+          });
+
+          return ExpensesLoaded(
+            expenses: expenses,
+            stages: Expense.expenseStages(userId),
+            allLoaded: expenses.length < numberOfExpenses,
           );
-        }
-      },
-      onError: (error) => emit(ExpensesError(error: error)),
-    );
+        })
+        .throttle(Duration(milliseconds: 200))
+        .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
   void loadMore(String userId) {
