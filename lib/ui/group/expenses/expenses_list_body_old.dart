@@ -9,21 +9,12 @@ import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 
-class ExpensesListBody extends StatelessWidget {
-  const ExpensesListBody({Key? key}) : super(key: key);
+class ExpensesListBodyOld extends StatelessWidget {
+  const ExpensesListBodyOld({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
-    final scrollController = ScrollController();
-    const loadingThreshold = 200.0;
-    scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent -
-              scrollController.position.pixels <
-          loadingThreshold) {
-        context.read<ExpensesCubit>().loadMore(authBloc.uid);
-      }
-    });
 
     return ExpensesBuilder(
       builder: (context, expenses, allLoaded) {
@@ -33,7 +24,6 @@ class ExpensesListBody extends StatelessWidget {
 
         return ListView.builder(
           itemCount: expenses.length,
-          controller: scrollController,
           itemBuilder: (context, index) {
             var expense = expenses[index];
 

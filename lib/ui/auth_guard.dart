@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/sign_in.dart';
-import 'package:statera/utils/utils.dart';
+import 'package:statera/ui/notifications_initializer.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget Function() builder;
@@ -19,13 +18,6 @@ class AuthGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notificationsRepository = context.read<NotificationService>();
-    final userRepository = context.read<UserRepository>();
-    final notificationsCubit = NotificationsCubit(
-      notificationsRepository: notificationsRepository,
-      userRepository: userRepository,
-    )..load(context);
-
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         if (authState.status == AuthStatus.unauthenticated) {
@@ -35,26 +27,8 @@ class AuthGuard extends StatelessWidget {
           );
         }
 
-        if (!kCheckNotifications) {
-          return BlocProvider<NotificationsCubit>(
-            create: (context) => NotificationsCubit(
-              notificationsRepository: notificationsRepository,
-              userRepository: userRepository,
-              allowed: true,
-            )..load(context),
-            child: this.builder(),
-          );
-        }
-
-        final uid = authState.user!.uid;
-        notificationsCubit.requestPermission(uid: uid);
-
-        if (isHomePage) {
-          notificationsCubit.updateToken(uid: uid);
-        }
-
-        return BlocProvider<NotificationsCubit>(
-          create: (context) => notificationsCubit,
+        return NotificationsInitializer(
+          isHomePage: isHomePage,
           child: this.builder(),
         );
       },

@@ -20,10 +20,7 @@ class GroupListItem extends StatelessWidget {
           Flexible(
             child: UnmarkedExpensesBadge(
               groupId: this.group.id,
-              child: Text(
-                this.group.name,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(this.group.name, overflow: TextOverflow.ellipsis),
             ),
           )
         ],

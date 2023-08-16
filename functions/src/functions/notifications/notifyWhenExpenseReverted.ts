@@ -11,7 +11,7 @@ export async function notifyWhenExpenseReverted(expenseSnap: QueryDocumentSnapsh
   const groupId = expenseSnap.data()?.groupId
   console.log('Sending Notification', expenseSnap.id, 'expense_reverted');
   
-  const authorTokens = await getExpenseNotificationTokens(expenseSnap, false)
+  const authorTokens = await getExpenseNotificationTokens(expenseSnap)
 
   if (authorTokens.length === 0) return null
 

@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/utils/stream_extensions.dart';
 
 part 'expenses_state.dart';
 
@@ -11,6 +12,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
+  static const int expensesPerPage = 10;
 
   ExpensesCubit(ExpenseService expenseService, GroupService groupService)
       : super(ExpensesLoading()) {
@@ -18,34 +20,51 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _groupService = groupService;
   }
 
-  void load(String userId, String? groupId) {
+  void load(
+    String userId,
+    String? groupId, {
+    int numberOfExpenses = expensesPerPage,
+  }) {
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
-        .listenForRelatedExpenses(userId, groupId)
+        .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
         .map((expenses) {
-      expenses.sort((firstExpense, secondExpense) {
-        final expenseStages = Expense.expenseStages(userId);
-        for (var stage in expenseStages) {
-          if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-            return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-          }
-          if (firstExpense.isIn(stage)) return -1;
-          if (secondExpense.isIn(stage)) return 1;
-        }
+          expenses.sort((firstExpense, secondExpense) {
+            final expenseStages = Expense.expenseStages(userId);
+            for (var stage in expenseStages) {
+              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
+                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
+              }
+              if (firstExpense.isIn(stage)) return -1;
+              if (secondExpense.isIn(stage)) return 1;
+            }
 
-        return 0;
-      });
+            return 0;
+          });
 
-      return ExpensesLoaded(
-        expenses: expenses,
-        stages: Expense.expenseStages(userId),
+          return ExpensesLoaded(
+            expenses: expenses,
+            stages: Expense.expenseStages(userId),
+            allLoaded: expenses.length < numberOfExpenses,
+          );
+        })
+        .throttle(Duration(milliseconds: 200))
+        .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
+  }
+
+  void loadMore(String userId) {
+    final currentState = state;
+    if (currentState is ExpensesLoaded) {
+      if (currentState.allLoaded) return;
+
+      final groupId = currentState.expenses.first.groupId;
+      print('loading more');
+      load(
+        userId,
+        groupId,
+        numberOfExpenses: currentState.expenses.length + expensesPerPage,
       );
-    }).listen(
-      emit,
-      onError: (error) {
-        emit(ExpensesError(error: error));
-      },
-    );
+    }
   }
 
   void updateExpense(Expense expense) async {
