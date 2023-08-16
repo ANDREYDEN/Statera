@@ -58,6 +58,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       if (currentState.allLoaded) return;
 
       final groupId = currentState.expenses.first.groupId;
+      print('loading more');
       load(
         userId,
         groupId,

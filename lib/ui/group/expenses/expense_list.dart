@@ -1,8 +1,8 @@
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/ui/group/expenses/expense_list_filters.dart';
 import 'package:statera/ui/group/expenses/expenses_list_body.dart';
 import 'package:statera/ui/group/expenses/expenses_list_body_old.dart';
@@ -14,8 +14,7 @@ class ExpenseList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
-    final useDynamicExpenseLoading = FirebaseRemoteConfig.instance
-        .getBool('dynamic_expense_loading_feature_flag');
+    final featureService = context.read<FeatureService>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -24,7 +23,7 @@ class ExpenseList extends StatelessWidget {
         ExpenseListFilters(),
         if (isWide) NewExpenseButton(),
         Expanded(
-          child: useDynamicExpenseLoading
+          child: featureService.useDynamicExpenseLoading
               ? ExpensesListBody()
               : ExpensesListBodyOld(),
         ),

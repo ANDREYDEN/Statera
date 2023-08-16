@@ -9,16 +9,17 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/services/auth_service.mocks.dart';
-import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
-import 'package:statera/data/services/user_repository.mocks.dart';
-import 'package:statera/data/services/auth_service.dart';
-import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/group_service.dart';
-import 'package:statera/data/services/user_repository.dart';
-import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/auth_service.dart';
+import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/expense_service.dart';
+import 'package:statera/data/services/expense_service.mocks.dart';
+import 'package:statera/data/services/feature_service.dart';
+import 'package:statera/data/services/feature_service.mocks.dart';
+import 'package:statera/data/services/group_service.dart';
+import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/user_repository.dart';
+import 'package:statera/data/services/user_repository.mocks.dart';
 
 class MockUser extends Mock implements User {
   String get uid =>
@@ -46,6 +47,7 @@ Future<void> customPump(
   GroupService? groupService,
   UserRepository? userRepository,
   AuthService? authService,
+  FeatureService? featureService,
   String? currentUserId,
   Group? group,
   List<Expense>? expenses,
@@ -53,15 +55,19 @@ Future<void> customPump(
   when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
-  when(defaultExpenseService.listenForRelatedExpenses(any, any))
+  when(defaultExpenseService.listenForRelatedExpenses(any, any, quantity: anyNamed('quantity')))
       .thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
   when(defaultGroupService.groupStream(any))
       .thenAnswer((_) => Stream.fromIterable([group]));
 
+  final featureServiceMock = MockFeatureService();
+  when(featureServiceMock.useDynamicExpenseLoading).thenReturn(false);
+
   await tester.pumpWidget(
     MultiProvider(
       providers: [
-        Provider<LayoutState>(create: (_) => LayoutState.narrow()),
+        Provider(create: (_) => LayoutState.narrow()),
+        Provider(create: (_) => featureService ?? featureServiceMock),
         BlocProvider(
             create: (context) =>
                 ExpenseBloc(expenseService ?? defaultExpenseService)),
@@ -81,7 +87,7 @@ Future<void> customPump(
         BlocProvider(
             create: (context) => AuthBloc(authService ?? defaultAuthService))
       ],
-      child: MaterialApp(home: Scaffold(body: ExpenseList())),
+      child: MaterialApp(home: Scaffold(body: widget)),
     ),
   );
 }
