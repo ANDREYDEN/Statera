@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
+import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/utils/utils.dart';
 
@@ -45,7 +45,6 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
 
   ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
   GroupCubit get groupCubit => context.read<GroupCubit>();
-  bool get isWide => context.read<LayoutState>().isWide;
 
   bool get _nameIsValid => _nameController.text != '';
   bool get _pickedValidAssignees => _memberController.value.isNotEmpty;
@@ -61,8 +60,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('New Expense'),
-      content: SizedBox(
-        width: isWide ? 400 : 200,
+      content: DialogWidth(
         child: ListView(
           shrinkWrap: true,
           children: [

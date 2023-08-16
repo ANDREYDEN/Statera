@@ -7,13 +7,15 @@ export async function getGroupNotificationTokens(group: firestore.DocumentSnapsh
   return getUsersNotificationTokens(userIds)
 }
 
-export async function getExpenseNotificationTokens(expense: firestore.DocumentSnapshot<firestore.DocumentData>, authorIncluded = false) {
+export async function getExpenseNotificationTokens(expense: firestore.DocumentSnapshot<firestore.DocumentData>) {
   const assigneeIds = (expense?.data()?.assigneeIds ?? []) as string[]
   const authorId = (expense?.data()?.authorUid ?? []) as string
   const targetUserIds = assigneeIds.filter((uid) => uid !== authorId)
   console.log(`Sending notifications to ${targetUserIds.join(', ')}`)
 
-  return getUsersNotificationTokens(targetUserIds)
+  const tokens = await getUsersNotificationTokens(targetUserIds)
+  console.log('Retrieved tokens:', tokens)
+  return tokens
 }
 
 export async function getUsersNotificationTokens(uids: string[]) {

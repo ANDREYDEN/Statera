@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
-import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -57,7 +55,8 @@ class _GroupPageState extends State<GroupPage> {
         label: 'Expenses',
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        wrapper: (child) => UnmarkedExpensesBadge(child: child),
+        wrapper: (child) =>
+            UnmarkedExpensesBadge(groupId: widget.groupId, child: child),
       ),
       NavBarItemData(
         label: 'Settings',
@@ -70,6 +69,7 @@ class _GroupPageState extends State<GroupPage> {
       key: GroupPage.scaffoldKey,
       titleWidget: GroupTitle(),
       actions: [GroupQRButton()],
+      fabText: 'New Expense',
       onFabPressed: isWide || _selectedNavBarItemIndex != 1
           ? null
           : () => showNewExpenseDialog(
@@ -90,14 +90,12 @@ class _GroupPageState extends State<GroupPage> {
                   duration: Duration(milliseconds: 500),
                   curve: Curves.ease,
                 );
-                setState(() {
-                  this._selectedNavBarItemIndex = index;
-                });
               },
             ),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => ExpenseBloc(context.read<ExpenseService>())),
+          BlocProvider(
+              create: (context) => ExpenseBloc(context.read<ExpenseService>())),
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide
@@ -125,14 +123,7 @@ class _GroupPageState extends State<GroupPage> {
                     this._selectedNavBarItemIndex = index;
                   });
                 },
-                children: [
-                  OwingsList(),
-                  BlocProvider(
-                    create: (context) => ExpenseBloc(context.read<ExpenseService>()),
-                    child: ExpenseList(),
-                  ),
-                  GroupSettings()
-                ],
+                children: [OwingsList(), ExpenseList(), GroupSettings()],
               ),
       ),
     );

@@ -51,7 +51,7 @@ class PaymentDetailsDialog extends StatelessWidget {
             Text(
               payment.reason ??
                   (payment.hasRelatedExpense
-                      ? 'Expense "${payment.relatedExpense!.name}" was finalized.'
+                      ? 'Expense "${payment.relatedExpense!.name}" was ${payment.relatedExpense!.action?.name ?? 'finalized'}.'
                       : 'Manual payment.'),
             ),
             SizedBox(height: 20),

@@ -9,10 +9,10 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
-import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/business_logic/payments/payments_cubit.dart';
+import 'package:statera/business_logic/user/user_cubit.dart';
+import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
@@ -21,6 +21,7 @@ import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
+import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -64,15 +65,22 @@ final List<PagePath> _paths = [
           create: (context) => ExpensesCubit(
             context.read<ExpenseService>(),
             context.read<GroupService>(),
-          )..load(context.read<AuthBloc>().uid, matches?[0]),
+          )..load(
+              context.read<AuthBloc>().uid,
+              matches?[0],
+              numberOfExpenses:
+                  context.read<FeatureService>().useDynamicExpenseLoading
+                      ? ExpensesCubit.expensesPerPage
+                      : 10000,
+            ),
         ),
         BlocProvider(
-            create: (context) =>
-                NewPaymentsCubit(context.read<PaymentService>())
-                  ..load(
-                    groupId: matches?[0],
-                    uid: context.read<AuthBloc>().uid,
-                  )),
+          create: (context) => NewPaymentsCubit(context.read<PaymentService>())
+            ..load(
+              groupId: matches?[0],
+              uid: context.read<AuthBloc>().uid,
+            ),
+        ),
       ],
       child: GroupPage(groupId: matches?[0]),
     ),
@@ -189,6 +197,7 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   return path.isPublic
       ? path.builder(context, matches)
       : AuthGuard(
+          isHomePage: path == _groupsPagePath,
           builder: () => path.builder(context, matches),
         );
 }

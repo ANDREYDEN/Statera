@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.7.0+17
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: ">=2.17.0-0 <3.0.0"
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="MODE=debug"
@@ -55,6 +55,7 @@ dependencies:
   dynamic_color: ^1.6.2
   shared_preferences: ^2.0.18
   flutter_animate: ^4.1.1+1
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   integration_test:

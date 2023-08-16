@@ -24,7 +24,7 @@ class PlatformOption {
     name: 'Android',
     platform: TargetPlatform.android,
     icon: Icons.phone_android,
-    url: 'https://play.google.com/store/apps/details?id=com.statera.app',
+    url: 'https://play.google.com/store/apps/details?id=com.statera.statera',
   );
 
   static PlatformOption web = PlatformOption(

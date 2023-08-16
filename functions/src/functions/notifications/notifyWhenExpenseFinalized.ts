@@ -1,17 +1,17 @@
-import { firestore, messaging } from 'firebase-admin'
+import { messaging } from 'firebase-admin'
 import { getExpenseNotificationTokens } from './notificationUtils'
+import { QueryDocumentSnapshot } from 'firebase-admin/firestore'
 
-export async function notifyWhenExpenseFinalized(expenseId: string) {
-  const expenseSnap = await firestore().collection('expenses').doc(expenseId).get()
+export async function notifyWhenExpenseFinalized(expenseSnap: QueryDocumentSnapshot) {
   if (!expenseSnap.exists) {
-    console.log(`Expense ${expenseId} no longer exists`)
+    console.log(`Expense ${expenseSnap.id} no longer exists`)
     return
   }
 
   const groupId = expenseSnap.data()?.groupId
 
-  const authorTokens = await getExpenseNotificationTokens(expenseSnap, false)
-  console.log('Retrieved tokens:', authorTokens)
+  console.log('Sending Notification', expenseSnap.id, 'expense_finalized');
+  const authorTokens = await getExpenseNotificationTokens(expenseSnap)
 
   if (authorTokens.length === 0) return null
 

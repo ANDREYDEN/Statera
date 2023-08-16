@@ -7,6 +7,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/advanced_dropdown.dart';
+import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 part 'field_data.dart';
 
@@ -92,8 +93,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
     return AlertDialog(
       title: Text(widget.title),
-      content: Container(
-        width: isWide ? 400 : 200,
+      content: DialogWidth(
         child: ListView(
           shrinkWrap: true,
           children: [

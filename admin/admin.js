@@ -192,7 +192,6 @@ function createPayment(value, reason, payerId, receiverId, group, groupId) {
         reason: reason,
         payerId,
         receiverId,
-        payerReceiverId: payerId + '_' + receiverId,
         groupId,
         oldPayerBalance: group.balance[payerId][receiverId],
         timeCreated: admin.firestore.Timestamp.now(),

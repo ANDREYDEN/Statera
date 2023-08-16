@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -7,13 +8,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
+import 'package:statera/ui/custom_layout_builder.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
@@ -31,6 +31,7 @@ Future<void> main() async {
   await FirebaseRemoteConfig.instance.setDefaults(<String, dynamic>{
     'greeting_message': 'Welcome to Statera!',
     'show_greeting_dialog': false,
+    'dynamic_expense_loading_feature_flag': true
   });
 
   configureEmulators();
@@ -61,24 +62,20 @@ class Statera extends StatelessWidget {
         : GroupList.route.replaceFirst('/', '');
 
     return RepositoryRegistrant(
+      firestore: FirebaseFirestore.instance,
       child: BlocProvider(
         create: (context) => AuthBloc(context.read<AuthService>()),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Provider<LayoutState>.value(
-              value: LayoutState(constraints),
-              child: CustomThemeBuilder(
-                builder: (lightTheme, darkTheme) {
-                  return MaterialApp(
-                    title: kAppName,
-                    theme: lightTheme,
-                    darkTheme: darkTheme,
-                    themeMode: ThemeMode.system,
-                    initialRoute: initialRoute ?? defaultRoute,
-                    onGenerateRoute: onGenerateRoute,
-                    debugShowCheckedModeBanner: false,
-                  );
-                },
+        child: CustomThemeBuilder(
+          builder: (lightTheme, darkTheme) {
+            return CustomLayoutBuilder(
+              child: MaterialApp(
+                title: kAppName,
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                themeMode: ThemeMode.system,
+                initialRoute: initialRoute ?? defaultRoute,
+                onGenerateRoute: onGenerateRoute,
+                debugShowCheckedModeBanner: false,
               ),
             );
           },
