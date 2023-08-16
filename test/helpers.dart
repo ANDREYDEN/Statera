@@ -61,7 +61,7 @@ Future<void> customPump(
       .thenAnswer((_) => Stream.fromIterable([group]));
 
   final featureServiceMock = MockFeatureService();
-  when(featureServiceMock.useDynamicExpenseLoading).thenReturn(false);
+  when(featureServiceMock.useDynamicExpenseLoading).thenReturn(true);
 
   await tester.pumpWidget(
     MultiProvider(
