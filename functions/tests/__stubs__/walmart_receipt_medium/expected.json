@@ -1,0 +1,102 @@
+[
+    {
+        "name": "MED . BLACK C L $ D",
+        "sku": "006568421528",
+        "value": 4.18
+    },
+    {
+        "name": "MED COCONUT L $ D",
+        "sku": "006568400625",
+        "value": 4.18
+    },
+    {
+        "name": "R FA SALAD KIT $ D",
+        "sku": "088804800052",
+        "value": 6.97
+    },
+    {
+        "name": "R B J COR CC $ J",
+        "sku": "005877914231",
+        "value": 3.97
+    },
+    {
+        "name": "R SAUC ORG $ D",
+        "sku": "006200013889",
+        "value": 6.87
+    },
+    {
+        "name": "R CARROTS BAND $ D",
+        "sku": "007146418095",
+        "value": 2.77
+    },
+    {
+        "name": "R CL TUNA DILL $ D",
+        "sku": "006136243483",
+        "value": 0.97
+    },
+    {
+        "name": "CL TUNA DILL R $ D",
+        "sku": "006136243483",
+        "value": 0.97
+    },
+    {
+        "name": "CL TUNA DILL R $ D",
+        "sku": "006136243483",
+        "value": 0.97
+    },
+    {
+        "name": "CL TUNA DILL R $ D",
+        "sku": "006136243483",
+        "value": 0.97
+    },
+    {
+        "name": "CL TUNA DILL R $ D",
+        "sku": "006136243483",
+        "value": 0.97
+    },
+    {
+        "name": "YAM / SW POT R",
+        "sku": "000000004074",
+        "value": 0
+    },
+    {
+        "name": "OTV TOMATO R",
+        "sku": "000000004664",
+        "value": 0.64
+    },
+    {
+        "name": "CUCUMBER R $ D",
+        "sku": "000000004593",
+        "value": 0.64
+    },
+    {
+        "name": "PEPPER 3CT R $ D",
+        "sku": "005783600004",
+        "value": 3.97
+    },
+    {
+        "name": "KIWI R",
+        "sku": "000000004030",
+        "value": 2.47
+    },
+    {
+        "name": "YFM MUSHROOM R $ D",
+        "sku": "062891536515",
+        "value": 2.47
+    },
+    {
+        "name": "ORG BANANA R",
+        "sku": "000000094011",
+        "value": 0
+    },
+    {
+        "name": "ORANGES NVL R",
+        "sku": "000000004012",
+        "value": 1.97
+    },
+    {
+        "name": "GRAPEFRUIT R $ D",
+        "sku": "000000004289",
+        "value": 1.97
+    }
+]
