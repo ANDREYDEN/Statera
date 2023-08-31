@@ -2,6 +2,7 @@ import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
 import { verticalSegment } from '../utils'
+import { VerticalSegment } from '../types/geometry'
 
 export async function analyzeReceipt(
     receiptUrl: string,
@@ -21,16 +22,16 @@ export async function analyzeReceipt(
     `This image has some text: ${labels.length}` :
     'This image has no text')
 
-  type LabelBox = { p1: number; p2: number; description: string }
-  const lines: LabelBox[][] = []
+  type LabelBox = VerticalSegment & { description: string }
+  let lines: LabelBox[][] = []
 
   labels.forEach((label) => {
     const labelSegment = verticalSegment(label)
-    const center = (labelSegment.p1 + labelSegment.p2) / 2
+    const center = (labelSegment.yTop + labelSegment.yBottom) / 2
     const labelBox = { ...labelSegment, description: label.description ?? '' }
 
     for (const line of lines) {
-      if (line[0].p1 < center && center < line[0].p2) {
+      if (line[0].yTop < center && center < line[0].yBottom) {
         line.push(labelBox)
         return
       }
@@ -38,6 +39,8 @@ export async function analyzeReceipt(
 
     lines.push([labelBox])
   })
+
+  lines = lines.map((line) => line.sort((line1, line2) => line1.x - line2.x))
 
   const rows = lines.map((line) => line.map((label) => label.description))
   console.log('Raw image text data:', rows)

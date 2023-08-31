@@ -1,102 +1,102 @@
 [
     {
-        "name": "MED . BLACK C L $ D",
-        "sku": "006568421528",
+        "name": "Med . Black C",
+        "sku": "006568421528L",
         "value": 4.18
     },
     {
-        "name": "MED COCONUT L $ D",
-        "sku": "006568400625",
+        "name": "Med Coconut",
+        "sku": "006568400625L",
         "value": 4.18
     },
     {
-        "name": "R FA SALAD KIT $ D",
-        "sku": "088804800052",
+        "name": "Fa Salad Kit",
+        "sku": "088804800052R",
         "value": 6.97
     },
     {
-        "name": "R B J COR CC $ J",
-        "sku": "005877914231",
+        "name": "B J Cor Cc",
+        "sku": "005877914231R",
         "value": 3.97
     },
     {
-        "name": "R SAUC ORG $ D",
-        "sku": "006200013889",
+        "name": "Sauc Org",
+        "sku": "006200013889R",
         "value": 6.87
     },
     {
-        "name": "R CARROTS BAND $ D",
-        "sku": "007146418095",
+        "name": "Carrots Band",
+        "sku": "007146418095R",
         "value": 2.77
     },
     {
-        "name": "R CL TUNA DILL $ D",
-        "sku": "006136243483",
+        "name": "Cl Tuna Dill",
+        "sku": "006136243483R",
         "value": 0.97
     },
     {
-        "name": "CL TUNA DILL R $ D",
-        "sku": "006136243483",
+        "name": "Cl Tuna Dill",
+        "sku": "006136243483R",
         "value": 0.97
     },
     {
-        "name": "CL TUNA DILL R $ D",
-        "sku": "006136243483",
+        "name": "Cl Tuna Dill",
+        "sku": "006136243483R",
         "value": 0.97
     },
     {
-        "name": "CL TUNA DILL R $ D",
-        "sku": "006136243483",
+        "name": "Cl Tuna Dill",
+        "sku": "006136243483R",
         "value": 0.97
     },
     {
-        "name": "CL TUNA DILL R $ D",
-        "sku": "006136243483",
+        "name": "Cl Tuna Dill",
+        "sku": "006136243483R",
         "value": 0.97
     },
     {
-        "name": "YAM / SW POT R",
-        "sku": "000000004074",
+        "name": "Yam / Sw Pot",
+        "sku": "000000004074R",
         "value": 0
     },
     {
-        "name": "OTV TOMATO R",
-        "sku": "000000004664",
+        "name": "Otv Tomato",
+        "sku": "000000004664R",
         "value": 0.64
     },
     {
-        "name": "CUCUMBER R $ D",
-        "sku": "000000004593",
+        "name": "Cucumber",
+        "sku": "000000004593R",
         "value": 0.64
     },
     {
-        "name": "PEPPER 3CT R $ D",
-        "sku": "005783600004",
+        "name": "Pepper 3Ct",
+        "sku": "005783600004R",
         "value": 3.97
     },
     {
-        "name": "KIWI R",
-        "sku": "000000004030",
+        "name": "Kiwi",
+        "sku": "000000004030R",
         "value": 2.47
     },
     {
-        "name": "YFM MUSHROOM R $ D",
-        "sku": "062891536515",
+        "name": "Yfm Mushroom",
+        "sku": "062891536515R",
         "value": 2.47
     },
     {
-        "name": "ORG BANANA R",
-        "sku": "000000094011",
+        "name": "Org Banana",
+        "sku": "000000094011R",
         "value": 0
     },
     {
-        "name": "ORANGES NVL R",
-        "sku": "000000004012",
+        "name": "Oranges Nvl",
+        "sku": "000000004012R",
         "value": 1.97
     },
     {
-        "name": "GRAPEFRUIT R $ D",
-        "sku": "000000004289",
+        "name": "Grapefruit",
+        "sku": "000000004289R",
         "value": 1.97
     }
 ]
