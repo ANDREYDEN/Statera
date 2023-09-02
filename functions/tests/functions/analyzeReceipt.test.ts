@@ -14,21 +14,21 @@ jest.mock('@google-cloud/vision', () => ({
 describe('analyzeReceipt', () => {
   it('can analyze Walmart receipt', async () => {
     textDetection.mockResolvedValue(walmartReceiptData)
-    const products = await analyzeReceipt('https://example.com', false, 'walmart')
+    const products = await analyzeReceipt('https://example.com', 'walmart')
 
     expect(products).toMatchSnapshot()
   })
 
   it('can analyze a medium Walmart receipt', async () => {
     textDetection.mockResolvedValue(walmartReceiptMediumData)
-    const products = await analyzeReceipt('https://example.com', false, 'walmart')
+    const products = await analyzeReceipt('https://example.com', 'walmart')
 
     expect(products).toEqual(walmartReceiptMediumExpected)
   })
 
   it('can analyze LCBO receipt', async () => {
     textDetection.mockResolvedValue(lcboReceiptData)
-    const products = await analyzeReceipt('https://example.com', false, 'lcbo')
+    const products = await analyzeReceipt('https://example.com', 'lcbo')
 
     expect(products).toMatchSnapshot()
   })

@@ -9,7 +9,6 @@ type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
 
 export async function analyzeReceipt(
     receiptUrl: string,
-    isWalmart: boolean, // TODO: deprecate
     storeName: string,
     withNameImprovement?: boolean
 ): Promise<Product[]> {
@@ -22,7 +21,7 @@ export async function analyzeReceipt(
   const rows = buildRows(result)
   console.log('Image text data:', rows)
 
-  const store = isWalmart ? stores.walmart : stores[storeName] ?? defaultStore
+  const store = stores[storeName] ?? defaultStore
 
   let products = store.normalize(rows)
   console.log('Normalized products:', products)
