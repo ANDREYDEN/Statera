@@ -28,15 +28,23 @@ Array [
   },
   Object {
     "deposit": 0.1,
-    "id": "00019347",
+    "id": "00267286",
     "name": "SAUZA GOLD",
+    "quantity": 1,
+    "value": 20.85,
+    "volume": 375,
+  },
+  Object {
+    "deposit": 0.1,
+    "id": "00019347",
+    "name": "FOUNDER'S ORIGINAL BOURBON SOUR",
     "quantity": 1,
     "value": 2.85,
     "volume": 355,
   },
   Object {
     "deposit": 0.1,
-    "id": "00024321",
+    "id": "00024319",
     "name": "DILLON'S TANGERINE LEMON & A HINT OF M",
     "quantity": 1,
     "value": 3.05,
@@ -44,16 +52,16 @@ Array [
   },
   Object {
     "deposit": 0.1,
-    "id": "00267286",
-    "name": "FOUNDER'S ORIGINAL TEQUILA PALOMA",
+    "id": "00024321",
+    "name": "DILLON'S BLACKBERRY LEMON & A DASH OF",
     "quantity": 1,
-    "value": 20.85,
-    "volume": 375,
+    "value": 3.05,
+    "volume": 473,
   },
   Object {
     "deposit": 0.1,
     "id": "00019350",
-    "name": "FOUNDER'S ORIGINAL BOURBON SOUR",
+    "name": "FOUNDER'S ORIGINAL TEQUILA PALOMA",
     "quantity": 1,
     "value": 3,
     "volume": 355,
@@ -66,7 +74,7 @@ Array [
   Object {
     "name": "Yam / Sw Pot",
     "sku": "000000004074R",
-    "value": 5.98,
+    "value": 3.47,
   },
   Object {
     "name": "Lib Grk 650",
@@ -76,7 +84,7 @@ Array [
   Object {
     "name": "Hgdz Vncmlpr",
     "sku": "005500040742R",
-    "value": 0,
+    "value": 12,
   },
   Object {
     "name": "Chk Bst Bnls",
@@ -116,7 +124,7 @@ Array [
   Object {
     "name": "Kiwi",
     "sku": "000000004030R",
-    "value": 6.97,
+    "value": 2.61,
   },
   Object {
     "name": "Wldrf Salad",
@@ -136,7 +144,7 @@ Array [
   Object {
     "name": "Red Grapes",
     "sku": "000000004023R",
-    "value": 0,
+    "value": 3.75,
   },
 ]
 `;

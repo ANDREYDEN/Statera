@@ -1,9 +1,11 @@
-import * as vision from '@google-cloud/vision'
+import { google } from '@google-cloud/vision/build/protos/protos'
 import { VerticalSegment } from './types/geometry'
 import _ from 'lodash'
 
+type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
+
 export function verticalSegment(
-    label: vision.protos.google.cloud.vision.v1.IEntityAnnotation
+    label: IEntityAnnotation
 ): VerticalSegment {
   const corners = label.boundingPoly?.vertices ?? []
   const sortedCorners = corners.sort(
