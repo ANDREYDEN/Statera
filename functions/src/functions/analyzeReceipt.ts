@@ -2,6 +2,9 @@ import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
 import { verticalSegment } from '../utils'
+import { google } from '@google-cloud/vision/build/protos/protos'
+
+type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 
 export async function analyzeReceipt(
     receiptUrl: string,
@@ -17,6 +20,10 @@ export async function analyzeReceipt(
 
   // first element contains information about all lines
   const labels = result.textAnnotations?.slice(1) ?? []
+  // console.log('Text read from the image:', labels.map((l) => ({ text: l.description, vertices: l.boundingPoly?.vertices?.map(v => `(${v.x},${v.y})`).join(' ') })))
+
+  const orientedLabels = rotateLabels(labels)
+  
   console.log(labels.length > 0 ?
     `This image has some text: ${labels.length}` :
     'This image has no text')
@@ -24,7 +31,7 @@ export async function analyzeReceipt(
   type LabelBox = { p1: number; p2: number; description: string }
   const lines: LabelBox[][] = []
 
-  labels.forEach((label) => {
+  orientedLabels.forEach((label) => {
     const labelSegment = verticalSegment(label)
     const center = (labelSegment.p1 + labelSegment.p2) / 2
     const labelBox = { ...labelSegment, description: label.description ?? '' }
@@ -54,4 +61,29 @@ export async function analyzeReceipt(
   }
 
   return products
+}
+
+function rotateLabels(labels: IEntityAnnotation[]) {
+  const longLabel = labels.find((l) => l.description?.length && l.description.length > 5)
+  const longLabelVertices = longLabel?.boundingPoly?.vertices
+  if (!longLabelVertices || longLabelVertices.length != 4) return labels
+
+  const xCoords = longLabel.boundingPoly!.vertices!.map(v => v.x).sort((a, b) => a! - b!)
+  const yCoords = longLabel.boundingPoly!.vertices!.map(v => v.y).sort((a, b) => a! - b!)
+  const longLabelWidth = (xCoords[2]! + xCoords[3]!) / 2 - (xCoords[0]! + xCoords[1]!) / 2
+  const longLabelHeight = (yCoords[2]! + yCoords[3]!) / 2 - (yCoords[0]! + yCoords[1]!) / 2
+  const needsRotation = longLabelWidth < longLabelHeight
+  if (!needsRotation) return labels
+
+  console.log('Rotating labels...')
+  return labels.map((l) => {
+    const rotatedVertices = l.boundingPoly?.vertices?.map((v) => ({ x: v.y, y: v.x }))
+
+    return {
+      ...l,
+      boundingPoly: {
+        vertices: rotatedVertices,
+      },
+    }
+  }
 }
