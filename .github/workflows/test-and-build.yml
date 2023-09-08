@@ -91,7 +91,7 @@ jobs:
 
       - name: Install Chrome
         run: |
-          wget --no-verbose -O /tmp/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb
+          wget --no-verbose -O /tmp/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb
           apt install -y /tmp/chrome.deb
           rm /tmp/chrome.deb
 
