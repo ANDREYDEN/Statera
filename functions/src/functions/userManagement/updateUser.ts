@@ -11,22 +11,22 @@ export async function updateUser(userId: string, oldUserData: UserData, newUserD
     try {
       await updateUsersInGroups(userId, newUserData)
     } catch (e: any) {
-      console.log(`Something went wrong while updating user in groups: ${e.toString()}`);
+      console.log(`Something went wrong while updating user in groups: ${e.toString()}`)
     }
 
     try {
       await updateAuthUser(userId, newUserData)
     } catch (e: any) {
-      console.log(`Something went wrong while updating user in Auth: ${e.toString()}`);
+      console.log(`Something went wrong while updating user in Auth: ${e.toString()}`)
     }
   }
 }
 
 async function updateUsersInGroups(userId: string, userData: UserData) {
   const groupsSnap = await admin.firestore()
-    .collection('groups')
-    .where('memberIds', 'array-contains', userId)
-    .get()
+      .collection('groups')
+      .where('memberIds', 'array-contains', userId)
+      .get()
 
   for (const groupDoc of groupsSnap.docs) {
     const members = groupDoc.data().members.map((member: any) => {

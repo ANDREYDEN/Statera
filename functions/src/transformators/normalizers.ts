@@ -1,6 +1,7 @@
 import { LCBOProduct, Product, WalmartProduct } from '../types/products'
+import { toPascalCase } from '../utils'
 
-const CODE_REGEX = /\d{11,13}/
+const CODE_REGEX = /\d{11,13}\w?/
 const VALUE_REGEX = /\$?(\d+(\.|,)\d+)/
 
 export function normalizeProducts(rows: string[][]): Product[] {
@@ -37,7 +38,7 @@ export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
       const valueMatcher = element.match(VALUE_REGEX)
       if (codeMatcher) {
         product.sku = codeMatcher[0]
-        row[i] = element.replace(codeMatcher[0], '')
+        row[i] = element.replace(codeMatcher[0], 'C-O-D-E')
       }
 
       if (valueMatcher) {
@@ -45,7 +46,13 @@ export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
         row[i] = element.replace(valueMatcher[0], '')
       }
     })
-    product.name = row.filter((element) => element != '').join(' ')
+
+    const codeIndex = row.indexOf('C-O-D-E')
+    const nameElements = row.slice(0, codeIndex)
+    const prettyNameElements = nameElements
+        .map(toPascalCase)
+        .filter((element) => element != '')
+    product.name = prettyNameElements.join(' ')
 
     return product
   })
