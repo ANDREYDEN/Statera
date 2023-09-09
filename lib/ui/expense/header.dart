@@ -3,6 +3,15 @@ part of 'expense_details.dart';
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
 
+  void _copyExpenseName(BuildContext context, String name) async {
+    ClipboardData clipData = ClipboardData(text: name);
+    await Clipboard.setData(clipData);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Expense name copied to clipboard')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
@@ -32,16 +41,23 @@ class Header extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Flexible(
-                        child: Text(
-                          expense.name,
-                          softWrap: false,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 32,
+                        child: GestureDetector(
+                          onLongPress: () =>
+                              _copyExpenseName(context, expense.name),
+                          onHorizontalDragStart: (_) =>
+                              _copyExpenseName(context, expense.name),
+                          child: Text(
+                            expense.name,
+                            softWrap: false,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 32,
+                            ),
+                            overflow: TextOverflow.fade,
                           ),
-                          overflow: TextOverflow.fade,
                         ),
                       ),
+                      SizedBox(width: 10),
                       Card(
                         color: Colors.grey[600],
                         child: Padding(

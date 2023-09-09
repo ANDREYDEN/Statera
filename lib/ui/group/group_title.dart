@@ -7,9 +7,9 @@ class GroupTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GroupBuilder(
-      builder: (context, group) => Text(
+      builder: (context, group) => SelectableText(
         group.name,
-        overflow: TextOverflow.ellipsis,
+        style: TextStyle(overflow: TextOverflow.ellipsis),
       ),
       loadingWidget: Text('...'),
     );

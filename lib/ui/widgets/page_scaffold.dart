@@ -30,9 +30,9 @@ class PageScaffold extends StatelessWidget {
       bottomNavigationBar: this.bottomNavBar,
       appBar: AppBar(
         title: titleWidget ??
-            Text(
+            SelectableText(
               this.title ?? '',
-              overflow: TextOverflow.ellipsis,
+              style: TextStyle(overflow: TextOverflow.ellipsis),
             ),
         actions: this.actions,
       ),
