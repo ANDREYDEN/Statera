@@ -30,10 +30,12 @@ class GroupInviteDialog extends StatelessWidget {
                     SizedBox(
                       width: 200,
                       height: 200,
-                      child: QrImage(
+                      child: QrImageView(
                         data: inviteLink,
-                        foregroundColor:
-                            Theme.of(context).textTheme.bodyText1!.color,
+                        dataModuleStyle: QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.circle,
+                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                        ),
                       ),
                     ),
                     Flexible(
