@@ -22,12 +22,12 @@ export async function getUsersNotificationTokens(uids: string[]) {
   const userDocs = await Promise.all(uids.map((uid) => firestore().collection('users').doc(uid).get()))
   return userDocs.flatMap((doc) =>
     Object.values(doc.data()?.notifications ?? {})
-      .map((platform: any) => platform.token)
+        .map((platform: any) => platform.token)
   )
 }
 
 export async function getUserNotificationTokens(uid: string) {
   const userDoc = await firestore().collection('users').doc(uid).get()
   return Object.values(userDoc.data()?.notifications ?? {})
-    .map((platform: any) => platform.token)
+      .map((platform: any) => platform.token)
 }
