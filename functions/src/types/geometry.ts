@@ -1,4 +1,5 @@
-export type Segment = {
-  p1: number
-  p2: number
+export type VerticalSegment = {
+  yTop: number
+  yBottom: number
+  x: number
 }
