@@ -51,12 +51,6 @@ jobs:
     env:
       CHROME_VERSION: 114.0.5735.90
     steps:
-      - name: Install Chrome Driver
-        uses: nanasess/setup-chromedriver@v2
-
-      - name: Start Chrome Driver
-        run: chromedriver --port=4444 --url-base=wd/hub & sleep 20
-
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -86,6 +80,10 @@ jobs:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
 
+      - name: Install function dependencies
+        working-directory: functions
+        run: npm i
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -100,6 +98,12 @@ jobs:
 
       - name: Start emulators
         run: firebase emulators:start --only functions,firestore,auth --import ./emulator_data_testing & sleep 10
+
+      - name: Install Chrome Driver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Start Chrome Driver
+        run: chromedriver --port=4444 & sleep 20
 
       - name: Run integration tests
         run: |
