@@ -83,17 +83,22 @@ flutter test --coverage
 
 ### Integration tests
 
-These tests run on a simulator while talking to an emulator version of Firebase.
+These tests run on a test version of Chrome while talking to an emulator version of Firebase.
 Integration tests are contained under the `integration_test` directory while the driver is defined under the `test_driver` directory.
 
 Run integration tests:
-1. Start the Firebase emulators
+1. [Install the Chrome web driver](https://chromedriver.chromium.org/getting-started) (the version should match the version of your Chrome browser)
+2. Start the Chrome web driver
+    ```
+    chromedriver --port=4444
+    ```
+3. Start the Firebase emulators
     ```
     firebase emulators:start --import ./emulator_data_testing
     ```
-2. Start the test driver
+4. Runs the tests
     ```
-    ./scripts/take_screenshots.sh
+    ./scripts/run_integration_tests_observe.sh
     ```
 
 ### Atomated screenshots

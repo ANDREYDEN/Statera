@@ -80,6 +80,10 @@ jobs:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
 
+      - name: Install function dependencies
+        working-directory: functions
+        run: npm i
+
       - name: Get dependencies
         run: flutter pub get
 
