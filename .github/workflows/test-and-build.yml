@@ -51,6 +51,9 @@ jobs:
     env:
       CHROME_VERSION: 114.0.5735.90
     steps:
+      - name: Check Chrome version
+        run: google-chrome --version
+        
       - name: Checkout repo
         uses: actions/checkout@v3
 
