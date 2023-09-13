@@ -24,24 +24,25 @@ class ExpenseListItem extends StatelessWidget {
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => isWide
-            ? expenseBloc.load(expense.id)
-            : Navigator.of(context)
-                .pushNamed(ExpensePage.route + '/${expense.id}'),
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.all(5),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  expense.getColor(authBloc.uid),
-                  Theme.of(context).cardColor,
-                ],
-                stops: [0, 0.8],
-              ),
+      child: Card(
+        clipBehavior: Clip.hardEdge,
+        margin: EdgeInsets.all(5),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                expense.getColor(authBloc.uid),
+                Theme.of(context).colorScheme.surface,
+              ],
+              stops: [0, 0.8],
             ),
+          ),
+          child: InkWell(
+            mouseCursor: SystemMouseCursors.click,
+            onTap: () => isWide
+                ? expenseBloc.load(expense.id)
+                : Navigator.of(context)
+                    .pushNamed(ExpensePage.route + '/${expense.id}'),
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
