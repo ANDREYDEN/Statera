@@ -74,9 +74,9 @@ class ExpenseListItem extends StatelessWidget {
                                   Text(
                                     pluralize(
                                             'item', this.expense.items.length) +
-                                        (toStringDate(this.expense.date) == null
+                                        (this.expense.date == null
                                             ? ''
-                                            : ' on ${toStringDate(this.expense.date)!}'),
+                                            : ' · ${toRelativeStringDate(this.expense.date)!}'),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
