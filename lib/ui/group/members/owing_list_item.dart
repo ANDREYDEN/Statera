@@ -30,41 +30,40 @@ class OwingListItem extends StatelessWidget {
         final paymentPageRoute =
             '${GroupPage.route}/${group.id}${PaymentListPage.route}/${member.uid}';
         final owingColor = this.owing >= group.debtThreshold
-            ? Theme.of(context).errorColor
+            ? Theme.of(context).colorScheme.error
             : null;
         final isAdmin = group.admin.uid == this.member.uid;
 
-        return InkWell(
-          onTap: () => isWide
-              ? owingCubit.select(member.uid)
-              : Navigator.of(context).pushNamed(paymentPageRoute),
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Color.fromARGB(255, 204, 204, 204)),
+        return Card(
+          clipBehavior: Clip.hardEdge,
+          child: InkWell(
+            mouseCursor: SystemMouseCursors.click,
+            onTap: () => isWide
+                ? owingCubit.select(member.uid)
+                : Navigator.of(context).pushNamed(paymentPageRoute),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: UserAvatar(
+                      author: this.member,
+                      withName: true,
+                      withIcon: isAdmin,
+                      icon: isAdmin ? Icons.star : null,
+                      iconColor: isAdmin ? Colors.yellow : null,
+                      iconBackgroudColor: isAdmin ? Colors.black : null,
+                    ),
+                  ),
+                  NewPaymentsBadge(
+                    memberId: member.uid,
+                    child: PriceText(
+                      value: this.owing,
+                      textStyle: TextStyle(fontSize: 18, color: owingColor),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: UserAvatar(
-                    author: this.member,
-                    withName: true,
-                    withIcon: isAdmin,
-                    icon: isAdmin ? Icons.star : null,
-                    iconColor: isAdmin ? Colors.yellow : null,
-                    iconBackgroudColor: isAdmin ? Colors.black : null,
-                  ),
-                ),
-                NewPaymentsBadge(
-                  memberId: member.uid,
-                  child: PriceText(
-                    value: this.owing,
-                    textStyle: TextStyle(fontSize: 18, color: owingColor),
-                  ),
-                ),
-              ],
             ),
           ),
         );
