@@ -4,6 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/expense/actions/expense_action.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/expense_title.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/finalize_button.dart';
@@ -43,6 +44,7 @@ class ExpenseListItem extends StatelessWidget {
                 ? expenseBloc.load(expense.id)
                 : Navigator.of(context)
                     .pushNamed(ExpensePage.route + '/${expense.id}'),
+            onLongPress: () => EditExpenseAction(expense).handle(context),
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
