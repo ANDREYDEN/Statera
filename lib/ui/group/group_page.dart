@@ -37,14 +37,6 @@ class _GroupPageState extends State<GroupPage> {
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
 
-    if (_pageController.hasClients) {
-      _pageController.animateToPage(
-        _selectedNavBarItemIndex,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
-    }
-
     final _navBarItems = [
       NavBarItemData(
         label: 'Home',
