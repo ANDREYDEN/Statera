@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
@@ -58,6 +59,8 @@ class _GroupListState extends State<GroupList> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration.zero, _showGreetingDialog);
+
+    final isWide = context.select((LayoutState state) => state.isWide);
 
     return NotificationsReminder(
       child: PageScaffold(
@@ -116,12 +119,13 @@ class _GroupListState extends State<GroupList> {
                               Expanded(
                                 child: groups.isEmpty
                                     ? ListEmpty(text: 'Join or create a group!')
-                                    : ListView.builder(
-                                        itemCount: groups.length,
-                                        itemBuilder: (context, index) {
-                                          var group = groups[index];
-                                          return GroupListItem(group: group);
-                                        },
+                                    : GridView.count(
+                                        crossAxisCount: isWide ? 3 : 1,
+                                        childAspectRatio: 6,
+                                        children: groups
+                                            .map((group) =>
+                                                GroupListItem(group: group))
+                                            .toList(),
                                       ),
                               ),
                             ],
