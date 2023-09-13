@@ -56,6 +56,18 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
     super.initState();
   }
 
+  Future<void> _handleSubmit() async {
+    if (_nameIsValid && _pickedValidAssignees) {
+      _newExpense.name = _nameController.text;
+      _newExpense.updateAssignees(_memberController.value);
+      await expensesCubit.addExpense(
+        _newExpense,
+        groupCubit.loadedState.group.id,
+      );
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -78,6 +90,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
                   this._dirty = true;
                 });
               },
+              onSubmitted: (_) => _handleSubmit(),
             ),
             SizedBox(height: 20),
             Text('Pick Assignees'),
@@ -96,15 +109,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
               _dirty = true;
             });
 
-            if (_nameIsValid && _pickedValidAssignees) {
-              _newExpense.name = _nameController.text;
-              _newExpense.updateAssignees(_memberController.value);
-              await expensesCubit.addExpense(
-                _newExpense,
-                groupCubit.loadedState.group.id,
-              );
-              Navigator.of(context).pop();
-            }
+            await _handleSubmit();
           },
           child: Text('Add'),
         ),
