@@ -17,7 +17,7 @@ class CustomFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 8.0),
+      padding: EdgeInsets.only(right: 8.0),
       child: FilterChip(
         label: Text(this.label),
         labelStyle: TextStyle(color: Colors.black),

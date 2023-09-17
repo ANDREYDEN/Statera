@@ -21,21 +21,20 @@ class OptionallyDismissible extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return this.isDismissible
-        ? Dismissible(
-            key: this.key!,
-            direction: DismissDirection.startToEnd,
-            background: DismissBackground(),
-            child: this.child,
-            confirmDismiss: this.confirmation == null
-                ? null
-                : (dir) => showDialog<bool>(
-                      context: context,
-                      builder: (context) =>
-                          OKCancelDialog(text: this.confirmation!),
-                    ),
-            onDismissed: this.onDismissed,
-          )
-        : this.child;
+    if (!isDismissible) return this.child;
+
+    return Dismissible(
+      key: this.key!,
+      direction: DismissDirection.startToEnd,
+      background: DismissBackground(),
+      confirmDismiss: this.confirmation == null
+          ? null
+          : (dir) => showDialog<bool>(
+                context: context,
+                builder: (context) => OKCancelDialog(text: this.confirmation!),
+              ),
+      onDismissed: this.onDismissed,
+      child: this.child,
+    );
   }
 }

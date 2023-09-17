@@ -11,7 +11,7 @@ class NewExpenseButton extends StatelessWidget {
     final expenseBloc = context.read<ExpenseBloc>();
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+      padding: const EdgeInsets.only(top: 10.0),
       child: ElevatedButton(
         onPressed: () => showNewExpenseDialog(
           context,

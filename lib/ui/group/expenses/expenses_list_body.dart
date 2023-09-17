@@ -29,7 +29,7 @@ class ExpensesListBody extends StatelessWidget {
           return ListEmpty(text: 'Start by adding an expense');
         }
 
-        return ListView.builder(
+        return ListView.separated(
           itemCount: expenses.length,
           controller: scrollController,
           itemBuilder: (context, index) {
@@ -45,6 +45,7 @@ class ExpensesListBody extends StatelessWidget {
               child: ExpenseListItem(expense: expense),
             );
           },
+          separatorBuilder: (context, index) => SizedBox(height: 10),
         );
       },
     );
