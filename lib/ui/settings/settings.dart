@@ -33,7 +33,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   AuthBloc get _authBloc => context.read<AuthBloc>();
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
-  LayoutState get _layoutState => context.read<LayoutState>();
   UserCubit get _userCubit => context.read<UserCubit>();
 
   @override
@@ -69,15 +68,15 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = context.select((LayoutState state) => state.isWide);
+
     return PageScaffold(
       title: 'Settings',
       child: UserBuilder(builder: (context, user) {
         return ListView(
           padding: EdgeInsets.symmetric(
             vertical: 20,
-            horizontal: _layoutState.isWide
-                ? MediaQuery.of(context).size.width / 3
-                : 20,
+            horizontal: isWide ? MediaQuery.of(context).size.width / 3 : 20,
           ),
           children: [
             SectionTitle('Profile Information'),

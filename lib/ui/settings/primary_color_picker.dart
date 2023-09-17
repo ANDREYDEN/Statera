@@ -39,14 +39,11 @@ class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text('Pick a color'),
-            content: SizedBox(
-              width: 300,
-              child: ColorPicker(
-                pickerColor: _newColor,
-                onColorChanged: (color) {
-                  setState(() => _newColor = color);
-                },
-              ),
+            content: ColorPicker(
+              pickerColor: _newColor,
+              onColorChanged: (color) {
+                setState(() => _newColor = color);
+              },
             ),
             actions: [
               CancelButton(),
