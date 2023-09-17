@@ -22,8 +22,14 @@ class OwingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final owingCubit = context.read<OwingCubit>();
+    final owingCubit = context.watch<OwingCubit>();
     final isWide = context.read<LayoutState>().isWide;
+
+    String? selectedMemberUid = null;
+
+    if (owingCubit.state is OwingSelected) {
+      selectedMemberUid = (owingCubit.state as OwingSelected).memberId;
+    }
 
     return GroupBuilder(
       builder: (context, group) {
@@ -40,6 +46,9 @@ class OwingListItem extends StatelessWidget {
             onTap: () => isWide
                 ? owingCubit.select(member.uid)
                 : Navigator.of(context).pushNamed(paymentPageRoute),
+            selected: selectedMemberUid == member.uid,
+            selectedTileColor:
+                Theme.of(context).colorScheme.primary.withAlpha(50),
             title: Row(
               children: [
                 Expanded(

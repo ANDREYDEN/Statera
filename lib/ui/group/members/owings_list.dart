@@ -20,8 +20,10 @@ class OwingsList extends StatelessWidget {
 
     return Column(
       children: [
-        SizedBox(height: 20),
-        SectionTitle('Your Owings'),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: SectionTitle('Your Owings'),
+        ),
         Flexible(
           child: GroupBuilder(
             builder: (context, group) {
@@ -70,7 +72,7 @@ class OwingsList extends StatelessWidget {
                           owing: userOwing.value,
                         );
                       }),
-                      separatorBuilder: (context, index) => Divider(height: 1),
+                      separatorBuilder: (context, index) => Divider(height: 10),
                     );
                   });
             },

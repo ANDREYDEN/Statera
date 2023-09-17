@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/owing_builder.dart';
 import 'package:statera/ui/payments/payment_list.dart';
@@ -11,6 +13,8 @@ class PaymentListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final owingCubit = context.watch<OwingCubit>();
+
     return OwingBuilder(
       builder: (context, otherMemberId) {
         return GroupBuilder(
@@ -19,6 +23,10 @@ class PaymentListPage extends StatelessWidget {
 
             return PageScaffold(
               title: '${otherMember.name} payments',
+              onPop: () {
+                owingCubit.deselect();
+                return Future.value(true);
+              },
               child: PaymentList(),
             );
           },
