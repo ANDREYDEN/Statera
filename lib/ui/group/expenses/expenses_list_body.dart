@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/expense_list_item.dart';
 import 'package:statera/ui/group/expenses/expenses_builder.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -14,6 +15,8 @@ class ExpensesListBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final scrollController = ScrollController();
+    final isWide = context.select((LayoutState state) => state.isWide);
+
     const loadingThreshold = 200.0;
     scrollController.addListener(() {
       if (scrollController.position.maxScrollExtent -
@@ -37,7 +40,7 @@ class ExpensesListBody extends StatelessWidget {
 
             return OptionallyDismissible(
               key: Key(expense.id!),
-              isDismissible: expense.canBeUpdatedBy(authBloc.uid),
+              isDismissible: !isWide && expense.canBeUpdatedBy(authBloc.uid),
               confirmation:
                   'Are you sure you want to delete this expense and all of its items?',
               onDismissed: (_) =>

@@ -4,17 +4,16 @@ import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/group_title.dart';
+import 'package:statera/ui/group/group_wide_content.dart';
 import 'package:statera/ui/group/members/owings_list.dart';
 import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
-import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
@@ -91,22 +90,20 @@ class _GroupPageState extends State<GroupPage> {
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide
-            ? Row(
-                children: [
-                  Container(
-                    width: 100,
-                    child: GroupSideNavBar(
-                      selectedItem: _selectedNavBarItemIndex,
-                      onItemSelected: (index) {
-                        setState(() {
-                          _selectedNavBarItemIndex = index;
-                        });
-                      },
-                      items: _navBarItems,
-                    ),
+            ? GroupWideContent(
+                navIndex: _selectedNavBarItemIndex,
+                sideNavBar: Container(
+                  width: 180,
+                  child: GroupSideNavBar(
+                    selectedItem: _selectedNavBarItemIndex,
+                    onItemSelected: (index) {
+                      setState(() {
+                        _selectedNavBarItemIndex = index;
+                      });
+                    },
+                    items: _navBarItems,
                   ),
-                  ..._renderContent()
-                ],
+                ),
               )
             : PageView(
                 controller: this._pageController,
@@ -119,24 +116,5 @@ class _GroupPageState extends State<GroupPage> {
               ),
       ),
     );
-  }
-
-  List<Widget> _renderContent() {
-    switch (_selectedNavBarItemIndex) {
-      case 0:
-        return [
-          Flexible(flex: 1, child: OwingsList()),
-          Flexible(flex: 2, child: PaymentList())
-        ];
-      case 1:
-        return [
-          Flexible(flex: 1, child: ExpenseList()),
-          Flexible(flex: 2, child: ExpenseDetails())
-        ];
-      case 2:
-        return [Flexible(child: GroupSettings())];
-      default:
-        return [];
-    }
   }
 }
