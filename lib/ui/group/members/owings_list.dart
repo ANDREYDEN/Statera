@@ -22,57 +22,60 @@ class OwingsList extends StatelessWidget {
       children: [
         SizedBox(height: 20),
         SectionTitle('Your Owings'),
-        Flexible(child: GroupBuilder(
-          builder: (context, group) {
-            final owings = group.getOwingsForUser(authBloc.uid);
-            if (owings.isEmpty) {
-              return ListEmpty(
-                text: 'Start by inviting people to your group...',
-                action: GroupQRButton(),
-              );
-            }
+        Flexible(
+          child: GroupBuilder(
+            builder: (context, group) {
+              final owings = group.getOwingsForUser(authBloc.uid);
+              if (owings.isEmpty) {
+                return ListEmpty(
+                  text: 'Start by inviting people to your group...',
+                  action: GroupQRButton(),
+                );
+              }
 
-            return FutureBuilder<Map<String, DateTime>>(
-                future: paymentService.getMostRecentPaymentDateForMembers(
-                    group, authBloc.uid),
-                builder: (context, snap) {
-                  if (snap.connectionState != ConnectionState.done) {
-                    return Center(child: Loader());
-                  }
+              return FutureBuilder<Map<String, DateTime>>(
+                  future: paymentService.getMostRecentPaymentDateForMembers(
+                      group, authBloc.uid),
+                  builder: (context, snap) {
+                    if (snap.connectionState != ConnectionState.done) {
+                      return Center(child: Loader());
+                    }
 
-                  if (snap.hasError) {
-                    debugPrint(snap.error.toString());
-                    debugPrintStack(stackTrace: snap.stackTrace);
-                  }
+                    if (snap.hasError) {
+                      debugPrint(snap.error.toString());
+                      debugPrintStack(stackTrace: snap.stackTrace);
+                    }
 
-                  final order = snap.data;
+                    final order = snap.data;
 
-                  final userOwings = owings.entries.toList();
-                  if (order != null) {
-                    userOwings.sort((a, b) {
-                      final aDate = order[a.key.uid];
-                      final bDate = order[b.key.uid];
-                      if (aDate == null && bDate == null) return 0;
-                      if (aDate == null && bDate != null) return 1;
-                      if (aDate != null && bDate == null) return -1;
+                    final userOwings = owings.entries.toList();
+                    if (order != null) {
+                      userOwings.sort((a, b) {
+                        final aDate = order[a.key.uid];
+                        final bDate = order[b.key.uid];
+                        if (aDate == null && bDate == null) return 0;
+                        if (aDate == null && bDate != null) return 1;
+                        if (aDate != null && bDate == null) return -1;
 
-                      return bDate!.compareTo(aDate!);
-                    });
-                  }
+                        return bDate!.compareTo(aDate!);
+                      });
+                    }
 
-                  return ListView(
-                    children: userOwings
-                        .map(
-                          (userOwing) => OwingListItem(
-                            member: userOwing.key,
-                            owing: userOwing.value,
-                          ),
-                        )
-                        .toList(),
-                  );
-                });
-          },
-        )),
+                    return ListView.separated(
+                      itemCount: userOwings.length,
+                      itemBuilder: ((context, index) {
+                        var userOwing = userOwings[index];
+                        return OwingListItem(
+                          member: userOwing.key,
+                          owing: userOwing.value,
+                        );
+                      }),
+                      separatorBuilder: (context, index) => Divider(height: 1),
+                    );
+                  });
+            },
+          ),
+        ),
       ],
     );
   }

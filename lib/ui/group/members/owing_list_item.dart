@@ -34,36 +34,32 @@ class OwingListItem extends StatelessWidget {
             : null;
         final isAdmin = group.admin.uid == this.member.uid;
 
-        return Card(
-          clipBehavior: Clip.hardEdge,
-          child: InkWell(
-            mouseCursor: SystemMouseCursors.click,
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ListTile(
             onTap: () => isWide
                 ? owingCubit.select(member.uid)
                 : Navigator.of(context).pushNamed(paymentPageRoute),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: UserAvatar(
-                      author: this.member,
-                      withName: true,
-                      withIcon: isAdmin,
-                      icon: isAdmin ? Icons.star : null,
-                      iconColor: isAdmin ? Colors.yellow : null,
-                      iconBackgroudColor: isAdmin ? Colors.black : null,
-                    ),
+            title: Row(
+              children: [
+                Expanded(
+                  child: UserAvatar(
+                    author: this.member,
+                    withName: true,
+                    withIcon: isAdmin,
+                    icon: isAdmin ? Icons.star : null,
+                    iconColor: isAdmin ? Colors.yellow : null,
+                    iconBackgroudColor: isAdmin ? Colors.black : null,
                   ),
-                  NewPaymentsBadge(
-                    memberId: member.uid,
-                    child: PriceText(
-                      value: this.owing,
-                      textStyle: TextStyle(fontSize: 18, color: owingColor),
-                    ),
+                ),
+                NewPaymentsBadge(
+                  memberId: member.uid,
+                  child: PriceText(
+                    value: this.owing,
+                    textStyle: TextStyle(fontSize: 18, color: owingColor),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
