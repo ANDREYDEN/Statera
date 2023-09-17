@@ -20,14 +20,26 @@ class ExpenseListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthBloc authBloc = context.read<AuthBloc>();
-    final expenseBloc = context.read<ExpenseBloc>();
+    final expenseBloc = context.watch<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
+
+    final isSelected = expenseBloc.state is ExpenseLoaded &&
+        (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
 
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: isWide ? 0 : kMobileMargin.left,
       ),
       clipBehavior: Clip.hardEdge,
+      shape: isSelected
+          ? RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withAlpha(150),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            )
+          : null,
       child: Ink(
         decoration: BoxDecoration(
           gradient: LinearGradient(
