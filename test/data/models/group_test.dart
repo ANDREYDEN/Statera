@@ -84,6 +84,72 @@ void main() {
     });
   });
 
+  group('redirects', () {
+    test('can get memebers who owe to a given user', () {
+      final member = CustomUser(uid: 'mem', name: 'member');
+      final otherMember = CustomUser(uid: 'omem', name: 'other member');
+      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
+
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      group.balance[member.uid]![otherMember.uid] = 10;
+      group.balance[otherMember.uid]![member.uid] = -10;
+      group.balance[anotherMember.uid]![member.uid] = 5;
+      group.balance[member.uid]![anotherMember.uid] = -5;
+
+      final owers = group.getMembersThatOweToUser(member.uid);
+
+      expect(owers, hasLength(1));
+      expect(owers, contains(anotherMember.uid));
+    });
+
+    test('can get memebers who a given user owes to', () {
+      final member = CustomUser(uid: 'mem', name: 'member');
+      final otherMember = CustomUser(uid: 'omem', name: 'other member');
+      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
+
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      group.balance[member.uid]![otherMember.uid] = 10;
+      group.balance[otherMember.uid]![member.uid] = -10;
+      group.balance[anotherMember.uid]![member.uid] = 5;
+      group.balance[member.uid]![anotherMember.uid] = -5;
+
+      final receivers = group.getMembersThatUserOwesTo(member.uid);
+
+      expect(receivers, hasLength(1));
+      expect(receivers, contains(otherMember.uid));
+    });
+
+    test('can check if redirect is possible', () {
+      final member = CustomUser(uid: 'mem', name: 'member');
+      final otherMember = CustomUser(uid: 'omem', name: 'other member');
+      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
+
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      expect(group.canRedirect(member.uid), isFalse);
+
+      group.balance[member.uid]![otherMember.uid] = 10;
+      group.balance[otherMember.uid]![member.uid] = -10;
+
+      expect(group.canRedirect(member.uid), isFalse);
+
+      group.balance[anotherMember.uid]![member.uid] = 5;
+      group.balance[member.uid]![anotherMember.uid] = -5;
+
+      expect(group.canRedirect(member.uid), isTrue);
+    });
+
+    test('can redirect', () {});
+  });
+
   group('conversion', () {
     test('to Firestore maps member ids', () {
       final firstMember = CustomUser(uid: 'first', name: 'First');

@@ -149,6 +149,29 @@ class Group {
         this.balance[payment.receiverId]![payment.payerId]! + payment.value;
   }
 
+  bool canRedirect(String uid) {
+    final owers = getMembersThatOweToUser(uid);
+    final receivers = getMembersThatUserOwesTo(uid);
+    
+    return owers.isNotEmpty && receivers.isNotEmpty;
+  }
+
+  List<String> getMembersThatOweToUser(String uid) {
+    return this
+        .balance
+        .keys
+        .where((otherUid) => (this.balance[otherUid]![uid] ?? 0) > 0)
+        .toList();
+  }
+
+  List<String> getMembersThatUserOwesTo(String uid) {
+    return this
+        .balance
+        .keys
+        .where((otherUid) => (this.balance[uid]![otherUid] ?? 0) > 0)
+        .toList();
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
