@@ -12,6 +12,7 @@ class UserAvatar extends StatelessWidget {
   final Color? iconBackgroudColor;
   final double? dimension;
   final EdgeInsets? margin;
+  final NamePosition namePosition;
 
   UserAvatar({
     Key? key,
@@ -25,6 +26,7 @@ class UserAvatar extends StatelessWidget {
     this.iconBackgroudColor = Colors.green,
     this.dimension,
     this.margin,
+    this.namePosition = NamePosition.right,
   }) : super(key: key);
 
   @override
@@ -35,7 +37,10 @@ class UserAvatar extends StatelessWidget {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: this.onTap,
-          child: Row(
+          child: Flex(
+            direction: namePosition == NamePosition.bottom
+                ? Axis.vertical
+                : Axis.horizontal,
             mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
@@ -111,3 +116,5 @@ class UserAvatar extends StatelessWidget {
     );
   }
 }
+
+enum NamePosition { bottom, right }
