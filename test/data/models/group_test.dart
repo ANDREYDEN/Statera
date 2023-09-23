@@ -85,10 +85,11 @@ void main() {
   });
 
   group('redirects', () {
+    final member = CustomUser(uid: 'mem', name: 'member');
+    final otherMember = CustomUser(uid: 'omem', name: 'other member');
+    final anotherMember = CustomUser(uid: 'amem', name: 'another member');
+
     test('can get memebers who owe to a given user', () {
-      final member = CustomUser(uid: 'mem', name: 'member');
-      final otherMember = CustomUser(uid: 'omem', name: 'other member');
-      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
 
       final group = Group.empty(
         members: [member, otherMember, anotherMember],
@@ -106,10 +107,6 @@ void main() {
     });
 
     test('can get memebers who a given user owes to', () {
-      final member = CustomUser(uid: 'mem', name: 'member');
-      final otherMember = CustomUser(uid: 'omem', name: 'other member');
-      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
-
       final group = Group.empty(
         members: [member, otherMember, anotherMember],
       );
@@ -126,10 +123,6 @@ void main() {
     });
 
     test('can check if redirect is possible', () {
-      final member = CustomUser(uid: 'mem', name: 'member');
-      final otherMember = CustomUser(uid: 'omem', name: 'other member');
-      final anotherMember = CustomUser(uid: 'amem', name: 'another member');
-
       final group = Group.empty(
         members: [member, otherMember, anotherMember],
       );
@@ -147,7 +140,53 @@ void main() {
       expect(group.canRedirect(member.uid), isTrue);
     });
 
-    test('can redirect', () {});
+    test('can redirect when ower debt is smaller than member debt', () {
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      group.balance[anotherMember.uid]![member.uid] = 3;
+      group.balance[member.uid]![anotherMember.uid] = -3;
+      group.balance[member.uid]![otherMember.uid] = 5;
+      group.balance[otherMember.uid]![member.uid] = -5;
+
+      group.redirect(
+        authorUid: member.uid,
+        owerUid: anotherMember.uid,
+        receiverUid: otherMember.uid,
+      );
+
+      expect(group.balance[anotherMember.uid]![member.uid], equals(0));
+      expect(group.balance[member.uid]![anotherMember.uid], equals(0));
+      expect(group.balance[member.uid]![otherMember.uid], equals(2));
+      expect(group.balance[otherMember.uid]![member.uid], equals(-2));
+      expect(group.balance[anotherMember.uid]![otherMember.uid], equals(3));
+      expect(group.balance[otherMember.uid]![anotherMember.uid], equals(-3));
+    });
+
+    test('can redirect when ower debt is bigger than member debt', () {
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      group.balance[anotherMember.uid]![member.uid] = 5;
+      group.balance[member.uid]![anotherMember.uid] = -5;
+      group.balance[member.uid]![otherMember.uid] = 3;
+      group.balance[otherMember.uid]![member.uid] = -3;
+
+      group.redirect(
+        authorUid: member.uid,
+        owerUid: anotherMember.uid,
+        receiverUid: otherMember.uid,
+      );
+
+      expect(group.balance[anotherMember.uid]![member.uid], equals(2));
+      expect(group.balance[member.uid]![anotherMember.uid], equals(-2));
+      expect(group.balance[member.uid]![otherMember.uid], equals(0));
+      expect(group.balance[otherMember.uid]![member.uid], equals(-0));
+      expect(group.balance[anotherMember.uid]![otherMember.uid], equals(3));
+      expect(group.balance[otherMember.uid]![anotherMember.uid], equals(-3));
+    });
   });
 
   group('conversion', () {

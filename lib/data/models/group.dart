@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:statera/data/models/models.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -152,8 +154,38 @@ class Group {
   bool canRedirect(String uid) {
     final owers = getMembersThatOweToUser(uid);
     final receivers = getMembersThatUserOwesTo(uid);
-    
+
     return owers.isNotEmpty && receivers.isNotEmpty;
+  }
+
+  void redirect({
+    required String authorUid,
+    required String owerUid,
+    required String receiverUid,
+  }) {
+    final newOwerDebt = max(
+      0.0,
+      this.balance[owerUid]![authorUid]! -
+          this.balance[authorUid]![receiverUid]!,
+    );
+    final newAuthorDebt = max(
+      0.0,
+          this.balance[authorUid]![receiverUid]! -
+      this.balance[owerUid]![authorUid]!,
+    );
+    final redirectedBalance = min(
+      this.balance[owerUid]![authorUid]!,
+      this.balance[authorUid]![receiverUid]!,
+    );
+    
+    this.balance[owerUid]![authorUid] = newOwerDebt;
+    this.balance[authorUid]![owerUid] = -newOwerDebt;
+
+    this.balance[authorUid]![receiverUid] = newAuthorDebt;
+    this.balance[receiverUid]![authorUid] = -newAuthorDebt;
+
+    this.balance[owerUid]![receiverUid] = this.balance[owerUid]![receiverUid]! + redirectedBalance;
+    this.balance[receiverUid]![owerUid] = this.balance[receiverUid]![owerUid]! - redirectedBalance;
   }
 
   List<String> getMembersThatOweToUser(String uid) {
