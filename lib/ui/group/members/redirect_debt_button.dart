@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
@@ -32,114 +33,115 @@ class RedirectDebtButton extends StatelessWidget {
                 builder: (context) => BlocProvider<GroupCubit>.value(
                   value: groupCubit,
                   child: AlertDialog(
-                      title: Text('Redirect Debt'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SectionTitle('Before'),
-                          Row(
-                            children: [
-                              UserAvatar(
-                                author: group.getMember(owerUid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
+                    title: Text('Redirect Debt'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SectionTitle('Before'),
+                        Row(
+                          children: [
+                            UserAvatar(
+                              author: group.getMember(owerUid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.arrow_forward_rounded, size: 50),
+                                  PriceText(
+                                      value: group.balance[owerUid]![uid]!),
+                                ],
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.arrow_forward_rounded, size: 50),
-                                    PriceText(
-                                        value: group.balance[owerUid]![uid]!),
-                                  ],
-                                ),
+                            ),
+                            UserAvatar(
+                              author: group.getMember(uid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.arrow_forward_rounded, size: 50),
+                                  PriceText(
+                                      value: group.balance[uid]![receiverUid]!),
+                                ],
                               ),
-                              UserAvatar(
-                                author: group.getMember(uid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
+                            ),
+                            UserAvatar(
+                              author: group.getMember(receiverUid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        SectionTitle('After'),
+                        Row(
+                          children: [
+                            UserAvatar(
+                              author: group.getMember(owerUid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.arrow_forward_rounded, size: 50),
+                                  PriceText(
+                                      value: group.balance[owerUid]![uid]!),
+                                ],
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.arrow_forward_rounded, size: 50),
-                                    PriceText(
-                                        value:
-                                            group.balance[uid]![receiverUid]!),
-                                  ],
-                                ),
+                            ),
+                            UserAvatar(
+                              author: group.getMember(uid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.arrow_forward_rounded, size: 50),
+                                  PriceText(
+                                      value: group.balance[uid]![receiverUid]!),
+                                ],
                               ),
-                              UserAvatar(
-                                author: group.getMember(receiverUid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          SectionTitle('After'),
-                          Row(
-                            children: [
-                              UserAvatar(
-                                author: group.getMember(owerUid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.arrow_forward_rounded, size: 50),
-                                    PriceText(
-                                        value: group.balance[owerUid]![uid]!),
-                                  ],
-                                ),
-                              ),
-                              UserAvatar(
-                                author: group.getMember(uid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.arrow_forward_rounded, size: 50),
-                                    PriceText(
-                                        value:
-                                            group.balance[uid]![receiverUid]!),
-                                  ],
-                                ),
-                              ),
-                              UserAvatar(
-                                author: group.getMember(receiverUid),
-                                dimension: 75,
-                                withName: true,
-                                namePosition: NamePosition.bottom,
-                              ),
-                            ],
-                          ),
-                        ],
-                      )),
+                            ),
+                            UserAvatar(
+                              author: group.getMember(receiverUid),
+                              dimension: 75,
+                              withName: true,
+                              namePosition: NamePosition.bottom,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
             label: Text('Redirect Debt'),
-          ),
+          )
+              .animate(onPlay: (controller) => controller.repeat())
+              .shimmer(delay: 3.seconds, duration: 1.seconds),
         );
       },
     );
