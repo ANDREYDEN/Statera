@@ -6,7 +6,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
-import 'package:statera/ui/group/members/redirect_debt_button.dart';
+import 'package:statera/ui/group/members/debt_redirect/redirect_debt_button.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/section_title.dart';
