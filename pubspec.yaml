@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.8.1+19
 
 environment:
-  sdk: ">=2.17.0-0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="MODE=debug"
