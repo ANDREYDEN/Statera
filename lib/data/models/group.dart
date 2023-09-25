@@ -158,7 +158,7 @@ class Group {
     return owers.isNotEmpty && receivers.isNotEmpty;
   }
 
-  void redirect({
+  (double, double, double) estimateRedirect({
     required String authorUid,
     required String owerUid,
     required String receiverUid,
@@ -170,22 +170,38 @@ class Group {
     );
     final newAuthorDebt = max(
       0.0,
-          this.balance[authorUid]![receiverUid]! -
-      this.balance[owerUid]![authorUid]!,
+      this.balance[authorUid]![receiverUid]! -
+          this.balance[owerUid]![authorUid]!,
     );
     final redirectedBalance = min(
       this.balance[owerUid]![authorUid]!,
       this.balance[authorUid]![receiverUid]!,
     );
-    
+
+    return (newOwerDebt, newAuthorDebt, redirectedBalance);
+  }
+
+  void redirect({
+    required String authorUid,
+    required String owerUid,
+    required String receiverUid,
+  }) {
+    final (newOwerDebt, newAuthorDebt, redirectedDebt) = this.estimateRedirect(
+      authorUid: authorUid,
+      owerUid: owerUid,
+      receiverUid: receiverUid,
+    );
+
     this.balance[owerUid]![authorUid] = newOwerDebt;
     this.balance[authorUid]![owerUid] = -newOwerDebt;
 
     this.balance[authorUid]![receiverUid] = newAuthorDebt;
     this.balance[receiverUid]![authorUid] = -newAuthorDebt;
 
-    this.balance[owerUid]![receiverUid] = this.balance[owerUid]![receiverUid]! + redirectedBalance;
-    this.balance[receiverUid]![owerUid] = this.balance[receiverUid]![owerUid]! - redirectedBalance;
+    this.balance[owerUid]![receiverUid] =
+        this.balance[owerUid]![receiverUid]! + redirectedDebt;
+    this.balance[receiverUid]![owerUid] =
+        this.balance[receiverUid]![owerUid]! - redirectedDebt;
   }
 
   List<String> getMembersThatOweToUser(String uid) {

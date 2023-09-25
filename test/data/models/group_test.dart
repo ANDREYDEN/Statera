@@ -90,7 +90,6 @@ void main() {
     final anotherMember = CustomUser(uid: 'amem', name: 'another member');
 
     test('can get memebers who owe to a given user', () {
-
       final group = Group.empty(
         members: [member, otherMember, anotherMember],
       );
@@ -138,6 +137,28 @@ void main() {
       group.balance[member.uid]![anotherMember.uid] = -5;
 
       expect(group.canRedirect(member.uid), isTrue);
+    });
+
+    test('can estimate redirect', () {
+      final group = Group.empty(
+        members: [member, otherMember, anotherMember],
+      );
+
+      group.balance[anotherMember.uid]![member.uid] = 3;
+      group.balance[member.uid]![anotherMember.uid] = -3;
+      group.balance[member.uid]![otherMember.uid] = 5;
+      group.balance[otherMember.uid]![member.uid] = -5;
+
+      final (newOwerDebt, newAuthorDebt, redirectedDebt) =
+          group.estimateRedirect(
+        authorUid: member.uid,
+        owerUid: anotherMember.uid,
+        receiverUid: otherMember.uid,
+      );
+
+      expect(newOwerDebt, equals(0));
+      expect(newAuthorDebt, equals(2));
+      expect(redirectedDebt, equals(3));
     });
 
     test('can redirect when ower debt is smaller than member debt', () {
