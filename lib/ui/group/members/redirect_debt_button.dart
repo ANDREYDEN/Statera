@@ -23,6 +23,12 @@ class RedirectDebtButton extends StatelessWidget {
         final owerUid = group.getMembersThatOweToUser(uid).first;
         final receiverUid = group.getMembersThatUserOwesTo(uid).first;
 
+        final (newOwerDebt, newAuthorDebt, _) = group.estimateRedirect(
+          authorUid: uid,
+          owerUid: owerUid,
+          receiverUid: receiverUid,
+        );
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 10.0),
           child: ElevatedButton.icon(
@@ -101,8 +107,7 @@ class RedirectDebtButton extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(Icons.arrow_forward_rounded, size: 50),
-                                  PriceText(
-                                      value: group.balance[owerUid]![uid]!),
+                                  PriceText(value: newOwerDebt),
                                 ],
                               ),
                             ),
@@ -119,8 +124,7 @@ class RedirectDebtButton extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(Icons.arrow_forward_rounded, size: 50),
-                                  PriceText(
-                                      value: group.balance[uid]![receiverUid]!),
+                                  PriceText(value: newAuthorDebt),
                                 ],
                               ),
                             ),
