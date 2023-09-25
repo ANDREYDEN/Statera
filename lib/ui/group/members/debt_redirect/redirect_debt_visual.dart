@@ -10,6 +10,8 @@ class RedirectDebtVisual extends StatelessWidget {
   final String receiverUid;
   final double? owerDebt;
   final double? receiverDebt;
+  final void Function()? onOwerTap;
+  final void Function()? onReceiverTap;
 
   const RedirectDebtVisual({
     super.key,
@@ -17,6 +19,8 @@ class RedirectDebtVisual extends StatelessWidget {
     required this.receiverUid,
     this.owerDebt,
     this.receiverDebt,
+    this.onOwerTap,
+    this.onReceiverTap,
   });
 
   @override
@@ -32,6 +36,7 @@ class RedirectDebtVisual extends StatelessWidget {
             dimension: 75,
             withName: true,
             namePosition: NamePosition.bottom,
+            onTap: onOwerTap,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -39,7 +44,8 @@ class RedirectDebtVisual extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.arrow_forward_rounded, size: 50),
-                PriceText(value: owerDebt ?? group.balance[owerUid]![uid]!),
+                PriceText(
+                    value: owerDebt ?? group.balance[owerUid]![uid]!),
               ],
             ),
           ),
@@ -56,7 +62,8 @@ class RedirectDebtVisual extends StatelessWidget {
               children: [
                 Icon(Icons.arrow_forward_rounded, size: 50),
                 PriceText(
-                    value: receiverDebt ?? group.balance[uid]![receiverUid]!),
+                    value: receiverDebt ??
+                        group.balance[uid]![receiverUid]!),
               ],
             ),
           ),
@@ -65,6 +72,7 @@ class RedirectDebtVisual extends StatelessWidget {
             dimension: 75,
             withName: true,
             namePosition: NamePosition.bottom,
+            onTap: onReceiverTap,
           ),
         ],
       );

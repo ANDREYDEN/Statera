@@ -3,7 +3,7 @@ import 'package:statera/data/models/custom_user.dart';
 
 class UserAvatar extends StatelessWidget {
   final CustomUser author;
-  late final Function()? onTap;
+  final void Function()? onTap;
   final bool withName;
   final Color? borderColor;
   final bool withIcon;
