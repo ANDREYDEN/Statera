@@ -113,10 +113,10 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
     var groupCubit = context.read<GroupCubit>();
 
     return Padding(
-      padding: kMobileMargin,
+      padding: EdgeInsets.symmetric(horizontal: 30),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SectionTitle('Before', alignment: Alignment.centerLeft),
           RedirectDebtVisual(

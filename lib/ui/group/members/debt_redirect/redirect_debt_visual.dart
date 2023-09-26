@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/members/debt_redirect/redirect_arrow.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
@@ -29,7 +30,8 @@ class RedirectDebtVisual extends StatelessWidget {
 
     return GroupBuilder(builder: (context, group) {
       return Row(
-        mainAxisSize: MainAxisSize.min,
+        // mainAxisSize: MainAxisSize.min,
+
         children: [
           UserAvatar(
             author: group.getMember(owerUid),
@@ -38,15 +40,10 @@ class RedirectDebtVisual extends StatelessWidget {
             namePosition: NamePosition.bottom,
             onTap: onOwerTap,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.arrow_forward_rounded, size: 50),
-                PriceText(
-                    value: owerDebt ?? group.balance[owerUid]![uid]!),
-              ],
+          Expanded(
+            child: RedirectArrow(
+              value: owerDebt ?? group.balance[owerUid]![uid]!,
+              color: Colors.green,
             ),
           ),
           UserAvatar(
@@ -55,16 +52,10 @@ class RedirectDebtVisual extends StatelessWidget {
             withName: true,
             namePosition: NamePosition.bottom,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.arrow_forward_rounded, size: 50),
-                PriceText(
-                    value: receiverDebt ??
-                        group.balance[uid]![receiverUid]!),
-              ],
+          Expanded(
+            child: RedirectArrow(
+              value: receiverDebt ?? group.balance[uid]![receiverUid]!,
+              color: Colors.red,
             ),
           ),
           UserAvatar(
