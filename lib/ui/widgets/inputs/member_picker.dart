@@ -9,8 +9,13 @@ class MemberPicker extends StatefulWidget {
   final MemberController controller;
   final void Function(List<String> value)? onChange;
   final bool singleSelection;
+
+  /// If true, the current user will be excluded from the list.
   final bool excludeMe;
   final bool allSelected;
+
+  /// If not null, the picker will only show members with the given uids.
+  final List<String>? memberUids;
 
   MemberPicker({
     Key? key,
@@ -20,6 +25,7 @@ class MemberPicker extends StatefulWidget {
     this.singleSelection = false,
     this.excludeMe = false,
     this.allSelected = false,
+    this.memberUids,
   })  : this.value = value ?? [],
         this.controller = controller ?? MemberController(value: value ?? []),
         super(key: key);
@@ -37,8 +43,13 @@ class _MemberPickerState extends State<MemberPicker> {
 
     return GroupBuilder(
       builder: (context, group) {
-        final members =
-            group.members.where((m) => !widget.excludeMe || m.uid != uid);
+        final members = group.members.where((m) {
+          final inMemberUids = widget.memberUids == null ||
+              (widget.memberUids != null && widget.memberUids!.contains(m.uid));
+          final notExcluded =
+              !widget.excludeMe || (widget.excludeMe && m.uid != uid);
+          return inMemberUids && notExcluded;
+        });
 
         if (widget.allSelected && !isDirty) {
           widget.controller.value = members.map((e) => e.uid).toList();
@@ -52,7 +63,7 @@ class _MemberPickerState extends State<MemberPicker> {
               visible: isDirty && widget.controller.value.isEmpty,
               child: Text(
                 'Please select at least one assignee',
-                style: TextStyle(color: Theme.of(context).errorColor),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
             ...members.map((member) {

@@ -53,9 +53,11 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
       builder: (_) => BlocProvider<GroupCubit>.value(
         value: context.read<GroupCubit>(),
         child: MemberSelectDialog(
+          value: [_owerUid],
           title: 'Select ower',
           singleSelection: true,
           excludeMe: true,
+          memberUids: _owerUids,
         ),
       ),
     );
@@ -81,9 +83,11 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
       builder: (_) => BlocProvider<GroupCubit>.value(
         value: context.read<GroupCubit>(),
         child: MemberSelectDialog(
+          value: [_receiverUid],
           title: 'Select receiver',
           singleSelection: true,
           excludeMe: true,
+          memberUids: _receiverUids,
         ),
       ),
     );
