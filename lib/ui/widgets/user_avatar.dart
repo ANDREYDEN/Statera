@@ -34,7 +34,8 @@ class UserAvatar extends StatelessWidget {
     return Padding(
       padding: this.margin ?? EdgeInsets.all(0),
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor:
+            this.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
         child: GestureDetector(
           onTap: this.onTap,
           child: Flex(
