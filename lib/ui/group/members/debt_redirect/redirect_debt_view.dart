@@ -135,18 +135,21 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
             onOwerTap: _handleOwerTap,
             onReceiverTap: _handleReceiverTap,
           ),
-          Spacer(),
+          SizedBox(height: 50),
           Center(
-            child: ElevatedButton(
-              onPressed: () {
-                groupCubit.update((group) => group.redirect(
-                      authorUid: uid,
-                      owerUid: _owerUid,
-                      receiverUid: _receiverUid,
-                    ));
-                Navigator.pop(context);
-              },
-              child: Text('Redirect'),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  groupCubit.update((group) => group.redirect(
+                        authorUid: uid,
+                        owerUid: _owerUid,
+                        receiverUid: _receiverUid,
+                      ));
+                  Navigator.pop(context);
+                },
+                child: Text('Redirect'),
+              ),
             ),
           )
         ],
