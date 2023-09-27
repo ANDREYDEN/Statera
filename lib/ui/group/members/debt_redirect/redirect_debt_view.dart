@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/members/debt_redirect/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_visual.dart';
@@ -111,9 +112,11 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
   Widget build(BuildContext context) {
     var uid = context.read<AuthBloc>().uid;
     var groupCubit = context.read<GroupCubit>();
+    final isWide = context.select((LayoutState state) => state.isWide);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30),
+      padding: EdgeInsets.symmetric(
+          horizontal: isWide ? MediaQuery.of(context).size.width / 3 : 30),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
