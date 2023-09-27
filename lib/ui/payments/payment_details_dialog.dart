@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/buttons/ok_button.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 import '../../data/models/models.dart';
@@ -81,10 +82,7 @@ class PaymentDetailsDialog extends StatelessWidget {
             child: Text('Go to expense'),
           )
         else
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          )
+          OkButton(),
       ],
     );
   }

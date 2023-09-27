@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/group/members/debt_redirect/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_visual.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/section_title.dart';
-import 'package:statera/utils/utils.dart';
 
 class RedirectDebtView extends StatefulWidget {
   final Group group;
@@ -118,6 +118,22 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            'Looks like you can simplify some transactions! Here is the suggested redirection of debt, but you are free to choose any ower/receiver combination.',
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => DebtRedirectExplainerDialog(),
+                );
+              },
+              child: Text('Learn more about Debt Redirection'),
+            ),
+          ),
+          SizedBox(height: 20),
           SectionTitle('Before', alignment: Alignment.centerLeft),
           RedirectDebtVisual(
             owerUid: _owerUid,

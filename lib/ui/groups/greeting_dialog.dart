@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/widgets/buttons/ok_button.dart';
 
 class GreetingDialog extends StatefulWidget {
   final String message;
@@ -41,9 +42,7 @@ class _GreetingDialogState extends State<GreetingDialog> {
           ),
         ],
       ),
-      actions: [
-        ElevatedButton(onPressed: _handleConfirm, child: Text('OK')),
-      ],
+      actions: [OkButton(onPressed: _handleConfirm)],
     );
   }
 }
