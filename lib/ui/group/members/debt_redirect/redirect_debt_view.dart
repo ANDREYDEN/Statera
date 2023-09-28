@@ -34,8 +34,9 @@ class _RedirectDebtViewState extends State<RedirectDebtView> {
     _receiverUids = widget.group.getMembersThatUserOwesTo(uid);
 
     // TODO: Select this better
-    _owerUid = _owerUids.first;
-    _receiverUid = _receiverUids.first;
+    final (bestOwerUid, bestReceiverUid) = widget.group.getBestRedirect(uid);
+    _owerUid = bestOwerUid;
+    _receiverUid = bestReceiverUid;
 
     final (newOwerDebt, newAuthorDebt, _) = widget.group.estimateRedirect(
       authorUid: uid,
