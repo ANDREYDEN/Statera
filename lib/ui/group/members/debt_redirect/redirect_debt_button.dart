@@ -1,3 +1,4 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,10 +16,14 @@ class RedirectDebtButton extends StatelessWidget {
     var uid = context.watch<AuthBloc>().uid;
     var groupCubit = context.read<GroupCubit>();
 
+    var redirectDebtFeatureEnabled =
+        FirebaseRemoteConfig.instance.getBool('redirect_debt_feature_flag');
+
     return GroupBuilder(
       builder: (context, group) {
         if (!group.supportsDebtRedirection) return SizedBox.shrink();
         if (!group.canRedirect(uid)) return SizedBox.shrink();
+        if (!redirectDebtFeatureEnabled) return SizedBox.shrink();
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 10.0),

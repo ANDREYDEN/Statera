@@ -84,7 +84,7 @@ class GroupSettings extends StatelessWidget {
               SwitchListTile(
                 title: Row(
                   children: [
-                    Text('Allow users to redirect debt'),
+                    Text('Allow members to redirect debt'),
                     SizedBox(width: 5),
                     TextButton(
                       onPressed: () => showDialog(
