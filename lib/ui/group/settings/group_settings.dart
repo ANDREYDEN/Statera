@@ -6,6 +6,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/members/debt_redirect/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
@@ -76,6 +77,30 @@ class GroupSettings extends StatelessWidget {
 
                   groupCubit.update((group) {
                     group.debtThreshold = double.parse(value);
+                  });
+                },
+              ),
+              SizedBox(height: 20),
+              SwitchListTile(
+                title: Row(
+                  children: [
+                    Text('Debt redirection'),
+                    SizedBox(width: 5),
+                    TextButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => DebtRedirectExplainerDialog(),
+                      ),
+                      child: Text('Learn more'),
+                    )
+                  ],
+                ),
+                value: group.supportsDebtRedirection,
+                onChanged: (isOn) {
+                  final groupCubit = context.read<GroupCubit>();
+
+                  groupCubit.update((group) {
+                    group.supportsDebtRedirection = isOn;
                   });
                 },
               ),

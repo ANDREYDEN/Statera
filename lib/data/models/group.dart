@@ -28,6 +28,7 @@ class Group {
   String? inviteLink;
   late double debtThreshold;
   late ExpenseSettings defaultExpenseSettings;
+  bool supportsDebtRedirection;
 
   static const String kdefaultCurrencySign = '\$';
   static const double kdefaultDebtThreshold = 50;
@@ -43,6 +44,7 @@ class Group {
     this.inviteLink,
     double? debtThreshold,
     ExpenseSettings? defaultExpenseSettings,
+    this.supportsDebtRedirection = false,
   }) {
     this.members = [];
     this.balance = {};
@@ -260,6 +262,7 @@ class Group {
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
       'defaultExpenseSettings': defaultExpenseSettings.toFirestore(),
+      'supportsDebtRedirection': supportsDebtRedirection,
     };
   }
 
@@ -293,6 +296,7 @@ class Group {
       defaultExpenseSettings: map['defaultExpenseSettings'] == null
           ? null
           : ExpenseSettings.fromFirestore(map['defaultExpenseSettings']),
+      supportsDebtRedirection: map['supportsDebtRedirection'] ?? false,
     );
   }
 }

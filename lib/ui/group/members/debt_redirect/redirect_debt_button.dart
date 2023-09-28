@@ -17,6 +17,7 @@ class RedirectDebtButton extends StatelessWidget {
 
     return GroupBuilder(
       builder: (context, group) {
+        if (!group.supportsDebtRedirection) return SizedBox.shrink();
         if (!group.canRedirect(uid)) return SizedBox.shrink();
 
         return Padding(
