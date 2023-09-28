@@ -158,6 +158,7 @@ class Group {
     return owers.isNotEmpty && receivers.isNotEmpty;
   }
 
+  /// returns newOwerDebt, newAuthorDebt and redirectedBalance as a tuple
   (double, double, double) estimateRedirect({
     required String authorUid,
     required String owerUid,
@@ -179,6 +180,33 @@ class Group {
     );
 
     return (newOwerDebt, newAuthorDebt, redirectedBalance);
+  }
+
+  (String, String) getBestRedirect(String uid) {
+    if (!this.canRedirect(uid)) {
+      throw Exception('User with id $uid cannot redirect debt');
+    }
+
+    final owerUids = getMembersThatOweToUser(uid);
+    final receiverUids = getMembersThatUserOwesTo(uid);
+
+    final bestOwerUid = owerUids.reduce((best, current) {
+      if (this.balance[current]![uid]! > this.balance[best]![uid]!) {
+        return current;
+      }
+
+      return best;
+    });
+
+    final bestReceiverUid = receiverUids.reduce((best, current) {
+      if (this.balance[uid]![current]! > this.balance[uid]![best]!) {
+        return current;
+      }
+
+      return best;
+    });
+
+    return (bestOwerUid, bestReceiverUid);
   }
 
   void redirect({
