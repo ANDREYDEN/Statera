@@ -4,6 +4,7 @@ import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.d
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_arrow.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 class RedirectDebtVisual extends StatelessWidget {
@@ -11,8 +12,8 @@ class RedirectDebtVisual extends StatelessWidget {
 
   const RedirectDebtVisual({super.key, this.isAfter = false});
 
-
-Future<void> _handleOwerTap(BuildContext context, DebtRedirectionLoaded loadedState) async {
+  Future<void> _handleOwerTap(
+      BuildContext context, DebtRedirectionLoaded loadedState) async {
     final groupCubit = context.read<GroupCubit>();
     final debtRedirectionCubit = context.read<DebtRedirectionCubit>();
 
@@ -37,7 +38,8 @@ Future<void> _handleOwerTap(BuildContext context, DebtRedirectionLoaded loadedSt
     }
   }
 
-  Future<void> _handleReceiverTap(BuildContext context, DebtRedirectionLoaded loadedState) async {
+  Future<void> _handleReceiverTap(
+      BuildContext context, DebtRedirectionLoaded loadedState) async {
     final groupCubit = context.read<GroupCubit>();
     final debtRedirectionCubit = context.read<DebtRedirectionCubit>();
 
@@ -65,49 +67,54 @@ Future<void> _handleOwerTap(BuildContext context, DebtRedirectionLoaded loadedSt
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
-      builder: (context, state) {
-        if (state is DebtRedirectionLoading) {
-          return Center(child: CircularProgressIndicator());
-        }
+        builder: (context, state) {
+      if (state is! DebtRedirectionLoaded) return SizedBox.shrink();
 
-        final loadedState = state as DebtRedirectionLoaded;
-        return Row(
-          children: [
-            UserAvatar(
-              author: loadedState.ower,
-              dimension: 75,
-              withName: true,
-              namePosition: NamePosition.bottom,
-              onTap: () => _handleOwerTap(context, loadedState),
-            ),
-            Expanded(
-              child: RedirectArrow(
-                value: isAfter ? loadedState.newOwerDebt : loadedState.owerDebt,
-                color: Colors.green,
+      return Column(
+        children: [
+          SizedBox(height: 20),
+          SectionTitle(
+            isAfter ? 'After' : 'Before',
+            alignment: Alignment.centerLeft,
+          ),
+          Row(
+            children: [
+              UserAvatar(
+                author: state.ower,
+                dimension: 75,
+                withName: true,
+                namePosition: NamePosition.bottom,
+                onTap: () => _handleOwerTap(context, state),
               ),
-            ),
-            UserAvatar(
-              author: loadedState.author,
-              dimension: 75,
-              withName: true,
-              namePosition: NamePosition.bottom,
-            ),
-            Expanded(
-              child: RedirectArrow(
-                value: isAfter ? loadedState.newAuthorDebt : loadedState.authorDebt,
-                color: Colors.red,
+              Expanded(
+                child: RedirectArrow(
+                  value: isAfter ? state.newOwerDebt : state.owerDebt,
+                  color: Colors.green,
+                ),
               ),
-            ),
-            UserAvatar(
-              author:loadedState.receiver,
-              dimension: 75,
-              withName: true,
-              namePosition: NamePosition.bottom,
-              onTap: () => _handleReceiverTap(context, loadedState),
-            ),
-          ],
-        );
-      }
-    );
+              UserAvatar(
+                author: state.author,
+                dimension: 75,
+                withName: true,
+                namePosition: NamePosition.bottom,
+              ),
+              Expanded(
+                child: RedirectArrow(
+                  value: isAfter ? state.newAuthorDebt : state.authorDebt,
+                  color: Colors.red,
+                ),
+              ),
+              UserAvatar(
+                author: state.receiver,
+                dimension: 75,
+                withName: true,
+                namePosition: NamePosition.bottom,
+                onTap: () => _handleReceiverTap(context, state),
+              ),
+            ],
+          ),
+        ],
+      );
+    });
   }
 }

@@ -17,19 +17,19 @@ class RedirectDebtCommitButton extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
           builder: (context, state) {
-            if (state is! DebtRedirectionLoaded) {
-              return CircularProgressIndicator();
-            }
-
             return ElevatedButton(
-              onPressed: () {
-                groupCubit.update((group) => group.redirect(
-                      authorUid: uid,
-                      owerUid: state.owerUid,
-                      receiverUid: state.receiverUid,
-                    ));
-                Navigator.pop(context);
-              },
+              onPressed: (state is DebtRedirectionLoaded)
+                  ? () {
+                      groupCubit.update((group) {
+                        group.redirect(
+                          authorUid: uid,
+                          owerUid: state.owerUid,
+                          receiverUid: state.receiverUid,
+                        );
+                      });
+                      Navigator.pop(context);
+                    }
+                  : null,
               child: Text('Redirect'),
             );
           },

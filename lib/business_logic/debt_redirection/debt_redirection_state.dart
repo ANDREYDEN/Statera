@@ -69,4 +69,6 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
   double get authorDebt => group.balance[uid]![receiverUid]!;
 }
 
-class DebtRedirectionLoading extends DebtRedirectionState {}
+class DebtRedirectionImpossible extends DebtRedirectionState {}
+
+class DebtRedirectionOff extends DebtRedirectionState {}

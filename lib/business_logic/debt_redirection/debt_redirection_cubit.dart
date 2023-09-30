@@ -5,7 +5,11 @@ part 'debt_redirection_state.dart';
 
 class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
   DebtRedirectionCubit({required String uid, required Group group})
-      : super(DebtRedirectionLoaded.initial(uid: uid, group: group));
+      : super(group.supportsDebtRedirection
+            ? group.canRedirect(uid)
+                ? DebtRedirectionLoaded.initial(uid: uid, group: group)
+                : DebtRedirectionImpossible()
+            : DebtRedirectionOff());
 
   void changeOwer({required String newOwerUid}) {
     if (this.state is! DebtRedirectionLoaded) return;

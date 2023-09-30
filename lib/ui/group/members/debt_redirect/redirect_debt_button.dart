@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_view.dart';
-import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class RedirectDebtButton extends StatelessWidget {
   const RedirectDebtButton({super.key});
@@ -34,20 +32,9 @@ class RedirectDebtButton extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MultiBlocProvider(
-                    providers: [
-                      BlocProvider<GroupCubit>.value(value: groupCubit),
-                      BlocProvider<DebtRedirectionCubit>(
-                        create: (context) => DebtRedirectionCubit(
-                          uid: uid,
-                          group: group,
-                        ),
-                      ),
-                    ],
-                    child: PageScaffold(
-                      title: 'Redirect Debt',
-                      child: RedirectDebtView(group: group),
-                    ),
+                  builder: (context) => BlocProvider<GroupCubit>.value(
+                    value: groupCubit,
+                    child: RedirectDebtView(group: group),
                   ),
                 ),
               );
