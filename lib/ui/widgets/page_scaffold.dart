@@ -11,6 +11,7 @@ class PageScaffold extends StatelessWidget {
   final String? fabText;
   final void Function()? onFabPressed;
   final Future<bool> Function()? onPop;
+  final Widget? fab;
 
   const PageScaffold({
     Key? key,
@@ -22,6 +23,7 @@ class PageScaffold extends StatelessWidget {
     this.fabText,
     this.onFabPressed,
     this.onPop,
+    this.fab,
   }) : super(key: key);
 
   @override
@@ -40,17 +42,18 @@ class PageScaffold extends StatelessWidget {
               ),
           actions: this.actions,
         ),
-        floatingActionButton: this.onFabPressed == null
-            ? null
-            : isWide
-                ? FloatingActionButton.extended(
-                    onPressed: this.onFabPressed,
-                    icon: Icon(Icons.add),
-                    label: Text(fabText ?? 'Add'))
-                : FloatingActionButton(
-                    onPressed: this.onFabPressed,
-                    child: Icon(Icons.add),
-                  ),
+        floatingActionButton: fab ??
+            (this.onFabPressed == null
+                ? null
+                : isWide
+                    ? FloatingActionButton.extended(
+                        onPressed: this.onFabPressed,
+                        icon: Icon(Icons.add),
+                        label: Text(fabText ?? 'Add'))
+                    : FloatingActionButton(
+                        onPressed: this.onFabPressed,
+                        child: Icon(Icons.add),
+                      )),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: child,
       ),
