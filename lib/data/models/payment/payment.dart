@@ -65,6 +65,20 @@ class Payment implements Comparable {
         ),
         oldPayerBalance = oldPayerBalance;
 
+  Payment.fromRedirect({
+    required String groupId,
+    required String authorId,
+    required String payerId,
+    required String receiverId,
+    required double amount,
+  })  : id = null,
+        groupId = groupId,
+        payerId = payerId,
+        receiverId = receiverId,
+        value = amount,
+        newFor = [payerId, receiverId],
+        redirectInfo = PaymentRedirectInfo(authorUid: authorId);
+
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
   bool get hasRelatedExpense => relatedExpense != null;

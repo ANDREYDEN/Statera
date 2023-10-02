@@ -211,7 +211,8 @@ class Group {
     return (bestOwerUid, bestReceiverUid);
   }
 
-  void redirect({
+  /// returns owerPaymentAmount, authorPaymentAmount and redirectedBalance as a tuple
+  (double, double, double) redirect({
     required String authorUid,
     required String owerUid,
     required String receiverUid,
@@ -222,9 +223,12 @@ class Group {
       receiverUid: receiverUid,
     );
 
+    final owerPaymentAmount = this.balance[owerUid]![authorUid]! - newOwerDebt;
     this.balance[owerUid]![authorUid] = newOwerDebt;
     this.balance[authorUid]![owerUid] = -newOwerDebt;
 
+    final authorPaymentAmount =
+        this.balance[authorUid]![receiverUid]! - newAuthorDebt;
     this.balance[authorUid]![receiverUid] = newAuthorDebt;
     this.balance[receiverUid]![authorUid] = -newAuthorDebt;
 
@@ -232,6 +236,8 @@ class Group {
         this.balance[owerUid]![receiverUid]! + redirectedDebt;
     this.balance[receiverUid]![owerUid] =
         this.balance[receiverUid]![owerUid]! - redirectedDebt;
+
+    return (owerPaymentAmount, authorPaymentAmount, redirectedDebt);
   }
 
   List<String> getMembersThatOweToUser(String uid) {
