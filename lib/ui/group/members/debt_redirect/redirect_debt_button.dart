@@ -6,6 +6,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_view.dart';
+import 'package:statera/utils/utils.dart';
 
 class RedirectDebtButton extends StatelessWidget {
   const RedirectDebtButton({super.key});
@@ -27,7 +28,7 @@ class RedirectDebtButton extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 10.0),
           child: ElevatedButton.icon(
-            icon: Icon(Icons.bolt),
+            icon: Icon(kRedirectDebtIcon),
             onPressed: () {
               Navigator.push(
                 context,

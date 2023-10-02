@@ -37,3 +37,5 @@ const kNotificationsReminderCooldown = Duration(days: 2);
 const kMobileMargin = EdgeInsets.symmetric(horizontal: 10.0);
 
 const kWideMargin = EdgeInsets.symmetric(horizontal: 50.0);
+
+const kRedirectDebtIcon = Icons.bolt;

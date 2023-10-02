@@ -4,5 +4,5 @@ export 'custom_user.dart';
 export 'expense.dart';
 export 'group.dart';
 export 'item.dart';
-export 'payment.dart';
+export 'payment/payment.dart';
 export 'expense_settings.dart';

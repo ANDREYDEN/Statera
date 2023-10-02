@@ -1,16 +1,21 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/custom_theme_builder.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/models/payment.dart';
-import 'package:statera/data/services/auth_service.dart';
+import 'package:statera/data/models/payment/payment.dart';
+import 'package:statera/data/models/payment/payment_expense_info.dart';
+import 'package:statera/data/models/payment/payment_redirect_info.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 
@@ -48,29 +53,30 @@ class ListCover extends StatelessWidget {
     when(user.uid).thenReturn('a');
     when(authService.currentUser).thenReturn(user);
 
-    return CustomThemeBuilder(
-      builder: (lightTheme, darkTheme) {
-        return MaterialApp(
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: ThemeMode.system,
-          home: MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (_) => GroupCubit(
-                  MockGroupService(),
-                  MockExpenseService(),
-                  MockUserRepository(),
-                )..loadGroup(Group(
-                    name: 'Example',
-                    members: [user1, user2],
-                  )),
-              ),
-              BlocProvider(
-                create: (_) => AuthBloc(authService),
-              )
-            ],
-            child: Scaffold(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => GroupCubit(
+            MockGroupService(),
+            MockExpenseService(),
+            MockUserRepository(),
+          )..loadGroup(Group(
+              name: 'Example',
+              members: [user1, user2],
+            )),
+        ),
+        BlocProvider(
+          create: (_) => AuthBloc(authService),
+        ),
+        Provider.value(value: PreferencesService()),
+      ],
+      child: CustomThemeBuilder(
+        builder: (lightTheme, darkTheme) {
+          return MaterialApp(
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: ThemeMode.system,
+            home: Scaffold(
               body: ListView(
                 children: [
                   PaymentListItem(
@@ -150,12 +156,32 @@ class ListCover extends StatelessWidget {
                       newFor: ['a', 'b'],
                     ),
                   ),
+                  PaymentListItem(
+                    payment: Payment(
+                      groupId: 'asd',
+                      payerId: 'a',
+                      receiverId: 'b',
+                      value: 123,
+                      timeCreated: DateTime.now(),
+                      redirectInfo: PaymentRedirectInfo(authorUid: 'a'),
+                    ),
+                  ),
+                  PaymentListItem(
+                    payment: Payment(
+                      groupId: 'asd',
+                      payerId: 'b',
+                      receiverId: 'a',
+                      value: 123,
+                      timeCreated: DateTime.now(),
+                      redirectInfo: PaymentRedirectInfo(authorUid: 'b'),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

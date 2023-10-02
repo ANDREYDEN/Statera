@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/models/models.dart';
+import 'package:statera/data/models/payment/payment_expense_info.dart';
+import 'package:statera/data/models/payment/payment_redirect_info.dart';
 
 class Payment implements Comparable {
   String? id;
@@ -12,6 +14,7 @@ class Payment implements Comparable {
   List<String> newFor;
 
   PaymentExpenseInfo? relatedExpense;
+  PaymentRedirectInfo? redirectInfo;
   DateTime? timeCreated;
   String? reason;
   double? oldPayerBalance;
@@ -24,6 +27,7 @@ class Payment implements Comparable {
     required this.value,
     this.newFor = const [],
     this.relatedExpense,
+    this.redirectInfo,
     this.timeCreated,
     this.reason,
     this.oldPayerBalance,
@@ -65,7 +69,24 @@ class Payment implements Comparable {
 
   bool get hasRelatedExpense => relatedExpense != null;
 
+  bool get hasRelatedRedirect => redirectInfo != null;
+
   bool get isAdmin => reason != null;
+
+  String getFullReason(String uid, Group group) {
+    if (reason != null) return reason!;
+
+    if (hasRelatedExpense) {
+      return 'Expense "${relatedExpense!.name}" was ${relatedExpense!.action?.name ?? 'finalized'}.';
+    }
+
+    if (hasRelatedRedirect) {
+      final authorName = uid == redirectInfo!.authorUid ? 'you' : group.getMember(redirectInfo!.authorUid).name;
+      return 'This payment was created because $authorName redirected some debt.';
+    }
+
+    return 'Manual payment.';
+  }
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -75,6 +96,7 @@ class Payment implements Comparable {
       'value': value,
       'relatedExpense':
           relatedExpense == null ? null : relatedExpense!.toFirestore(),
+      'redirectInfo': redirectInfo == null ? null : redirectInfo!.toFirestore(),
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
       'newFor': newFor,
@@ -93,6 +115,9 @@ class Payment implements Comparable {
       relatedExpense: map['relatedExpense'] == null
           ? null
           : PaymentExpenseInfo.fromFirestore(map['relatedExpense']),
+      redirectInfo: map['redirectInfo'] == null
+          ? null
+          : PaymentRedirectInfo.fromFirestore(map['redirectInfo']),
       timeCreated: map['timeCreated'] == null
           ? null
           : DateTime.parse(map['timeCreated'].toDate().toString()),
@@ -130,59 +155,5 @@ class Payment implements Comparable {
     }
 
     return -1;
-  }
-}
-
-enum PaymentExpenseAction {
-  revert('reverted'),
-  finalize('finalized');
-
-  final String name;
-
-  const PaymentExpenseAction(this.name);
-
-  factory PaymentExpenseAction.fromFirestore(String action) {
-    return values.firstWhere((e) => e.name == action, orElse: () => finalize);
-  }
-}
-
-class PaymentExpenseInfo {
-  String? id;
-  String name;
-  PaymentExpenseAction? action;
-
-  PaymentExpenseInfo({
-    required this.id,
-    required this.name,
-    this.action,
-  });
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'id': id,
-      'name': name,
-      'action': action == null ? null : action!.name,
-    };
-  }
-
-  factory PaymentExpenseInfo.fromFirestore(Map<String, dynamic> map) {
-    return PaymentExpenseInfo(
-      id: map['id'],
-      name: map['name'],
-      action: map['action'] == null
-          ? PaymentExpenseAction.finalize
-          : PaymentExpenseAction.fromFirestore(map['action']),
-    );
-  }
-
-  factory PaymentExpenseInfo.fromExpense(
-    Expense expense, {
-    required PaymentExpenseAction action,
-  }) {
-    return PaymentExpenseInfo(
-      id: expense.id,
-      name: expense.name,
-      action: action,
-    );
   }
 }

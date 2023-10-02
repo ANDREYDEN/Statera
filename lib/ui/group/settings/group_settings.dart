@@ -6,12 +6,11 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/members/debt_redirect/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
 
-import 'debt_redirect_explainer_dialog.dart';
+import '../../../widgets/dialogs/debt_redirect_explainer_dialog.dart';
 
 class RedirectDebtHeaderText extends StatelessWidget {
   const RedirectDebtHeaderText({super.key});
