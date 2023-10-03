@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:statera/data/models/custom_user.dart';
 
 class UserAvatar extends StatelessWidget {
@@ -13,6 +14,7 @@ class UserAvatar extends StatelessWidget {
   final double? dimension;
   final EdgeInsets? margin;
   final NamePosition namePosition;
+  final bool loading;
 
   UserAvatar({
     Key? key,
@@ -27,11 +29,12 @@ class UserAvatar extends StatelessWidget {
     this.dimension,
     this.margin,
     this.namePosition = NamePosition.right,
+    this.loading = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final result = Padding(
       padding: this.margin ?? EdgeInsets.all(0),
       child: MouseRegion(
         cursor:
@@ -115,6 +118,14 @@ class UserAvatar extends StatelessWidget {
         ),
       ),
     );
+
+    if (loading) {
+      return result
+          .animate(onPlay: (controller) => controller.repeat())
+          .shimmer(duration: 1.seconds);
+    }
+
+    return result;
   }
 }
 

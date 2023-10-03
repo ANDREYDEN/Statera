@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_arrow.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -68,7 +69,16 @@ class RedirectDebtVisual extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
         builder: (context, state) {
-      if (state is! DebtRedirectionLoaded) return SizedBox.shrink();
+      if (state is! DebtRedirectionLoaded && state is! DebtRedirectionLoading) {
+        return SizedBox.shrink();
+      }
+
+      final isLoading = state is DebtRedirectionLoading;
+
+      var loadedState = DebtRedirectionLoaded.fake();
+      if (state is DebtRedirectionLoaded) {
+        loadedState = state;
+      }
 
       return Column(
         children: [
@@ -80,36 +90,44 @@ class RedirectDebtVisual extends StatelessWidget {
           Row(
             children: [
               UserAvatar(
-                author: state.ower,
+                author: isLoading ? CustomUser.fake() : loadedState.ower,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,
-                onTap: () => _handleOwerTap(context, state),
+                onTap: () => _handleOwerTap(context, loadedState),
+                loading: isLoading,
               ),
               Expanded(
                 child: RedirectArrow(
-                  value: isAfter ? state.newOwerDebt : state.owerDebt,
+                  value:
+                      isAfter ? loadedState.newOwerDebt : loadedState.owerDebt,
                   color: Colors.green,
+                  loading: isLoading,
                 ),
               ),
               UserAvatar(
-                author: state.author,
+                author: isLoading ? CustomUser.fake() : loadedState.author,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,
+                loading: isLoading,
               ),
               Expanded(
                 child: RedirectArrow(
-                  value: isAfter ? state.newAuthorDebt : state.authorDebt,
+                  value: isAfter
+                      ? loadedState.newAuthorDebt
+                      : loadedState.authorDebt,
                   color: Colors.red,
+                  loading: isLoading,
                 ),
               ),
               UserAvatar(
-                author: state.receiver,
+                author: isLoading ? CustomUser.fake() : loadedState.receiver,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,
-                onTap: () => _handleReceiverTap(context, state),
+                onTap: () => _handleReceiverTap(context, loadedState),
+                loading: isLoading,
               ),
             ],
           ),

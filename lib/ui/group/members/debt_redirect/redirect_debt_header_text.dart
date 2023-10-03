@@ -11,11 +11,16 @@ class RedirectDebtHeaderText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
       builder: (context, state) {
+        if (state is DebtRedirectionLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+
         if (state is DebtRedirectionImpossible) {
           return Text(
             "Looks like you ca't perfom debt redirection at this time.",
           );
         }
+
         if (state is DebtRedirectionOff) {
           return Text('Debt redirection is turned off for this group.');
         }

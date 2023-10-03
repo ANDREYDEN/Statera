@@ -23,10 +23,11 @@ class RedirectDebtView extends StatelessWidget {
     return GroupBuilder(
       builder: (context, group) {
         return BlocProvider.value(
-          value: DebtRedirectionCubit(
-            uid: uid,
-            group: group,
-          ),
+          // value: DebtRedirectionCubit()..init(
+          //   uid: uid,
+          //   group: group,
+          // ),
+          value: DebtRedirectionCubit(),
           child: PageScaffold(
             title: 'Redirect Debt',
             fab: RedirectDebtFAB(),

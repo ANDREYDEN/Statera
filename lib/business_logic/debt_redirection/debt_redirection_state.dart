@@ -3,8 +3,8 @@ part of 'debt_redirection_cubit.dart';
 abstract class DebtRedirectionState {}
 
 class DebtRedirectionLoaded extends DebtRedirectionState {
-  final String uid;
-  final Group group;
+  late final String uid;
+  late final Group group;
   late final String owerUid;
   late final String receiverUid;
   late List<String> owerUids;
@@ -12,10 +12,18 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
   late final double newOwerDebt;
   late final double newAuthorDebt;
 
-  DebtRedirectionLoaded.initial({
+  DebtRedirectionLoaded({
     required this.uid,
-    required this.group
-  }) {
+    required this.group,
+    required this.owerUid,
+    required this.receiverUid,
+    required this.owerUids,
+    required this.receiverUids,
+    required this.newOwerDebt,
+    required this.newAuthorDebt,
+  });
+
+  DebtRedirectionLoaded.initial({required this.uid, required this.group}) {
     owerUids = group.getMembersThatOweToUser(uid);
     receiverUids = group.getMembersThatUserOwesTo(uid);
 
@@ -32,16 +40,22 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
     this.newOwerDebt = newOwerDebt;
   }
 
-  DebtRedirectionLoaded({
-    required this.uid,
-    required this.group,
-    required this.owerUid,
-    required this.receiverUid,
-    required this.owerUids,
-    required this.receiverUids,
-    required this.newOwerDebt,
-    required this.newAuthorDebt,
-  });
+  DebtRedirectionLoaded.fake({
+    this.owerUids = const [],
+    this.receiverUids = const [],
+    this.newOwerDebt = 0,
+    this.newAuthorDebt = 0,
+  }) {
+    this.uid = 'uid';
+    this.owerUid = 'owerUid';
+    this.receiverUid = 'receiverUid';
+    this.group = Group(
+      name: 'group',
+      members: [uid, owerUid, receiverUid]
+          .map((e) => CustomUser(name: e, uid: e))
+          .toList(),
+    );
+  }
 
   DebtRedirectionLoaded copyWith({
     String? owerUid,
@@ -68,6 +82,8 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
   double get owerDebt => group.balance[owerUid]![uid]!;
   double get authorDebt => group.balance[uid]![receiverUid]!;
 }
+
+class DebtRedirectionLoading extends DebtRedirectionState {}
 
 class DebtRedirectionImpossible extends DebtRedirectionState {}
 
