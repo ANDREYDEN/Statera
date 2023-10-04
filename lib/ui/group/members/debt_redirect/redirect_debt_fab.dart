@@ -25,7 +25,7 @@ class RedirectDebtFAB extends StatelessWidget {
         late double owerPaymentAmount;
         late double authorPaymentAmount;
         late double redirectedDebt;
-        await groupCubit.update((group) {
+        groupCubit.update((group) {
           final (owerPaymentAmnt, authorPaymentAmnt, redirectedDbt) =
               group.redirect(
             authorUid: uid,
