@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_arrow.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -90,7 +89,7 @@ class RedirectDebtVisual extends StatelessWidget {
           Row(
             children: [
               UserAvatar(
-                author: isLoading ? CustomUser.fake() : loadedState.ower,
+                author: loadedState.ower,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,
@@ -106,7 +105,7 @@ class RedirectDebtVisual extends StatelessWidget {
                 ),
               ),
               UserAvatar(
-                author: isLoading ? CustomUser.fake() : loadedState.author,
+                author: loadedState.author,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,
@@ -122,7 +121,7 @@ class RedirectDebtVisual extends StatelessWidget {
                 ),
               ),
               UserAvatar(
-                author: isLoading ? CustomUser.fake() : loadedState.receiver,
+                author: loadedState.receiver,
                 dimension: 75,
                 withName: true,
                 namePosition: NamePosition.bottom,

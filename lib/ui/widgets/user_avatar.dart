@@ -74,16 +74,17 @@ class UserAvatar extends StatelessWidget {
                                     color: Colors.grey,
                                   ),
                                 ),
-                                Text(
-                                  this.author.name.isEmpty
-                                      ? '?'
-                                      : this.author.name[0],
-                                  style: TextStyle(
-                                    fontSize: dimension == null
-                                        ? 24
-                                        : (dimension! / 2),
+                                if (!loading)
+                                  Text(
+                                    this.author.name.isEmpty
+                                        ? '?'
+                                        : this.author.name[0],
+                                    style: TextStyle(
+                                      fontSize: dimension == null
+                                          ? 24
+                                          : (dimension! / 2),
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                     ),
@@ -104,15 +105,25 @@ class UserAvatar extends StatelessWidget {
                 ],
               ),
               if (this.withName)
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text(
-                      this.author.name,
-                      overflow: TextOverflow.ellipsis,
+                if (!this.loading)
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        this.author.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: 80,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey,
                     ),
                   ),
-                ),
             ],
           ),
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
@@ -22,14 +21,11 @@ class RedirectDebtFAB extends StatelessWidget {
       () async {
         debtRedirectionCubit.startLoading();
 
-        await Future.delayed(Duration(seconds: 1));
-        throw Exception('Weird error');
-
         // TODO: create transaction
         late double owerPaymentAmount;
         late double authorPaymentAmount;
         late double redirectedDebt;
-        groupCubit.update((group) {
+        await groupCubit.update((group) {
           final (owerPaymentAmnt, authorPaymentAmnt, redirectedDbt) =
               group.redirect(
             authorUid: uid,
@@ -53,7 +49,7 @@ class RedirectDebtFAB extends StatelessWidget {
 
     debtRedirectionCubit.init(
       uid: uid,
-      group: state.group,
+      groupCubit: groupCubit,
     );
 
     if (success) {

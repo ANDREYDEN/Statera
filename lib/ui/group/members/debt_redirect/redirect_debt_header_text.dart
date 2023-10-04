@@ -12,7 +12,10 @@ class RedirectDebtHeaderText extends StatelessWidget {
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
       builder: (context, state) {
         if (state is DebtRedirectionLoading) {
-          return Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (state is DebtRedirectionImpossible) {

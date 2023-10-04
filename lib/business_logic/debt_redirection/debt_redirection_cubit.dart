@@ -1,12 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 
 part 'debt_redirection_state.dart';
 
 class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
+  StreamSubscription<GroupState>? _groupSubscription;
+
   DebtRedirectionCubit() : super(DebtRedirectionLoading());
 
-  init({required String uid, required Group group}) {
+  init({required String uid, required GroupCubit groupCubit}) {
+    _init(uid, groupCubit.state);
+
+    _groupSubscription = groupCubit.stream.listen((groupState) {
+      _init(uid, groupState);
+    });
+  }
+
+  _init(String uid, GroupState groupState) {
+    if (groupState is! GroupLoaded) return;
+
+    final group = groupState.group;
+
     if (!group.supportsDebtRedirection) {
       return emit(DebtRedirectionOff());
     }
@@ -55,6 +72,13 @@ class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
   }
 
   void startLoading() {
+    _groupSubscription?.cancel();
     emit(DebtRedirectionLoading());
+  }
+
+  @override
+  Future<void> close() {
+    _groupSubscription?.cancel();
+    return super.close();
   }
 }
