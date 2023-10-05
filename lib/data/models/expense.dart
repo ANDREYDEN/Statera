@@ -190,6 +190,19 @@ class Expense {
 
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
+  // TODO: move to a cloud function
+  Map<String, int> get memberStages {
+    final uids = [...assigneeUids];
+    if (!uids.contains(authorUid)) uids.add(authorUid);
+
+    final Map<String, int> result = {};
+    for (var uid in uids) {
+      final stageIndex = Expense.expenseStages(uid).indexWhere((stage) => stage.test(this));
+      result[uid] = stageIndex;
+    }
+    return result;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,
@@ -203,6 +216,7 @@ class Expense {
       'date': date,
       'finalizedDate': finalizedDate,
       'settings': settings.toFirestore(),
+      'memberStages': memberStages, // used for ordering expenses
     };
   }
 

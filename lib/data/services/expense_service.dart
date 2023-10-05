@@ -23,6 +23,7 @@ class ExpenseService extends Firestore {
             ),
           ),
         )
+        .orderBy('memberStages.$uid')
         .orderBy('date', descending: true);
     if (quantity != null) {
       query = query.limit(quantity);

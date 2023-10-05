@@ -29,19 +29,6 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
         .map((expenses) {
-          expenses.sort((firstExpense, secondExpense) {
-            final expenseStages = Expense.expenseStages(userId);
-            for (var stage in expenseStages) {
-              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-              }
-              if (firstExpense.isIn(stage)) return -1;
-              if (secondExpense.isIn(stage)) return 1;
-            }
-
-            return 0;
-          });
-
           return ExpensesLoaded(
             expenses: expenses,
             stages: Expense.expenseStages(userId),
