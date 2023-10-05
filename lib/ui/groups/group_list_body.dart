@@ -41,6 +41,9 @@ class GroupListBody extends StatelessWidget {
         if (groupsState is GroupsLoaded) {
           final groups = groupsState.groups;
 
+          final columnCount = isWide ? 3 : 1;
+          final columnWidth = MediaQuery.of(context).size.width / columnCount;
+
           return Padding(
             padding: isWide ? kWideMargin : kMobileMargin,
             child: Column(
@@ -56,8 +59,8 @@ class GroupListBody extends StatelessWidget {
                   child: groups.isEmpty
                       ? ListEmpty(text: 'Join or create a group!')
                       : GridView.count(
-                          crossAxisCount: isWide ? 3 : 1,
-                          childAspectRatio: 6,
+                          crossAxisCount: columnCount,
+                          childAspectRatio: columnWidth / 100,
                           children: groups
                               .map((group) => GroupListItem(group: group))
                               .toList(),
