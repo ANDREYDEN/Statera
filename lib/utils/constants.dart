@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 const kAppName = 'Statera';
 
 const kEmulatorFlag = 'MODE';
@@ -31,3 +33,9 @@ const kRequiredValidationMessage = "Can't be empty";
 const kUpdateBannerRefreshFrequency = Duration(hours: 1);
 
 const kNotificationsReminderCooldown = Duration(days: 2);
+
+const kMobileMargin = EdgeInsets.symmetric(horizontal: 10.0);
+
+const kWideMargin = EdgeInsets.symmetric(horizontal: 50.0);
+
+const kRedirectDebtIcon = Icons.bolt;

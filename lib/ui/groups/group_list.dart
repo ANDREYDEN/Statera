@@ -10,15 +10,13 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/greeting_dialog.dart';
-import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
-import 'package:statera/ui/widgets/list_empty.dart';
-import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
@@ -79,59 +77,7 @@ class _GroupListState extends State<GroupList> {
         child: Column(
           children: [
             UpdateBanner(),
-            Expanded(
-              child: defaultTargetPlatform == TargetPlatform.windows
-                  ? Center(
-                      child: Text(
-                          'Main app functionality is currently in development...'),
-                    )
-                  : BlocBuilder<GroupsCubit, GroupsState>(
-                      builder: (context, groupsState) {
-                        if (groupsState is GroupsLoading) {
-                          return Center(child: Loader());
-                        }
-
-                        if (groupsState is GroupsError) {
-                          developer.log(
-                            'Failed loading groups',
-                            error: groupsState.error,
-                          );
-
-                          return Center(
-                              child: Text(groupsState.error.toString()));
-                        }
-
-                        if (groupsState is GroupsLoaded) {
-                          final groups = groupsState.groups;
-
-                          return Column(
-                            children: [
-                              SizedBox.square(
-                                dimension: 16,
-                                child: Visibility(
-                                  visible: groupsState is GroupsProcessing,
-                                  child: Loader(),
-                                ),
-                              ),
-                              Expanded(
-                                child: groups.isEmpty
-                                    ? ListEmpty(text: 'Join or create a group!')
-                                    : ListView.builder(
-                                        itemCount: groups.length,
-                                        itemBuilder: (context, index) {
-                                          var group = groups[index];
-                                          return GroupListItem(group: group);
-                                        },
-                                      ),
-                              ),
-                            ],
-                          );
-                        }
-
-                        return Container();
-                      },
-                    ),
-            ),
+            Expanded(child: GroupListBody()),
           ],
         ),
       ),

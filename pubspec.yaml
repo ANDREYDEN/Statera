@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.8.1+19
 
 environment:
-  sdk: ">=2.17.0-0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 scripts:
   run-web-emulate: flutter run -d chrome --dart-define="MODE=debug"
@@ -32,7 +32,7 @@ dependencies:
   firebase_dynamic_links: ^5.0.0
   firebase_messaging: ^14.3.0
   firebase_analytics: ^10.1.0
-  firebase_remote_config: ^3.0.0
+  firebase_remote_config: ^4.0.0
   cloud_firestore: ^4.5.0
   cloud_functions: ^4.0.0
   fake_cloud_firestore: ^2.4.0
@@ -69,7 +69,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/logo.png
+    - images/
     - .env
 
   fonts:

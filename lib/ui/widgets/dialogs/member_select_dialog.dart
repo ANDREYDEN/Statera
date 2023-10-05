@@ -4,7 +4,7 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 
 /// Shows all group members to select from.
-/// 
+///
 /// If [singleSelection] is `true`, returns a `String?` containing the picked member uid.
 /// If [singleSelection] is `false`, returns a `List<String>?` containing the picked members' uids.
 class MemberSelectDialog extends StatefulWidget {
@@ -13,6 +13,7 @@ class MemberSelectDialog extends StatefulWidget {
   final bool singleSelection;
   final bool allSelected;
   final bool excludeMe;
+  final List<String>? memberUids;
 
   const MemberSelectDialog({
     Key? key,
@@ -21,6 +22,7 @@ class MemberSelectDialog extends StatefulWidget {
     this.singleSelection = false,
     this.allSelected = false,
     this.excludeMe = false,
+    this.memberUids,
   }) : super(key: key);
 
   @override
@@ -46,6 +48,7 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
           singleSelection: widget.singleSelection,
           allSelected: widget.allSelected,
           excludeMe: widget.excludeMe,
+          memberUids: widget.memberUids,
           onChange: (selectedMembers) => setState(() {
             _selectedMemberUids = selectedMembers;
           }),

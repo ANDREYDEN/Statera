@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:statera/data/models/custom_user.dart';
 
 class UserAvatar extends StatelessWidget {
   final CustomUser author;
-  late final Function()? onTap;
+  final void Function()? onTap;
   final bool withName;
   final Color? borderColor;
   final bool withIcon;
@@ -12,6 +13,8 @@ class UserAvatar extends StatelessWidget {
   final Color? iconBackgroudColor;
   final double? dimension;
   final EdgeInsets? margin;
+  final NamePosition namePosition;
+  final bool loading;
 
   UserAvatar({
     Key? key,
@@ -25,17 +28,23 @@ class UserAvatar extends StatelessWidget {
     this.iconBackgroudColor = Colors.green,
     this.dimension,
     this.margin,
+    this.namePosition = NamePosition.right,
+    this.loading = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final result = Padding(
       padding: this.margin ?? EdgeInsets.all(0),
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor:
+            this.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
         child: GestureDetector(
           onTap: this.onTap,
-          child: Row(
+          child: Flex(
+            direction: namePosition == NamePosition.bottom
+                ? Axis.vertical
+                : Axis.horizontal,
             mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
@@ -65,16 +74,17 @@ class UserAvatar extends StatelessWidget {
                                     color: Colors.grey,
                                   ),
                                 ),
-                                Text(
-                                  this.author.name.isEmpty
-                                      ? '?'
-                                      : this.author.name[0],
-                                  style: TextStyle(
-                                    fontSize: dimension == null
-                                        ? 24
-                                        : (dimension! / 2),
+                                if (!loading)
+                                  Text(
+                                    this.author.name.isEmpty
+                                        ? '?'
+                                        : this.author.name[0],
+                                    style: TextStyle(
+                                      fontSize: dimension == null
+                                          ? 24
+                                          : (dimension! / 2),
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                     ),
@@ -95,19 +105,39 @@ class UserAvatar extends StatelessWidget {
                 ],
               ),
               if (this.withName)
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text(
-                      this.author.name,
-                      overflow: TextOverflow.ellipsis,
+                if (!this.loading)
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        this.author.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: 80,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey,
                     ),
                   ),
-                ),
             ],
           ),
         ),
       ),
     );
+
+    if (loading) {
+      return result
+          .animate(onPlay: (controller) => controller.repeat())
+          .shimmer(duration: 1.seconds);
+    }
+
+    return result;
   }
 }
+
+enum NamePosition { bottom, right }

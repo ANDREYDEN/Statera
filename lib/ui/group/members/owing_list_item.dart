@@ -22,30 +22,34 @@ class OwingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final owingCubit = context.read<OwingCubit>();
+    final owingCubit = context.watch<OwingCubit>();
     final isWide = context.read<LayoutState>().isWide;
+
+    String? selectedMemberUid = null;
+
+    if (owingCubit.state is OwingSelected) {
+      selectedMemberUid = (owingCubit.state as OwingSelected).memberId;
+    }
 
     return GroupBuilder(
       builder: (context, group) {
         final paymentPageRoute =
             '${GroupPage.route}/${group.id}${PaymentListPage.route}/${member.uid}';
         final owingColor = this.owing >= group.debtThreshold
-            ? Theme.of(context).errorColor
+            ? Theme.of(context).colorScheme.error
             : null;
         final isAdmin = group.admin.uid == this.member.uid;
 
-        return InkWell(
-          onTap: () => isWide
-              ? owingCubit.select(member.uid)
-              : Navigator.of(context).pushNamed(paymentPageRoute),
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Color.fromARGB(255, 204, 204, 204)),
-              ),
-            ),
-            child: Row(
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ListTile(
+            onTap: () => isWide
+                ? owingCubit.select(member.uid)
+                : Navigator.of(context).pushNamed(paymentPageRoute),
+            selected: selectedMemberUid == member.uid,
+            selectedTileColor:
+                Theme.of(context).colorScheme.primary.withAlpha(50),
+            title: Row(
               children: [
                 Expanded(
                   child: UserAvatar(

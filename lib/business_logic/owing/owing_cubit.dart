@@ -9,4 +9,8 @@ class OwingCubit extends Cubit<OwingState> {
   void select(String memberId) {
     emit(OwingSelected(memberId: memberId));
   }
+
+  void deselect() {
+    emit(OwingNone());
+  }
 }

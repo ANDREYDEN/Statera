@@ -6,6 +6,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
+import 'package:statera/ui/group/members/debt_redirect/redirect_debt_button.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -20,59 +21,65 @@ class OwingsList extends StatelessWidget {
 
     return Column(
       children: [
-        SizedBox(height: 20),
-        SectionTitle('Your Owings'),
-        Flexible(child: GroupBuilder(
-          builder: (context, group) {
-            final owings = group.getOwingsForUser(authBloc.uid);
-            if (owings.isEmpty) {
-              return ListEmpty(
-                text: 'Start by inviting people to your group...',
-                action: GroupQRButton(),
-              );
-            }
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: SectionTitle('Your Owings'),
+        ),
+        RedirectDebtButton(),
+        Flexible(
+          child: GroupBuilder(
+            builder: (context, group) {
+              final owings = group.getOwingsForUser(authBloc.uid);
+              if (owings.isEmpty) {
+                return ListEmpty(
+                  text: 'Start by inviting people to your group...',
+                  action: GroupQRButton(),
+                );
+              }
 
-            return FutureBuilder<Map<String, DateTime>>(
-                future: paymentService.getMostRecentPaymentDateForMembers(
-                    group, authBloc.uid),
-                builder: (context, snap) {
-                  if (snap.connectionState != ConnectionState.done) {
-                    return Center(child: Loader());
-                  }
+              return FutureBuilder<Map<String, DateTime>>(
+                  future: paymentService.getMostRecentPaymentDateForMembers(
+                      group, authBloc.uid),
+                  builder: (context, snap) {
+                    if (snap.connectionState != ConnectionState.done) {
+                      return Center(child: Loader());
+                    }
 
-                  if (snap.hasError) {
-                    debugPrint(snap.error.toString());
-                    debugPrintStack(stackTrace: snap.stackTrace);
-                  }
+                    if (snap.hasError) {
+                      debugPrint(snap.error.toString());
+                      debugPrintStack(stackTrace: snap.stackTrace);
+                    }
 
-                  final order = snap.data;
+                    final order = snap.data;
 
-                  final userOwings = owings.entries.toList();
-                  if (order != null) {
-                    userOwings.sort((a, b) {
-                      final aDate = order[a.key.uid];
-                      final bDate = order[b.key.uid];
-                      if (aDate == null && bDate == null) return 0;
-                      if (aDate == null && bDate != null) return 1;
-                      if (aDate != null && bDate == null) return -1;
+                    final userOwings = owings.entries.toList();
+                    if (order != null) {
+                      userOwings.sort((a, b) {
+                        final aDate = order[a.key.uid];
+                        final bDate = order[b.key.uid];
+                        if (aDate == null && bDate == null) return 0;
+                        if (aDate == null && bDate != null) return 1;
+                        if (aDate != null && bDate == null) return -1;
 
-                      return bDate!.compareTo(aDate!);
-                    });
-                  }
+                        return bDate!.compareTo(aDate!);
+                      });
+                    }
 
-                  return ListView(
-                    children: userOwings
-                        .map(
-                          (userOwing) => OwingListItem(
-                            member: userOwing.key,
-                            owing: userOwing.value,
-                          ),
-                        )
-                        .toList(),
-                  );
-                });
-          },
-        )),
+                    return ListView.separated(
+                      itemCount: userOwings.length,
+                      itemBuilder: ((context, index) {
+                        var userOwing = userOwings[index];
+                        return OwingListItem(
+                          member: userOwing.key,
+                          owing: userOwing.value,
+                        );
+                      }),
+                      separatorBuilder: (context, index) => Divider(height: 10),
+                    );
+                  });
+            },
+          ),
+        ),
       ],
     );
   }

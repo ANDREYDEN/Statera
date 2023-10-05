@@ -5,7 +5,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/payments/payment_details_dialog.dart';
-import 'package:statera/utils/helpers.dart';
+import 'package:statera/utils/utils.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
@@ -25,6 +25,13 @@ class PaymentListItem extends StatelessWidget {
     );
   }
 
+  IconData _getIcon() {
+    if (payment.isAdmin) return Icons.warning_rounded;
+    if (payment.hasRelatedExpense) return Icons.receipt_long_rounded;
+    if (payment.hasRelatedRedirect) return kRedirectDebtIcon;
+    return Icons.paid_rounded;
+  }
+
   @override
   Widget build(BuildContext context) {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
@@ -36,11 +43,7 @@ class PaymentListItem extends StatelessWidget {
         final paymentItem = ListTile(
           isThreeLine: payment.hasRelatedExpense,
           leading: Icon(
-            payment.isAdmin
-                ? Icons.warning_rounded
-                : payment.hasRelatedExpense
-                    ? Icons.receipt_long_rounded
-                    : Icons.paid_rounded,
+            _getIcon(),
             color: payment.isAdmin
                 ? Colors.red
                 : Theme.of(context).colorScheme.secondary,

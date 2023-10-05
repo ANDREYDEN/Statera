@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/expense/expense_page.dart';
+import 'package:statera/ui/widgets/dialogs/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/buttons/ok_button.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 import '../../data/models/models.dart';
@@ -26,6 +28,7 @@ class PaymentDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final receiverUid =
         context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     return AlertDialog(
       title: Text('Payment Info'),
@@ -48,12 +51,20 @@ class PaymentDetailsDialog extends StatelessWidget {
             ),
             Divider(),
             SectionTitle('Reason'),
-            Text(
-              payment.reason ??
-                  (payment.hasRelatedExpense
-                      ? 'Expense "${payment.relatedExpense!.name}" was ${payment.relatedExpense!.action?.name ?? 'finalized'}.'
-                      : 'Manual payment.'),
-            ),
+            Text(payment.getFullReason(uid, group)),
+            if (payment.hasRelatedRedirect)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => DebtRedirectExplainerDialog(),
+                    );
+                  },
+                  child: Text('Learn more about Debt Redirection'),
+                ),
+              ),
             SizedBox(height: 20),
             if (payment.oldPayerBalance != null) ...[
               SectionTitle('Balance change'),
@@ -81,10 +92,7 @@ class PaymentDetailsDialog extends StatelessWidget {
             child: Text('Go to expense'),
           )
         else
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          )
+          OkButton(),
       ],
     );
   }

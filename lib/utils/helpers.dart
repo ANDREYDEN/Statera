@@ -38,6 +38,31 @@ String getRandomLetter() {
   return String.fromCharCode(asciiCode);
 }
 
+String? toRelativeStringDate(DateTime? date) {
+  if (date == null) return null;
+
+  final now = DateTime.now();
+  final difference = now.difference(date);
+
+  if (difference.inDays > 365) {
+    return toStringDate(date);
+  }
+
+  if (difference.inDays > 1) {
+    return DateFormat('d MMM').format(date);
+  }
+
+  if (difference.inDays == 1) {
+    return 'yesterday';
+  }
+
+  if (difference.inMinutes > 1) {
+    return DateFormat('h:mm a').format(date);
+  }
+
+  return 'just now';
+}
+
 String? toStringDate(DateTime? date) {
   return date == null ? null : DateFormat('d MMM, yyyy').format(date);
 }

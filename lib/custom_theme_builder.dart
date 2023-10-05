@@ -17,6 +17,11 @@ class CustomThemeBuilder extends StatelessWidget {
         primarySwatch: createMaterialColor(Colors.white),
         textButtonTheme: textButtonTheme,
         cardTheme: cardTheme,
+        listTileTheme: ListTileThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+        ),
         fontFamily: 'Nunito',
       );
 

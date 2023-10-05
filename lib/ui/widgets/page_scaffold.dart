@@ -10,6 +10,8 @@ class PageScaffold extends StatelessWidget {
   final Widget? bottomNavBar;
   final String? fabText;
   final void Function()? onFabPressed;
+  final Future<bool> Function()? onPop;
+  final Widget? fab;
 
   const PageScaffold({
     Key? key,
@@ -20,35 +22,41 @@ class PageScaffold extends StatelessWidget {
     this.bottomNavBar,
     this.fabText,
     this.onFabPressed,
+    this.onPop,
+    this.fab,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
 
-    return Scaffold(
-      bottomNavigationBar: this.bottomNavBar,
-      appBar: AppBar(
-        title: titleWidget ??
-            SelectableText(
-              this.title ?? '',
-              style: TextStyle(overflow: TextOverflow.ellipsis),
-            ),
-        actions: this.actions,
+    return WillPopScope(
+      onWillPop: onPop,
+      child: Scaffold(
+        bottomNavigationBar: this.bottomNavBar,
+        appBar: AppBar(
+          title: titleWidget ??
+              SelectableText(
+                this.title ?? '',
+                style: TextStyle(overflow: TextOverflow.ellipsis),
+              ),
+          actions: this.actions,
+        ),
+        floatingActionButton: fab ??
+            (this.onFabPressed == null
+                ? null
+                : isWide
+                    ? FloatingActionButton.extended(
+                        onPressed: this.onFabPressed,
+                        icon: Icon(Icons.add),
+                        label: Text(fabText ?? 'Add'))
+                    : FloatingActionButton(
+                        onPressed: this.onFabPressed,
+                        child: Icon(Icons.add),
+                      )),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        body: child,
       ),
-      floatingActionButton: this.onFabPressed == null
-          ? null
-          : isWide
-              ? FloatingActionButton.extended(
-                  onPressed: this.onFabPressed,
-                  icon: Icon(Icons.add),
-                  label: Text(fabText ?? 'Add'))
-              : FloatingActionButton(
-                  onPressed: this.onFabPressed,
-                  child: Icon(Icons.add),
-                ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: child,
     );
   }
 }

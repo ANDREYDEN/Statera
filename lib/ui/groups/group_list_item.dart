@@ -10,27 +10,41 @@ class GroupListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).pushNamed(GroupPage.route + '/${this.group.id}');
-      },
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: UnmarkedExpensesBadge(
-              groupId: this.group.id,
-              child: Text(this.group.name, overflow: TextOverflow.ellipsis),
-            ),
-          )
-        ],
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.person),
-          Text(this.group.members.length.toString()),
-        ],
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context)
+              .pushNamed(GroupPage.route + '/${this.group.id}');
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: UnmarkedExpensesBadge(
+                        groupId: this.group.id,
+                        child: Text(this.group.name,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.person),
+                  Text(this.group.members.length.toString()),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

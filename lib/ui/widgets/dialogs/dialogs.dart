@@ -5,3 +5,4 @@ export 'new_expense_dialog.dart';
 export 'member_select_dialog.dart';
 export 'ok_cancel_dialog.dart';
 export 'payment_dialog.dart';
+export 'debt_redirect_explainer_dialog.dart';

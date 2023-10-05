@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:statera/data/models/models.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -26,6 +28,7 @@ class Group {
   String? inviteLink;
   late double debtThreshold;
   late ExpenseSettings defaultExpenseSettings;
+  bool supportsDebtRedirection;
 
   static const String kdefaultCurrencySign = '\$';
   static const double kdefaultDebtThreshold = 50;
@@ -41,6 +44,7 @@ class Group {
     this.inviteLink,
     double? debtThreshold,
     ExpenseSettings? defaultExpenseSettings,
+    this.supportsDebtRedirection = false,
   }) {
     this.members = [];
     this.balance = {};
@@ -149,6 +153,109 @@ class Group {
         this.balance[payment.receiverId]![payment.payerId]! + payment.value;
   }
 
+  bool canRedirect(String uid) {
+    final owers = getMembersThatOweToUser(uid);
+    final receivers = getMembersThatUserOwesTo(uid);
+
+    return owers.isNotEmpty && receivers.isNotEmpty;
+  }
+
+  /// returns newOwerDebt, newAuthorDebt and redirectedBalance as a tuple
+  (double, double, double) estimateRedirect({
+    required String authorUid,
+    required String owerUid,
+    required String receiverUid,
+  }) {
+    final newOwerDebt = max(
+      0.0,
+      this.balance[owerUid]![authorUid]! -
+          this.balance[authorUid]![receiverUid]!,
+    );
+    final newAuthorDebt = max(
+      0.0,
+      this.balance[authorUid]![receiverUid]! -
+          this.balance[owerUid]![authorUid]!,
+    );
+    final redirectedBalance = min(
+      this.balance[owerUid]![authorUid]!,
+      this.balance[authorUid]![receiverUid]!,
+    );
+
+    return (newOwerDebt, newAuthorDebt, redirectedBalance);
+  }
+
+  (String, String) getBestRedirect(String uid) {
+    if (!this.canRedirect(uid)) {
+      throw Exception('User with id $uid cannot redirect debt');
+    }
+
+    final owerUids = getMembersThatOweToUser(uid);
+    final receiverUids = getMembersThatUserOwesTo(uid);
+
+    final bestOwerUid = owerUids.reduce((best, current) {
+      if (this.balance[current]![uid]! > this.balance[best]![uid]!) {
+        return current;
+      }
+
+      return best;
+    });
+
+    final bestReceiverUid = receiverUids.reduce((best, current) {
+      if (this.balance[uid]![current]! > this.balance[uid]![best]!) {
+        return current;
+      }
+
+      return best;
+    });
+
+    return (bestOwerUid, bestReceiverUid);
+  }
+
+  /// returns owerPaymentAmount, authorPaymentAmount and redirectedBalance as a tuple
+  (double, double, double) redirect({
+    required String authorUid,
+    required String owerUid,
+    required String receiverUid,
+  }) {
+    final (newOwerDebt, newAuthorDebt, redirectedDebt) = this.estimateRedirect(
+      authorUid: authorUid,
+      owerUid: owerUid,
+      receiverUid: receiverUid,
+    );
+
+    final owerPaymentAmount = this.balance[owerUid]![authorUid]! - newOwerDebt;
+    this.balance[owerUid]![authorUid] = newOwerDebt;
+    this.balance[authorUid]![owerUid] = -newOwerDebt;
+
+    final authorPaymentAmount =
+        this.balance[authorUid]![receiverUid]! - newAuthorDebt;
+    this.balance[authorUid]![receiverUid] = newAuthorDebt;
+    this.balance[receiverUid]![authorUid] = -newAuthorDebt;
+
+    this.balance[owerUid]![receiverUid] =
+        this.balance[owerUid]![receiverUid]! + redirectedDebt;
+    this.balance[receiverUid]![owerUid] =
+        this.balance[receiverUid]![owerUid]! - redirectedDebt;
+
+    return (owerPaymentAmount, authorPaymentAmount, redirectedDebt);
+  }
+
+  List<String> getMembersThatOweToUser(String uid) {
+    return this
+        .balance
+        .keys
+        .where((otherUid) => (this.balance[otherUid]![uid] ?? 0) > 0)
+        .toList();
+  }
+
+  List<String> getMembersThatUserOwesTo(String uid) {
+    return this
+        .balance
+        .keys
+        .where((otherUid) => (this.balance[uid]![otherUid] ?? 0) > 0)
+        .toList();
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -161,6 +268,7 @@ class Group {
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
       'defaultExpenseSettings': defaultExpenseSettings.toFirestore(),
+      'supportsDebtRedirection': supportsDebtRedirection,
     };
   }
 
@@ -194,6 +302,7 @@ class Group {
       defaultExpenseSettings: map['defaultExpenseSettings'] == null
           ? null
           : ExpenseSettings.fromFirestore(map['defaultExpenseSettings']),
+      supportsDebtRedirection: map['supportsDebtRedirection'] ?? false,
     );
   }
 }

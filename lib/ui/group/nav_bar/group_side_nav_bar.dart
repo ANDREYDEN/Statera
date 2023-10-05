@@ -16,10 +16,15 @@ class GroupSideNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NavigationRail(
+      extended: true,
+      selectedLabelTextStyle: Theme.of(context)
+          .textTheme
+          .bodyMedium!
+          .copyWith(fontWeight: FontWeight.bold),
       destinations: items
           .map((item) => NavigationRailDestination(
                 icon: item.wrapper(Icon(item.icon)),
-                label: item.wrapper(Text(item.label)),
+                label: Text(item.label),
                 selectedIcon: Icon(item.activeIcon),
               ))
           .toList(),
