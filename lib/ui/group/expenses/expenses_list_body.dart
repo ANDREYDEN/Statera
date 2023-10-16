@@ -19,9 +19,9 @@ class ExpensesListBody extends StatelessWidget {
 
     const loadingThreshold = 200.0;
     scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent -
-              scrollController.position.pixels <
-          loadingThreshold) {
+      final distanceToBottom = scrollController.position.maxScrollExtent -
+          scrollController.position.pixels;
+      if (distanceToBottom < loadingThreshold) {
         context.read<ExpensesCubit>().loadMore(authBloc.uid);
       }
     });
@@ -33,9 +33,13 @@ class ExpensesListBody extends StatelessWidget {
         }
 
         return ListView.separated(
-          itemCount: expenses.length,
+          itemCount: expenses.length + 1,
           controller: scrollController,
           itemBuilder: (context, index) {
+            if (index == expenses.length && !allLoaded) {
+              return Center(child: CircularProgressIndicator());
+            }
+
             var expense = expenses[index];
 
             return OptionallyDismissible(
