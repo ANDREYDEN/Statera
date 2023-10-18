@@ -7,8 +7,13 @@ extension StreamExtensions<T> on Stream<T> {
     StreamController<T> resultStreamController = StreamController<T>();
 
     listen((event) {
-      lastEvent = event;
-      throttleTimer ??= Timer(
+      if (throttleTimer != null) {
+        lastEvent = event;
+        return;
+      }
+
+      resultStreamController.add(event);
+      throttleTimer = Timer(
         duration,
         () {
           throttleTimer = null;

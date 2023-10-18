@@ -26,7 +26,7 @@ class ExpensesLoaded extends ExpensesState {
       .toList();
 
   @override
-  List<Object> get props => [filteredExpenses];
+  List<Object> get props => [filteredExpenses, allLoaded];
 }
 
 /// After the expenses were loaded; whenever the list is changing (creates, updates)

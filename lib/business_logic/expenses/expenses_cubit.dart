@@ -28,24 +28,20 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
-        .map((expenses) {
-          return ExpensesLoaded(
-            expenses: expenses,
-            stages: Expense.expenseStages(userId),
-            allLoaded: expenses.length < numberOfExpenses,
-          );
-        })
+        .map((expenses) => ExpensesLoaded(
+              expenses: expenses,
+              stages: Expense.expenseStages(userId),
+              allLoaded: expenses.length < numberOfExpenses,
+            ))
         .throttle(Duration(milliseconds: 200))
         .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
-  void loadMore(String userId) {
-    final currentState = state;
-    if (currentState is ExpensesLoaded) {
+  void loadMore(String userId) async {
+    if (state case final ExpensesLoaded currentState) {
       if (currentState.allLoaded) return;
 
       final groupId = currentState.expenses.first.groupId;
-      print('loading more');
       load(
         userId,
         groupId,

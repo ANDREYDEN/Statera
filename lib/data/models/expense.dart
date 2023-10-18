@@ -37,6 +37,13 @@ class Expense {
     this.settings = settings ?? ExpenseSettings();
   }
 
+  Expense.empty({String? groupId})
+      : this(
+          name: 'Empty',
+          authorUid: '',
+          groupId: groupId,
+        );
+
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
     if (other.date == null) return false;
@@ -190,14 +197,14 @@ class Expense {
 
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
-  // TODO: move to a cloud function
   Map<String, int> get memberStages {
     final uids = [...assigneeUids];
     if (!uids.contains(authorUid)) uids.add(authorUid);
 
     final Map<String, int> result = {};
     for (var uid in uids) {
-      final stageIndex = Expense.expenseStages(uid).indexWhere((stage) => stage.test(this));
+      final stageIndex =
+          Expense.expenseStages(uid).indexWhere((stage) => stage.test(this));
       result[uid] = stageIndex;
     }
     return result;
@@ -287,5 +294,10 @@ class Expense {
         date.hashCode ^
         finalizedDate.hashCode ^
         settings.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Expense "$name"';
   }
 }
