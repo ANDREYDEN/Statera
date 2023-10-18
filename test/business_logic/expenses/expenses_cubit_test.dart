@@ -14,7 +14,7 @@ void main() {
   final uid = 'testUserId';
   final groupId = 'testGroupId';
   final expenses = List.generate(
-    15,
+    25,
     (index) => Expense(
       name: 'Expense $index',
       authorUid: uid,
@@ -54,11 +54,6 @@ void main() {
     );
 
     final firstExpenses = expenses.take(ExpensesCubit.expensesPerPage).toList();
-    final secondExpenses = expenses.sublist(
-      ExpensesCubit.expensesPerPage,
-      ExpensesCubit.expensesPerPage + 3,
-    );
-    
     blocTest(
       'can load more expenses',
       setUp: () {
@@ -70,7 +65,9 @@ void main() {
         )).thenAnswer((_) {
           return [
             Stream.fromIterable([firstExpenses]),
-            Stream.fromIterable([secondExpenses])
+            Stream.fromIterable(
+              [expenses.take(ExpensesCubit.expensesPerPage + 3).toList()],
+            )
           ][invocation++];
         });
       },
@@ -87,7 +84,7 @@ void main() {
           allLoaded: false,
         ),
         ExpensesLoaded(
-          expenses: secondExpenses,
+          expenses: expenses.take(ExpensesCubit.expensesPerPage + 3).toList(),
           stages: Expense.expenseStages(uid),
           allLoaded: true,
         ),
@@ -98,6 +95,59 @@ void main() {
           groupId,
           quantity: anyNamed('quantity'),
         )).called(2);
+      },
+    );
+
+    final secondExpenses =
+        expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
+
+    blocTest(
+      'sets allLoaded to true if the total number of expenses is divisible by page size',
+      setUp: () {
+        int invocation = 0;
+        when(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+        )).thenAnswer((_) {
+          return [
+            Stream.fromIterable([firstExpenses]),
+            Stream.fromIterable([secondExpenses]),
+            Stream.fromIterable([secondExpenses]),
+          ][invocation++];
+        });
+      },
+      build: () => expensesCubit,
+      act: (ExpensesCubit cubit) async {
+        cubit.load(uid, groupId);
+        await Future.delayed(0.5.seconds);
+        cubit.loadMore(uid);
+        await Future.delayed(0.5.seconds);
+        cubit.loadMore(uid);
+      },
+      expect: () => [
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: Expense.expenseStages(uid),
+          allLoaded: false,
+        ),
+        ExpensesLoaded(
+          expenses: secondExpenses,
+          stages: Expense.expenseStages(uid),
+          allLoaded: false,
+        ),
+        ExpensesLoaded(
+          expenses: secondExpenses,
+          stages: Expense.expenseStages(uid),
+          allLoaded: true,
+        ),
+      ],
+      verify: (_) {
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+        )).called(3);
       },
     );
   });
