@@ -17,7 +17,7 @@ class ExpensesListBody extends StatelessWidget {
     final scrollController = ScrollController();
     final isWide = context.select((LayoutState state) => state.isWide);
 
-    const loadingThreshold = 200.0;
+    const loadingThreshold = 20.0;
     scrollController.addListener(() {
       final distanceToBottom = scrollController.position.maxScrollExtent -
           scrollController.position.pixels;
@@ -36,7 +36,8 @@ class ExpensesListBody extends StatelessWidget {
           itemCount: expenses.length + 1,
           controller: scrollController,
           itemBuilder: (context, index) {
-            if (index == expenses.length && !allLoaded) {
+            if (index == expenses.length) {
+              if (allLoaded) return SizedBox.shrink();
               return Center(child: CircularProgressIndicator());
             }
 
