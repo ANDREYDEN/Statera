@@ -55,7 +55,8 @@ Future<void> customPump(
   when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
-  when(defaultExpenseService.listenForRelatedExpenses(any, any, quantity: anyNamed('quantity')))
+  when(defaultExpenseService.listenForRelatedExpenses(any, any,
+          quantity: anyNamed('quantity')))
       .thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
   when(defaultGroupService.groupStream(any))
       .thenAnswer((_) => Stream.fromIterable([group]));
@@ -79,10 +80,10 @@ Future<void> customPump(
                 )..load((group ?? defaultGroup).id)),
         BlocProvider(
           create: (context) => ExpensesCubit(
+            (group ?? defaultGroup).id,
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
-          )..load(currentUserId ?? defaultCurrentUserId,
-              (group ?? defaultGroup).id),
+          )..load(currentUserId ?? defaultCurrentUserId),
         ),
         BlocProvider(
             create: (context) => AuthBloc(authService ?? defaultAuthService))

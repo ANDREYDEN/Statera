@@ -12,17 +12,23 @@ class ExpenseService extends Firestore {
     String uid,
     String? groupId, {
     int? quantity,
+    List<int>? stageIndexes,
   }) {
+    var filter = Filter.and(
+      Filter('groupId', isEqualTo: groupId),
+      Filter.or(
+        Filter('authorUid', isEqualTo: uid),
+        Filter('assigneeIds', arrayContains: uid),
+      ),
+    );
+    if (stageIndexes != null) {
+      filter = Filter.and(
+        filter,
+        Filter('memberStages.$uid', whereIn: stageIndexes),
+      );
+    }
     var query = expensesCollection
-        .where(
-          Filter.and(
-            Filter('groupId', isEqualTo: groupId),
-            Filter.or(
-              Filter('authorUid', isEqualTo: uid),
-              Filter('assigneeIds', arrayContains: uid),
-            ),
-          ),
-        )
+        .where(filter)
         .orderBy('memberStages.$uid')
         .orderBy('date', descending: true);
     if (quantity != null) {
@@ -90,13 +96,13 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> finalizeExpense(Expense expense) async {
-    await expensesCollection
-        .doc(expense.id)
-        .update({'finalizedDate': Timestamp.now()});
+    expense.finalizedDate = Timestamp.now().toDate();
+    await updateExpense(expense);
   }
 
   Future<void> revertExpense(Expense expense) async {
-    await expensesCollection.doc(expense.id).update({'finalizedDate': null});
+    expense.finalizedDate = null;
+    await updateExpense(expense);
   }
 
   Future<void> deleteExpense(Expense expense) {

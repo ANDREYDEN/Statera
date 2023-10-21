@@ -10,9 +10,10 @@ import 'package:statera/data/services/group_service.mocks.dart';
 void main() {
   late final expenseService = MockExpenseService();
   late final groupService = MockGroupService();
-  ExpensesCubit expensesCubit = ExpensesCubit(expenseService, groupService);
-  final uid = 'testUserId';
   final groupId = 'testGroupId';
+  final uid = 'testUserId';
+  ExpensesCubit expensesCubit =
+      ExpensesCubit(groupId, expenseService, groupService);
   final expenses = List.generate(
     25,
     (index) => Expense(
@@ -24,7 +25,7 @@ void main() {
 
   group('ExpensesCubit', () {
     setUp(() async {
-      expensesCubit = ExpensesCubit(expenseService, groupService);
+      expensesCubit = ExpensesCubit(groupId, expenseService, groupService);
     });
 
     test(
@@ -42,7 +43,7 @@ void main() {
         )).thenAnswer((_) => Stream.fromIterable([[]]));
       },
       build: () => expensesCubit,
-      act: (ExpensesCubit cubit) => cubit.load('testUserId', 'testGroupId'),
+      act: (ExpensesCubit cubit) => cubit.load(uid),
       expect: () => [isA<ExpensesLoaded>()],
       verify: (_) {
         verify(expenseService.listenForRelatedExpenses(
@@ -73,7 +74,7 @@ void main() {
       },
       build: () => expensesCubit,
       act: (ExpensesCubit cubit) async {
-        cubit.load(uid, groupId);
+        cubit.load(uid);
         await Future.delayed(0.5.seconds);
         cubit.loadMore(uid);
       },
@@ -119,7 +120,7 @@ void main() {
       },
       build: () => expensesCubit,
       act: (ExpensesCubit cubit) async {
-        cubit.load(uid, groupId);
+        cubit.load(uid);
         await Future.delayed(0.5.seconds);
         cubit.loadMore(uid);
         await Future.delayed(0.5.seconds);
