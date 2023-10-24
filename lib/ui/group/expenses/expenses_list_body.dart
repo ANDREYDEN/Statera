@@ -22,7 +22,7 @@ class ExpensesListBody extends StatelessWidget {
       final distanceToBottom = scrollController.position.maxScrollExtent -
           scrollController.position.pixels;
       if (distanceToBottom < loadingThreshold) {
-        context.read<ExpensesCubit>().loadMore(authBloc.uid);
+        context.read<ExpensesCubit>().loadMore();
       }
     });
 

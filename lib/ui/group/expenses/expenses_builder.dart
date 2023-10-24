@@ -38,7 +38,7 @@ class ExpensesBuilder extends StatelessWidget {
                   dimension: 16,
                   child: Loader(),
                 ),
-              Expanded(child: builder(groupContext, state.filteredExpenses, state.allLoaded))
+              Expanded(child: builder(groupContext, state.expenses, state.allLoaded))
             ],
           );
         }

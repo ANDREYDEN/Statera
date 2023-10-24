@@ -10,59 +10,55 @@ part 'expenses_state.dart';
 
 class ExpensesCubit extends Cubit<ExpensesState> {
   late final String? _groupId;
+  late final String _userId;
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
   ExpensesCubit(
-      String? groupId, ExpenseService expenseService, GroupService groupService)
-      : super(ExpensesLoading()) {
+    String? groupId,
+    String userId,
+    ExpenseService expenseService,
+    GroupService groupService,
+  ) : super(ExpensesLoading()) {
     _expenseService = expenseService;
     _groupService = groupService;
     _groupId = groupId;
+    _userId = userId;
   }
 
-  void load(
-    String userId, {
+  void load({
     int numberOfExpenses = expensesPerPage,
-    List<String>? stageNames,
+    List<ExpenseStage>? expenseStages,
   }) {
-    final allStages = Expense.expenseStages(userId);
-    final stageIndexes = stageNames == null
-        ? null
-        : stageNames
-            .map((stageName) =>
-                allStages.indexWhere((stage) => stage.name == stageName))
-            .toList();
+    final selectedStages = expenseStages ?? Expense.expenseStages(_userId);
+    final stageValues = selectedStages.map((s) => s.value).toList();
+
     _expensesSubscription?.cancel();
     _expensesSubscription = _expenseService
         .listenForRelatedExpenses(
-          userId,
+          _userId,
           _groupId,
           quantity: numberOfExpenses,
-          stageIndexes: stageIndexes,
+          stages: stageValues,
         )
         .map((expenses) => ExpensesLoaded(
               expenses: expenses,
-              stages: Expense.expenseStages(userId),
+              stages: expenseStages ?? Expense.expenseStages(_userId),
               allLoaded: expenses.length < numberOfExpenses,
             ))
         .throttle(Duration(milliseconds: 200))
         .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
-  void loadMore(String userId) async {
+  void loadMore() async {
     if (state case final ExpensesLoaded currentState) {
       if (currentState.allLoaded) return;
 
       emit(ExpensesProcessing.fromLoaded(currentState));
-      await Future.delayed(Duration(seconds: 2));
       print('loading more...');
-      load(
-        userId,
-        numberOfExpenses: currentState.expenses.length + expensesPerPage,
-      );
+      load(numberOfExpenses: currentState.expenses.length + expensesPerPage);
     }
   }
 
@@ -89,10 +85,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     return null;
   }
 
-  void selectExpenseStages(String uid, List<String> stageNames) {
+  void selectExpenseStages(List<ExpenseStage> expenseStages) {
     if (state case final ExpensesLoaded currentState) {
       emit(ExpensesProcessing.fromLoaded(currentState));
-      load(uid, stageNames: stageNames);
+      load(expenseStages: expenseStages);
     }
   }
 

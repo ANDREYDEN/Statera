@@ -13,16 +13,17 @@ class ExpenseListFilters extends StatefulWidget {
 }
 
 class _ExpenseListFiltersState extends State<ExpenseListFilters> {
-  List<String> _filters = [];
+  List<ExpenseStage> _selectedStages = [];
 
   AuthBloc get authBloc => context.read<AuthBloc>();
   ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
+  List<String> get _stageNames => _selectedStages.map((s) => s.name).toList();
 
   @override
   void initState() {
     super.initState();
-    _filters =
-        Expense.expenseStages(authBloc.uid).map((stage) => stage.name).toList();
+    _selectedStages =
+        Expense.expenseStages(authBloc.uid);
   }
 
   @override
@@ -34,17 +35,17 @@ class _ExpenseListFiltersState extends State<ExpenseListFilters> {
             child: CustomFilterChip(
               label: stage.name,
               color: stage.color,
-              filtersList: _filters,
+              filtersList: _stageNames,
               onSelected: (selected) {
                 setState(() {
                   if (selected) {
-                    _filters.add(stage.name);
+                    _selectedStages.add(stage);
                   } else {
-                    _filters.remove(stage.name);
+                    _selectedStages.remove(stage);
                   }
                 });
 
-                expensesCubit.selectExpenseStages(authBloc.uid, _filters);
+                expensesCubit.selectExpenseStages(_selectedStages);
               },
             ),
           )

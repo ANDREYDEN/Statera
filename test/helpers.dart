@@ -81,9 +81,10 @@ Future<void> customPump(
         BlocProvider(
           create: (context) => ExpensesCubit(
             (group ?? defaultGroup).id,
+            defaultCurrentUserId,
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
-          )..load(currentUserId ?? defaultCurrentUserId),
+          )..load(),
         ),
         BlocProvider(
             create: (context) => AuthBloc(authService ?? defaultAuthService))

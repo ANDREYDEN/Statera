@@ -64,10 +64,10 @@ final List<PagePath> _paths = [
         BlocProvider(
           create: (context) => ExpensesCubit(
             matches?[0],
+            context.read<AuthBloc>().uid,
             context.read<ExpenseService>(),
             context.read<GroupService>(),
           )..load(
-              context.read<AuthBloc>().uid,
               numberOfExpenses:
                   context.read<FeatureService>().useDynamicExpenseLoading
                       ? ExpensesCubit.expensesPerPage

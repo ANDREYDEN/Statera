@@ -12,7 +12,7 @@ class ExpenseService extends Firestore {
     String uid,
     String? groupId, {
     int? quantity,
-    List<int>? stageIndexes,
+    List<int>? stages,
   }) {
     var filter = Filter.and(
       Filter('groupId', isEqualTo: groupId),
@@ -21,10 +21,10 @@ class ExpenseService extends Firestore {
         Filter('assigneeIds', arrayContains: uid),
       ),
     );
-    if (stageIndexes != null) {
+    if (stages != null) {
       filter = Filter.and(
         filter,
-        Filter('memberStages.$uid', whereIn: stageIndexes),
+        Filter('memberStages.$uid', whereIn: stages),
       );
     }
     var query = expensesCollection

@@ -13,7 +13,7 @@ void main() {
   final groupId = 'testGroupId';
   final uid = 'testUserId';
   ExpensesCubit expensesCubit =
-      ExpensesCubit(groupId, expenseService, groupService);
+      ExpensesCubit(groupId, uid, expenseService, groupService);
   final expenses = List.generate(
     25,
     (index) => Expense(
@@ -25,7 +25,7 @@ void main() {
 
   group('ExpensesCubit', () {
     setUp(() async {
-      expensesCubit = ExpensesCubit(groupId, expenseService, groupService);
+      expensesCubit = ExpensesCubit(groupId, uid, expenseService, groupService);
     });
 
     test(
@@ -40,16 +40,18 @@ void main() {
           uid,
           groupId,
           quantity: anyNamed('quantity'),
+          stages: anyNamed('stages'),
         )).thenAnswer((_) => Stream.fromIterable([[]]));
       },
       build: () => expensesCubit,
-      act: (ExpensesCubit cubit) => cubit.load(uid),
+      act: (ExpensesCubit cubit) => cubit.load(),
       expect: () => [isA<ExpensesLoaded>()],
       verify: (_) {
         verify(expenseService.listenForRelatedExpenses(
           uid,
           groupId,
           quantity: ExpensesCubit.expensesPerPage,
+          stages: anyNamed('stages'),
         )).called(1);
       },
     );
@@ -63,6 +65,7 @@ void main() {
           uid,
           groupId,
           quantity: anyNamed('quantity'),
+          stages: anyNamed('stages'),
         )).thenAnswer((_) {
           return [
             Stream.fromIterable([firstExpenses]),
@@ -74,15 +77,22 @@ void main() {
       },
       build: () => expensesCubit,
       act: (ExpensesCubit cubit) async {
-        cubit.load(uid);
+        cubit.load();
         await Future.delayed(0.5.seconds);
-        cubit.loadMore(uid);
+        cubit.loadMore();
       },
       expect: () => [
         ExpensesLoaded(
           expenses: firstExpenses,
           stages: Expense.expenseStages(uid),
           allLoaded: false,
+        ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: Expense.expenseStages(uid),
+            allLoaded: false,
+          ),
         ),
         ExpensesLoaded(
           expenses: expenses.take(ExpensesCubit.expensesPerPage + 3).toList(),
@@ -94,8 +104,15 @@ void main() {
         verify(expenseService.listenForRelatedExpenses(
           uid,
           groupId,
-          quantity: anyNamed('quantity'),
-        )).called(2);
+          quantity: ExpensesCubit.expensesPerPage,
+          stages: anyNamed('stages'),
+        )).called(1);
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: ExpensesCubit.expensesPerPage * 2,
+          stages: anyNamed('stages'),
+        )).called(1);
       },
     );
 
@@ -110,6 +127,7 @@ void main() {
           uid,
           groupId,
           quantity: anyNamed('quantity'),
+          stages: anyNamed('stages'),
         )).thenAnswer((_) {
           return [
             Stream.fromIterable([firstExpenses]),
@@ -120,11 +138,11 @@ void main() {
       },
       build: () => expensesCubit,
       act: (ExpensesCubit cubit) async {
-        cubit.load(uid);
+        cubit.load();
         await Future.delayed(0.5.seconds);
-        cubit.loadMore(uid);
+        cubit.loadMore();
         await Future.delayed(0.5.seconds);
-        cubit.loadMore(uid);
+        cubit.loadMore();
       },
       expect: () => [
         ExpensesLoaded(
@@ -132,10 +150,24 @@ void main() {
           stages: Expense.expenseStages(uid),
           allLoaded: false,
         ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: Expense.expenseStages(uid),
+            allLoaded: false,
+          ),
+        ),
         ExpensesLoaded(
           expenses: secondExpenses,
           stages: Expense.expenseStages(uid),
           allLoaded: false,
+        ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: secondExpenses,
+            stages: Expense.expenseStages(uid),
+            allLoaded: false,
+          ),
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
@@ -147,8 +179,80 @@ void main() {
         verify(expenseService.listenForRelatedExpenses(
           uid,
           groupId,
+          quantity: ExpensesCubit.expensesPerPage,
+          stages: anyNamed('stages'),
+        )).called(1);
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: ExpensesCubit.expensesPerPage * 2,
+          stages: anyNamed('stages'),
+        )).called(1);
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: ExpensesCubit.expensesPerPage * 3,
+          stages: anyNamed('stages'),
+        )).called(1);
+      },
+    );
+
+    final allStages = Expense.expenseStages(uid);
+    final selectedStages = allStages.take(2).toList();
+    blocTest(
+      'can change expense stages',
+      setUp: () {
+        int invocation = 0;
+        when(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
           quantity: anyNamed('quantity'),
-        )).called(3);
+          stages: anyNamed('stages'),
+        )).thenAnswer((_) {
+          return [
+            Stream.fromIterable([firstExpenses]),
+            Stream.fromIterable([secondExpenses]),
+          ][invocation++];
+        });
+      },
+      build: () => expensesCubit,
+      act: (ExpensesCubit cubit) async {
+        cubit.load();
+        await Future.delayed(0.5.seconds);
+        cubit.selectExpenseStages(selectedStages);
+      },
+      expect: () => [
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: Expense.expenseStages(uid),
+          allLoaded: false,
+        ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: Expense.expenseStages(uid),
+            allLoaded: false,
+          ),
+        ),
+        ExpensesLoaded(
+          expenses: secondExpenses,
+          stages: selectedStages,
+          allLoaded: false,
+        ),
+      ],
+      verify: (_) {
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+          stages: allStages.map((e) => e.value).toList(),
+        )).called(1);
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+          stages: selectedStages.map((e) => e.value).toList(),
+        )).called(1);
       },
     );
   });

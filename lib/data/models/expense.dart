@@ -1,18 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 
-class ExpenseStage {
-  String name;
-  Color color;
-  bool Function(Expense) test;
+class ExpenseStage extends Equatable {
+  final String name;
+  final Color color;
+  final bool Function(Expense) test;
+  /// Used for numerical representation of the stage in the DB
+  final int value;
 
   ExpenseStage({
     required this.name,
     required this.color,
     required this.test,
+    required this.value,
   });
+  
+  @override
+  List<Object?> get props => [name, color, value];
+
+  @override
+  String toString() {
+    return 'ExpenseStage "$name - $value"';
+  }
 }
 
 class Expense {
@@ -88,11 +100,13 @@ class Expense {
   static List<ExpenseStage> expenseStages(String uid) {
     return [
       ExpenseStage(
+        value: 0,
         name: 'Not Marked',
         color: Colors.red[200]!,
         test: (expense) => expense.hasAssignee(uid) && !expense.isMarkedBy(uid),
       ),
       ExpenseStage(
+        value: 1,
         name: 'Pending',
         color: Colors.yellow[300]!,
         test: (expense) =>
@@ -100,6 +114,7 @@ class Expense {
             !expense.finalized,
       ),
       ExpenseStage(
+        value: 2,
         name: 'Finalized',
         color: Colors.grey[400]!,
         test: (expense) => expense.finalized,
