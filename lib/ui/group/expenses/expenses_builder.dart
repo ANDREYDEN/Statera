@@ -34,11 +34,13 @@ class ExpensesBuilder extends StatelessWidget {
           return Column(
             children: [
               if (state is ExpensesProcessing)
-                SizedBox.square(
-                  dimension: 16,
-                  child: Loader(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: LinearProgressIndicator(),
                 ),
-              Expanded(child: builder(groupContext, state.expenses, state.allLoaded))
+              Expanded(
+                child: builder(groupContext, state.expenses, state.allLoaded),
+              )
             ],
           );
         }
