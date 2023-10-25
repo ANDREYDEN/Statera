@@ -58,7 +58,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
       emit(ExpensesProcessing.fromLoaded(currentState));
       print('loading more...');
-      load(numberOfExpenses: currentState.expenses.length + expensesPerPage);
+      load(
+        numberOfExpenses: currentState.expenses.length + expensesPerPage,
+        expenseStages: currentState.stages,
+      );
     }
   }
 

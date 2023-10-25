@@ -116,7 +116,7 @@ void main() {
       },
     );
 
-    final secondExpenses =
+    var secondExpenses =
         expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
 
     blocTest(
@@ -253,6 +253,82 @@ void main() {
           quantity: anyNamed('quantity'),
           stages: selectedStages.map((e) => e.value).toList(),
         )).called(1);
+      },
+    );
+
+    secondExpenses =
+        expenses.skip(5).take(ExpensesCubit.expensesPerPage).toList();
+    var thirdExpenses =
+        expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
+    blocTest(
+      'loading more keeps the selected expense stages',
+      setUp: () {
+        int invocation = 0;
+        when(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+          stages: anyNamed('stages'),
+        )).thenAnswer((_) {
+          return [
+            Stream.fromIterable([firstExpenses]),
+            Stream.fromIterable([secondExpenses]),
+            Stream.fromIterable([thirdExpenses]),
+          ][invocation++];
+        });
+      },
+      build: () => expensesCubit,
+      act: (ExpensesCubit cubit) async {
+        cubit.load();
+        await Future.delayed(0.5.seconds);
+        cubit.selectExpenseStages(selectedStages);
+        await Future.delayed(0.5.seconds);
+        cubit.loadMore();
+      },
+      expect: () => [
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: Expense.expenseStages(uid),
+          allLoaded: false,
+        ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: Expense.expenseStages(uid),
+            allLoaded: false,
+          ),
+        ),
+        ExpensesLoaded(
+          expenses: secondExpenses,
+          stages: selectedStages,
+          allLoaded: false,
+        ),
+        ExpensesProcessing.fromLoaded(
+          ExpensesLoaded(
+            expenses: secondExpenses,
+            stages: selectedStages,
+            allLoaded: false,
+          ),
+        ),
+        ExpensesLoaded(
+          expenses: thirdExpenses,
+          stages: selectedStages,
+          allLoaded: false,
+        ),
+      ],
+      verify: (_) {
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+          stages: allStages.map((e) => e.value).toList(),
+        )).called(1);
+        verify(expenseService.listenForRelatedExpenses(
+          uid,
+          groupId,
+          quantity: anyNamed('quantity'),
+          stages: selectedStages.map((e) => e.value).toList(),
+        )).called(2);
       },
     );
   });
