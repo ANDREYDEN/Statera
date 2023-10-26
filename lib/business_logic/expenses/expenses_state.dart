@@ -21,6 +21,11 @@ class ExpensesLoaded extends ExpensesState {
     this.allLoaded = false,
   }) : expenses = expenses;
 
+  bool stagesAreDifferentFrom(ExpensesLoaded other) {
+    return stages.length != other.stages.length ||
+        stages.any((stage) => !other.stages.contains(stage));
+  }
+
   @override
   List<Object> get props => [expenses, allLoaded, stages];
 }

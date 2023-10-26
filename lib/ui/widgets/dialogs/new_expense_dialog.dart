@@ -60,6 +60,12 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
     if (_nameIsValid && _pickedValidAssignees) {
       _newExpense.name = _nameController.text;
       _newExpense.updateAssignees(_memberController.value);
+      for (var i = 0; i < 15; i++) {
+        await expensesCubit.addExpense(
+          _newExpense,
+          groupCubit.loadedState.group.id,
+        );
+      }
       final newExpenseId = await expensesCubit.addExpense(
         _newExpense,
         groupCubit.loadedState.group.id,

@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class ExpensesBuilder extends StatelessWidget {
-  final Widget Function(BuildContext, List<Expense>, bool) builder;
+  final Widget Function(BuildContext, ExpensesLoaded) builder;
   final Widget Function(BuildContext, ExpensesError)? errorBuilder;
   final Widget? loadingWidget;
+  final void Function(BuildContext, ExpensesState)? onStagesChanged;
+  final bool renderExpensesProcessing;
 
   const ExpensesBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.loadingWidget,
+    this.onStagesChanged,
+    this.renderExpensesProcessing = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExpensesCubit, ExpensesState>(
+    return BlocConsumer<ExpensesCubit, ExpensesState>(
+      listenWhen: (previous, current) =>
+          (previous is ExpensesLoaded && current is ExpensesLoaded) &&
+          previous.stagesAreDifferentFrom(current),
+      listener: onStagesChanged ?? (_, __) {},
       builder: (groupContext, state) {
         if (state is ExpensesLoading) {
           return loadingWidget ?? Center(child: Loader());
@@ -31,6 +38,10 @@ class ExpensesBuilder extends StatelessWidget {
         }
 
         if (state is ExpensesLoaded) {
+          if (!renderExpensesProcessing) {
+            return builder(groupContext, state);
+          }
+
           return Column(
             children: [
               if (state is ExpensesProcessing)
@@ -38,9 +49,7 @@ class ExpensesBuilder extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: LinearProgressIndicator(),
                 ),
-              Expanded(
-                child: builder(groupContext, state.expenses, state.allLoaded),
-              )
+              Expanded(child: builder(groupContext, state))
             ],
           );
         }
