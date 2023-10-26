@@ -7,56 +7,29 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    // const groupId = '0i9Ni8Bz5qUk7yBIj5Cu'
-    const groupId = 'Kc052CgJBU4VNyBxpxCQ'
-    const groupReference = await db.collection('groups').doc(groupId).get()
-    const group = groupReference.data()
+    // const expenseDocs = await db.collection('expenses').get()
+    const expenses = await db.collection('expenses').get()
+    console.log(`Found ${expenses.docs.length} expenses...`);
 
-    const expenseId = '6SMoDPBvcyNU6X8gJ7zf'
-    const expenseReference = await db.collection('expenses').doc(expenseId).get()
-    const expense = expenseReference.data()
+    for (const expenseDoc of expenses.docs) {
+        console.log(`Updating expense ${expenseDoc.id}...`);
+        try {
+            const expense = expenseDoc.data()
 
-    const authorId = expense.authorUid
-    for (const assigneeId of expense.assigneeIds) {
-        if (assigneeId == authorId) continue
+            expense.memberStages = expense.assigneeIds.reduce(
+                (stages, assigneeId) => ({
+                    ...stages,
+                    [assigneeId]: calculateStage(expense, assigneeId)
+                }),
+                {}
+            )
 
-        const payments = await getPayments(groupId, authorId, assigneeId)
-
-        const previousDebt = payments
-            .find(p => p.relatedExpense?.id === expenseId)
-            .value
-
-        const currantDebt = getTotalDebt(expense, assigneeId)
-
-        const paymentValueDifferenceByAuthor = currantDebt - previousDebt
-        const payerId = paymentValueDifferenceByAuthor > 0 ? authorId : assigneeId
-        const receiverId = paymentValueDifferenceByAuthor > 0 ? assigneeId : authorId
-
-        const payment = createPayment(
-            Math.abs(paymentValueDifferenceByAuthor),
-            `Debt adjustment for expense "${expense.name}"`,
-            payerId,
-            receiverId,
-            group,
-            groupId
-        )
-
-        group.balance[receiverId][payerId] += Math.abs(paymentValueDifferenceByAuthor)
-        group.balance[payerId][receiverId] -= Math.abs(paymentValueDifferenceByAuthor)
-
-        console.log(payment);
-        await db.collection('payments').add(payment)
+            // console.log(expense);
+            await expenseDoc.ref.set(expense)
+        } catch (error) {
+            console.log(`Could not update expense ${expenseDoc.id}: `, error);
+        }
     }
-
-    console.log('new group: ', group);
-    await groupReference.ref.set(group)
-
-    // const userId = 'VVcVfnsRNqbZtvW4NG173yMfxd72'
-    // const userReference = await db.collection('users').doc(userId).get()
-    // const user = {
-    //     uid: userId,
-    //     ...userReference.data()
-    // }
 })();
 
 function addUserToGroup(group, user) {
@@ -207,4 +180,12 @@ async function getPayments(groupId, fromId, toId) {
         .get()
 
     return payments.docs.map(p => p.data())
+}
+
+function calculateStage(expense, assigneeId) {
+    if (expense.finalizedDate != null) return 2
+
+    if (expense.unmarkedAssigneeIds.includes(assigneeId)) return 0
+
+    return 1
 }
