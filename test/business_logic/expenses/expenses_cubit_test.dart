@@ -256,7 +256,7 @@ void main() {
       },
     );
 
-    secondExpenses =
+    var withoutFirstFive =
         expenses.skip(5).take(ExpensesCubit.expensesPerPage).toList();
     var thirdExpenses =
         expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
@@ -272,7 +272,7 @@ void main() {
         )).thenAnswer((_) {
           return [
             Stream.fromIterable([firstExpenses]),
-            Stream.fromIterable([secondExpenses]),
+            Stream.fromIterable([withoutFirstFive]),
             Stream.fromIterable([thirdExpenses]),
           ][invocation++];
         });
@@ -299,13 +299,13 @@ void main() {
           ),
         ),
         ExpensesLoaded(
-          expenses: secondExpenses,
+          expenses: withoutFirstFive,
           stages: selectedStages,
           allLoaded: false,
         ),
         ExpensesProcessing.fromLoaded(
           ExpensesLoaded(
-            expenses: secondExpenses,
+            expenses: withoutFirstFive,
             stages: selectedStages,
             allLoaded: false,
           ),
