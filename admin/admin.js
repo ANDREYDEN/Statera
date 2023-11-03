@@ -7,7 +7,6 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    // const expenseDocs = await db.collection('expenses').get()
     const expenses = await db.collection('expenses').get()
     console.log(`Found ${expenses.docs.length} expenses...`);
 
@@ -15,17 +14,27 @@ const auth = admin.auth();
         console.log(`Updating expense ${expenseDoc.id}...`);
         try {
             const expense = expenseDoc.data()
-
-            expense.memberStages = expense.assigneeIds.reduce(
-                (stages, assigneeId) => ({
-                    ...stages,
-                    [assigneeId]: calculateStage(expense, assigneeId)
-                }),
-                {}
-            )
+            for (const assigneeId of expense.assigneeIds) {
+                const stage = calculateStage(expense, assigneeId)
+                await db.collection('users').doc(assigneeId)
+                    .collection('expenses').doc(expenseDoc.id)
+                    .set({
+                        authorUid: expense.authorUid, 
+                        groupId: expense.groupId,
+                        name: expense.name,
+                        itemQuantity: expense.items.length,
+                        date: expense.date,
+                        // TODO: define these fields
+                        stage,
+                        canBeFinalized,
+                        total,
+                        confirmedTotal,
+                        hasItemsDeniedByAll
+                    })
+            }
 
             // console.log(expense);
-            await expenseDoc.ref.set(expense)
+            // await expenseDoc.ref.set(expense)
         } catch (error) {
             console.log(`Could not update expense ${expenseDoc.id}: `, error);
         }

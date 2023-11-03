@@ -62,7 +62,7 @@ class ExpensesListBody extends StatelessWidget {
                   'Are you sure you want to delete this expense and all of its items?',
               onDismissed: (_) =>
                   context.read<ExpensesCubit>().deleteExpense(expense),
-              child: ExpenseListItem(expense: expense),
+              child: ExpenseListItem(userExpense: expense),
             );
           },
           separatorBuilder: (context, index) => SizedBox(height: 10),

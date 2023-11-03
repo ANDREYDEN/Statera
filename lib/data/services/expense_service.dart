@@ -8,35 +8,6 @@ class ExpenseService extends Firestore {
   ExpenseService(FirebaseFirestore firestoreInstance)
       : super(firestoreInstance);
 
-  Stream<List<Expense>> listenForRelatedExpenses(
-    String uid,
-    String? groupId, {
-    int? quantity,
-    List<int>? stages,
-  }) {
-    var filter = Filter.and(
-      Filter('groupId', isEqualTo: groupId),
-      Filter.or(
-        Filter('authorUid', isEqualTo: uid),
-        Filter('assigneeIds', arrayContains: uid),
-      ),
-    );
-    if (stages != null) {
-      filter = Filter.and(
-        filter,
-        Filter('memberStages.$uid', whereIn: stages),
-      );
-    }
-    var query = expensesCollection
-        .where(filter)
-        .orderBy('memberStages.$uid')
-        .orderBy('date', descending: true);
-    if (quantity != null) {
-      query = query.limit(quantity);
-    }
-    return queryToExpensesStream(query);
-  }
-
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
     if (!expenseDoc.exists)
@@ -95,7 +66,8 @@ class ExpenseService extends Firestore {
     await Future.wait(outstandingExpenses.map(updateExpense));
   }
 
-  Future<void> finalizeExpense(Expense expense) async {
+  Future<void> finalizeExpense(String expenseId) async {
+    final expense = await getExpense(expenseId);
     expense.finalizedDate = Timestamp.now().toDate();
     await updateExpense(expense);
   }

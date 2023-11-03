@@ -6,3 +6,4 @@ export 'group.dart';
 export 'item.dart';
 export 'payment/payment.dart';
 export 'expense_settings.dart';
+export 'user_expense.dart';

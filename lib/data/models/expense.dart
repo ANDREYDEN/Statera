@@ -1,32 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
-
-class ExpenseStage extends Equatable {
-  final String name;
-  final Color color;
-  final bool Function(Expense) test;
-  /// Used for numerical representation of the stage in the DB
-  final int value;
-
-  ExpenseStage({
-    required this.name,
-    required this.color,
-    required this.test,
-    required this.value,
-  });
-  
-  @override
-  List<Object?> get props => [name, color, value];
-
-  @override
-  String toString() {
-    return 'ExpenseStage "$name - $value"';
-  }
-}
-
 class Expense {
   String? id = '';
   String? groupId;
@@ -70,8 +44,6 @@ class Expense {
       (previousValue, item) =>
           previousValue + item.getValueWithTax(this.settings.tax));
 
-  bool isIn(ExpenseStage stage) => stage.test(this);
-
   bool get finalized => finalizedDate != null;
 
   bool get completed =>
@@ -96,38 +68,6 @@ class Expense {
         (previousValue, assigneeUid) =>
             previousValue + (isMarkedBy(assigneeUid) ? 1 : 0),
       );
-
-  static List<ExpenseStage> expenseStages(String uid) {
-    return [
-      ExpenseStage(
-        value: 0,
-        name: 'Not Marked',
-        color: Colors.red[200]!,
-        test: (expense) => expense.hasAssignee(uid) && !expense.isMarkedBy(uid),
-      ),
-      ExpenseStage(
-        value: 1,
-        name: 'Pending',
-        color: Colors.yellow[300]!,
-        test: (expense) =>
-            (expense.isMarkedBy(uid) || !expense.hasAssignee(uid)) &&
-            !expense.finalized,
-      ),
-      ExpenseStage(
-        value: 2,
-        name: 'Finalized',
-        color: Colors.grey[400]!,
-        test: (expense) => expense.finalized,
-      ),
-    ];
-  }
-
-  Color getColor(String uid) {
-    for (var stage in expenseStages(uid)) {
-      if (isIn(stage)) return stage.color;
-    }
-    return Colors.blue[200]!;
-  }
 
   void addItem(Item newItem) {
     newItem.assignees = this
@@ -212,19 +152,6 @@ class Expense {
 
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
-  Map<String, int> get memberStages {
-    final uids = [...assigneeUids];
-    if (!uids.contains(authorUid)) uids.add(authorUid);
-
-    final Map<String, int> result = {};
-    for (var uid in uids) {
-      final stageIndex =
-          Expense.expenseStages(uid).indexWhere((stage) => stage.test(this));
-      result[uid] = stageIndex;
-    }
-    return result;
-  }
-
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,
@@ -238,7 +165,6 @@ class Expense {
       'date': date,
       'finalizedDate': finalizedDate,
       'settings': settings.toFirestore(),
-      'memberStages': memberStages, // used for ordering expenses
     };
   }
 

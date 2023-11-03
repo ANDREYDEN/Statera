@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
@@ -14,17 +13,17 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/utils/utils.dart';
 
 class ExpenseListItem extends StatelessWidget {
-  final Expense expense;
-  const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
+  final UserExpense userExpense;
+  const ExpenseListItem({Key? key, required this.userExpense})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    AuthBloc authBloc = context.read<AuthBloc>();
     final expenseBloc = context.watch<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
 
     final isSelected = expenseBloc.state is ExpenseLoaded &&
-        (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
+        (expenseBloc.state as ExpenseLoaded).expense.id == userExpense.id;
 
     return Card(
       margin: EdgeInsets.symmetric(
@@ -44,7 +43,7 @@ class ExpenseListItem extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              expense.getColor(authBloc.uid),
+              userExpense.stage.color,
               Theme.of(context).colorScheme.surface,
             ],
             stops: [0, 0.8],
@@ -53,10 +52,10 @@ class ExpenseListItem extends StatelessWidget {
         child: InkWell(
           mouseCursor: SystemMouseCursors.click,
           onTap: () => isWide
-              ? expenseBloc.load(expense.id)
+              ? expenseBloc.load(userExpense.id)
               : Navigator.of(context)
-                  .pushNamed(ExpensePage.route + '/${expense.id}'),
-          onLongPress: () => EditExpenseAction(expense).handle(context),
+                  .pushNamed(ExpensePage.route + '/${userExpense.id}'),
+          onLongPress: () => EditExpenseAction(userExpense).handle(context),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
@@ -72,7 +71,7 @@ class ExpenseListItem extends StatelessWidget {
                         children: [
                           GroupBuilder(builder: (context, group) {
                             return UserAvatar(
-                              author: group.getMember(expense.authorUid),
+                              author: group.getMember(userExpense.authorUid),
                             );
                           }),
                           SizedBox(width: 15),
@@ -81,12 +80,15 @@ class ExpenseListItem extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Flexible(child: ExpenseTitle(expense: expense)),
+                                Flexible(
+                                    child:
+                                        ExpenseTitle(userExpense: userExpense)),
                                 Text(
-                                  pluralize('item', this.expense.items.length) +
-                                      (this.expense.date == null
+                                  pluralize('item',
+                                          this.userExpense.itemQuantity) +
+                                      (this.userExpense.date == null
                                           ? ''
-                                          : ' · ${toRelativeStringDate(this.expense.date)!}'),
+                                          : ' · ${toRelativeStringDate(this.userExpense.date)!}'),
                                   style: TextStyle(color: Colors.black),
                                 ),
                               ],
@@ -99,22 +101,20 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         PriceText(
-                          value: this
-                              .expense
-                              .getConfirmedTotalForUser(authBloc.uid),
+                          value: this.userExpense.confirmedTotal,
                           textStyle: TextStyle(fontSize: 24),
                         ),
                         PriceText(
-                          value: this.expense.total,
+                          value: this.userExpense.total,
                           textStyle: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
                   ],
                 ),
-                if (expense.canBeFinalizedBy(authBloc.uid)) ...[
+                if (userExpense.canBeFinalized) ...[
                   SizedBox(height: 5),
-                  FinalizeButton(expense: expense)
+                  FinalizeButton(expenseId: userExpense.id)
                 ]
               ],
             ),
