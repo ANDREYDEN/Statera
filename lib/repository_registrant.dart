@@ -31,6 +31,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(
             create: (_) => PaymentService(groupService, firestore)),
         RepositoryProvider(create: (_) => ExpenseService(firestore)),
+        RepositoryProvider(create: (_) => UserExpenseRepository(firestore)),
         RepositoryProvider(create: (_) => FeatureService()),
       ],
       child: child,

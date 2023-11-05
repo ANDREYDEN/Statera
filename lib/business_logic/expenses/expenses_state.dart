@@ -1,4 +1,4 @@
-part of 'expenses_cubit.dart';
+part of 'user_expenses_cubit.dart';
 
 abstract class ExpensesState extends Equatable {
   const ExpensesState();
@@ -11,7 +11,7 @@ abstract class ExpensesState extends Equatable {
 class ExpensesLoading extends ExpensesState {}
 
 class ExpensesLoaded extends ExpensesState {
-  final List<Expense> expenses;
+  final List<UserExpense> expenses;
   final List<ExpenseStage> stages;
   final bool allLoaded;
 
@@ -33,7 +33,7 @@ class ExpensesLoaded extends ExpensesState {
 /// After the expenses were loaded; whenever the list is changing (creates, updates)
 class ExpensesProcessing extends ExpensesLoaded {
   ExpensesProcessing({
-    required List<Expense> expenses,
+    required List<UserExpense> expenses,
     required List<ExpenseStage> stages,
   }) : super(expenses: expenses, stages: stages);
 

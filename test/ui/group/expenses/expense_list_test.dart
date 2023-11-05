@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/expense_service.mocks.dart';
+import 'package:statera/data/services/user_expense_repository.mocks.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 
 import '../../../helpers.dart';
@@ -15,12 +15,12 @@ class MockUser extends Mock implements User {
 void main() {
   group('Expense List', () {
     final expenses = [
-      Expense(name: 'E1', authorUid: defaultCurrentUserId),
-      Expense(name: 'E2', authorUid: defaultCurrentUserId)
+      UserExpense(id: '1', name: 'E1', authorUid: defaultCurrentUserId),
+      UserExpense(id: '2', name: 'E2', authorUid: defaultCurrentUserId)
     ];
 
     testWidgets('shows all group expenses', (WidgetTester tester) async {
-      await customPump(ExpenseList(), tester, expenses: expenses);
+      await customPump(ExpenseList(), tester, userExpenses: expenses);
       await tester.pumpAndSettle();
 
       for (var expense in expenses) {
@@ -29,25 +29,22 @@ void main() {
     });
 
     group('filtering', () {
-      final finalizedExpense = createFinalizedExpense(
+      final finalizedExpense = createFinalizedUserExpense(
         authorUid: defaultCurrentUserId,
-        name: 'finalized',
       );
 
       final pendingExpense = createPendingExpense(
         authorUid: defaultCurrentUserId,
-        name: 'pending',
       );
 
       final notMarkedExpense = createNotMarkedExpense(
         authorUid: defaultCurrentUserId,
-        name: 'not marked',
       );
 
       testWidgets('can select finalized expenses', (WidgetTester tester) async {
-        final expenseService = MockExpenseService();
+        final userExpenseRepository = MockUserExpenseRepository();
         var responseCount = 0;
-        when(expenseService.listenForRelatedExpenses(
+        when(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -63,13 +60,17 @@ void main() {
                 [finalizedExpense, pendingExpense, notMarkedExpense]
               ]),
             ][responseCount++]);
-        await customPump(ExpenseList(), tester, expenseService: expenseService);
+        await customPump(
+          ExpenseList(),
+          tester,
+          userExpenseRepository: userExpenseRepository,
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Finalized'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -82,7 +83,7 @@ void main() {
         await tester.tap(find.text('Finalized'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -94,9 +95,9 @@ void main() {
       });
 
       testWidgets('can select pending expenses', (WidgetTester tester) async {
-        final expenseService = MockExpenseService();
+        final userExpenseRepository = MockUserExpenseRepository();
         var responseCount = 0;
-        when(expenseService.listenForRelatedExpenses(
+        when(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -112,13 +113,17 @@ void main() {
                 [finalizedExpense, pendingExpense, notMarkedExpense]
               ]),
             ][responseCount++]);
-        await customPump(ExpenseList(), tester, expenseService: expenseService);
+        await customPump(
+          ExpenseList(),
+          tester,
+          userExpenseRepository: userExpenseRepository,
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Pending'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -131,7 +136,7 @@ void main() {
         await tester.tap(find.text('Pending'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -144,9 +149,9 @@ void main() {
 
       testWidgets('can select not marked expenses',
           (WidgetTester tester) async {
-        final expenseService = MockExpenseService();
+        final userExpenseRepository = MockUserExpenseRepository();
         var responseCount = 0;
-        when(expenseService.listenForRelatedExpenses(
+        when(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -162,13 +167,17 @@ void main() {
                 [finalizedExpense, pendingExpense, notMarkedExpense]
               ]),
             ][responseCount++]);
-        await customPump(ExpenseList(), tester, expenseService: expenseService);
+        await customPump(
+          ExpenseList(),
+          tester,
+          userExpenseRepository: userExpenseRepository,
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Not Marked'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),
@@ -181,7 +190,7 @@ void main() {
         await tester.tap(find.text('Not Marked'));
         await tester.pumpAndSettle();
 
-        verify(expenseService.listenForRelatedExpenses(
+        verify(userExpenseRepository.listenForRelatedExpenses(
           any,
           any,
           quantity: anyNamed('quantity'),

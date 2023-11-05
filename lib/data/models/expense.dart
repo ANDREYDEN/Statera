@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 class Expense {
-  String? id = '';
+  String id = '';
   String? groupId;
   List<Item> items = [];
   List<String> assigneeUids = [];
@@ -152,6 +153,12 @@ class Expense {
 
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
+  ExpenseStage getStage(String uid) {
+    if (this.finalized) return ExpenseStage.Finalized;
+    if (isMarkedBy(uid)) return ExpenseStage.Pending;
+    return ExpenseStage.NotMarked;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,
@@ -168,7 +175,7 @@ class Expense {
     };
   }
 
-  static Expense fromFirestore(Map<String, dynamic> data, String? id) {
+  static Expense fromFirestore(Map<String, dynamic> data, String id) {
     // TODO: deprecate
     final author = data['author'] == null
         ? null

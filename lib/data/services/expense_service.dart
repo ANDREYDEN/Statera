@@ -19,6 +19,12 @@ class ExpenseService extends Firestore {
     expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
+  Future<void> updateExpenseById(String expenseId, Function(Expense) updater) async {
+    var expense = await getExpense(expenseId);
+    updater(expense);
+    expensesCollection.doc(expense.id).set(expense.toFirestore());
+  }
+
   Stream<Expense?> expenseStream(String? expenseId) {
     return expensesCollection
         .doc(expenseId)
@@ -77,7 +83,7 @@ class ExpenseService extends Firestore {
     await updateExpense(expense);
   }
 
-  Future<void> deleteExpense(Expense expense) {
-    return expensesCollection.doc(expense.id).delete();
+  Future<void> deleteExpense(String expenseId) {
+    return expensesCollection.doc(expenseId).delete();
   }
 }

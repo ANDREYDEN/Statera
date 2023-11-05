@@ -26,7 +26,7 @@ class Header extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  expense.getColor(authBloc.uid),
+                  expense.getStage(authBloc.uid).color,
                   Theme.of(context).colorScheme.surface,
                 ],
                 stops: [0, 0.8],

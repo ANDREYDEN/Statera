@@ -5,23 +5,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/utils/stream_extensions.dart';
 
 part 'expenses_state.dart';
 
-class ExpensesCubit extends Cubit<ExpensesState> {
+class UserExpensesCubit extends Cubit<ExpensesState> {
   late final String? _groupId;
   late final String _userId;
+  late final UserExpenseRepository _userExpenseRepository;
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
-  ExpensesCubit(
+  UserExpensesCubit(
     String? groupId,
     String userId,
+    UserExpenseRepository userExpenseRepository,
     ExpenseService expenseService,
     GroupService groupService,
   ) : super(ExpensesLoading()) {
+    _userExpenseRepository = userExpenseRepository;
     _expenseService = expenseService;
     _groupService = groupService;
     _groupId = groupId;
@@ -32,11 +36,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     int numberOfExpenses = expensesPerPage,
     List<ExpenseStage>? expenseStages,
   }) {
-    final selectedStages = expenseStages ?? Expense.expenseStages(_userId);
-    final stageValues = selectedStages.map((s) => s.value).toList();
-
+    final selectedStages = expenseStages ?? ExpenseStage.values;
+    final stageValues = selectedStages.map((e) => e.index).toList();
     _expensesSubscription?.cancel();
-    _expensesSubscription = _expenseService
+    _expensesSubscription = _userExpenseRepository
         .listenForRelatedExpenses(
           _userId,
           _groupId,
@@ -45,7 +48,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
         )
         .map((expenses) => ExpensesLoaded(
               expenses: expenses,
-              stages: expenseStages ?? Expense.expenseStages(_userId),
+              stages: expenseStages ?? ExpenseStage.values,
               allLoaded: expenses.length < numberOfExpenses,
             ))
         .throttle(Duration(milliseconds: 200))
@@ -80,10 +83,10 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     return null;
   }
 
-  Future<void> deleteExpense(Expense expense) async {
+  Future<void> deleteExpense(String expenseId) async {
     if (state is ExpensesLoaded) {
       emit(ExpensesLoading());
-      return await _expenseService.deleteExpense(expense);
+      return await _expenseService.deleteExpense(expenseId);
     }
     return null;
   }

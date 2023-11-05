@@ -12,11 +12,16 @@ const auth = admin.auth();
 
     for (const expenseDoc of expenses.docs) {
         console.log(`Updating expense ${expenseDoc.id}...`);
+        const expense = expenseDoc.data()
         try {
-            const expense = expenseDoc.data()
-            for (const assigneeId of expense.assigneeIds) {
-                const stage = calculateStage(expense, assigneeId)
-                await db.collection('users').doc(assigneeId)
+            const relatedUids = new Set([...expense.assigneeIds, expense.authorUid]).values()
+            for (const uid of relatedUids) {
+                const stage = calculateStage(expense, uid)
+                const canBeFinalized = getCanBeFinalized(expense, uid)
+                const total = getTotal(expense)
+                const confirmedTotal = getConfirmedTotal(expense, uid)
+                const hasItemsDeniedByAll = getHasItemsDeniedByAll(expense)
+                await db.collection('users').doc(uid)
                     .collection('expenses').doc(expenseDoc.id)
                     .set({
                         authorUid: expense.authorUid, 
@@ -24,7 +29,6 @@ const auth = admin.auth();
                         name: expense.name,
                         itemQuantity: expense.items.length,
                         date: expense.date,
-                        // TODO: define these fields
                         stage,
                         canBeFinalized,
                         total,
@@ -197,4 +201,28 @@ function calculateStage(expense, assigneeId) {
     if (expense.unmarkedAssigneeIds.includes(assigneeId)) return 0
 
     return 1
+}
+
+function getCanBeFinalized(expense, uid) {
+    return !expense.finalizedDate && 
+            expense.authorUid === uid && 
+            !expense.unmarkedAssigneeIds.length
+}
+
+function getTotal(expense) {
+    return expense.items.reduce((acc, item) => acc + item.value, 0)
+}
+
+function getConfirmedTotal(expense, uid) {
+    return expense.items.reduce((acc, item) => {
+        const assignee = item.assignees.find(a => a.uid === uid)
+        if (assignee == null) return acc
+        return acc + item.value * assignee.parts
+    }, 0)
+}
+
+function getHasItemsDeniedByAll(expense) {
+    return expense.items.some(item => {
+        return item.assignees.every(a => a.parts === 0)
+    })
 }

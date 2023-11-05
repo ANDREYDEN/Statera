@@ -8,7 +8,7 @@ class UserExpense {
   String name;
   String authorUid;
   DateTime? date;
-  ExpenseStage stage = ExpenseStage.NotMarked;
+  ExpenseStage stage;
   double total = 0.0;
   double confirmedTotal = 0.0;
   bool canBeFinalized = false;
@@ -19,7 +19,11 @@ class UserExpense {
     required this.name,
     required this.authorUid,
     this.groupId,
+    this.stage = ExpenseStage.NotMarked,
   });
+
+  bool canBeUpdatedBy(String uid) =>
+      authorUid == uid && stage != ExpenseStage.Finalized;
 
   static UserExpense fromFirestore(Map<String, dynamic> data, String id) {
     final authorUid = data['authorUid'] ?? '';

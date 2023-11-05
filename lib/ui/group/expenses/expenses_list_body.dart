@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/expenses/expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/expense_list_item.dart';
 import 'package:statera/ui/group/expenses/expenses_builder.dart';
@@ -30,7 +30,7 @@ class ExpensesListBody extends StatelessWidget {
       final distanceToBottom = scrollController.position.maxScrollExtent -
           scrollController.position.pixels;
       if (distanceToBottom < loadingThreshold) {
-        context.read<ExpensesCubit>().loadMore();
+        context.read<UserExpensesCubit>().loadMore();
       }
     });
 
@@ -53,16 +53,16 @@ class ExpensesListBody extends StatelessWidget {
               return Center(child: CircularProgressIndicator());
             }
 
-            var expense = expenses[index];
+            var userExpense = expenses[index];
 
             return OptionallyDismissible(
-              key: Key(expense.id!),
-              isDismissible: !isWide && expense.canBeUpdatedBy(authBloc.uid),
+              key: Key(userExpense.id),
+              isDismissible: !isWide && userExpense.canBeUpdatedBy(authBloc.uid),
               confirmation:
                   'Are you sure you want to delete this expense and all of its items?',
               onDismissed: (_) =>
-                  context.read<ExpensesCubit>().deleteExpense(expense),
-              child: ExpenseListItem(userExpense: expense),
+                  context.read<UserExpensesCubit>().deleteExpense(userExpense.id),
+              child: ExpenseListItem(userExpense: userExpense),
             );
           },
           separatorBuilder: (context, index) => SizedBox(height: 10),

@@ -6,9 +6,10 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/expenses/expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
@@ -18,6 +19,8 @@ import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/data/services/group_service.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/user_expense_repository.dart';
+import 'package:statera/data/services/user_expense_repository.mocks.dart';
 import 'package:statera/data/services/user_repository.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 
@@ -28,6 +31,7 @@ class MockUser extends Mock implements User {
 
 final defaultGroupService = MockGroupService();
 final defaultExpenseService = MockExpenseService();
+final defaultUserExpenseRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
 final defaultAuthService = MockAuthService();
 final defaultCurrentUser = MockUser();
@@ -44,23 +48,24 @@ Future<void> customPump(
   Widget widget,
   WidgetTester tester, {
   ExpenseService? expenseService,
+  UserExpenseRepository? userExpenseRepository,
   GroupService? groupService,
   UserRepository? userRepository,
   AuthService? authService,
   FeatureService? featureService,
   String? currentUserId,
   Group? group,
-  List<Expense>? expenses,
+  List<UserExpense>? userExpenses,
 }) async {
   when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
-  when(defaultExpenseService.listenForRelatedExpenses(
+  when(defaultUserExpenseRepository.listenForRelatedExpenses(
     any,
     any,
     quantity: anyNamed('quantity'),
     stages: anyNamed('stages'),
-  )).thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
+  )).thenAnswer((_) => Stream.fromIterable([userExpenses ?? []]));
   when(defaultGroupService.groupStream(any))
       .thenAnswer((_) => Stream.fromIterable([group]));
 
@@ -82,9 +87,10 @@ Future<void> customPump(
                   userRepository ?? defaultUserRepository,
                 )..load((group ?? defaultGroup).id)),
         BlocProvider(
-          create: (context) => ExpensesCubit(
+          create: (context) => UserExpensesCubit(
             (group ?? defaultGroup).id,
             defaultCurrentUserId,
+            userExpenseRepository ?? defaultUserExpenseRepository,
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
           )..load(),
@@ -97,33 +103,29 @@ Future<void> customPump(
   );
 }
 
-Expense createFinalizedExpense({
-  required String authorUid,
-  required String name,
-}) {
-  final finalizedExpense = Expense(name: name, authorUid: authorUid);
-  finalizedExpense.finalizedDate = DateTime.now();
-  return finalizedExpense;
+UserExpense createFinalizedUserExpense({required String authorUid}) {
+  return UserExpense(
+    id: 'asd',
+    name: 'finalized',
+    authorUid: authorUid,
+    stage: ExpenseStage.Finalized,
+  );
 }
 
-Expense createPendingExpense({
-  required String authorUid,
-  required String name,
-}) {
-  final pendingExpense = Expense(name: 'pending', authorUid: authorUid);
-  final completeItem = Item(name: 'Banana', value: 0.5);
-  completeItem.assignees.add(AssigneeDecision(uid: authorUid, parts: 1));
-  pendingExpense.items.add(completeItem);
-  return pendingExpense;
+UserExpense createPendingExpense({required String authorUid}) {
+  return UserExpense(
+    id: 'asd',
+    name: 'pending',
+    authorUid: authorUid,
+    stage: ExpenseStage.Pending,
+  );
 }
 
-Expense createNotMarkedExpense({
-  required String authorUid,
-  required String name,
-}) {
-  final notMarkedExpense = Expense(name: name, authorUid: authorUid);
-  final incompleteItem = Item(name: 'Apple', value: 0.5);
-  incompleteItem.assignees.add(AssigneeDecision(uid: authorUid));
-  notMarkedExpense.items.add(incompleteItem);
-  return notMarkedExpense;
+UserExpense createNotMarkedExpense({required String authorUid}) {
+  return UserExpense(
+    id: 'asd',
+    name: 'not_marked',
+    authorUid: authorUid,
+    stage: ExpenseStage.NotMarked,
+  );
 }

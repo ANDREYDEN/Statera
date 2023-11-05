@@ -3,9 +3,9 @@ import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 
-@GenerateNiceMocks([MockSpec<ExpenseService>()])
-class ExpenseService extends Firestore {
-  ExpenseService(FirebaseFirestore firestoreInstance)
+@GenerateNiceMocks([MockSpec<UserExpenseRepository>()])
+class UserExpenseRepository extends Firestore {
+  UserExpenseRepository(FirebaseFirestore firestoreInstance)
       : super(firestoreInstance);
 
   CollectionReference userExpensesCollection(String uid) {
