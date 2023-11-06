@@ -14,6 +14,7 @@ import { removeUserFromGroups } from './src/functions/userManagement/removeUserF
 import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
 import { Timestamp } from 'firebase-admin/firestore'
+import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
 
 admin.initializeApp()
 
@@ -27,9 +28,11 @@ export const setTimestampOnPaymentCreation = functions.firestore
 
 export const handleExpenseUpdate = functions.firestore
     .document('expenses/{expenseId}')
-    .onUpdate(async (change, _) => {
+    .onWrite(async (change, _) => {
       const oldExpense = change.before.data()
       const newExpense = change.after.data()
+
+      await updateUserExpenses(change)
 
       if (!newExpense || !oldExpense) return
 
