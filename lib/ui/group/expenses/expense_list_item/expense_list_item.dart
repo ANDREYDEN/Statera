@@ -14,9 +14,8 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/utils/utils.dart';
 
 class ExpenseListItem extends StatelessWidget {
-  final UserExpense userExpense;
-  const ExpenseListItem({Key? key, required this.userExpense})
-      : super(key: key);
+  final Expense expense;
+  const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class ExpenseListItem extends StatelessWidget {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     final isSelected = expenseBloc.state is ExpenseLoaded &&
-        (expenseBloc.state as ExpenseLoaded).expense.id == userExpense.id;
+        (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
 
     return Card(
       margin: EdgeInsets.symmetric(
@@ -45,7 +44,7 @@ class ExpenseListItem extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              userExpense.stage.color,
+              expense.getStage(uid).color,
               Theme.of(context).colorScheme.surface,
             ],
             stops: [0, 0.8],
@@ -54,10 +53,10 @@ class ExpenseListItem extends StatelessWidget {
         child: InkWell(
           mouseCursor: SystemMouseCursors.click,
           onTap: () => isWide
-              ? expenseBloc.load(userExpense.id)
+              ? expenseBloc.load(expense.id)
               : Navigator.of(context)
-                  .pushNamed(ExpensePage.route + '/${userExpense.id}'),
-          onLongPress: () => EditExpenseAction(userExpense).handle(context),
+                  .pushNamed(ExpensePage.route + '/${expense.id}'),
+          onLongPress: () => EditExpenseAction(expense).handle(context),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
@@ -73,7 +72,7 @@ class ExpenseListItem extends StatelessWidget {
                         children: [
                           GroupBuilder(builder: (context, group) {
                             return UserAvatar(
-                              author: group.getMember(userExpense.authorUid),
+                              author: group.getMember(expense.authorUid),
                             );
                           }),
                           SizedBox(width: 15),
@@ -82,15 +81,12 @@ class ExpenseListItem extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Flexible(
-                                    child:
-                                        ExpenseTitle(userExpense: userExpense)),
+                                Flexible(child: ExpenseTitle(expense: expense)),
                                 Text(
-                                  pluralize('item',
-                                          this.userExpense.items.length) +
-                                      (this.userExpense.date == null
+                                  pluralize('item', this.expense.items.length) +
+                                      (this.expense.date == null
                                           ? ''
-                                          : ' · ${toRelativeStringDate(this.userExpense.date)!}'),
+                                          : ' · ${toRelativeStringDate(this.expense.date)!}'),
                                   style: TextStyle(color: Colors.black),
                                 ),
                               ],
@@ -103,20 +99,20 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         PriceText(
-                          value: this.userExpense.getConfirmedTotalForUser(uid),
+                          value: this.expense.getConfirmedTotalForUser(uid),
                           textStyle: TextStyle(fontSize: 24),
                         ),
                         PriceText(
-                          value: this.userExpense.total,
+                          value: this.expense.total,
                           textStyle: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
                   ],
                 ),
-                if (userExpense.canBeFinalizedBy(uid)) ...[
+                if (expense.canBeFinalizedBy(uid)) ...[
                   SizedBox(height: 5),
-                  FinalizeButton(expenseId: userExpense.id)
+                  FinalizeButton(expenseId: expense.id)
                 ]
               ],
             ),

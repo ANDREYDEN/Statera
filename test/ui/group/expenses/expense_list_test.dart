@@ -15,12 +15,12 @@ class MockUser extends Mock implements User {
 void main() {
   group('Expense List', () {
     final expenses = [
-      UserExpense(name: 'E1', authorUid: defaultCurrentUserId),
-      UserExpense(name: 'E2', authorUid: defaultCurrentUserId)
+      Expense(name: 'E1', authorUid: defaultCurrentUserId),
+      Expense(name: 'E2', authorUid: defaultCurrentUserId)
     ];
 
     testWidgets('shows all group expenses', (WidgetTester tester) async {
-      await customPump(ExpenseList(), tester, userExpenses: expenses);
+      await customPump(ExpenseList(), tester, expenses: expenses);
       await tester.pumpAndSettle();
 
       for (var expense in expenses) {
@@ -29,7 +29,7 @@ void main() {
     });
 
     group('filtering', () {
-      final finalizedExpense = createFinalizedUserExpense(
+      final finalizedExpense = createFinalizedExpense(
         authorUid: defaultCurrentUserId,
       );
 

@@ -12,7 +12,7 @@ class UserExpenseRepository extends Firestore {
     return usersCollection.doc(uid).collection('expenses');
   }
 
-  Stream<List<UserExpense>> listenForRelatedExpenses(
+  Stream<List<Expense>> listenForRelatedExpenses(
     String uid,
     String? groupId, {
     int? quantity,
@@ -32,7 +32,7 @@ class UserExpenseRepository extends Firestore {
     if (quantity != null) {
       query = query.limit(quantity);
     }
-    return query.snapshots().map<List<UserExpense>>(
-        (snap) => snap.docs.map((doc) => UserExpense.fromSnapshot(doc)).toList());
+    return query.snapshots().map<List<Expense>>(
+        (snap) => snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
   }
 }

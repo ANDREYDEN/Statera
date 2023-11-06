@@ -1,9 +1,9 @@
 part of 'expense_action.dart';
 
 class EditExpenseAction extends EntityAction {
-  final UserExpense userExpense;
+  final Expense expense;
 
-  EditExpenseAction(this.userExpense);
+  EditExpenseAction(this.expense);
 
   @override
   IconData get icon => Icons.edit;
@@ -24,11 +24,11 @@ class EditExpenseAction extends EntityAction {
             id: 'expense_name',
             label: 'Expense name',
             validators: [FieldData.requiredValidator],
-            initialData: userExpense.name,
+            initialData: expense.name,
           )
         ],
         onSubmit: (values) async {
-          expenseService.updateExpenseById(userExpense.id, (expense) {
+          expenseService.updateExpenseById(expense.id, (expense) {
             expense.name = values['expense_name']!;
           });
         },

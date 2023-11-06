@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
@@ -19,7 +19,7 @@ showNewExpenseDialog(
     builder: (_) => MultiBlocProvider(
       providers: [
         BlocProvider.value(value: context.read<GroupCubit>()),
-        BlocProvider.value(value: context.read<UserExpensesCubit>())
+        BlocProvider.value(value: context.read<ExpensesCubit>())
       ],
       child: NewExpenseDialog(afterAddition: afterAddition),
     ),
@@ -43,7 +43,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   late final Expense _newExpense;
   bool _dirty = false;
 
-  UserExpensesCubit get expensesCubit => context.read<UserExpensesCubit>();
+  ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
   GroupCubit get groupCubit => context.read<GroupCubit>();
 
   bool get _nameIsValid => _nameController.text != '';

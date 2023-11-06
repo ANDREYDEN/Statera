@@ -9,7 +9,7 @@ import 'package:statera/utils/stream_extensions.dart';
 
 part 'expenses_state.dart';
 
-class UserExpensesCubit extends Cubit<ExpensesState> {
+class ExpensesCubit extends Cubit<ExpensesState> {
   late final String? _groupId;
   late final String _userId;
   late final UserExpenseRepository _userExpenseRepository;
@@ -18,7 +18,7 @@ class UserExpensesCubit extends Cubit<ExpensesState> {
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
-  UserExpensesCubit(
+  ExpensesCubit(
     String? groupId,
     String userId,
     UserExpenseRepository userExpenseRepository,

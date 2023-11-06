@@ -154,7 +154,7 @@ class Expense {
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
   ExpenseStage getStage(String uid) {
-    if (this.finalized) return ExpenseStage.Finalized;
+    if (finalized) return ExpenseStage.Finalized;
     if (isMarkedBy(uid)) return ExpenseStage.Pending;
     return ExpenseStage.NotMarked;
   }

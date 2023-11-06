@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class ExpensesBuilder extends StatelessWidget {
@@ -21,7 +21,7 @@ class ExpensesBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<UserExpensesCubit, ExpensesState>(
+    return BlocConsumer<ExpensesCubit, ExpensesState>(
       listenWhen: (previous, current) =>
           (previous is ExpensesLoaded && current is ExpensesLoaded) &&
           previous.stagesAreDifferentFrom(current),

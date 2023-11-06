@@ -25,7 +25,7 @@ class DeleteExpenseAction extends ExpenseAction {
       ),
     );
 
-    final expensesCubit = context.read<UserExpensesCubit>();
+    final expensesCubit = context.read<ExpensesCubit>();
     if (confirmed == true) expensesCubit.deleteExpense(expense.id);
   }
 }

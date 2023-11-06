@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
@@ -62,7 +62,7 @@ final List<PagePath> _paths = [
           )..load(matches?[0]),
         ),
         BlocProvider(
-          create: (context) => UserExpensesCubit(
+          create: (context) => ExpensesCubit(
             matches?[0],
             context.read<AuthBloc>().uid,
             context.read<UserExpenseRepository>(),
@@ -71,7 +71,7 @@ final List<PagePath> _paths = [
           )..load(
               numberOfExpenses:
                   context.read<FeatureService>().useDynamicExpenseLoading
-                      ? UserExpensesCubit.expensesPerPage
+                      ? ExpensesCubit.expensesPerPage
                       : 10000,
             ),
         ),

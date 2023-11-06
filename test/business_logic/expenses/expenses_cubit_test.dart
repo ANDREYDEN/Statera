@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:statera/business_logic/expenses/user_expenses_cubit.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
@@ -12,8 +12,8 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //   late final groupService = MockGroupService();
 //   final groupId = 'testGroupId';
 //   final uid = 'testUserId';
-//   UserExpensesCubit expensesCubit =
-//       UserExpensesCubit(groupId, uid, expenseService, groupService);
+//   ExpensesCubit expensesCubit =
+//       ExpensesCubit(groupId, uid, expenseService, groupService);
 //   final expenses = List.generate(
 //     25,
 //     (index) => Expense(
@@ -26,7 +26,7 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //   group('ExpensesCubit', () {
 //     setUp(() async {
 //       expensesCubit =
-//           UserExpensesCubit(groupId, uid, expenseService, groupService);
+//           ExpensesCubit(groupId, uid, expenseService, groupService);
 //     });
 
 //     test(
@@ -45,20 +45,20 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         )).thenAnswer((_) => Stream.fromIterable([[]]));
 //       },
 //       build: () => expensesCubit,
-//       act: (UserExpensesCubit cubit) => cubit.load(),
+//       act: (ExpensesCubit cubit) => cubit.load(),
 //       expect: () => [isA<ExpensesLoaded>()],
 //       verify: (_) {
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage,
+//           quantity: ExpensesCubit.expensesPerPage,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //       },
 //     );
 
 //     final firstExpenses =
-//         expenses.take(UserExpensesCubit.expensesPerPage).toList();
+//         expenses.take(ExpensesCubit.expensesPerPage).toList();
 //     blocTest(
 //       'can load more expenses',
 //       setUp: () {
@@ -72,13 +72,13 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //           return [
 //             Stream.fromIterable([firstExpenses]),
 //             Stream.fromIterable(
-//               [expenses.take(UserExpensesCubit.expensesPerPage + 3).toList()],
+//               [expenses.take(ExpensesCubit.expensesPerPage + 3).toList()],
 //             )
 //           ][invocation++];
 //         });
 //       },
 //       build: () => expensesCubit,
-//       act: (UserExpensesCubit cubit) async {
+//       act: (ExpensesCubit cubit) async {
 //         cubit.load();
 //         await Future.delayed(0.5.seconds);
 //         cubit.loadMore();
@@ -98,7 +98,7 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         ),
 //         ExpensesLoaded(
 //           expenses:
-//               expenses.take(UserExpensesCubit.expensesPerPage + 3).toList(),
+//               expenses.take(ExpensesCubit.expensesPerPage + 3).toList(),
 //           stages: Expense.expenseStages(uid),
 //           allLoaded: true,
 //         ),
@@ -107,20 +107,20 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage,
+//           quantity: ExpensesCubit.expensesPerPage,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage * 2,
+//           quantity: ExpensesCubit.expensesPerPage * 2,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //       },
 //     );
 
 //     var secondExpenses =
-//         expenses.take(UserExpensesCubit.expensesPerPage * 2).toList();
+//         expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
 
 //     blocTest(
 //       'sets allLoaded to true if the total number of expenses is divisible by page size',
@@ -140,7 +140,7 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         });
 //       },
 //       build: () => expensesCubit,
-//       act: (UserExpensesCubit cubit) async {
+//       act: (ExpensesCubit cubit) async {
 //         cubit.load();
 //         await Future.delayed(0.5.seconds);
 //         cubit.loadMore();
@@ -182,19 +182,19 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage,
+//           quantity: ExpensesCubit.expensesPerPage,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage * 2,
+//           quantity: ExpensesCubit.expensesPerPage * 2,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //         verify(expenseService.listenForRelatedExpenses(
 //           uid,
 //           groupId,
-//           quantity: UserExpensesCubit.expensesPerPage * 3,
+//           quantity: ExpensesCubit.expensesPerPage * 3,
 //           stages: anyNamed('stages'),
 //         )).called(1);
 //       },
@@ -219,7 +219,7 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         });
 //       },
 //       build: () => expensesCubit,
-//       act: (UserExpensesCubit cubit) async {
+//       act: (ExpensesCubit cubit) async {
 //         cubit.load();
 //         await Future.delayed(0.5.seconds);
 //         cubit.selectExpenseStages(selectedStages);
@@ -260,9 +260,9 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //     );
 
 //     var withoutFirstFive =
-//         expenses.skip(5).take(UserExpensesCubit.expensesPerPage).toList();
+//         expenses.skip(5).take(ExpensesCubit.expensesPerPage).toList();
 //     var thirdExpenses =
-//         expenses.take(UserExpensesCubit.expensesPerPage * 2).toList();
+//         expenses.take(ExpensesCubit.expensesPerPage * 2).toList();
 //     blocTest(
 //       'loading more keeps the selected expense stages',
 //       setUp: () {
@@ -281,7 +281,7 @@ import 'package:statera/data/services/group_service.mocks.dart';
 //         });
 //       },
 //       build: () => expensesCubit,
-//       act: (UserExpensesCubit cubit) async {
+//       act: (ExpensesCubit cubit) async {
 //         cubit.load();
 //         await Future.delayed(0.5.seconds);
 //         cubit.selectExpenseStages(selectedStages);
