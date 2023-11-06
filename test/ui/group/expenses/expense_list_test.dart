@@ -15,8 +15,8 @@ class MockUser extends Mock implements User {
 void main() {
   group('Expense List', () {
     final expenses = [
-      UserExpense(id: '1', name: 'E1', authorUid: defaultCurrentUserId),
-      UserExpense(id: '2', name: 'E2', authorUid: defaultCurrentUserId)
+      UserExpense(name: 'E1', authorUid: defaultCurrentUserId),
+      UserExpense(name: 'E2', authorUid: defaultCurrentUserId)
     ];
 
     testWidgets('shows all group expenses', (WidgetTester tester) async {

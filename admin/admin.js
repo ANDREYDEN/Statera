@@ -17,24 +17,9 @@ const auth = admin.auth();
             const relatedUids = new Set([...expense.assigneeIds, expense.authorUid]).values()
             for (const uid of relatedUids) {
                 const stage = calculateStage(expense, uid)
-                const canBeFinalized = getCanBeFinalized(expense, uid)
-                const total = getTotal(expense)
-                const confirmedTotal = getConfirmedTotal(expense, uid)
-                const hasItemsDeniedByAll = getHasItemsDeniedByAll(expense)
                 await db.collection('users').doc(uid)
                     .collection('expenses').doc(expenseDoc.id)
-                    .set({
-                        authorUid: expense.authorUid, 
-                        groupId: expense.groupId,
-                        name: expense.name,
-                        itemQuantity: expense.items.length,
-                        date: expense.date,
-                        stage,
-                        canBeFinalized,
-                        total,
-                        confirmedTotal,
-                        hasItemsDeniedByAll
-                    })
+                    .set({ ...expense, stage })
             }
 
             // console.log(expense);
@@ -201,24 +186,6 @@ function calculateStage(expense, assigneeId) {
     if (expense.unmarkedAssigneeIds.includes(assigneeId)) return 0
 
     return 1
-}
-
-function getCanBeFinalized(expense, uid) {
-    return !expense.finalizedDate && 
-            expense.authorUid === uid && 
-            !expense.unmarkedAssigneeIds.length
-}
-
-function getTotal(expense) {
-    return expense.items.reduce((acc, item) => acc + item.value, 0)
-}
-
-function getConfirmedTotal(expense, uid) {
-    return expense.items.reduce((acc, item) => {
-        const assignee = item.assignees.find(a => a.uid === uid)
-        if (assignee == null) return acc
-        return acc + item.value * assignee.parts
-    }, 0)
 }
 
 function getHasItemsDeniedByAll(expense) {

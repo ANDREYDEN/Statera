@@ -161,11 +161,11 @@ class Expense {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'groupId': groupId,
       'name': name,
-      'items': items.map((item) => item.toFirestore()).toList(),
+      'groupId': groupId,
       'authorUid': authorUid,
       'assigneeIds': assigneeUids,
+      'items': items.map((item) => item.toFirestore()).toList(),
       'unmarkedAssigneeIds': assigneeUids
           .where((assigneeUid) => !isMarkedBy(assigneeUid))
           .toList(),

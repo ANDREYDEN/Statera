@@ -105,7 +105,6 @@ Future<void> customPump(
 
 UserExpense createFinalizedUserExpense({required String authorUid}) {
   return UserExpense(
-    id: 'asd',
     name: 'finalized',
     authorUid: authorUid,
     stage: ExpenseStage.Finalized,
@@ -114,7 +113,6 @@ UserExpense createFinalizedUserExpense({required String authorUid}) {
 
 UserExpense createPendingExpense({required String authorUid}) {
   return UserExpense(
-    id: 'asd',
     name: 'pending',
     authorUid: authorUid,
     stage: ExpenseStage.Pending,
@@ -123,7 +121,6 @@ UserExpense createPendingExpense({required String authorUid}) {
 
 UserExpense createNotMarkedExpense({required String authorUid}) {
   return UserExpense(
-    id: 'asd',
     name: 'not_marked',
     authorUid: authorUid,
     stage: ExpenseStage.NotMarked,

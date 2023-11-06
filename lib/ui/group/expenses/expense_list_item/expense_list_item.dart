@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
@@ -21,6 +22,7 @@ class ExpenseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final expenseBloc = context.watch<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     final isSelected = expenseBloc.state is ExpenseLoaded &&
         (expenseBloc.state as ExpenseLoaded).expense.id == userExpense.id;
@@ -85,7 +87,7 @@ class ExpenseListItem extends StatelessWidget {
                                         ExpenseTitle(userExpense: userExpense)),
                                 Text(
                                   pluralize('item',
-                                          this.userExpense.itemQuantity) +
+                                          this.userExpense.items.length) +
                                       (this.userExpense.date == null
                                           ? ''
                                           : ' · ${toRelativeStringDate(this.userExpense.date)!}'),
@@ -101,7 +103,7 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         PriceText(
-                          value: this.userExpense.confirmedTotal,
+                          value: this.userExpense.getConfirmedTotalForUser(uid),
                           textStyle: TextStyle(fontSize: 24),
                         ),
                         PriceText(
@@ -112,7 +114,7 @@ class ExpenseListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (userExpense.canBeFinalized) ...[
+                if (userExpense.canBeFinalizedBy(uid)) ...[
                   SizedBox(height: 5),
                   FinalizeButton(expenseId: userExpense.id)
                 ]
