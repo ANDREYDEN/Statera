@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
+
 class Expense {
   String id = '';
   String? groupId;
@@ -156,7 +157,7 @@ class Expense {
   ExpenseStage getStage(String uid) {
     if (finalized) return ExpenseStage.Finalized;
     if (isMarkedBy(uid)) return ExpenseStage.Pending;
-    return ExpenseStage.NotMarked;
+    return ExpenseStage.Not_Marked;
   }
 
   Map<String, dynamic> toFirestore() {

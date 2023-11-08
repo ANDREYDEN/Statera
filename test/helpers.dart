@@ -55,9 +55,12 @@ Future<void> customPump(
   when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
-  when(defaultUserExpensesRepository.listenForRelatedExpenses(any, any,
-          quantity: anyNamed('quantity')))
-      .thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
+  when(defaultUserExpensesRepository.listenForRelatedExpenses(
+    any,
+    any,
+    quantity: anyNamed('quantity'),
+    stages: anyNamed('stages'),
+  )).thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
   when(defaultGroupService.groupStream(any))
       .thenAnswer((_) => Stream.fromIterable([group]));
 

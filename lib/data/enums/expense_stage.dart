@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 enum ExpenseStage {
-  NotMarked(color: Colors.red, swatchValue: 200),
+  Not_Marked(color: Colors.red, swatchValue: 200),
   Pending(color: Colors.yellow, swatchValue: 300),
   Finalized(color: Colors.grey, swatchValue: 400);
 

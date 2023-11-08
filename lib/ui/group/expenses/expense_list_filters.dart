@@ -19,7 +19,7 @@ class ExpenseListFilters extends StatelessWidget {
           children: ExpenseStage.values
               .map((stage) => Flexible(
                     child: CustomFilterChip(
-                      label: stage.name,
+                      label: stage.name.replaceAll('_', ' '),
                       color: stage.color,
                       selected: expensesState.stages.contains(stage),
                       onSelected: (selected) {
