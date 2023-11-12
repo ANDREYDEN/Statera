@@ -15,10 +15,7 @@ class NewExpenseButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () => showNewExpenseDialog(
           context,
-          afterAddition: (expenseId) {
-            Navigator.of(context).pop();
-            expenseBloc.load(expenseId);
-          },
+          afterAddition: expenseBloc.load,
         ),
         child: Icon(Icons.add),
       ),

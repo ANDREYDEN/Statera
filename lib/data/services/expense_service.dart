@@ -8,28 +8,6 @@ class ExpenseService extends Firestore {
   ExpenseService(FirebaseFirestore firestoreInstance)
       : super(firestoreInstance);
 
-  Stream<List<Expense>> listenForRelatedExpenses(
-    String uid,
-    String? groupId, {
-    int? quantity,
-  }) {
-    var query = expensesCollection
-        .where(
-          Filter.and(
-            Filter('groupId', isEqualTo: groupId),
-            Filter.or(
-              Filter('authorUid', isEqualTo: uid),
-              Filter('assigneeIds', arrayContains: uid),
-            ),
-          ),
-        )
-        .orderBy('date', descending: true);
-    if (quantity != null) {
-      query = query.limit(quantity);
-    }
-    return queryToExpensesStream(query);
-  }
-
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
     if (!expenseDoc.exists)
@@ -38,6 +16,12 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> updateExpense(Expense expense) async {
+    expensesCollection.doc(expense.id).set(expense.toFirestore());
+  }
+
+  Future<void> updateExpenseById(String expenseId, Function(Expense) updater) async {
+    var expense = await getExpense(expenseId);
+    updater(expense);
     expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
@@ -88,17 +72,18 @@ class ExpenseService extends Firestore {
     await Future.wait(outstandingExpenses.map(updateExpense));
   }
 
-  Future<void> finalizeExpense(Expense expense) async {
-    await expensesCollection
-        .doc(expense.id)
-        .update({'finalizedDate': Timestamp.now()});
+  Future<void> finalizeExpense(String expenseId) async {
+    final expense = await getExpense(expenseId);
+    expense.finalizedDate = Timestamp.now().toDate();
+    await updateExpense(expense);
   }
 
   Future<void> revertExpense(Expense expense) async {
-    await expensesCollection.doc(expense.id).update({'finalizedDate': null});
+    expense.finalizedDate = null;
+    await updateExpense(expense);
   }
 
-  Future<void> deleteExpense(Expense expense) {
-    return expensesCollection.doc(expense.id).delete();
+  Future<void> deleteExpense(String expenseId) {
+    return expensesCollection.doc(expenseId).delete();
   }
 }

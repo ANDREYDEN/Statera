@@ -12,7 +12,7 @@ import 'package:statera/utils/utils.dart';
 
 showNewExpenseDialog(
   BuildContext context, {
-  required Function(String) afterAddition,
+  required Function(String?) afterAddition,
 }) {
   showDialog(
     context: context,
@@ -27,7 +27,7 @@ showNewExpenseDialog(
 }
 
 class NewExpenseDialog extends StatefulWidget {
-  final Function(String) afterAddition;
+  final Function(String?) afterAddition;
   const NewExpenseDialog({
     Key? key,
     required this.afterAddition,
@@ -60,10 +60,11 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
     if (_nameIsValid && _pickedValidAssignees) {
       _newExpense.name = _nameController.text;
       _newExpense.updateAssignees(_memberController.value);
-      await expensesCubit.addExpense(
+      final newExpenseId = await expensesCubit.addExpense(
         _newExpense,
         groupCubit.loadedState.group.id,
       );
+      widget.afterAddition(newExpenseId);
       Navigator.of(context).pop();
     }
   }

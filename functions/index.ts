@@ -13,6 +13,8 @@ import { createUserDoc } from './src/functions/userManagement/createUserDoc'
 import { removeUserFromGroups } from './src/functions/userManagement/removeUserFromGroups'
 import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
+import { Timestamp } from 'firebase-admin/firestore'
+import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
 
 admin.initializeApp()
 
@@ -26,13 +28,18 @@ export const setTimestampOnPaymentCreation = functions.firestore
 
 export const handleExpenseUpdate = functions.firestore
     .document('expenses/{expenseId}')
-    .onUpdate(async (change, _) => {
+    .onWrite(async (change, _) => {
       const oldExpense = change.before.data()
       const newExpense = change.after.data()
 
+      await updateUserExpenses(change)
+
       if (!newExpense || !oldExpense) return
 
-      if (oldExpense.finalizedDate !== newExpense.finalizedDate) {
+      const oldFinalizedTimestamp = oldExpense.finalizedDate as (Timestamp | null)
+      const newFinalizedTimestamp = newExpense.finalizedDate as (Timestamp | null)
+      
+      if (oldFinalizedTimestamp?.toMillis != newFinalizedTimestamp?.toMillis) {
         if (newExpense.finalizedDate) {
           await notifyWhenExpenseFinalized(change.after)
         } else {
@@ -53,7 +60,6 @@ export const getReceiptData = functions
 
       return analyzeReceipt(
           data.receiptUrl,
-          data.isWalmart,
           data.storeName,
           data.withNameImprovement
       )

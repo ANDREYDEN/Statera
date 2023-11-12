@@ -1,19 +1,11 @@
 part of 'expense_action.dart';
 
-class FinalizeExpenseAction extends ExpenseAction {
-  FinalizeExpenseAction(super.expense);
+class FinalizeExpenseAction {
+  final String expenseId;
 
-  @override
-  IconData get icon => Icons.done;
+  FinalizeExpenseAction(this.expenseId);
 
-  @override
-  String get name => 'Finalize';
-
-  @override
   handle(BuildContext context) async {
-    final valid = await verifyAllItemsValid(context);
-    if (!valid) return;
-
     snackbarCatch(
       context,
       () async {
@@ -21,10 +13,14 @@ class FinalizeExpenseAction extends ExpenseAction {
         final expenseService = context.read<ExpenseService>();
 
         // TODO: use transaction
+        final expense = await expenseService.getExpense(expenseId);
+        final valid = await verifyAllItemsValid(context, expense);
+        if (!valid) return;
+
         var group = groupCubit.loadedState.group;
 
-        await expenseService.finalizeExpense(expense);
-        final payments = await createPayments(context, group);
+        await expenseService.finalizeExpense(expenseId);
+        final payments = await createPayments(context, expense, group);
         updateGroup(groupCubit, payments);
       },
       successMessage:
@@ -32,7 +28,8 @@ class FinalizeExpenseAction extends ExpenseAction {
     );
   }
 
-  Future<bool> verifyAllItemsValid(BuildContext context) async {
+  Future<bool> verifyAllItemsValid(
+      BuildContext context, Expense expense) async {
     bool accepted = true;
     if (expense.hasItemsDeniedByAll) {
       accepted = await showDialog<bool>(
@@ -51,7 +48,7 @@ class FinalizeExpenseAction extends ExpenseAction {
 
   /// Add expense payments from author to all assignees
   Future<List<Payment>> createPayments(
-      BuildContext context, Group group) async {
+      BuildContext context, Expense expense, Group group) async {
     final paymentService = context.read<PaymentService>();
 
     final payments = expense.assigneeUids

@@ -13,7 +13,7 @@ scripts:
   run-emulate: flutter run --dart-define="MODE=debug"
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
-  create-mocks: flutter pub run build_runner build
+  create-mocks: dart run build_runner build
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
   emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data

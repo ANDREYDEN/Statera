@@ -1,22 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 
-class ExpenseStage {
-  String name;
-  Color color;
-  bool Function(Expense) test;
-
-  ExpenseStage({
-    required this.name,
-    required this.color,
-    required this.test,
-  });
-}
-
 class Expense {
-  String? id = '';
+  String id = '';
   String? groupId;
   List<Item> items = [];
   List<String> assigneeUids = [];
@@ -37,6 +25,13 @@ class Expense {
     this.settings = settings ?? ExpenseSettings();
   }
 
+  Expense.empty({String? groupId})
+      : this(
+          name: 'Empty',
+          authorUid: '',
+          groupId: groupId,
+        );
+
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
     if (other.date == null) return false;
@@ -50,8 +45,6 @@ class Expense {
       0,
       (previousValue, item) =>
           previousValue + item.getValueWithTax(this.settings.tax));
-
-  bool isIn(ExpenseStage stage) => stage.test(this);
 
   bool get finalized => finalizedDate != null;
 
@@ -77,35 +70,6 @@ class Expense {
         (previousValue, assigneeUid) =>
             previousValue + (isMarkedBy(assigneeUid) ? 1 : 0),
       );
-
-  static List<ExpenseStage> expenseStages(String uid) {
-    return [
-      ExpenseStage(
-        name: 'Not Marked',
-        color: Colors.red[200]!,
-        test: (expense) => expense.hasAssignee(uid) && !expense.isMarkedBy(uid),
-      ),
-      ExpenseStage(
-        name: 'Pending',
-        color: Colors.yellow[300]!,
-        test: (expense) =>
-            (expense.isMarkedBy(uid) || !expense.hasAssignee(uid)) &&
-            !expense.finalized,
-      ),
-      ExpenseStage(
-        name: 'Finalized',
-        color: Colors.grey[400]!,
-        test: (expense) => expense.finalized,
-      ),
-    ];
-  }
-
-  Color getColor(String uid) {
-    for (var stage in expenseStages(uid)) {
-      if (isIn(stage)) return stage.color;
-    }
-    return Colors.blue[200]!;
-  }
 
   void addItem(Item newItem) {
     newItem.assignees = this
@@ -190,13 +154,19 @@ class Expense {
 
   bool get hasItemsDeniedByAll => items.any((item) => item.isDeniedByAll);
 
+  ExpenseStage getStage(String uid) {
+    if (finalized) return ExpenseStage.Finalized;
+    if (isMarkedBy(uid)) return ExpenseStage.Pending;
+    return ExpenseStage.Not_Marked;
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
-      'groupId': groupId,
       'name': name,
-      'items': items.map((item) => item.toFirestore()).toList(),
+      'groupId': groupId,
       'authorUid': authorUid,
       'assigneeIds': assigneeUids,
+      'items': items.map((item) => item.toFirestore()).toList(),
       'unmarkedAssigneeIds': assigneeUids
           .where((assigneeUid) => !isMarkedBy(assigneeUid))
           .toList(),
@@ -206,7 +176,7 @@ class Expense {
     };
   }
 
-  static Expense fromFirestore(Map<String, dynamic> data, String? id) {
+  static Expense fromFirestore(Map<String, dynamic> data, String id) {
     // TODO: deprecate
     final author = data['author'] == null
         ? null
@@ -273,5 +243,10 @@ class Expense {
         date.hashCode ^
         finalizedDate.hashCode ^
         settings.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Expense "$name"';
   }
 }

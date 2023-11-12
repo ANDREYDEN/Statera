@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/stream_extensions.dart';
@@ -9,96 +10,91 @@ import 'package:statera/utils/stream_extensions.dart';
 part 'expenses_state.dart';
 
 class ExpensesCubit extends Cubit<ExpensesState> {
+  late final String? _groupId;
+  late final String _userId;
+  late final UserExpenseRepository _userExpenseRepository;
   late final ExpenseService _expenseService;
   late final GroupService _groupService;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
-  ExpensesCubit(ExpenseService expenseService, GroupService groupService)
-      : super(ExpensesLoading()) {
+  ExpensesCubit(
+    String? groupId,
+    String userId,
+    UserExpenseRepository userExpenseRepository,
+    ExpenseService expenseService,
+    GroupService groupService,
+  ) : super(ExpensesLoading()) {
+    _userExpenseRepository = userExpenseRepository;
     _expenseService = expenseService;
     _groupService = groupService;
+    _groupId = groupId;
+    _userId = userId;
   }
 
-  void load(
-    String userId,
-    String? groupId, {
+  void load({
     int numberOfExpenses = expensesPerPage,
+    List<ExpenseStage>? expenseStages,
   }) {
+    final selectedStages = expenseStages ?? ExpenseStage.values;
+    final stageValues = selectedStages.map((e) => e.index).toList();
     _expensesSubscription?.cancel();
-    _expensesSubscription = _expenseService
-        .listenForRelatedExpenses(userId, groupId, quantity: numberOfExpenses)
-        .map((expenses) {
-          expenses.sort((firstExpense, secondExpense) {
-            final expenseStages = Expense.expenseStages(userId);
-            for (var stage in expenseStages) {
-              if (firstExpense.isIn(stage) && secondExpense.isIn(stage)) {
-                return firstExpense.wasEarlierThan(secondExpense) ? 1 : -1;
-              }
-              if (firstExpense.isIn(stage)) return -1;
-              if (secondExpense.isIn(stage)) return 1;
-            }
-
-            return 0;
-          });
-
-          return ExpensesLoaded(
-            expenses: expenses,
-            stages: Expense.expenseStages(userId),
-            allLoaded: expenses.length < numberOfExpenses,
-          );
-        })
+    _expensesSubscription = _userExpenseRepository
+        .listenForRelatedExpenses(
+          _userId,
+          _groupId,
+          quantity: numberOfExpenses,
+          stages: stageValues,
+        )
+        .map((expenses) => ExpensesLoaded(
+              expenses: expenses,
+              stages: expenseStages ?? ExpenseStage.values,
+              allLoaded: expenses.length < numberOfExpenses,
+            ))
         .throttle(Duration(milliseconds: 200))
         .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
-  void loadMore(String userId) {
-    final currentState = state;
-    if (currentState is ExpensesLoaded) {
+  void loadMore() async {
+    if (state case final ExpensesLoaded currentState) {
       if (currentState.allLoaded) return;
 
-      final groupId = currentState.expenses.first.groupId;
-      print('loading more');
+      emit(ExpensesProcessing.fromLoaded(currentState));
+      print('loading more...');
       load(
-        userId,
-        groupId,
         numberOfExpenses: currentState.expenses.length + expensesPerPage,
+        expenseStages: currentState.stages,
       );
     }
   }
 
   void updateExpense(Expense expense) async {
-    if (state is ExpensesLoaded) {
-      emit(ExpensesProcessing.fromLoaded((state as ExpensesLoaded)));
+    if (state case final ExpensesLoaded currentState) {
+      emit(ExpensesProcessing.fromLoaded(currentState));
       await _expenseService.updateExpense(expense);
     }
   }
 
   Future<String?> addExpense(Expense expense, String? groupId) async {
-    if (state is ExpensesLoaded) {
-      emit(ExpensesProcessing.fromLoaded((state as ExpensesLoaded)));
+    if (state case final ExpensesLoaded currentState) {
+      emit(ExpensesProcessing.fromLoaded(currentState));
       return await _groupService.addExpense(groupId, expense);
     }
     return null;
   }
 
-  deleteExpense(Expense expense) async {
+  Future<void> deleteExpense(String expenseId) async {
     if (state is ExpensesLoaded) {
       emit(ExpensesLoading());
-      return await _expenseService.deleteExpense(expense);
+      return await _expenseService.deleteExpense(expenseId);
     }
     return null;
   }
 
-  void selectExpenseStages(String uid, List<String> stageNames) {
-    if (state is ExpensesLoaded) {
-      final stages = Expense.expenseStages(uid)
-          .where((es) => stageNames.contains(es.name))
-          .toList();
-      emit(ExpensesLoaded(
-        expenses: (state as ExpensesLoaded).expenses,
-        stages: stages,
-      ));
+  void selectExpenseStages(List<ExpenseStage> expenseStages) {
+    if (state case final ExpensesLoaded currentState) {
+      emit(ExpensesProcessing.fromLoaded(currentState));
+      load(expenseStages: expenseStages);
     }
   }
 

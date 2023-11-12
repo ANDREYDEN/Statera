@@ -19,9 +19,9 @@ class ExpenseListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthBloc authBloc = context.read<AuthBloc>();
     final expenseBloc = context.watch<ExpenseBloc>();
     final isWide = context.read<LayoutState>().isWide;
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     final isSelected = expenseBloc.state is ExpenseLoaded &&
         (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
@@ -44,7 +44,7 @@ class ExpenseListItem extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              expense.getColor(authBloc.uid),
+              expense.getStage(uid).color,
               Theme.of(context).colorScheme.surface,
             ],
             stops: [0, 0.8],
@@ -99,9 +99,7 @@ class ExpenseListItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         PriceText(
-                          value: this
-                              .expense
-                              .getConfirmedTotalForUser(authBloc.uid),
+                          value: this.expense.getConfirmedTotalForUser(uid),
                           textStyle: TextStyle(fontSize: 24),
                         ),
                         PriceText(
@@ -112,9 +110,9 @@ class ExpenseListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (expense.canBeFinalizedBy(authBloc.uid)) ...[
+                if (expense.canBeFinalizedBy(uid)) ...[
                   SizedBox(height: 5),
-                  FinalizeButton(expense: expense)
+                  FinalizeButton(expenseId: expense.id)
                 ]
               ],
             ),

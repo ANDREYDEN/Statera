@@ -1,7 +1,9 @@
 part of 'expense_action.dart';
 
-class EditExpenseAction extends ExpenseAction {
-  EditExpenseAction(super.expense);
+class EditExpenseAction extends EntityAction {
+  final Expense expense;
+
+  EditExpenseAction(this.expense);
 
   @override
   IconData get icon => Icons.edit;
@@ -11,7 +13,7 @@ class EditExpenseAction extends ExpenseAction {
 
   @override
   FutureOr<void> handle(BuildContext context) async {
-    ExpensesCubit expensesCubit = context.read<ExpensesCubit>();
+    final expenseService = context.read<ExpenseService>();
 
     showDialog(
       context: context,
@@ -26,8 +28,9 @@ class EditExpenseAction extends ExpenseAction {
           )
         ],
         onSubmit: (values) async {
-          expense.name = values['expense_name']!;
-          expensesCubit.updateExpense(expense);
+          expenseService.updateExpenseById(expense.id, (expense) {
+            expense.name = values['expense_name']!;
+          });
         },
       ),
     );
