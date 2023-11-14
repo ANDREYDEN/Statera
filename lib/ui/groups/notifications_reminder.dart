@@ -33,7 +33,10 @@ class NotificationsReminder extends StatelessWidget {
               CancelButton(),
               ElevatedButton(
                 onPressed: () async {
-                  await AppSettings.openNotificationSettings();
+                  await AppSettings.openAppSettings(
+                    type: AppSettingsType.notification,
+                    asAnotherTask: true,
+                  );
                   Navigator.pop(context);
                 },
                 child: Text('Open Settings'),
