@@ -97,7 +97,7 @@ class _NotificationsSettingState extends State<NotificationsSetting>
             SectionTitle('Notifications Preferences'),
             if (!state.allowed)
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (kIsWeb) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -109,7 +109,10 @@ class _NotificationsSettingState extends State<NotificationsSetting>
                     return;
                   }
 
-                  AppSettings.openNotificationSettings();
+                  await AppSettings.openAppSettings(
+                    type: AppSettingsType.notification,
+                    asAnotherTask: true,
+                  );
                 },
                 child: Text('Enable notifications'),
               )
