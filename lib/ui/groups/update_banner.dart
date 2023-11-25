@@ -76,11 +76,17 @@ class UpdateBanner extends StatelessWidget {
 
   void _handleUpdate() {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      launchUrl(Uri.parse(PlatformOption.android.url!));
+      launchUrl(
+        Uri.parse(PlatformOption.android.url!),
+        mode: LaunchMode.externalApplication,
+      );
     }
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      launchUrl(Uri.parse(PlatformOption.ios.url!));
+      launchUrl(
+        Uri.parse(PlatformOption.ios.url!),
+        mode: LaunchMode.externalApplication,
+      );
     }
   }
 }
