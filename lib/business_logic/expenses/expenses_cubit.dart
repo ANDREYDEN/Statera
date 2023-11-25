@@ -68,7 +68,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     }
   }
 
-  void updateExpense(Expense expense) async {
+  Future updateExpense(Expense expense) async {
     if (state case final ExpensesLoaded currentState) {
       emit(ExpensesProcessing.fromLoaded(currentState));
       await _expenseService.updateExpense(expense);
@@ -95,6 +95,12 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     if (state case final ExpensesLoaded currentState) {
       emit(ExpensesProcessing.fromLoaded(currentState));
       load(expenseStages: expenseStages);
+    }
+  }
+
+  void process() {
+    if (state is ExpensesLoaded) {
+      emit(ExpensesProcessing.fromLoaded(state as ExpensesLoaded));
     }
   }
 

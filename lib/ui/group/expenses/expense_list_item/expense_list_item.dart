@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
@@ -15,7 +16,13 @@ import 'package:statera/utils/utils.dart';
 
 class ExpenseListItem extends StatelessWidget {
   final Expense expense;
-  const ExpenseListItem({Key? key, required this.expense}) : super(key: key);
+  final bool processing;
+
+  const ExpenseListItem({
+    Key? key,
+    required this.expense,
+    this.processing = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +33,21 @@ class ExpenseListItem extends StatelessWidget {
     final isSelected = expenseBloc.state is ExpenseLoaded &&
         (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
 
-    return Card(
-      margin: EdgeInsets.symmetric(
-        horizontal: isWide ? 0 : kMobileMargin.left,
-      ),
+    void _handleTap() {
+      if (processing) return null;
+      if (isWide) return expenseBloc.load(expense.id);
+
+      Navigator.of(context).pushNamed(ExpensePage.route + '/${expense.id}');
+    }
+
+    void _handleLongPress() {
+      if (processing) return null;
+
+      EditExpenseAction(expense).handle(context);
+    }
+
+    final card = Card(
+      margin: EdgeInsets.symmetric(horizontal: isWide ? 0 : kMobileMargin.left),
       clipBehavior: Clip.hardEdge,
       shape: isSelected
           ? RoundedRectangleBorder(
@@ -52,11 +70,8 @@ class ExpenseListItem extends StatelessWidget {
         ),
         child: InkWell(
           mouseCursor: SystemMouseCursors.click,
-          onTap: () => isWide
-              ? expenseBloc.load(expense.id)
-              : Navigator.of(context)
-                  .pushNamed(ExpensePage.route + '/${expense.id}'),
-          onLongPress: () => EditExpenseAction(expense).handle(context),
+          onTap: _handleTap,
+          onLongPress: _handleLongPress,
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
@@ -110,7 +125,7 @@ class ExpenseListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (expense.canBeFinalizedBy(uid)) ...[
+                if (expense.canBeFinalizedBy(uid) && !processing) ...[
                   SizedBox(height: 5),
                   FinalizeButton(expenseId: expense.id)
                 ]
@@ -120,5 +135,14 @@ class ExpenseListItem extends StatelessWidget {
         ),
       ),
     );
+
+    if (processing) {
+      return card
+          .animate(onPlay: (controller) => controller.repeat(reverse: true))
+          .then(delay: 0.2.seconds)
+          .fade(duration: 1.seconds, begin: 1, end: 0.5);
+    }
+
+    return card;
   }
 }
