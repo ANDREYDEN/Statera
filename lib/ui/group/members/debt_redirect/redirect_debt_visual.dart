@@ -66,6 +66,8 @@ class RedirectDebtVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double avatarDimension = 65;
+
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
         builder: (context, state) {
       if (state is! DebtRedirectionLoaded && state is! DebtRedirectionLoading) {
@@ -90,7 +92,7 @@ class RedirectDebtVisual extends StatelessWidget {
             children: [
               UserAvatar(
                 author: loadedState.ower,
-                dimension: 75,
+                dimension: avatarDimension,
                 withName: true,
                 namePosition: NamePosition.bottom,
                 onTap: () => _handleOwerTap(context, loadedState),
@@ -106,7 +108,7 @@ class RedirectDebtVisual extends StatelessWidget {
               ),
               UserAvatar(
                 author: loadedState.author,
-                dimension: 75,
+                dimension: avatarDimension,
                 withName: true,
                 namePosition: NamePosition.bottom,
                 loading: isLoading,
@@ -122,7 +124,7 @@ class RedirectDebtVisual extends StatelessWidget {
               ),
               UserAvatar(
                 author: loadedState.receiver,
-                dimension: 75,
+                dimension: avatarDimension,
                 withName: true,
                 namePosition: NamePosition.bottom,
                 onTap: () => _handleReceiverTap(context, loadedState),
