@@ -84,8 +84,8 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   Future<void> deleteExpense(String expenseId) async {
-    if (state is ExpensesLoaded) {
-      emit(ExpensesLoading());
+    if (state case final ExpensesLoaded currentState) {
+      emit(ExpensesProcessing.fromLoaded(currentState));
       return await _expenseService.deleteExpense(expenseId);
     }
     return null;

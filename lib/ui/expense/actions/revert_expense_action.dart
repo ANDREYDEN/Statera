@@ -28,12 +28,14 @@ class RevertExpenseAction extends ExpenseAction {
     if (confirmed == false) return;
 
     final groupCubit = context.read<GroupCubit>();
+    final expensesCubit = context.read<ExpensesCubit>();
     final expenseService = context.read<ExpenseService>();
     final paymentService = context.read<PaymentService>();
 
     // TODO: use transaction
     final group = groupCubit.loadedState.group;
 
+    expensesCubit.process();
     await expenseService.revertExpense(expense);
     // add expense payments from all assignees to author
     final payments = expense.assigneeUids
