@@ -5,12 +5,13 @@ class FinalizeExpenseAction {
 
   FinalizeExpenseAction(this.expenseId);
 
-  handle(BuildContext context) async {
-    snackbarCatch(
+  Future handle(BuildContext context) {
+    return snackbarCatch(
       context,
       () async {
         final groupCubit = context.read<GroupCubit>();
         final expenseService = context.read<ExpenseService>();
+        final expensesCubit = context.read<ExpensesCubit>();
 
         // TODO: use transaction
         final expense = await expenseService.getExpense(expenseId);
@@ -20,6 +21,7 @@ class FinalizeExpenseAction {
         var group = groupCubit.loadedState.group;
 
         await expenseService.finalizeExpense(expenseId);
+        expensesCubit.process();
         final payments = await createPayments(context, expense, group);
         updateGroup(groupCubit, payments);
       },

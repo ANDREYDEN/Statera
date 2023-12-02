@@ -125,7 +125,10 @@ class _LandingPageState extends State<LandingPage>
 
                             final url = _selectedOption.url;
                             if (url != null) {
-                              launchUrl(Uri.parse(url));
+                              launchUrl(
+                                Uri.parse(url),
+                                mode: LaunchMode.externalApplication,
+                              );
                             }
                           },
                     child: Row(

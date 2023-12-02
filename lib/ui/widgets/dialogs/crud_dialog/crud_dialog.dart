@@ -177,7 +177,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
     }
   }
 
-  void submit({bool closeAfterSubmit = false}) async {
+  Future submit({bool closeAfterSubmit = false}) async {
     if (widget.fields.any((field) => field.getError().isNotEmpty)) {
       setState(() {
         this._dirty = true;

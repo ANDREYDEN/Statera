@@ -1,6 +1,3 @@
-import 'dart:developer' as developer;
-
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,8 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
-import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/groups/greeting_dialog.dart';
+import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
 import 'package:statera/ui/groups/update_banner.dart';
@@ -20,71 +16,43 @@ import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
-class GroupList extends StatefulWidget {
+class GroupList extends StatelessWidget {
   static const String route = '/groups';
 
   const GroupList({Key? key}) : super(key: key);
 
   @override
-  _GroupListState createState() => _GroupListState();
-}
-
-class _GroupListState extends State<GroupList> {
-  Future<void> _showGreetingDialog() async {
-    try {
-      await FirebaseRemoteConfig.instance.fetchAndActivate();
-      final message =
-          FirebaseRemoteConfig.instance.getString('greeting_message');
-      final showGreetingDialog =
-          FirebaseRemoteConfig.instance.getBool('show_greeting_dialog');
-
-      final preferencesService = context.read<PreferencesService>();
-      final messageSeen =
-          await preferencesService.checkGreetingMessageSeen(message);
-
-      if (!showGreetingDialog || messageSeen) return;
-
-      showDialog(
-        context: context,
-        builder: (_) => GreetingDialog(message: message),
-      );
-    } catch (e) {
-      developer.log(e.toString());
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero, _showGreetingDialog);
-
-    return NotificationsReminder(
-      child: PageScaffold(
-        title: kAppName,
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, SupportPage.route),
-            icon: Icon(Icons.info_outline_rounded),
-          ),
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, Settings.route),
-            icon: Icon(Icons.settings_outlined),
-          ),
-        ],
-        fabText: 'New Group',
-        onFabPressed: defaultTargetPlatform == TargetPlatform.windows
-            ? null
-            : createGroup,
-        child: Column(
-          children: [
-            UpdateBanner(),
-            Expanded(child: GroupListBody()),
+    return Greeting(
+      child: NotificationsReminder(
+        child: PageScaffold(
+          title: kAppName,
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.pushNamed(context, SupportPage.route),
+              icon: Icon(Icons.info_outline_rounded),
+            ),
+            IconButton(
+              onPressed: () => Navigator.pushNamed(context, Settings.route),
+              icon: Icon(Icons.settings_outlined),
+            ),
           ],
+          fabText: 'New Group',
+          onFabPressed: defaultTargetPlatform == TargetPlatform.windows
+              ? null
+              : () => _createGroup(context),
+          child: Column(
+            children: [
+              UpdateBanner(),
+              Expanded(child: GroupListBody()),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  createGroup() {
+  _createGroup(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final groupsCubit = context.read<GroupsCubit>();
 

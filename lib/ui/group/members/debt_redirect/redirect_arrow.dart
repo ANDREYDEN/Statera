@@ -15,15 +15,19 @@ class RedirectArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Stack(
+      alignment: Alignment.center,
       children: [
         Icon(
           Icons.arrow_right_alt_rounded,
           size: 60,
           color: value == 0 || loading ? Colors.grey : color,
         ),
-        if (!loading) PriceText(value: value),
+        if (!loading)
+          Positioned(
+            bottom: 0,
+            child: PriceText(value: value),
+          ),
       ],
     );
   }

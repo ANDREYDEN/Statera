@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 enum ButtonType { elevated, text }
 
 class ProtectedButton extends StatefulWidget {
-  final FutureOr<void> Function()? onPressed;
+  final Future<void> Function()? onPressed;
   final ButtonType buttonType;
 
   final Widget child;
@@ -18,8 +18,7 @@ class ProtectedButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ProtectedButtonState createState() =>
-      _ProtectedButtonState();
+  _ProtectedButtonState createState() => _ProtectedButtonState();
 }
 
 class _ProtectedButtonState extends State<ProtectedButton> {
@@ -51,9 +50,15 @@ class _ProtectedButtonState extends State<ProtectedButton> {
                 _actionStateController.add(false);
               };
 
+        final content = actionInProgress
+            ? SizedBox.square(
+                dimension: 20,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              )
+            : widget.child;
         return widget.buttonType == ButtonType.text
-            ? TextButton(onPressed: onPressed, child: widget.child)
-            : ElevatedButton(onPressed: onPressed, child: widget.child);
+            ? TextButton(onPressed: onPressed, child: content)
+            : ElevatedButton(onPressed: onPressed, child: content);
       },
     );
   }

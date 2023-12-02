@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/widgets/buttons/ok_button.dart';
+import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 class GreetingDialog extends StatefulWidget {
   final String message;
@@ -26,21 +27,23 @@ class _GreetingDialogState extends State<GreetingDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Welcome back!'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(widget.message),
-          SizedBox(height: 10),
-          CheckboxListTile(
-            title: Text("Don't show this again"),
-            value: _nextTimeGone,
-            onChanged: (_) {
-              setState(() {
-                _nextTimeGone = !_nextTimeGone;
-              });
-            },
-          ),
-        ],
+      content: DialogWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.message),
+            SizedBox(height: 10),
+            CheckboxListTile(
+              title: Text("Don't show this again"),
+              value: _nextTimeGone,
+              onChanged: (_) {
+                setState(() {
+                  _nextTimeGone = !_nextTimeGone;
+                });
+              },
+            ),
+          ],
+        ),
       ),
       actions: [OkButton(onPressed: _handleConfirm)],
     );
