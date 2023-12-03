@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:statera/data/models/custom_user.dart';
 
+part 'user_avatar_name.dart';
+
 class UserAvatar extends StatelessWidget {
   final CustomUser author;
   final void Function()? onTap;
@@ -105,25 +107,12 @@ class UserAvatar extends StatelessWidget {
                 ],
               ),
               if (this.withName)
-                if (!this.loading)
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        this.author.name,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  )
-                else
-                  Container(
-                    width: 80,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.grey,
-                    ),
-                  ),
+                UserAvatarName(
+                  author.name,
+                  loading: loading,
+                  namePosition: namePosition,
+                  dimension: dimension,
+                )
             ],
           ),
         ),
