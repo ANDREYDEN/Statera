@@ -240,15 +240,36 @@ void main() {
   });
 
   group('conversion', () {
-    test('to Firestore maps member ids', () {
-      final firstMember = CustomUser(uid: 'first', name: 'First');
-      final secondMember = CustomUser(uid: 'second', name: 'Second');
-      var group = Group.empty(members: [firstMember, secondMember]);
+    group('to Firestore', () {
+      test('maps member ids', () {
+        final firstMember = CustomUser(uid: 'first', name: 'First');
+        final secondMember = CustomUser(uid: 'second', name: 'Second');
+        var group = Group.empty(members: [firstMember, secondMember]);
 
-      var firestoreData = group.toFirestore();
+        var firestoreData = group.toFirestore();
 
-      var memberIds = [firstMember.uid, secondMember.uid];
-      expect(firestoreData['memberIds'], equals(memberIds));
+        var memberIds = [firstMember.uid, secondMember.uid];
+        expect(firestoreData['memberIds'], equals(memberIds));
+      });
+
+      final balanceCases = [(1 / 3, 0.33), (0.999999, 1), (0.000001, 0)];
+      for (final (actualBalance, expectedBalance) in balanceCases) {
+        test('maps balance from ${actualBalance} to ${expectedBalance}', () {
+          final firstMember = CustomUser(uid: 'first', name: 'First');
+          final secondMember = CustomUser(uid: 'second', name: 'Second');
+          var group = Group.empty(members: [firstMember, secondMember]);
+          group.balance[firstMember.uid]![secondMember.uid] = actualBalance;
+
+          final firestoreData = group.toFirestore();
+
+          final firestoreBalance = firestoreData['balance'];
+
+          expect(
+            firestoreBalance[firstMember.uid]![secondMember.uid],
+            equals(expectedBalance),
+          );
+        });
+      }
     });
 
     test('parses Firestore document data', () {

@@ -7,25 +7,28 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const expenses = await db.collection('expenses').get()
-    console.log(`Found ${expenses.docs.length} expenses...`);
+    const groups = await db.collection('groups').get()
+    console.log(`Found ${groups.docs.length} groups...`);
 
-    for (const expenseDoc of expenses.docs) {
-        console.log(`Updating expense ${expenseDoc.id}...`);
-        const expense = expenseDoc.data()
+    for (const groupDoc of groups.docs) {
+        console.log(`Updating group ${groupDoc.id}...`);
+        const group = groupDoc.data()
         try {
-            const relatedUids = new Set([...expense.assigneeIds, expense.authorUid]).values()
-            for (const uid of relatedUids) {
-                const stage = calculateStage(expense, uid)
-                await db.collection('users').doc(uid)
-                    .collection('expenses').doc(expenseDoc.id)
-                    .set({ ...expense, stage })
+            const balance = group['balance']
+            // console.log('Old balance: ', JSON.stringify(balance, undefined, 2));
+
+            for (const uid1 in balance) {
+                for (const uid2 in balance[uid1]) {
+                    balance[uid1][uid2] = Math.round(balance[uid1][uid2] * 100) / 100
+                }
             }
 
-            // console.log(expense);
-            // await expenseDoc.ref.set(expense)
+            await groupDoc.ref.update({
+                balance
+            })
+            // console.log('New balance: ', JSON.stringify(balance, undefined, 2));
         } catch (error) {
-            console.log(`Could not update expense ${expenseDoc.id}: `, error);
+            console.log(`Could not update group ${groupDoc.id}: `, error);
         }
     }
 })();

@@ -165,3 +165,8 @@ isApplePlatform() {
 
 String currentPlatformName =
     kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];
+
+double round(double value, int places) {
+  final mod = pow(10.0, places);
+  return ((value * mod).round().toDouble() / mod);
+}

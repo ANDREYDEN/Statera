@@ -256,6 +256,21 @@ class Group {
         .toList();
   }
 
+  Map<String, Map<String, double>> getFirestoreBalance() {
+    return Map.fromEntries(
+      this.balance.entries.map(
+            (memberEntry) => MapEntry(
+              memberEntry.key,
+              Map.fromEntries(
+                memberEntry.value.entries.map(
+                  (entry) => MapEntry(entry.key, round(entry.value, 2)),
+                ),
+              ),
+            ),
+          ),
+    );
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -263,7 +278,7 @@ class Group {
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
       'adminId': admin.uid,
-      'balance': balance,
+      'balance': getFirestoreBalance(),
       'currencySign': currencySign,
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
