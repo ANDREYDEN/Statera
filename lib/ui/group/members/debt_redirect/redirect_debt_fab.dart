@@ -50,21 +50,21 @@ class RedirectDebtFAB extends StatelessWidget {
 
     await paymentService.addPayment(Payment.fromRedirect(
       groupId: state.group.id!,
-      authorId: state.uid,
+      authorId: state.authorUid,
       payerId: state.owerUid,
-      receiverId: state.uid,
+      receiverId: state.authorUid,
       amount: owerPaymentAmount,
     ));
     await paymentService.addPayment(Payment.fromRedirect(
       groupId: state.group.id!,
-      authorId: state.uid,
-      payerId: state.uid,
+      authorId: state.authorUid,
+      payerId: state.authorUid,
       receiverId: state.receiverUid,
       amount: authorPaymentAmount,
     ));
     await paymentService.addPayment(Payment.fromRedirect(
       groupId: state.group.id!,
-      authorId: state.uid,
+      authorId: state.authorUid,
       payerId: state.receiverUid,
       receiverId: state.owerUid,
       amount: redirectedDebt,

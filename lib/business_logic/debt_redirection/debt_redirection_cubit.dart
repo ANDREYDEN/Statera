@@ -42,12 +42,12 @@ class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
     final state = this.state as DebtRedirectionLoaded;
 
     final redirect = state.group.estimateRedirect(
-      authorUid: state.uid,
+      authorUid: state.authorUid,
       owerUid: newOwerUid,
       receiverUid: state.receiverUid,
     );
 
-    emit(state.copyWith(owerUid: newOwerUid, redirect: redirect));
+    emit(state.copyWith(redirect: redirect));
   }
 
   void changeReceiver({required String newReceiverUid}) {
@@ -56,12 +56,12 @@ class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
     final state = this.state as DebtRedirectionLoaded;
 
     final redirect = state.group.estimateRedirect(
-      authorUid: state.uid,
+      authorUid: state.authorUid,
       owerUid: state.owerUid,
       receiverUid: newReceiverUid,
     );
 
-    emit(state.copyWith(receiverUid: newReceiverUid, redirect: redirect));
+    emit(state.copyWith(redirect: redirect));
   }
 
   void startLoading() {
