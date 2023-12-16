@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/debt_redirection/debt_redirection_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/helpers.dart';
 
 class RedirectDebtFAB extends StatelessWidget {
@@ -19,10 +17,8 @@ class RedirectDebtFAB extends StatelessWidget {
     final success = await snackbarCatch(
       context,
       () async {
-        debtRedirectionCubit.startLoading();
-
         // TODO: create transaction
-        await _createPayments(context, state);
+        await debtRedirectionCubit.createPayments();
         groupCubit.update((group) => state.redirect.execute(group));
       },
       successMessage: 'Debt successfuly redirected',
@@ -36,39 +32,6 @@ class RedirectDebtFAB extends StatelessWidget {
     if (success) {
       Navigator.of(context).pop();
     }
-  }
-
-  Future<void> _createPayments(
-    BuildContext context,
-    DebtRedirectionLoaded state,
-  ) async {
-    final paymentService = context.read<PaymentService>();
-
-    final owerPaymentAmount = state.owerDebt - state.redirect.newOwerDebt;
-    final authorPaymentAmount = state.authorDebt - state.redirect.newAuthorDebt;
-    final redirectedDebt = state.redirect.redirectedBalance;
-
-    await paymentService.addPayment(Payment.fromRedirect(
-      groupId: state.group.id!,
-      authorId: state.authorUid,
-      payerId: state.owerUid,
-      receiverId: state.authorUid,
-      amount: owerPaymentAmount,
-    ));
-    await paymentService.addPayment(Payment.fromRedirect(
-      groupId: state.group.id!,
-      authorId: state.authorUid,
-      payerId: state.authorUid,
-      receiverId: state.receiverUid,
-      amount: authorPaymentAmount,
-    ));
-    await paymentService.addPayment(Payment.fromRedirect(
-      groupId: state.group.id!,
-      authorId: state.authorUid,
-      payerId: state.receiverUid,
-      receiverId: state.owerUid,
-      amount: redirectedDebt,
-    ));
   }
 
   @override
