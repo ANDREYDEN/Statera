@@ -86,127 +86,128 @@ void main() {
 
   group('redirects', () {
     final member = CustomUser(uid: 'mem', name: 'member');
-    final receiverMember = CustomUser(uid: 'omem', name: 'other member');
-    final owerMember = CustomUser(uid: 'amem', name: 'another member');
+    final receiver = CustomUser(uid: 'omem', name: 'other member');
+    final ower = CustomUser(uid: 'amem', name: 'another member');
 
     test('can get memebers who owe to a given user', () {
       final group = Group.empty(
-        members: [member, receiverMember, owerMember],
+        members: [member, receiver, ower],
       );
 
-      group.balance[member.uid]![receiverMember.uid] = 10;
-      group.balance[receiverMember.uid]![member.uid] = -10;
-      group.balance[owerMember.uid]![member.uid] = 5;
-      group.balance[member.uid]![owerMember.uid] = -5;
+      group.balance[member.uid]![receiver.uid] = 10;
+      group.balance[receiver.uid]![member.uid] = -10;
+      group.balance[ower.uid]![member.uid] = 5;
+      group.balance[member.uid]![ower.uid] = -5;
 
       final owers = group.getMembersThatOweToUser(member.uid);
 
       expect(owers, hasLength(1));
-      expect(owers, contains(owerMember.uid));
+      expect(owers, contains(ower.uid));
     });
 
     test('can get memebers who a given user owes to', () {
       final group = Group.empty(
-        members: [member, receiverMember, owerMember],
+        members: [member, receiver, ower],
       );
 
-      group.balance[member.uid]![receiverMember.uid] = 10;
-      group.balance[receiverMember.uid]![member.uid] = -10;
-      group.balance[owerMember.uid]![member.uid] = 5;
-      group.balance[member.uid]![owerMember.uid] = -5;
+      group.balance[member.uid]![receiver.uid] = 10;
+      group.balance[receiver.uid]![member.uid] = -10;
+      group.balance[ower.uid]![member.uid] = 5;
+      group.balance[member.uid]![ower.uid] = -5;
 
       final receivers = group.getMembersThatUserOwesTo(member.uid);
 
       expect(receivers, hasLength(1));
-      expect(receivers, contains(receiverMember.uid));
+      expect(receivers, contains(receiver.uid));
     });
 
     test('can check if redirect is possible', () {
       final group = Group.empty(
-        members: [member, receiverMember, owerMember],
+        members: [member, receiver, ower],
       );
 
       expect(group.canRedirect(member.uid), isFalse);
 
-      group.balance[member.uid]![receiverMember.uid] = 10;
-      group.balance[receiverMember.uid]![member.uid] = -10;
+      group.balance[member.uid]![receiver.uid] = 10;
+      group.balance[receiver.uid]![member.uid] = -10;
 
       expect(group.canRedirect(member.uid), isFalse);
 
-      group.balance[owerMember.uid]![member.uid] = 5;
-      group.balance[member.uid]![owerMember.uid] = -5;
+      group.balance[ower.uid]![member.uid] = 5;
+      group.balance[member.uid]![ower.uid] = -5;
 
       expect(group.canRedirect(member.uid), isTrue);
     });
 
     test('can estimate redirect', () {
       final group = Group.empty(
-        members: [member, receiverMember, owerMember],
+        members: [member, receiver, ower],
       );
 
-      group.balance[owerMember.uid]![member.uid] = 3;
-      group.balance[member.uid]![owerMember.uid] = -3;
-      group.balance[member.uid]![receiverMember.uid] = 5;
-      group.balance[receiverMember.uid]![member.uid] = -5;
+      group.balance[ower.uid]![member.uid] = 3;
+      group.balance[member.uid]![ower.uid] = -3;
+      group.balance[member.uid]![receiver.uid] = 5;
+      group.balance[receiver.uid]![member.uid] = -5;
 
-      final (newOwerDebt, newAuthorDebt, redirectedDebt) =
-          group.estimateRedirect(
+      final redirect = group.estimateRedirect(
         authorUid: member.uid,
-        owerUid: owerMember.uid,
-        receiverUid: receiverMember.uid,
+        owerUid: ower.uid,
+        receiverUid: receiver.uid,
       );
 
-      expect(newOwerDebt, equals(0));
-      expect(newAuthorDebt, equals(2));
-      expect(redirectedDebt, equals(3));
+      expect(redirect.newOwerDebt, equals(0));
+      expect(redirect.newAuthorDebt, equals(2));
+      expect(redirect.redirectedBalance, equals(3));
     });
 
-    test('can redirect when ower debt is smaller than member debt', () {
-      final group = Group.empty(
-        members: [member, receiverMember, owerMember],
-      );
+    <List<double>>[
+      [3, 5, 0, 0, 2, 3],
+      [5, 3, 0, 2, 0, 3],
+      [88.47, 168.63, 280.35, 0, 80.16, 368.82],
+    ].forEach((testCase) {
+      final [
+        owerMemberDebt,
+        memberDebt,
+        owerReceiverDebt,
+        expectedOwerMemberDebt,
+        expectedMemberDebt,
+        expectedOwerReceiverDebt,
+      ] = testCase;
 
-      group.balance[owerMember.uid]![member.uid] = 3;
-      group.balance[member.uid]![owerMember.uid] = -3;
-      group.balance[member.uid]![receiverMember.uid] = 5;
-      group.balance[receiverMember.uid]![member.uid] = -5;
+      test(
+          'can redirect debt from A--[$owerMemberDebt]-->B--[$memberDebt]-->C($owerReceiverDebt) to A--[$expectedOwerMemberDebt]-->B--[$expectedMemberDebt]-->C($expectedOwerReceiverDebt)',
+          () {
+        final group = Group.empty(
+          members: [member, receiver, ower],
+        );
 
-      group.redirect(
-        authorUid: member.uid,
-        owerUid: owerMember.uid,
-        receiverUid: receiverMember.uid,
-      );
+        group.balance[ower.uid]![member.uid] = owerMemberDebt;
+        group.balance[member.uid]![ower.uid] = -owerMemberDebt;
+        group.balance[member.uid]![receiver.uid] = memberDebt;
+        group.balance[receiver.uid]![member.uid] = -memberDebt;
+        group.balance[ower.uid]![receiver.uid] = owerReceiverDebt;
+        group.balance[receiver.uid]![ower.uid] = -owerReceiverDebt;
 
-      expect(group.balance[owerMember.uid]![member.uid], equals(0));
-      expect(group.balance[member.uid]![owerMember.uid], equals(0));
-      expect(group.balance[member.uid]![receiverMember.uid], equals(2));
-      expect(group.balance[receiverMember.uid]![member.uid], equals(-2));
-      expect(group.balance[owerMember.uid]![receiverMember.uid], equals(3));
-      expect(group.balance[receiverMember.uid]![owerMember.uid], equals(-3));
-    });
+        final redirect = group.estimateRedirect(
+          authorUid: member.uid,
+          owerUid: ower.uid,
+          receiverUid: receiver.uid,
+        );
+        redirect.execute(group);
 
-    test('can redirect when ower debt is bigger than member debt', () {
-      final group = Group.empty(
-        members: [member, receiverMember, owerMember],
-      );
-
-      group.balance[owerMember.uid]![member.uid] = 5;
-      group.balance[member.uid]![owerMember.uid] = -5;
-      group.balance[member.uid]![receiverMember.uid] = 3;
-      group.balance[receiverMember.uid]![member.uid] = -3;
-
-      group.redirect(
-        authorUid: member.uid,
-        owerUid: owerMember.uid,
-        receiverUid: receiverMember.uid,
-      );
-
-      expect(group.balance[owerMember.uid]![member.uid], equals(2));
-      expect(group.balance[member.uid]![owerMember.uid], equals(-2));
-      expect(group.balance[member.uid]![receiverMember.uid], equals(0));
-      expect(group.balance[receiverMember.uid]![member.uid], equals(-0));
-      expect(group.balance[owerMember.uid]![receiverMember.uid], equals(3));
-      expect(group.balance[receiverMember.uid]![owerMember.uid], equals(-3));
+        expect(group.balance[ower.uid]![member.uid],
+            closeTo(expectedOwerMemberDebt, 0.001));
+        expect(group.balance[member.uid]![ower.uid],
+            closeTo(-expectedOwerMemberDebt, 0.001));
+        expect(group.balance[member.uid]![receiver.uid],
+            closeTo(expectedMemberDebt, 0.001));
+        expect(group.balance[receiver.uid]![member.uid],
+            closeTo(-expectedMemberDebt, 0.001));
+        expect(group.balance[ower.uid]![receiver.uid],
+            closeTo(expectedOwerReceiverDebt, 0.001));
+        expect(group.balance[receiver.uid]![ower.uid],
+            closeTo(-expectedOwerReceiverDebt, 0.001));
+      });
     });
 
     test('can suggest best redirect for a given user', () {
@@ -214,21 +215,15 @@ void main() {
       final anotherReceiver = CustomUser(uid: 'fourth', name: 'Fourth');
 
       final group = Group.empty(
-        members: [
-          member,
-          receiverMember,
-          owerMember,
-          anotherOwer,
-          anotherReceiver
-        ],
+        members: [member, receiver, ower, anotherOwer, anotherReceiver],
       );
 
-      group.balance[owerMember.uid]![member.uid] = 5;
-      group.balance[member.uid]![owerMember.uid] = -5;
+      group.balance[ower.uid]![member.uid] = 5;
+      group.balance[member.uid]![ower.uid] = -5;
       group.balance[anotherOwer.uid]![member.uid] = 10;
       group.balance[member.uid]![anotherOwer.uid] = -10;
-      group.balance[member.uid]![receiverMember.uid] = 3;
-      group.balance[receiverMember.uid]![member.uid] = -3;
+      group.balance[member.uid]![receiver.uid] = 3;
+      group.balance[receiver.uid]![member.uid] = -3;
       group.balance[member.uid]![anotherReceiver.uid] = 7;
       group.balance[anotherReceiver.uid]![member.uid] = -7;
 
@@ -252,8 +247,12 @@ void main() {
         expect(firestoreData['memberIds'], equals(memberIds));
       });
 
-      final balanceCases = [(1 / 3, 0.33), (0.999999, 1), (0.000001, 0)];
-      for (final (actualBalance, expectedBalance) in balanceCases) {
+      [
+        (1 / 3, 0.33),
+        (0.999999, 1),
+        (0.000001, 0),
+      ].forEach((testCase) {
+        final (actualBalance, expectedBalance) = testCase;
         test('maps balance from ${actualBalance} to ${expectedBalance}', () {
           final firstMember = CustomUser(uid: 'first', name: 'First');
           final secondMember = CustomUser(uid: 'second', name: 'Second');
@@ -269,7 +268,7 @@ void main() {
             equals(expectedBalance),
           );
         });
-      }
+      });
     });
 
     test('parses Firestore document data', () {

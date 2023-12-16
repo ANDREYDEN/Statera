@@ -100,8 +100,9 @@ class RedirectDebtVisual extends StatelessWidget {
               ),
               Expanded(
                 child: RedirectArrow(
-                  value:
-                      isAfter ? loadedState.newOwerDebt : loadedState.owerDebt,
+                  value: isAfter
+                      ? loadedState.redirect.newOwerDebt
+                      : loadedState.owerDebt,
                   color: Colors.green,
                   loading: isLoading,
                 ),
@@ -116,7 +117,7 @@ class RedirectDebtVisual extends StatelessWidget {
               Expanded(
                 child: RedirectArrow(
                   value: isAfter
-                      ? loadedState.newAuthorDebt
+                      ? loadedState.redirect.newAuthorDebt
                       : loadedState.authorDebt,
                   color: Colors.red,
                   loading: isLoading,

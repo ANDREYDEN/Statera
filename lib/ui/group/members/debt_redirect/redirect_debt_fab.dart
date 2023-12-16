@@ -22,27 +22,8 @@ class RedirectDebtFAB extends StatelessWidget {
         debtRedirectionCubit.startLoading();
 
         // TODO: create transaction
-        late double owerPaymentAmount;
-        late double authorPaymentAmount;
-        late double redirectedDebt;
-        groupCubit.update((group) {
-          final (owerPaymentAmnt, authorPaymentAmnt, redirectedDbt) =
-              group.redirect(
-            authorUid: uid,
-            owerUid: state.owerUid,
-            receiverUid: state.receiverUid,
-          );
-          owerPaymentAmount = owerPaymentAmnt;
-          authorPaymentAmount = authorPaymentAmnt;
-          redirectedDebt = redirectedDbt;
-        });
-        await _createPayments(
-          context,
-          state,
-          owerPaymentAmount,
-          authorPaymentAmount,
-          redirectedDebt,
-        );
+        await _createPayments(context, state);
+        groupCubit.update((group) => state.redirect.execute(group));
       },
       successMessage: 'Debt successfuly redirected',
     );
@@ -60,11 +41,12 @@ class RedirectDebtFAB extends StatelessWidget {
   Future<void> _createPayments(
     BuildContext context,
     DebtRedirectionLoaded state,
-    double owerPaymentAmount,
-    double authorPaymentAmount,
-    double redirectedDebt,
   ) async {
     final paymentService = context.read<PaymentService>();
+
+    final owerPaymentAmount = state.owerDebt - state.redirect.newOwerDebt;
+    final authorPaymentAmount = state.authorDebt - state.redirect.newAuthorDebt;
+    final redirectedDebt = state.redirect.redirectedBalance;
 
     await paymentService.addPayment(Payment.fromRedirect(
       groupId: state.group.id!,

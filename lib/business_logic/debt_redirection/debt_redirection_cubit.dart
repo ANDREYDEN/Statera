@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/value_objects/redirect.dart';
 
 part 'debt_redirection_state.dart';
 
@@ -40,17 +41,13 @@ class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
 
     final state = this.state as DebtRedirectionLoaded;
 
-    final (newOwerDebt, newAuthorDebt, _) = state.group.estimateRedirect(
+    final redirect = state.group.estimateRedirect(
       authorUid: state.uid,
       owerUid: newOwerUid,
       receiverUid: state.receiverUid,
     );
 
-    emit(state.copyWith(
-      owerUid: newOwerUid,
-      newAuthorDebt: newAuthorDebt,
-      newOwerDebt: newOwerDebt,
-    ));
+    emit(state.copyWith(owerUid: newOwerUid, redirect: redirect));
   }
 
   void changeReceiver({required String newReceiverUid}) {
@@ -58,17 +55,13 @@ class DebtRedirectionCubit extends Cubit<DebtRedirectionState> {
 
     final state = this.state as DebtRedirectionLoaded;
 
-    final (newOwerDebt, newAuthorDebt, _) = state.group.estimateRedirect(
+    final redirect = state.group.estimateRedirect(
       authorUid: state.uid,
       owerUid: state.owerUid,
       receiverUid: newReceiverUid,
     );
 
-    emit(state.copyWith(
-      receiverUid: newReceiverUid,
-      newAuthorDebt: newAuthorDebt,
-      newOwerDebt: newOwerDebt,
-    ));
+    emit(state.copyWith(receiverUid: newReceiverUid, redirect: redirect));
   }
 
   void startLoading() {

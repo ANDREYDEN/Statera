@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/value_objects/redirect.dart';
 import 'package:statera/utils/helpers.dart';
 
 /// Describes a group of users sharing expenses
@@ -160,8 +161,7 @@ class Group {
     return owers.isNotEmpty && receivers.isNotEmpty;
   }
 
-  /// returns newOwerDebt, newAuthorDebt and redirectedBalance as a tuple
-  (double, double, double) estimateRedirect({
+  Redirect estimateRedirect({
     required String authorUid,
     required String owerUid,
     required String receiverUid,
@@ -181,7 +181,14 @@ class Group {
       this.balance[authorUid]![receiverUid]!,
     );
 
-    return (newOwerDebt, newAuthorDebt, redirectedBalance);
+    return Redirect(
+      owerUid,
+      newOwerDebt,
+      authorUid,
+      newAuthorDebt,
+      receiverUid,
+      redirectedBalance,
+    );
   }
 
   (String, String) getBestRedirect(String uid) {
@@ -209,35 +216,6 @@ class Group {
     });
 
     return (bestOwerUid, bestReceiverUid);
-  }
-
-  /// returns owerPaymentAmount, authorPaymentAmount and redirectedBalance as a tuple
-  (double, double, double) redirect({
-    required String authorUid,
-    required String owerUid,
-    required String receiverUid,
-  }) {
-    final (newOwerDebt, newAuthorDebt, redirectedDebt) = this.estimateRedirect(
-      authorUid: authorUid,
-      owerUid: owerUid,
-      receiverUid: receiverUid,
-    );
-
-    final owerPaymentAmount = this.balance[owerUid]![authorUid]! - newOwerDebt;
-    this.balance[owerUid]![authorUid] = newOwerDebt;
-    this.balance[authorUid]![owerUid] = -newOwerDebt;
-
-    final authorPaymentAmount =
-        this.balance[authorUid]![receiverUid]! - newAuthorDebt;
-    this.balance[authorUid]![receiverUid] = newAuthorDebt;
-    this.balance[receiverUid]![authorUid] = -newAuthorDebt;
-
-    this.balance[owerUid]![receiverUid] =
-        this.balance[owerUid]![receiverUid]! + redirectedDebt;
-    this.balance[receiverUid]![owerUid] =
-        this.balance[receiverUid]![owerUid]! - redirectedDebt;
-
-    return (owerPaymentAmount, authorPaymentAmount, redirectedDebt);
   }
 
   List<String> getMembersThatOweToUser(String uid) {

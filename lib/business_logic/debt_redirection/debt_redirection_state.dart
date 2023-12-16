@@ -9,19 +9,16 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
   late final String receiverUid;
   late List<String> owerUids;
   late List<String> receiverUids;
-  late final double newOwerDebt;
-  late final double newAuthorDebt;
+  late Redirect redirect;
 
-  DebtRedirectionLoaded({
-    required this.uid,
-    required this.group,
-    required this.owerUid,
-    required this.receiverUid,
-    required this.owerUids,
-    required this.receiverUids,
-    required this.newOwerDebt,
-    required this.newAuthorDebt,
-  });
+  DebtRedirectionLoaded(
+      {required this.uid,
+      required this.group,
+      required this.owerUid,
+      required this.receiverUid,
+      required this.owerUids,
+      required this.receiverUids,
+      required this.redirect});
 
   DebtRedirectionLoaded.initial({required this.uid, required this.group}) {
     owerUids = group.getMembersThatOweToUser(uid);
@@ -31,20 +28,16 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
     owerUid = bestOwerUid;
     receiverUid = bestReceiverUid;
 
-    final (newOwerDebt, newAuthorDebt, _) = group.estimateRedirect(
+    redirect = group.estimateRedirect(
       authorUid: uid,
       owerUid: owerUid,
       receiverUid: receiverUid,
     );
-    this.newAuthorDebt = newAuthorDebt;
-    this.newOwerDebt = newOwerDebt;
   }
 
   DebtRedirectionLoaded.fake({
     this.owerUids = const [],
     this.receiverUids = const [],
-    this.newOwerDebt = 0,
-    this.newAuthorDebt = 0,
   }) {
     this.uid = 'uid';
     this.owerUid = 'owerUid';
@@ -55,13 +48,13 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
           .map((e) => CustomUser(name: e, uid: e))
           .toList(),
     );
+    this.redirect = Redirect('owerUid', 0, 'uid', 0, 'receiverUid', 0);
   }
 
   DebtRedirectionLoaded copyWith({
     String? owerUid,
     String? receiverUid,
-    double? newOwerDebt,
-    double? newAuthorDebt,
+    Redirect? redirect,
   }) {
     return DebtRedirectionLoaded(
       uid: uid,
@@ -70,8 +63,7 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
       receiverUid: receiverUid ?? this.receiverUid,
       owerUids: owerUids,
       receiverUids: receiverUids,
-      newOwerDebt: newOwerDebt ?? this.newOwerDebt,
-      newAuthorDebt: newAuthorDebt ?? this.newAuthorDebt,
+      redirect: redirect ?? this.redirect,
     );
   }
 
