@@ -20,15 +20,12 @@ class RedirectDebtView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
     final uid = context.read<AuthBloc>().uid;
-    final groupCubit = context.read<GroupCubit>();
     final paymentService = context.read<PaymentService>();
+    final groupCubit = context.watch<GroupCubit>();
 
     return BlocProvider.value(
       value: DebtRedirectionCubit(paymentService)
-        ..init(
-          uid: uid,
-          groupCubit: groupCubit,
-        ),
+        ..init(uid, groupCubit.loadedState.group),
       child: PageScaffold(
         title: 'Redirect Debt',
         fab: RedirectDebtFAB(),

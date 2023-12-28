@@ -15,6 +15,7 @@ import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
@@ -29,6 +30,7 @@ final defaultExpenseService = MockExpenseService();
 final defaultUserExpensesRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
 final defaultAuthService = MockAuthService();
+final defaultPaymentService = MockPaymentService();
 final defaultCurrentUser = MockUser();
 final defaultCurrentUserId = 'foo';
 final defaultGroup = Group(
@@ -52,7 +54,7 @@ Future<void> customPump(
   Group? group,
   List<Expense>? expenses,
 }) async {
-  when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
+  when(defaultCurrentUser.uid).thenReturn(currentUserId ?? defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
   when(defaultUserExpensesRepository.listenForRelatedExpenses(
