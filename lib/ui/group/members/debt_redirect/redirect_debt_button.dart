@@ -13,8 +13,8 @@ class RedirectDebtButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var uid = context.watch<AuthBloc>().uid;
-    var groupCubit = context.read<GroupCubit>();
+    var uid = context.select((AuthBloc auth) => auth.uid);
+    var groupCubit = context.watch<GroupCubit>();
 
     var redirectDebtFeatureEnabled =
         FirebaseRemoteConfig.instance.getBool('redirect_debt_feature_flag');

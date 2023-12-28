@@ -31,7 +31,8 @@ Future<void> main() async {
   await FirebaseRemoteConfig.instance.setDefaults(<String, dynamic>{
     'greeting_message': 'Welcome to Statera!',
     'show_greeting_dialog': false,
-    'dynamic_expense_loading_feature_flag': true
+    'dynamic_expense_loading_feature_flag': true,
+    'redirect_debt_feature_flag': true
   });
 
   configureEmulators();
