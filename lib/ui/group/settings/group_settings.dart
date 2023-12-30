@@ -6,6 +6,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/settings/debt_redirect_setting.dart';
 import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
@@ -80,30 +81,6 @@ class GroupSettings extends StatelessWidget {
                 },
               ),
               SizedBox(height: 20),
-              SwitchListTile(
-                title: Row(
-                  children: [
-                    Text('Allow members to redirect debt'),
-                    SizedBox(width: 5),
-                    TextButton(
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => DebtRedirectExplainerDialog(),
-                      ),
-                      child: Text('Learn more'),
-                    )
-                  ],
-                ),
-                value: group.supportsDebtRedirection,
-                onChanged: (isOn) {
-                  final groupCubit = context.read<GroupCubit>();
-
-                  groupCubit.update((group) {
-                    group.supportsDebtRedirection = isOn;
-                  });
-                },
-              ),
-              SizedBox(height: 40),
               SectionTitle('Default Expense Settings'),
               SizedBox(height: 20),
               SwitchListTile(
@@ -177,6 +154,12 @@ class GroupSettings extends StatelessWidget {
                   },
                 ),
               ],
+              SizedBox(height: 40),
+              SectionTitle(
+                'Beta Features',
+                tooltipText: 'These settings are experimental',
+              ),
+              DebtRedirectSetting(group: group),
               SizedBox(height: 40),
             ],
             DangerZone(
