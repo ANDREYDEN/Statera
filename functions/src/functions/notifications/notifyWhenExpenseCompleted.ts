@@ -10,8 +10,7 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
 
   const groupId = expenseSnap.data()?.groupId
 
-  const author = expenseSnap.data()?.author
-  const authorTokens = await getUserNotificationTokens(author?.uid)
+  const authorTokens = await getUserNotificationTokens(expenseSnap.data()?.authorUid)
   console.log('Retrieved tokens:', authorTokens)
 
   if (authorTokens.length === 0) return null
