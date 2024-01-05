@@ -1,3 +1,5 @@
+import 'package:statera/utils/utils.dart';
+
 import '../models/models.dart';
 
 class Redirect {
@@ -18,6 +20,10 @@ class Redirect {
   );
 
   void execute(Group group) {
+    if (!_isValidFor(group)) {
+      throw Exception('Redirect $this is not valid for group with balance: ${group.balance}');
+    }
+
     group.balance[owerUid]![authorUid] = newOwerDebt;
     group.balance[authorUid]![owerUid] = -newOwerDebt;
 
@@ -63,5 +69,30 @@ class Redirect {
     ));
 
     return payments;
+  }
+
+  bool _isValidFor(Group group) {
+    final owerDebtIsConsistent = approxEqual(
+      group.balance[owerUid]![authorUid]!,
+      newOwerDebt + redirectedBalance,
+    );
+    final authorDebtIsConsistent = approxEqual(
+      group.balance[authorUid]![owerUid]! +
+          group.balance[authorUid]![receiverUid]!,
+      -newOwerDebt + newAuthorDebt,
+    );
+    final receiverDebtIsConsistent = approxEqual(
+      group.balance[receiverUid]![authorUid]!,
+      -newAuthorDebt - redirectedBalance,
+    );
+
+    return owerDebtIsConsistent &&
+        authorDebtIsConsistent &&
+        receiverDebtIsConsistent;
+  }
+
+  @override
+  String toString() {
+    return 'Redirect($owerUid, $newOwerDebt, $authorUid, $newAuthorDebt, $receiverUid, $redirectedBalance)';
   }
 }

@@ -85,9 +85,9 @@ void main() {
   });
 
   group('redirects', () {
-    final member = CustomUser(uid: 'mem', name: 'member');
-    final receiver = CustomUser(uid: 'omem', name: 'other member');
-    final ower = CustomUser(uid: 'amem', name: 'another member');
+    final member = CustomUser(uid: 'member', name: 'member');
+    final receiver = CustomUser(uid: 'receiver', name: 'other member');
+    final ower = CustomUser(uid: 'ower', name: 'another member');
 
     test('can get memebers who owe to a given user', () {
       final group = Group.empty(
