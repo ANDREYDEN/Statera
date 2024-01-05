@@ -170,3 +170,7 @@ double round(double value, int places) {
   final mod = pow(10.0, places);
   return ((value * mod).round().toDouble() / mod);
 }
+
+bool approxEqual(double a, double b, [double epsilon = 0.01]) {
+  return (a - b).abs() < epsilon;
+}

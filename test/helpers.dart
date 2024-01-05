@@ -12,9 +12,9 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
@@ -29,6 +29,7 @@ final defaultExpenseService = MockExpenseService();
 final defaultUserExpensesRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
 final defaultAuthService = MockAuthService();
+final defaultPaymentService = MockPaymentService();
 final defaultCurrentUser = MockUser();
 final defaultCurrentUserId = 'foo';
 final defaultGroup = Group(
@@ -52,7 +53,8 @@ Future<void> customPump(
   Group? group,
   List<Expense>? expenses,
 }) async {
-  when(defaultCurrentUser.uid).thenReturn(defaultCurrentUserId);
+  when(defaultCurrentUser.uid)
+      .thenReturn(currentUserId ?? defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
   when(defaultUserExpensesRepository.listenForRelatedExpenses(
@@ -65,7 +67,7 @@ Future<void> customPump(
       .thenAnswer((_) => Stream.fromIterable([group]));
 
   final featureServiceMock = MockFeatureService();
-  when(featureServiceMock.useDynamicExpenseLoading).thenReturn(true);
+  when(featureServiceMock.debtRedirectionEnabled).thenReturn(true);
 
   await tester.pumpWidget(
     MultiProvider(

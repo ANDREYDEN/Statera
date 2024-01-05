@@ -3,84 +3,64 @@ part of 'debt_redirection_cubit.dart';
 abstract class DebtRedirectionState {}
 
 class DebtRedirectionLoaded extends DebtRedirectionState {
-  late final String uid;
   late final Group group;
-  late final String owerUid;
-  late final String receiverUid;
   late List<String> owerUids;
   late List<String> receiverUids;
-  late final double newOwerDebt;
-  late final double newAuthorDebt;
+  late Redirect redirect;
 
   DebtRedirectionLoaded({
-    required this.uid,
     required this.group,
-    required this.owerUid,
-    required this.receiverUid,
     required this.owerUids,
     required this.receiverUids,
-    required this.newOwerDebt,
-    required this.newAuthorDebt,
+    required this.redirect,
   });
 
-  DebtRedirectionLoaded.initial({required this.uid, required this.group}) {
+  DebtRedirectionLoaded.initial({uid, required this.group}) {
     owerUids = group.getMembersThatOweToUser(uid);
     receiverUids = group.getMembersThatUserOwesTo(uid);
 
     final (bestOwerUid, bestReceiverUid) = group.getBestRedirect(uid);
-    owerUid = bestOwerUid;
-    receiverUid = bestReceiverUid;
 
-    final (newOwerDebt, newAuthorDebt, _) = group.estimateRedirect(
+    redirect = group.estimateRedirect(
       authorUid: uid,
-      owerUid: owerUid,
-      receiverUid: receiverUid,
+      owerUid: bestOwerUid,
+      receiverUid: bestReceiverUid,
     );
-    this.newAuthorDebt = newAuthorDebt;
-    this.newOwerDebt = newOwerDebt;
   }
 
   DebtRedirectionLoaded.fake({
     this.owerUids = const [],
     this.receiverUids = const [],
-    this.newOwerDebt = 0,
-    this.newAuthorDebt = 0,
   }) {
-    this.uid = 'uid';
-    this.owerUid = 'owerUid';
-    this.receiverUid = 'receiverUid';
     this.group = Group(
       name: 'group',
-      members: [uid, owerUid, receiverUid]
+      members: ['uid', 'owerUid', 'receiverUid']
           .map((e) => CustomUser(name: e, uid: e))
           .toList(),
     );
+    this.redirect = Redirect('owerUid', 0, 'uid', 0, 'receiverUid', 0);
   }
 
-  DebtRedirectionLoaded copyWith({
-    String? owerUid,
-    String? receiverUid,
-    double? newOwerDebt,
-    double? newAuthorDebt,
-  }) {
+  String get owerUid => redirect.owerUid;
+  String get receiverUid => redirect.receiverUid;
+  String get authorUid => redirect.authorUid;
+
+  CustomUser get ower => group.getMember(redirect.owerUid);
+  CustomUser get author => group.getMember(redirect.authorUid);
+  CustomUser get receiver => group.getMember(redirect.receiverUid);
+
+  double get owerDebt => group.balance[redirect.owerUid]![redirect.authorUid]!;
+  double get authorDebt =>
+      group.balance[redirect.authorUid]![redirect.receiverUid]!;
+
+  DebtRedirectionLoaded copyWith({Redirect? redirect}) {
     return DebtRedirectionLoaded(
-      uid: uid,
       group: group,
-      owerUid: owerUid ?? this.owerUid,
-      receiverUid: receiverUid ?? this.receiverUid,
       owerUids: owerUids,
       receiverUids: receiverUids,
-      newOwerDebt: newOwerDebt ?? this.newOwerDebt,
-      newAuthorDebt: newAuthorDebt ?? this.newAuthorDebt,
+      redirect: redirect ?? this.redirect,
     );
   }
-
-  CustomUser get ower => group.getMember(owerUid);
-  CustomUser get author => group.getMember(uid);
-  CustomUser get receiver => group.getMember(receiverUid);
-
-  double get owerDebt => group.balance[owerUid]![uid]!;
-  double get authorDebt => group.balance[uid]![receiverUid]!;
 }
 
 class DebtRedirectionLoading extends DebtRedirectionState {}

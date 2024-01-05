@@ -11,7 +11,6 @@ import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
-import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/auth_guard.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -68,12 +67,7 @@ final List<PagePath> _paths = [
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
             context.read<GroupService>(),
-          )..load(
-              numberOfExpenses:
-                  context.read<FeatureService>().useDynamicExpenseLoading
-                      ? ExpensesCubit.expensesPerPage
-                      : 10000,
-            ),
+          )..load(),
         ),
         BlocProvider(
           create: (context) => NewPaymentsCubit(context.read<PaymentService>())

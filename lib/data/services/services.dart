@@ -9,3 +9,4 @@ export 'payment_service.dart';
 export 'notification_service.dart';
 export 'preferences_service.dart';
 export 'user_expense_repository.dart';
+export 'feature_service.dart';
