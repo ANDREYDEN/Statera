@@ -5,6 +5,6 @@ import 'package:mockito/annotations.dart';
 /// This service is also auto mocked for testing.
 @GenerateNiceMocks([MockSpec<FeatureService>()])
 class FeatureService {
-  bool get useDynamicExpenseLoading => FirebaseRemoteConfig.instance
-        .getBool('dynamic_expense_loading_feature_flag');
+  bool get debtRedirectionEnabled =>
+      FirebaseRemoteConfig.instance.getBool('redirect_debt_feature_flag');
 }
