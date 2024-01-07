@@ -30,9 +30,14 @@ class EditExpenseAction extends EntityAction {
         ],
         onSubmit: (values) async {
           expensesCubit.process();
-          expenseService.updateExpenseById(expense.id, (expense) {
-            expense.name = values['expense_name']!;
-          });
+          final success = await snackbarCatch(
+            context,
+            () => expenseService.updateExpenseById(expense.id, (expense) {
+              expense.name = values['expense_name']!;
+            }),
+          );
+
+          if (!success) expensesCubit.stopProcessing();
         },
       ),
     );

@@ -68,13 +68,6 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     }
   }
 
-  Future updateExpense(Expense expense) async {
-    if (state case final ExpensesLoaded currentState) {
-      emit(ExpensesProcessing.fromLoaded(currentState));
-      await _expenseService.updateExpense(expense);
-    }
-  }
-
   Future<String?> addExpense(Expense expense, String? groupId) async {
     if (state case final ExpensesLoaded currentState) {
       emit(ExpensesProcessing.fromLoaded(currentState));
@@ -101,6 +94,12 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   void process() {
     if (state is ExpensesLoaded) {
       emit(ExpensesProcessing.fromLoaded(state as ExpensesLoaded));
+    }
+  }
+
+  void stopProcessing() {
+    if (state is ExpensesProcessing) {
+      emit((state as ExpensesProcessing).toLoaded());
     }
   }
 
