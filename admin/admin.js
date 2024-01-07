@@ -7,30 +7,24 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const groups = await db.collection('groups').get()
-    console.log(`Found ${groups.docs.length} groups...`);
-
-    for (const groupDoc of groups.docs) {
-        console.log(`Updating group ${groupDoc.id}...`);
-        const group = groupDoc.data()
+    const users = await auth.listUsers()
+    console.log(`Found ${users.users.length} users.`);
+    for (const user of users.users) {
+        console.log(`Processing user doc for ${user.uid}...`);
         try {
-            const balance = group['balance']
-            // console.log('Old balance: ', JSON.stringify(balance, undefined, 2));
-
-            for (const uid1 in balance) {
-                for (const uid2 in balance[uid1]) {
-                    balance[uid1][uid2] = Math.round(balance[uid1][uid2] * 100) / 100
-                }
+            const userDocRef = await db.doc(`users/${user.uid}`).get()
+            if (!userDocRef.exists) {
+                console.log(`Creating user doc for ${user.uid}...`);
+                await db.doc(`users/${user.uid}`).set({
+                    name: user.displayName ?? 'anonymous',
+                    photoURL: user.photoURL ?? null,
+                })
             }
-
-            await groupDoc.ref.update({
-                balance
-            })
-            // console.log('New balance: ', JSON.stringify(balance, undefined, 2));
         } catch (error) {
-            console.log(`Could not update group ${groupDoc.id}: `, error);
+            console.log(`Could not create user doc for ${user.uid}: `, error);
         }
     }
+    
 })();
 
 function addUserToGroup(group, user) {
