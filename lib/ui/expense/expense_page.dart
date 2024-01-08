@@ -37,8 +37,9 @@ class ExpensePage extends StatelessWidget {
 
           return PageScaffold(
             fabText: 'New Item',
-            onFabPressed:
-                expenseCanBeUpdated ? () => UpsertItemAction().handle(context) : null,
+            onFabPressed: expenseCanBeUpdated
+                ? () => UpsertItemAction().handle(context)
+                : null,
             actions: [ExpenseActionsButton(expense: expense)],
             child: ExpenseDetails(),
           );

@@ -8,12 +8,14 @@ class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
   final Widget Function(BuildContext, ExpenseError)? errorBuilder;
   final Widget? loadingWidget;
+  final bool withSnackBars;
 
   const ExpenseBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.loadingWidget,
+    this.withSnackBars = false,
   }) : super(key: key);
 
   @override
