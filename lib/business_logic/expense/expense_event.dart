@@ -20,9 +20,14 @@ class UpdateRequested extends ExpenseEvent {
   List<Object> get props => [issuerUid];
 }
 
-class ExpenseChanged extends ExpenseEvent {
+class _FinishedUpdating extends ExpenseEvent {
+  final Expense expense;
+  const _FinishedUpdating(this.expense) : super();
+}
+
+class _ExpenseUpdatedFromDB extends ExpenseEvent {
   final Expense? expense;
-  const ExpenseChanged(this.expense) : super();
+  const _ExpenseUpdatedFromDB(this.expense) : super();
 
   @override
   List<Object?> get props => [expense];

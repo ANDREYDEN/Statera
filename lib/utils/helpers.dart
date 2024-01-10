@@ -80,8 +80,8 @@ Future<bool> snackbarCatch(
   dynamic exception;
   try {
     await operation();
-  } catch (e) {
-    exception = e;
+  } catch (err) {
+    exception = err;
   }
 
   final errorOccured = exception != null;
@@ -95,7 +95,7 @@ Future<bool> snackbarCatch(
     );
     showSnackBar(
       context,
-      errorMessage ?? exception.toString(),
+      errorMessage ?? stringifyException(exception),
       color: Theme.of(context).colorScheme.error,
     );
   } else if (successMessage != null && successMessage.isNotEmpty) {
@@ -107,6 +107,14 @@ Future<bool> snackbarCatch(
   }
 
   return !errorOccured;
+}
+
+String stringifyException(dynamic exception) {
+  if (exception.toString().contains('code=permission-denied')) {
+    return 'Insufficient permissions';
+  }
+
+  return exception.toString();
 }
 
 void showSnackBar(

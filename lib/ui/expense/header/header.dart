@@ -1,4 +1,4 @@
-part of 'expense_details.dart';
+part of '../expense_details.dart';
 
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
@@ -58,19 +58,7 @@ class Header extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 10),
-                      Card(
-                        color: Colors.grey[600],
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 5,
-                          ),
-                          child: PriceText(
-                            value: expense.total,
-                            textStyle: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      ExpensePrice()
                     ],
                   ),
                   Row(

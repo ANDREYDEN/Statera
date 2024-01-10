@@ -12,10 +12,14 @@ part 'expense_state.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpenseService _expenseService;
+  Timer? updateTimer;
 
   ExpenseBloc(this._expenseService) : super(ExpenseLoading()) {
     on<UpdateRequested>(_handleUpdate);
-    on<ExpenseChanged>(_handleExpenseChanged);
+    on<_FinishedUpdating>(
+      (event, emit) => emit(ExpenseLoaded(expense: event.expense)),
+    );
+    on<_ExpenseUpdatedFromDB>(_handleExpenseUpdatedFromDB);
   }
 
   StreamSubscription? _expenseSubscription;
@@ -24,26 +28,39 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     _expenseSubscription?.cancel();
     _expenseSubscription = _expenseService
         .expenseStream(expenseId)
-        .listen((expense) => add(ExpenseChanged(expense)));
+        .listen((expense) => add(_ExpenseUpdatedFromDB(expense)));
   }
 
-  _handleUpdate(UpdateRequested event, Emitter<ExpenseState> emit) async {
-    if (state is ExpenseLoaded) {
-      final expense = (state as ExpenseLoaded).expense;
+  Future<void> _handleUpdate(
+    UpdateRequested event,
+    Emitter<ExpenseState> emit,
+  ) async {
+    if (state is! ExpenseLoaded) return;
 
-      final wasCompleted = expense.completed;
-      await event.update.call(expense);
+    final expense = (state as ExpenseLoaded).expense;
+    emit(ExpenseUpdating(expense: expense));
+
+    final wasCompleted = expense.completed;
+    await event.update(expense);
+
+    updateTimer?.cancel();
+    updateTimer = Timer(Duration(seconds: 3), () async {
       await _expenseService.updateExpense(expense);
 
+      // TODO: move to cloud functions (firestore trigger)
       if (!wasCompleted &&
           expense.completed &&
           event.issuerUid != expense.authorUid) {
-        Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
+        await Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
       }
-    }
+      add(_FinishedUpdating(expense));
+    });
   }
 
-  _handleExpenseChanged(ExpenseChanged event, Emitter<ExpenseState> emit) {
+  void _handleExpenseUpdatedFromDB(
+    _ExpenseUpdatedFromDB event,
+    Emitter<ExpenseState> emit,
+  ) {
     emit(event.expense == null
         ? ExpenseError(error: Exception('expense does not exist'))
         : ExpenseLoaded(expense: event.expense!));

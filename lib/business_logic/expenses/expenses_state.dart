@@ -39,6 +39,14 @@ class ExpensesProcessing extends ExpensesLoaded {
 
   ExpensesProcessing.fromLoaded(ExpensesLoaded loaded)
       : super(expenses: loaded.expenses, stages: loaded.stages);
+
+  ExpensesLoaded toLoaded() {
+    return ExpensesLoaded(
+      expenses: expenses,
+      stages: stages,
+      allLoaded: allLoaded,
+    );
+  }
 }
 
 class ExpensesError extends ExpensesState {
