@@ -34,7 +34,6 @@ class ExpenseDetails extends StatelessWidget {
 
     return ExpenseBuilder(
       loadingWidget: ListEmpty(text: 'Pick an expense first'),
-      withSnackBars: true,
       builder: (context, expense) {
         final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
 
