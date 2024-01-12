@@ -61,9 +61,12 @@ class GroupListBody extends StatelessWidget {
                       : GridView.count(
                           crossAxisCount: columnCount,
                           childAspectRatio: columnWidth / 100,
-                          children: groups
-                              .map((group) => GroupListItem(group: group))
-                              .toList(),
+                          children: [
+                            ...groups
+                                .map((group) => GroupListItem(group: group))
+                                .toList(),
+                            SizedBox(height: 100) // leave space for FAB
+                          ],
                         ),
                 ),
               ],

@@ -44,7 +44,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     await event.update(expense);
 
     updateTimer?.cancel();
-    updateTimer = Timer(Duration(seconds: 3), () async {
+    updateTimer = Timer(Duration(seconds: 2), () async {
       await _expenseService.updateExpense(expense);
 
       // TODO: move to cloud functions (firestore trigger)
