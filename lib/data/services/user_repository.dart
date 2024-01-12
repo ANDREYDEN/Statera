@@ -6,7 +6,8 @@ import 'package:statera/utils/utils.dart';
 
 @GenerateNiceMocks([MockSpec<UserRepository>()])
 class UserRepository extends Firestore {
-  UserRepository(FirebaseFirestore firestoreInstance) : super(firestoreInstance);
+  UserRepository(FirebaseFirestore firestoreInstance)
+      : super(firestoreInstance);
 
   /// Updates user data in `/users/{uid}`.
   /// Auth data and related group user information will be updated by the changeUser Firebase Function
@@ -15,6 +16,7 @@ class UserRepository extends Firestore {
     String? name,
     String? photoURL,
     String? notificationToken,
+    String? paymentMethod,
   }) async {
     final newUserData = {
       if (name != null) 'name': name,
@@ -23,7 +25,8 @@ class UserRepository extends Firestore {
         'notifications.${currentPlatformName}': {
           'token': notificationToken,
           'lastUpdatedAt': FieldValue.serverTimestamp(),
-        }
+        },
+      if (paymentMethod != null) 'paymentMethod': paymentMethod,
     };
 
     await usersCollection.doc(uid).update(newUserData);
