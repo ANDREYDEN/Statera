@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
@@ -15,6 +16,15 @@ class PaymentListHeader extends StatelessWidget {
     required this.otherMemberId,
   }) : super(key: key);
 
+  void _copyPaymentInfo(BuildContext context, String paymentInfo) async {
+    ClipboardData clipData = ClipboardData(text: paymentInfo);
+    await Clipboard.setData(clipData);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Payment info copied to clipboard')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authBloc = context.watch<AuthBloc>();
@@ -27,17 +37,56 @@ class PaymentListHeader extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            UserAvatar(
-              author: otherMember,
-              dimension: 100,
-              margin: EdgeInsets.symmetric(vertical: 10),
+            Card(
+              margin: EdgeInsets.symmetric(horizontal: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Row(
+                  children: [
+                    UserAvatar(author: otherMember, dimension: 100),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('You owe'),
+                          PriceText(
+                            value: balance,
+                            textStyle: TextStyle(fontSize: 32),
+                          ),
+                          Text('Payment Info:'),
+                          if (otherMember.paymentInfo?.isNotEmpty != true)
+                            Text('N/A')
+                          else
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    otherMember.paymentInfo!,
+                                    overflow: TextOverflow.fade,
+                                    softWrap: false,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () => _copyPaymentInfo(
+                                        context, otherMember.paymentInfo!),
+                                    child: Icon(Icons.copy, size: 16),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            SizedBox(height: 8),
-            PriceText(value: balance, textStyle: TextStyle(fontSize: 32)),
-            Text('You owe'),
-            SizedBox(height: 8),
-            if (otherMember.paymentInfo?.isNotEmpty == true)
-              Text('Payment Info: ${otherMember.paymentInfo}'),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
