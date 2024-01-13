@@ -16,7 +16,7 @@ class UserRepository extends Firestore {
     String? name,
     String? photoURL,
     String? notificationToken,
-    String? paymentMethod,
+    String? paymentInfo,
   }) async {
     final newUserData = {
       if (name != null) 'name': name,
@@ -26,7 +26,7 @@ class UserRepository extends Firestore {
           'token': notificationToken,
           'lastUpdatedAt': FieldValue.serverTimestamp(),
         },
-      if (paymentMethod != null) 'paymentMethod': paymentMethod,
+      if (paymentInfo != null) 'paymentInfo': paymentInfo,
     };
 
     await usersCollection.doc(uid).update(newUserData);

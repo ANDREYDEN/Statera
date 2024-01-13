@@ -5,13 +5,13 @@ class CustomUser {
   late String uid;
   late String name;
   String? photoURL;
-  String? paymentMethod;
+  String? paymentInfo;
 
   CustomUser({
     required this.uid,
     required this.name,
     this.photoURL,
-    this.paymentMethod,
+    this.paymentInfo,
   });
 
   CustomUser.fromUser(User user) {
@@ -32,7 +32,7 @@ class CustomUser {
       uid: doc.id,
       name: docData['name'] ?? 'anonymous',
       photoURL: docData['photoURL'],
-      paymentMethod: docData['paymentMethod'],
+      paymentInfo: docData['paymentInfo'],
     );
   }
 
@@ -41,7 +41,7 @@ class CustomUser {
       uid: data['uid'],
       name: data['name'] ?? 'anonymous',
       photoURL: data['photoURL'],
-      paymentMethod: data['paymentMethod'],
+      paymentInfo: data['paymentInfo'],
     );
   }
 

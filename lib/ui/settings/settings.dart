@@ -106,9 +106,9 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
             ),
             SettingInput(
               label: 'Payment Method',
-              initialValue: user.paymentMethod ?? '',
-              onPressed: (newPaymentMethod) {
-                _userCubit.updatePaymentMethod(user.uid, newPaymentMethod);
+              initialValue: user.paymentInfo ?? '',
+              onPressed: (newPaymentInfo) {
+                _userCubit.updatePaymentInfo(user.uid, newPaymentInfo);
               },
             ),
             SizedBox(height: 40),
