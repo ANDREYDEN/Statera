@@ -34,5 +34,5 @@ export function toPascalCase(str: string): string {
 
 // Returns true if any of the properties changed
 export function propertyChanged<T>(obj1: T, obj2: T, ...propertyNames: (keyof T)[]): boolean {
-  return propertyNames.every(propertyName => JSON.stringify(obj1[propertyName]) != JSON.stringify(obj2[propertyName]))
+  return propertyNames.some(propertyName => JSON.stringify(obj1[propertyName]) != JSON.stringify(obj2[propertyName]))
 }

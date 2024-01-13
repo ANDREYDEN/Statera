@@ -58,12 +58,13 @@ class _SettingInputState extends State<SettingInput> {
                 _error = _getError();
               });
             },
+            onFieldSubmitted: (_) => widget.onPressed(_newValue),
           ),
         ),
         if (_newValue != widget.initialValue && _error == null) ...[
           SizedBox(width: 4),
           ElevatedButton(
-            child: Icon(Icons.check_rounded),
+            child: Icon(Icons.check_rounded, color: Colors.white),
             style: ElevatedButton.styleFrom(
               shape: CircleBorder(),
               backgroundColor: Colors.green,

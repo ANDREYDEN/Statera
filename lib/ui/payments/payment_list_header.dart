@@ -37,7 +37,7 @@ class PaymentListHeader extends StatelessWidget {
             Text('You owe'),
             SizedBox(height: 8),
             if (otherMember.paymentInfo?.isNotEmpty == true)
-              Text('Payment method: ${otherMember.paymentInfo}'),
+              Text('Payment Info: ${otherMember.paymentInfo}'),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
