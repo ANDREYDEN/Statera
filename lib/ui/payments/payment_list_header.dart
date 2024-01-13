@@ -41,100 +41,102 @@ class PaymentListHeader extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 8),
               child: Padding(
                 padding: const EdgeInsets.all(15),
-                child: Row(
+                child: Column(
                   children: [
-                    UserAvatar(author: otherMember, dimension: 100),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('You owe'),
-                          PriceText(
-                            value: balance,
-                            textStyle: TextStyle(fontSize: 32),
+                    Row(
+                      children: [
+                        UserAvatar(author: otherMember, dimension: 100),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('You owe'),
+                              PriceText(
+                                value: balance,
+                                textStyle: TextStyle(fontSize: 32),
+                              ),
+                              Text('Payment Info:'),
+                              if (otherMember.paymentInfo?.isNotEmpty != true)
+                                Text('N/A')
+                              else
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        otherMember.paymentInfo!,
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () => _copyPaymentInfo(
+                                            context, otherMember.paymentInfo!),
+                                        child: Icon(Icons.copy, size: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
                           ),
-                          Text('Payment Info:'),
-                          if (otherMember.paymentInfo?.isNotEmpty != true)
-                            Text('N/A')
-                          else
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    otherMember.paymentInfo!,
-                                    overflow: TextOverflow.fade,
-                                    softWrap: false,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (_) => PaymentDialog(
+                                group: group,
+                                currentUid: authBloc.uid,
+                                payment: Payment(
+                                  groupId: group.id,
+                                  payerId: authBloc.uid,
+                                  receiverId: otherMemberId,
+                                  value: balance.abs(),
+                                  oldPayerBalance: group.balance[authBloc.uid]
+                                      ?[otherMemberId],
+                                  newFor: [otherMemberId],
                                 ),
-                                SizedBox(width: 10),
-                                MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  child: GestureDetector(
-                                    onTap: () => _copyPaymentInfo(
-                                        context, otherMember.paymentInfo!),
-                                    child: Icon(Icons.copy, size: 16),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                        ],
-                      ),
+                            child: Text('Pay'),
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (_) => PaymentDialog(
+                                group: group,
+                                currentUid: authBloc.uid,
+                                payment: Payment(
+                                  groupId: group.id,
+                                  payerId: otherMemberId,
+                                  receiverId: authBloc.uid,
+                                  value: balance.abs(),
+                                  oldPayerBalance: group.balance[otherMemberId]
+                                      ?[authBloc.uid],
+                                  newFor: [otherMemberId],
+                                ),
+                              ),
+                            ),
+                            child: Text('Receive'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => PaymentDialog(
-                          group: group,
-                          currentUid: authBloc.uid,
-                          payment: Payment(
-                            groupId: group.id,
-                            payerId: authBloc.uid,
-                            receiverId: otherMemberId,
-                            value: balance.abs(),
-                            oldPayerBalance: group.balance[authBloc.uid]
-                                ?[otherMemberId],
-                            newFor: [otherMemberId],
-                          ),
-                        ),
-                      ),
-                      child: Text('Pay'),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => PaymentDialog(
-                          group: group,
-                          currentUid: authBloc.uid,
-                          payment: Payment(
-                            groupId: group.id,
-                            payerId: otherMemberId,
-                            receiverId: authBloc.uid,
-                            value: balance.abs(),
-                            oldPayerBalance: group.balance[otherMemberId]
-                                ?[authBloc.uid],
-                            newFor: [otherMemberId],
-                          ),
-                        ),
-                      ),
-                      child: Text('Receive'),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],

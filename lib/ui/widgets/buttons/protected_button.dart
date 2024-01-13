@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-enum ButtonType { elevated, text }
+enum ButtonType { elevated, text, filled }
 
 class ProtectedButton extends StatefulWidget {
   final Future<void> Function()? onPressed;
@@ -56,9 +56,12 @@ class _ProtectedButtonState extends State<ProtectedButton> {
                 child: CircularProgressIndicator(strokeWidth: 3),
               )
             : widget.child;
-        return widget.buttonType == ButtonType.text
-            ? TextButton(onPressed: onPressed, child: content)
-            : ElevatedButton(onPressed: onPressed, child: content);
+        return switch (widget.buttonType) {
+          ButtonType.text => TextButton(onPressed: onPressed, child: content),
+          ButtonType.filled =>
+            FilledButton(onPressed: onPressed, child: content),
+          _ => ElevatedButton(onPressed: onPressed, child: content)
+        };
       },
     );
   }

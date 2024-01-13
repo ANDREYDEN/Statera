@@ -25,7 +25,7 @@ class RedirectDebtButton extends StatelessWidget {
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 10.0),
-          child: ElevatedButton.icon(
+          child: OutlinedButton.icon(
             icon: Icon(kRedirectDebtIcon),
             onPressed: () {
               Navigator.push(

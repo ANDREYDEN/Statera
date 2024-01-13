@@ -17,6 +17,7 @@ class PaymentList extends StatelessWidget {
         return Column(
           children: [
             PaymentListHeader(otherMemberId: otherMemberId),
+            SizedBox(height: 10),
             Expanded(child: PaymentListBody(otherMemberId: otherMemberId)),
           ],
         );
