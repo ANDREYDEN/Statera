@@ -4,10 +4,9 @@ import { auth } from 'firebase-admin'
 import { propertyChanged } from '../../utils'
 
 export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
-  const nameChanged = propertyChanged(oldUserData, newUserData, 'name')
-  const photoURLChanged = propertyChanged(oldUserData, newUserData, 'photoURL')
+  const targetPropertyChanged = propertyChanged(oldUserData, newUserData, 'name', 'photoURL', 'paymentMethod')
 
-  if (nameChanged || photoURLChanged) {
+  if (targetPropertyChanged) {
     try {
       await updateUsersInGroups(userId, newUserData)
     } catch (e: any) {

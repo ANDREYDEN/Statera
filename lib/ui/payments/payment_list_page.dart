@@ -23,9 +23,9 @@ class PaymentListPage extends StatelessWidget {
 
             return PageScaffold(
               title: '${otherMember.name} payments',
-              onPop: () {
+              onPop: (didPop) {
+                if (!didPop) return;
                 owingCubit.deselect();
-                return Future.value(true);
               },
               child: PaymentList(),
             );

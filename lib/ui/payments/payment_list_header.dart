@@ -36,6 +36,8 @@ class PaymentListHeader extends StatelessWidget {
             PriceText(value: balance, textStyle: TextStyle(fontSize: 32)),
             Text('You owe'),
             SizedBox(height: 8),
+            if (otherMember.paymentMethod?.isNotEmpty == true)
+              Text('Payment method: ${otherMember.paymentMethod}'),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
