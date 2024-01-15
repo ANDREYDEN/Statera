@@ -6,6 +6,7 @@ class PageScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
   final Widget? titleWidget;
+  final Widget Function(BuildContext, Widget Function(String))? titleBuilder;
   final List<Widget>? actions;
   final Widget? bottomNavBar;
   final String? fabText;
@@ -24,11 +25,15 @@ class PageScaffold extends StatelessWidget {
     this.onFabPressed,
     this.onPop,
     this.fab,
+    this.titleBuilder,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
+
+    final actualTitleBuilder = titleBuilder ??
+        ((_, titleWidgetBuilder) => titleWidgetBuilder(this.title ?? ''));
 
     return PopScope(
       onPopInvoked: onPop,
@@ -36,9 +41,12 @@ class PageScaffold extends StatelessWidget {
         bottomNavigationBar: this.bottomNavBar,
         appBar: AppBar(
           title: titleWidget ??
-              SelectableText(
-                this.title ?? '',
-                style: TextStyle(overflow: TextOverflow.ellipsis),
+              actualTitleBuilder(
+                context,
+                (titleText) => SelectableText(
+                  titleText,
+                  style: TextStyle(overflow: TextOverflow.ellipsis),
+                ),
               ),
           actions: this.actions,
         ),

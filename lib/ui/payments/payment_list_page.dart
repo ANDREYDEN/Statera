@@ -17,19 +17,20 @@ class PaymentListPage extends StatelessWidget {
 
     return OwingBuilder(
       builder: (context, otherMemberId) {
-        return GroupBuilder(
-          builder: (context, group) {
-            var otherMember = group.getMember(otherMemberId);
-
-            return PageScaffold(
-              title: '${otherMember.name} payments',
-              onPop: (didPop) {
-                if (!didPop) return;
-                owingCubit.deselect();
-              },
-              child: PaymentList(),
-            );
+        return PageScaffold(
+          titleBuilder: (context, titleWidgetBuilder) => GroupBuilder(
+            loadingWidget: Text('... Payments'),
+            builder: (context, group) {
+              var otherMember = group.getMember(otherMemberId);
+              return titleWidgetBuilder('${otherMember.name} Payments');
+            },
+            errorBuilder: (context, error) => titleWidgetBuilder('Error'),
+          ),
+          onPop: (didPop) {
+            if (!didPop) return;
+            owingCubit.deselect();
           },
+          child: PaymentList(),
         );
       },
     );

@@ -10,12 +10,14 @@ class GroupBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Group) builder;
   final Widget Function(BuildContext, GroupError)? errorBuilder;
   final Widget? loadingWidget;
+  final bool loadOnError;
 
   const GroupBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.loadingWidget,
+    this.loadOnError = false,
   }) : super(key: key);
 
   @override
@@ -40,11 +42,14 @@ class GroupBuilder extends StatelessWidget {
       listenWhen: (before, after) =>
           after is GroupError || after is GroupJoinSuccess,
       builder: (groupContext, state) {
+        final loadingUI = loadingWidget ?? Center(child: Loader());
         if (state is GroupLoading) {
-          return Center(child: loadingWidget ?? Loader());
+          return loadingUI;
         }
 
         if (state is GroupError) {
+          if (loadOnError) return loadingUI;
+
           return errorBuilder == null
               ? Center(child: Text(state.error.toString()))
               : errorBuilder!(groupContext, state);
