@@ -15,6 +15,7 @@ class RevertExpenseAction extends ExpenseAction {
   }
 
   @override
+  @protected
   handle(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,

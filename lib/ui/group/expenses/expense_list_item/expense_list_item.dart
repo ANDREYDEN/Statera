@@ -43,7 +43,7 @@ class ExpenseListItem extends StatelessWidget {
     void _handleLongPress() {
       if (processing || !expense.isAuthoredBy(uid)) return null;
 
-      EditExpenseAction(expense).handle(context);
+      EditExpenseAction(expense).safeHandle(context);
     }
 
     final card = Card(

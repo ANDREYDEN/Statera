@@ -31,7 +31,7 @@ class ItemsList extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
                   child: FilledButton(
-                    onPressed: () => UpsertItemAction().handle(context),
+                    onPressed: () => UpsertItemAction().safeHandle(context),
                     child: Icon(Icons.add),
                   ),
                 ),
@@ -55,7 +55,7 @@ class ItemsList extends StatelessWidget {
                               showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)
                                   ? () => UpsertItemAction(item: item)
-                                      .handle(context)
+                                      .safeHandle(context)
                                   : null,
                               onChangePartition: !expense.finalized
                                   ? (partition) => _handleItemPartitionChange(

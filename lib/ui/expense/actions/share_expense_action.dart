@@ -10,6 +10,7 @@ class ShareExpenseAction extends ExpenseAction {
   String get name => 'Share';
 
   @override
+  @protected
   FutureOr<void> handle(BuildContext context) async {
     await snackbarCatch(context, () async {
       final dynamicLinkRepository = context.read<DynamicLinkService>();

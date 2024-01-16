@@ -15,6 +15,7 @@ class DeleteExpenseAction extends ExpenseAction {
   }
 
   @override
+  @protected
   FutureOr<void> handle(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,

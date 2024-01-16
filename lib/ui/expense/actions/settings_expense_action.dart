@@ -10,6 +10,7 @@ class SettingsExpenseAction extends ExpenseAction {
   String get name => 'Settings';
 
   @override
+  @protected
   FutureOr<void> handle(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();

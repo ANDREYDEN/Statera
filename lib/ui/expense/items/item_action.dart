@@ -21,6 +21,7 @@ class UpsertItemAction extends ItemAction {
   String get name => 'Upsert Item';
 
   @override
+  @protected
   void handle(BuildContext context) {
     final expenseBloc = context.read<ExpenseBloc>();
 
