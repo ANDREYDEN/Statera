@@ -20,7 +20,7 @@ class GroupInviteDialog extends StatelessWidget {
         return AlertDialog(
           title: Text('Invite people to this group'),
           content: inviteLink == null
-              ? ElevatedButton(
+              ? FilledButton(
                   onPressed: onGenerate,
                   child: Text('Generate invite'),
                 )

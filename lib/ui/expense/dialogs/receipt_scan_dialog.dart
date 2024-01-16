@@ -9,6 +9,7 @@ import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firebase_storage_repository.dart';
+import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 enum Store { Walmart, LCBO, Other }
@@ -86,20 +87,12 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
               ],
             ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            'Cancel',
-            style: TextStyle(
-              color: Theme.of(context).errorColor,
-            ),
-          ),
-        ),
-        ElevatedButton(
+        CancelButton(),
+        FilledButton.tonal(
           onPressed: () => handleScan(ImageSource.camera),
           child: Icon(Icons.photo_camera),
         ),
-        ElevatedButton(
+        FilledButton.tonal(
           onPressed: () => handleScan(ImageSource.gallery),
           child: Icon(Icons.collections),
         ),
