@@ -15,7 +15,6 @@ class CustomThemeBuilder extends StatelessWidget {
         useMaterial3: true,
         colorScheme: colorScheme,
         primarySwatch: createMaterialColor(Colors.white),
-        textButtonTheme: textButtonTheme,
         cardTheme: cardTheme,
         listTileTheme: ListTileThemeData(
           shape: RoundedRectangleBorder(

@@ -87,7 +87,7 @@ class PaymentDetailsDialog extends StatelessWidget {
       actions: [
         if (payment.hasRelatedExpense) CancelButton(),
         if (payment.hasRelatedExpense)
-          ElevatedButton(
+          FilledButton(
             onPressed: () => _navigateToExpense(context),
             child: Text('Go to expense'),
           )

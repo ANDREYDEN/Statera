@@ -29,10 +29,12 @@ class SupportPage extends StatelessWidget {
                     text: 'Submit an issue report',
                     url: 'https://github.com/ANDREYDEN/Statera/issues',
                   ),
+                  SizedBox(height: 10),
                   TextLink(
                     text: 'Contact the developer',
                     url: 'mailto:andrey2850@gmail.com?subject=Statera',
                   ),
+                  SizedBox(height: 10),
                   TextLink(
                     text: 'Contribute to the app',
                     url: 'https://github.com/ANDREYDEN/Statera',

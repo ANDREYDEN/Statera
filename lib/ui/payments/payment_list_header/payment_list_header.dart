@@ -35,7 +35,7 @@ class PaymentListHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             PaymentListActions(otherMemberId: otherMemberId),
           ],
         ),

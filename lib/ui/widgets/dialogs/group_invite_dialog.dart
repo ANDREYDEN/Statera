@@ -20,7 +20,7 @@ class GroupInviteDialog extends StatelessWidget {
         return AlertDialog(
           title: Text('Invite people to this group'),
           content: inviteLink == null
-              ? ElevatedButton(
+              ? FilledButton(
                   onPressed: onGenerate,
                   child: Text('Generate invite'),
                 )
@@ -43,7 +43,7 @@ class GroupInviteDialog extends StatelessWidget {
                       ),
                     ),
                     Flexible(
-                      child: TextButton(
+                      child: FilledButton.tonal(
                         onPressed: onGenerate,
                         child: Text('Re-generate invite'),
                       ),
@@ -51,23 +51,15 @@ class GroupInviteDialog extends StatelessWidget {
                   ],
                 ),
           actions: [
-            Row(
-              children: [
-                const Expanded(child: const CancelButton()),
-                if (inviteLink != null)
-                  Expanded(
-                    child: ShareButton(
-                      data: inviteLink,
-                      copyMessage: 'Invite link copied to clipboard',
-                      iconSize: 30,
-                      mobileIcon: Icons.copy,
-                      afterShare: () => Navigator.pop(context),
-                    ),
-                  ),
-              ],
-            )
+            const CancelButton(),
+            if (inviteLink != null)
+              ShareButton(
+                data: inviteLink,
+                copyMessage: 'Invite link copied to clipboard',
+                mobileIcon: Icons.copy,
+                afterShare: () => Navigator.pop(context),
+              ),
           ],
-          actionsAlignment: MainAxisAlignment.center,
         );
       },
     );

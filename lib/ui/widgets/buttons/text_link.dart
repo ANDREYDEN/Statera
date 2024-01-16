@@ -13,7 +13,7 @@ class TextLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return OutlinedButton(
       onPressed: () {
         launchUrl(Uri.parse(url));
       },

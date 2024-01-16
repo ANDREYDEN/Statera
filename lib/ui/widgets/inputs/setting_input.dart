@@ -16,7 +16,8 @@ class SettingInput extends StatefulWidget {
     required this.onPressed,
     required this.label,
     this.validators,
-    this.formatters, this.helperText,
+    this.formatters,
+    this.helperText,
   }) : super(key: key);
 
   @override
@@ -65,13 +66,9 @@ class _SettingInputState extends State<SettingInput> {
         ),
         if (_newValue != widget.initialValue && _error == null) ...[
           SizedBox(width: 4),
-          ElevatedButton(
-            child: Icon(Icons.check_rounded, color: Colors.white),
-            style: ElevatedButton.styleFrom(
-              shape: CircleBorder(),
-              backgroundColor: Colors.green,
-              padding: EdgeInsets.all(0),
-            ),
+          IconButton.filledTonal(
+            icon: Icon(Icons.check_rounded),
+            color: Colors.green,
             onPressed: () => widget.onPressed(_newValue),
           )
         ]

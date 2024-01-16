@@ -31,7 +31,7 @@ class NotificationsReminder extends StatelessWidget {
                 'Head over to Settings to enable app notification permissions'),
             actions: [
               CancelButton(),
-              ElevatedButton(
+              FilledButton(
                 onPressed: () async {
                   await AppSettings.openAppSettings(
                     type: AppSettingsType.notification,
