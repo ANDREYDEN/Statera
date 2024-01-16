@@ -8,6 +8,7 @@ class SettingInput extends StatefulWidget {
   final void Function(String value) onPressed;
   final List<Validator>? validators;
   final List<TextInputFormatter>? formatters;
+  final String? helperText;
 
   const SettingInput({
     Key? key,
@@ -15,7 +16,7 @@ class SettingInput extends StatefulWidget {
     required this.onPressed,
     required this.label,
     this.validators,
-    this.formatters,
+    this.formatters, this.helperText,
   }) : super(key: key);
 
   @override
@@ -50,6 +51,7 @@ class _SettingInputState extends State<SettingInput> {
             decoration: InputDecoration(
               label: Text(widget.label),
               errorText: _error,
+              helperText: widget.helperText,
             ),
             inputFormatters: widget.formatters,
             onChanged: (value) {
@@ -58,12 +60,13 @@ class _SettingInputState extends State<SettingInput> {
                 _error = _getError();
               });
             },
+            onFieldSubmitted: (_) => widget.onPressed(_newValue),
           ),
         ),
         if (_newValue != widget.initialValue && _error == null) ...[
           SizedBox(width: 4),
           ElevatedButton(
-            child: Icon(Icons.check_rounded),
+            child: Icon(Icons.check_rounded, color: Colors.white),
             style: ElevatedButton.styleFrom(
               shape: CircleBorder(),
               backgroundColor: Colors.green,

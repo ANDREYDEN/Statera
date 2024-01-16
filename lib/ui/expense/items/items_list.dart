@@ -30,7 +30,7 @@ class ItemsList extends StatelessWidget {
               if (isWide && expenseCanBeUpdated)
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: () => UpsertItemAction().handle(context),
                     child: Icon(Icons.add),
                   ),
@@ -54,7 +54,8 @@ class ItemsList extends StatelessWidget {
                               item: item,
                               showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)
-                                  ? () => UpsertItemAction(item: item).handle(context)
+                                  ? () => UpsertItemAction(item: item)
+                                      .handle(context)
                                   : null,
                               onChangePartition: !expense.finalized
                                   ? (partition) => _handleItemPartitionChange(

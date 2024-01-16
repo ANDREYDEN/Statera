@@ -40,6 +40,11 @@ class UserCubit extends Cubit<UserState> {
     _userRepository.updateUser(uid: uid, photoURL: newPhotoUrl);
   }
 
+  void updatePaymentInfo(String uid, String newPaymentInfo) {
+    emit(UserLoading());
+    _userRepository.updateUser(uid: uid, paymentInfo: newPaymentInfo);
+  }
+
   @override
   Future<void> close() {
     _userSubscription?.cancel();

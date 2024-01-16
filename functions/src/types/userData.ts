@@ -1,6 +1,7 @@
 export type UserData = {
   name?: string
   photoURL?: string
+  paymentInfo?: string
   notifications?: Notification[]
 }
 

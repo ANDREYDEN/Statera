@@ -4,10 +4,10 @@ import { auth } from 'firebase-admin'
 import { propertyChanged } from '../../utils'
 
 export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
-  const nameChanged = propertyChanged(oldUserData, newUserData, 'name')
-  const photoURLChanged = propertyChanged(oldUserData, newUserData, 'photoURL')
+  const targetPropertyChanged = propertyChanged(oldUserData, newUserData, 'name', 'photoURL', 'paymentInfo')
 
-  if (nameChanged || photoURLChanged) {
+  console.log({targetPropertyChanged})
+  if (targetPropertyChanged) {
     try {
       await updateUsersInGroups(userId, newUserData)
     } catch (e: any) {
@@ -31,7 +31,12 @@ async function updateUsersInGroups(userId: string, userData: UserData) {
   for (const groupDoc of groupsSnap.docs) {
     const members = groupDoc.data().members.map((member: any) => {
       if (member.uid === userId) {
-        return { ...member, name: userData.name, photoURL: userData.photoURL }
+        return { 
+          ...member, 
+          name: userData.name,
+          photoURL: userData.photoURL,
+          paymentInfo: userData.paymentInfo, 
+        }
       }
       return member
     })

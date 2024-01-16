@@ -11,6 +11,7 @@ class FinalizeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProtectedButton(
+      buttonType: ButtonType.filled,
       onPressed: () => FinalizeExpenseAction(expenseId)
           .handle(GroupPage.scaffoldKey.currentContext!),
       child: Text('Finalize'),

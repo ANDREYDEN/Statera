@@ -6,11 +6,12 @@ class PageScaffold extends StatelessWidget {
   final Widget child;
   final String? title;
   final Widget? titleWidget;
+  final Widget Function(BuildContext, Widget Function(String))? titleBuilder;
   final List<Widget>? actions;
   final Widget? bottomNavBar;
   final String? fabText;
   final void Function()? onFabPressed;
-  final Future<bool> Function()? onPop;
+  final void Function(bool didPop)? onPop;
   final Widget? fab;
 
   const PageScaffold({
@@ -24,21 +25,28 @@ class PageScaffold extends StatelessWidget {
     this.onFabPressed,
     this.onPop,
     this.fab,
+    this.titleBuilder,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
 
-    return WillPopScope(
-      onWillPop: onPop,
+    final actualTitleBuilder = titleBuilder ??
+        ((_, titleWidgetBuilder) => titleWidgetBuilder(this.title ?? ''));
+
+    return PopScope(
+      onPopInvoked: onPop,
       child: Scaffold(
         bottomNavigationBar: this.bottomNavBar,
         appBar: AppBar(
           title: titleWidget ??
-              SelectableText(
-                this.title ?? '',
-                style: TextStyle(overflow: TextOverflow.ellipsis),
+              actualTitleBuilder(
+                context,
+                (titleText) => SelectableText(
+                  titleText,
+                  style: TextStyle(overflow: TextOverflow.ellipsis),
+                ),
               ),
           actions: this.actions,
         ),
@@ -49,7 +57,8 @@ class PageScaffold extends StatelessWidget {
                     ? FloatingActionButton.extended(
                         onPressed: this.onFabPressed,
                         icon: Icon(Icons.add),
-                        label: Text(fabText ?? 'Add'))
+                        label: Text(fabText ?? 'Add'),
+                      )
                     : FloatingActionButton(
                         onPressed: this.onFabPressed,
                         child: Icon(Icons.add),
