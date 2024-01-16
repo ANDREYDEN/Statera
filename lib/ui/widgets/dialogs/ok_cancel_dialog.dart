@@ -19,7 +19,7 @@ class OKCancelDialog extends StatelessWidget {
       content: DialogWidth(child: Text(this.text)),
       actions: [
         CancelButton(),
-        ElevatedButton(
+        FilledButton.tonal(
           onPressed: () {
             Navigator.pop(context, true);
           },

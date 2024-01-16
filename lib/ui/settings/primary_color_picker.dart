@@ -47,7 +47,7 @@ class _PrimaryColorPickerState extends State<PrimaryColorPicker> {
             ),
             actions: [
               CancelButton(),
-              ElevatedButton(
+              FilledButton(
                 onPressed: () {
                   _seedColorCubit.setColor(_newColor);
                   Navigator.pop(context);

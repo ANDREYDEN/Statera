@@ -56,16 +56,15 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
       ),
       actions: [
         CancelButton(returnsNull: true),
-        ElevatedButton(
+        FilledButton(
           onPressed: _selectedMemberUids.isNotEmpty
               ? () {
                   Navigator.pop(
-                      context,
-                      widget.singleSelection
-                          ? _selectedMemberUids.isEmpty
-                              ? null
-                              : _selectedMemberUids.first
-                          : _selectedMemberUids);
+                    context,
+                    widget.singleSelection
+                        ? _selectedMemberUids.firstOrNull
+                        : _selectedMemberUids,
+                  );
                 }
               : null,
           child: Text('Confirm'),

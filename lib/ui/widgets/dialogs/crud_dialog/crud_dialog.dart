@@ -71,6 +71,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
                 ],
               ),
             ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

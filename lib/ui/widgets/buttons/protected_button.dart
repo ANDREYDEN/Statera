@@ -14,7 +14,7 @@ class ProtectedButton extends StatefulWidget {
     Key? key,
     this.onPressed,
     required this.child,
-    this.buttonType = ButtonType.elevated,
+    this.buttonType = ButtonType.filled,
   }) : super(key: key);
 
   @override

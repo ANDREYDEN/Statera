@@ -6,7 +6,6 @@ class ShareButton extends StatelessWidget {
   final String data;
   final String? copyMessage;
   final void Function()? afterShare;
-  final double? iconSize;
   final IconData? webIcon;
   final IconData? mobileIcon;
 
@@ -15,24 +14,20 @@ class ShareButton extends StatelessWidget {
     required this.data,
     this.copyMessage,
     this.afterShare,
-    this.iconSize,
     this.webIcon = Icons.copy,
     this.mobileIcon = Icons.share,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return FilledButton.icon(
+      label: Text(kIsWeb ? 'Copy' : 'Share'),
+      icon: Icon(kIsWeb ? webIcon : mobileIcon),
       onPressed: () async {
         await _webShare(context);
 
         afterShare?.call();
       },
-      icon: Icon(
-        kIsWeb ? webIcon : mobileIcon,
-        size: iconSize,
-        color: Theme.of(context).colorScheme.primary,
-      ),
     );
   }
 
