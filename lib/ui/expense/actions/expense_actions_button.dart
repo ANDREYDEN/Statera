@@ -51,7 +51,7 @@ class ExpenseActionsButton extends StatelessWidget {
             ),
           );
         }).toList(),
-        onSelected: (action) => action.handle(context),
+        onSelected: (action) => action.safeHandle(context),
       ),
     );
   }

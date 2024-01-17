@@ -12,11 +12,12 @@ class EditExpenseAction extends EntityAction {
   String get name => 'Edit';
 
   @override
+  @protected
   FutureOr<void> handle(BuildContext context) async {
     final expenseService = context.read<ExpenseService>();
     final expensesCubit = context.read<ExpensesCubit>();
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: 'Edit Expense',

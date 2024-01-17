@@ -15,6 +15,7 @@ class RevertExpenseAction extends ExpenseAction {
   }
 
   @override
+  @protected
   handle(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -28,14 +29,14 @@ class RevertExpenseAction extends ExpenseAction {
     if (confirmed == false) return;
 
     final groupCubit = context.read<GroupCubit>();
-    final expensesCubit = context.read<ExpensesCubit>();
+    final expensesCubit = context.readOrDefault<ExpensesCubit>();
     final expenseService = context.read<ExpenseService>();
     final paymentService = context.read<PaymentService>();
 
     // TODO: use transaction
     final group = groupCubit.loadedState.group;
 
-    expensesCubit.process();
+    expensesCubit?.process();
     await expenseService.revertExpense(expense);
     // add expense payments from all assignees to author
     final payments = expense.assigneeUids
