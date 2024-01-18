@@ -90,6 +90,9 @@ jobs:
           bundler-cache: true
           working-directory: android
 
+      - name: Debug
+        run: ls -la && ls -la ..
+
       - name: Create App Distribution Release
         run: sudo fastlane run firebase_app_distribution app:${{ secrets.ANDROID_APP_ID }} apk_path:../android.aab groups:friends debug:true
         working-directory: android
