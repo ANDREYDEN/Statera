@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/models/payment/payment_expense_info.dart';
 import 'package:statera/data/models/payment/payment_redirect_info.dart';
 
-class Payment implements Comparable {
+class Payment implements Comparable, Equatable {
   String? id;
   String? groupId;
   String payerId;
@@ -18,6 +19,7 @@ class Payment implements Comparable {
   DateTime? timeCreated;
   String? reason;
   double? oldPayerBalance;
+  final bool isAdmin;
 
   Payment({
     this.id,
@@ -31,6 +33,7 @@ class Payment implements Comparable {
     this.timeCreated,
     this.reason,
     this.oldPayerBalance,
+    this.isAdmin = false,
   });
 
   Payment.fromFinalizedExpense({
@@ -47,7 +50,8 @@ class Payment implements Comparable {
           expense,
           action: PaymentExpenseAction.finalize,
         ),
-        oldPayerBalance = oldAuthorBalance;
+        oldPayerBalance = oldAuthorBalance,
+        isAdmin = false;
 
   Payment.fromRevertedExpense({
     required Expense expense,
@@ -63,7 +67,8 @@ class Payment implements Comparable {
           expense,
           action: PaymentExpenseAction.revert,
         ),
-        oldPayerBalance = oldPayerBalance;
+        oldPayerBalance = oldPayerBalance,
+        isAdmin = false;
 
   Payment.fromRedirect({
     required String groupId,
@@ -79,15 +84,14 @@ class Payment implements Comparable {
         value = amount,
         newFor = [payerId, receiverId],
         redirectInfo = PaymentRedirectInfo(authorUid: authorId),
-        oldPayerBalance = oldPayerBalance;
+        oldPayerBalance = oldPayerBalance,
+        isAdmin = false;
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
   bool get hasRelatedExpense => relatedExpense != null;
 
   bool get hasRelatedRedirect => redirectInfo != null;
-
-  bool get isAdmin => reason != null;
 
   String getFullReason(String uid, Group group) {
     if (reason != null) return reason!;
@@ -97,7 +101,9 @@ class Payment implements Comparable {
     }
 
     if (hasRelatedRedirect) {
-      final authorName = uid == redirectInfo!.authorUid ? 'you' : group.getMember(redirectInfo!.authorUid).name;
+      final authorName = uid == redirectInfo!.authorUid
+          ? 'you'
+          : group.getMember(redirectInfo!.authorUid).name;
       return 'This payment was created because $authorName redirected some debt.';
     }
 
@@ -116,6 +122,7 @@ class Payment implements Comparable {
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
       'newFor': newFor,
+      'isAdmin': isAdmin,
     };
   }
 
@@ -142,21 +149,9 @@ class Payment implements Comparable {
           ? null
           : double.parse(map['oldPayerBalance'].toString()),
       newFor: List<String>.from(map['newFor'] ?? []),
+      isAdmin: map['isAdmin'] ?? false,
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Payment &&
-        other.payerId == payerId &&
-        other.receiverId == receiverId &&
-        other.value == value;
-  }
-
-  @override
-  int get hashCode => payerId.hashCode ^ receiverId.hashCode ^ value.hashCode;
 
   @override
   int compareTo(other) {
@@ -172,4 +167,10 @@ class Payment implements Comparable {
 
     return -1;
   }
+
+  @override
+  List<Object?> get props => [payerId, receiverId, value];
+
+  @override
+  bool? get stringify => true;
 }
