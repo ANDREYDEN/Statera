@@ -7,24 +7,13 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const users = await auth.listUsers()
-    console.log(`Found ${users.users.length} users.`);
-    for (const user of users.users) {
-        console.log(`Processing user doc for ${user.uid}...`);
-        try {
-            const userDocRef = await db.doc(`users/${user.uid}`).get()
-            if (!userDocRef.exists) {
-                console.log(`Creating user doc for ${user.uid}...`);
-                await db.doc(`users/${user.uid}`).set({
-                    name: user.displayName ?? 'anonymous',
-                    photoURL: user.photoURL ?? null,
-                })
-            }
-        } catch (error) {
-            console.log(`Could not create user doc for ${user.uid}: `, error);
-        }
+    const payments = await db.collection('payments').where('reason', '!=', null).get()
+    console.log(`Found ${payments.docs.length} payments`)
+    for (const payment of payments.docs) {
+        await payment.ref.update({
+            isAdmin: true
+        })
     }
-    
 })();
 
 function addUserToGroup(group, user) {

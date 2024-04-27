@@ -25,6 +25,7 @@ class PaymentDialog extends StatefulWidget {
 
 class _PaymentDialogState extends State<PaymentDialog> {
   TextEditingController _balanceController = TextEditingController();
+  TextEditingController _commentController = TextEditingController();
   late String _enteredPaymentValue;
 
   @override
@@ -65,11 +66,9 @@ class _PaymentDialogState extends State<PaymentDialog> {
             decoration: InputDecoration(labelText: 'Value to $actionWord'),
             inputFormatters: [CommaReplacerTextInputFormatter()],
           ),
-          SizedBox(height: 10),
-          Text(
-            currentUserIsReceiving
-                ? 'You aknowledge that you received a payment of ${this.balanceToPay} from ${this.otherMember.name}.'
-                : 'At this point you should make a payment (e-Transfer or cash) of ${this.balanceToPay} to ${this.otherMember.name}.',
+          TextField(
+            controller: _commentController,
+            decoration: InputDecoration(labelText: 'Reason (optional)'),
           ),
         ],
       ),
@@ -83,8 +82,13 @@ class _PaymentDialogState extends State<PaymentDialog> {
                     context,
                     () async {
                       widget.payment.value = this.balanceToPay;
+                      if (_commentController.text.isNotEmpty) {
+                        widget.payment.reason = _commentController.text;
+                      }
+
                       await paymentService.payOffBalance(
-                          payment: widget.payment);
+                        payment: widget.payment,
+                      );
                       Navigator.of(context).pop();
                     },
                     successMessage: currentUserIsReceiving
