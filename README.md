@@ -2,7 +2,7 @@
 
 **An expense tracking app with granular price distribution.**
 
-Splitting the bill with your friends?
+Splitting a bill with your friends?
 Paying for food and drinks on a Friday night?
 Going on a trip together?
 
@@ -119,6 +119,10 @@ Run integration tests:
 
 
 Currently, there is an issue with [taking screenshots on iOS](https://github.com/flutter/flutter/issues/51890). There exists [a workaround](https://github.com/flutter/flutter/issues/91668#issuecomment-1132381182) and an [open PR](https://github.com/flutter/flutter/pull/116539).
+
+## Publishing
+
+![publishing](./docs/publishing.png)
 
 ## References & useful links
 

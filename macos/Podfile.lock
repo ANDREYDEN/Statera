@@ -958,13 +958,12 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.32):
     - BoringSSL-GRPC/Interface (= 0.0.32)
   - BoringSSL-GRPC/Interface (0.0.32)
-  - cloud_firestore (4.15.8):
+  - cloud_firestore (4.17.2):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/Firestore (~> 10.24.0)
     - firebase_core
     - FlutterMacOS
-    - nanopb (< 2.30910.0, >= 2.30908.0)
-  - cloud_functions (4.6.8):
+  - cloud_functions (4.7.3):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/Functions (~> 10.24.0)
     - firebase_core
@@ -1001,11 +1000,11 @@ PODS:
   - Firebase/Storage (10.24.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.24.0)
-  - firebase_analytics (10.8.9):
+  - firebase_analytics (10.10.4):
     - Firebase/Analytics (= 10.24.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_auth (4.17.8):
+  - firebase_auth (4.19.4):
     - Firebase/Auth (~> 10.24.0)
     - Firebase/CoreOnly (~> 10.24.0)
     - firebase_core
@@ -1013,22 +1012,22 @@ PODS:
   - firebase_core (2.30.1):
     - Firebase/CoreOnly (~> 10.24.0)
     - FlutterMacOS
-  - firebase_crashlytics (3.4.18):
+  - firebase_crashlytics (3.5.4):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/Crashlytics (~> 10.24.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_messaging (14.7.19):
+  - firebase_messaging (14.9.1):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/Messaging (~> 10.24.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_remote_config (4.3.17):
+  - firebase_remote_config (4.4.4):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/RemoteConfig (~> 10.24.0)
     - firebase_core
     - FlutterMacOS
-  - firebase_storage (11.6.9):
+  - firebase_storage (11.7.4):
     - Firebase/CoreOnly (~> 10.24.0)
     - Firebase/Storage (~> 10.24.0)
     - firebase_core
@@ -1148,9 +1147,11 @@ PODS:
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - FlutterMacOS (1.0.0)
   - google_sign_in_ios (0.0.1):
+    - AppAuth (>= 1.7.4)
     - Flutter
     - FlutterMacOS
-    - GoogleSignIn (~> 7.0)
+    - GoogleSignIn (~> 7.1)
+    - GTMSessionFetcher (>= 3.4.0)
   - GoogleAppMeasurement (10.24.0):
     - GoogleAppMeasurement/AdIdSupport (= 10.24.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
@@ -1288,7 +1289,11 @@ PODS:
   - GTMAppAuth (4.1.1):
     - AppAuth/Core (~> 1.7)
     - GTMSessionFetcher/Core (< 4.0, >= 3.3)
+  - GTMSessionFetcher (3.4.1):
+    - GTMSessionFetcher/Full (= 3.4.1)
   - GTMSessionFetcher/Core (3.4.1)
+  - GTMSessionFetcher/Full (3.4.1):
+    - GTMSessionFetcher/Core
   - leveldb-library (1.22.5)
   - nanopb (2.30909.1):
     - nanopb/decode (= 2.30909.1)
@@ -1406,18 +1411,18 @@ SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
   AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
-  cloud_firestore: 8d7d30c28ab3ae003ec91e15b831bd5291d8db7a
-  cloud_functions: 4cd18078cb94051f1151e614bd84e68e9678a04b
+  cloud_firestore: aef8aab24d6d83cf75b3741d799d0a70ff865d0b
+  cloud_functions: 35c655898f835bcd5b1f906ef7458a339371b815
   dynamic_color: 2eaa27267de1ca20d879fbd6e01259773fb1670f
   file_selector_macos: 468fb6b81fac7c0e88d71317f3eec34c3b008ff9
   Firebase: 91fefd38712feb9186ea8996af6cbdef41473442
-  firebase_analytics: 540289f6fcd5dfc28f29dfc780dd440bc394cffc
-  firebase_auth: d6c938225bf5386ea3328f57375ef84410516941
+  firebase_analytics: 18a56165340c07beeebb1b8949efdf9fe185e902
+  firebase_auth: 1f256a4ad376e8914449967f2e665cbaafa5f4b2
   firebase_core: 59eec96207757ff60fa76232d0b0bb749f2c4b89
-  firebase_crashlytics: 404798d6b841c655fc2caff249d76a0af3e39ba4
-  firebase_messaging: 01d062a3152a5ba9ed8ac2c42fef6191530d235e
-  firebase_remote_config: c9c39b8cef191d638729da7f98bf2045f1860e1d
-  firebase_storage: 5cd50d414ca743aceb4840931314a9875ba2ab9b
+  firebase_crashlytics: a737f3711049924e448bb3eacd6afc5a7d7ae183
+  firebase_messaging: 98b3c2a19b5d8c4dd77817ec076d5f71e6e9d5bb
+  firebase_remote_config: 9dfa92d625416fe6595545af2d99d4488cae6e79
+  firebase_storage: c2fc6c58565d88f0953810bc997f505cccc463a0
   FirebaseABTesting: 4431c2c56ac6e56f463b9cab05cc111078639f99
   FirebaseAnalytics: b5efc493eb0f40ec560b04a472e3e1a15d39ca13
   FirebaseAppCheckInterop: fecc08c89936c8acb1428d8088313aabedb348e4
@@ -1439,7 +1444,7 @@ SPEC CHECKSUMS:
   FirebaseSharedSwift: 76e1529c32101d80e4f1ca2fba7c39d59f0a390a
   FirebaseStorage: 03710f9a0e3824d3069ed1128601a3d3a5e7d817
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  google_sign_in_ios: 1bfaf6607b44cd1b24c4d4bc39719870440f9ce1
+  google_sign_in_ios: 07375bfbf2620bc93a602c0e27160d6afc6ead38
   GoogleAppMeasurement: f3abf08495ef2cba7829f15318c373b8d9226491
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
