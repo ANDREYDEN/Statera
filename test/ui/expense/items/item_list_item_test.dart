@@ -39,7 +39,7 @@ void main() {
     final authService = AuthServiceMock();
 
     setUp(() {
-      item = Item(name: 'foo', value: 145);
+      item = SimpleItem(name: 'foo', value: 145);
       final user = MockUser();
       when(user.uid).thenReturn('a');
       when(authService.currentUser).thenReturn(user);

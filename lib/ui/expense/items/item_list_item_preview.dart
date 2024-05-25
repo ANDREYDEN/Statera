@@ -47,12 +47,12 @@ class ItemListItemPreview extends StatelessWidget {
     when(user.uid).thenReturn(me.uid);
     when(authService.currentUser).thenReturn(user);
 
-    final simpleItem = Item(
+    final simpleItem = SimpleItem(
       name: 'Pizza',
       value: 23.33,
       assigneeUids: [me.uid, other.uid, another.uid],
     );
-    final partitionedItem = Item(
+    final partitionedItem = SimpleItem(
       name: 'Pizza',
       value: 23.33,
       partition: 5,

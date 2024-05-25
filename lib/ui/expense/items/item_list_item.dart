@@ -44,7 +44,7 @@ class ItemListItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PriceText(
-                  value: item.value,
+                  value: item.total,
                   textStyle: Theme.of(context).textTheme.titleMedium,
                   withTaxPostfix: expenseTax != null && item.isTaxable,
                 ),

@@ -8,7 +8,7 @@ import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
 class UpsertItemDialog extends StatefulWidget {
-  final Item? intialItem;
+  final SimpleItem? intialItem;
   final ExpenseBloc expenseBloc;
 
   UpsertItemDialog({Key? key, this.intialItem, required this.expenseBloc})
@@ -43,7 +43,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
         FieldData<double>(
           id: 'item_value',
           label: 'Item Value',
-          initialData: widget.intialItem?.value ?? 0.0,
+          initialData: widget.intialItem?.total ?? 0.0,
           validators: [FieldData.requiredValidator],
           formatters: [CommaReplacerTextInputFormatter()],
         ),
@@ -66,7 +66,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
       ],
       onSubmit: (values) {
         final item = widget.intialItem ??
-            Item(
+            SimpleItem(
               name: values['item_name']!,
               value: values['item_value']!,
             );

@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:statera/data/models/assignee_decision.dart';
-import 'package:statera/data/models/item.dart';
+import 'package:statera/data/models/models.dart';
 
 void main() {
   group('Item', () {
-    late Item item = Item(name: 'foo', value: 145.0);
+    late Item item = SimpleItem(name: 'foo', value: 145.0);
 
     test('gets the number of assignees that confirmed the item', () {
       var assignee1 = AssigneeDecision(uid: '1');
@@ -34,10 +33,10 @@ void main() {
     });
 
     group('calculates the shared value', () {
-      var item = Item(name: 'foo', value: 145.0);
-      var itemWithTax = Item(name: 'foo', value: 145.0, isTaxable: true);
-      var partitionedItem = Item(name: 'foo', value: 145.0, partition: 3);
-      var partitionedItemWithTax = Item(
+      var item = SimpleItem(name: 'foo', value: 145.0);
+      var itemWithTax = SimpleItem(name: 'foo', value: 145.0, isTaxable: true);
+      var partitionedItem = SimpleItem(name: 'foo', value: 145.0, partition: 3);
+      var partitionedItemWithTax = SimpleItem(
         name: 'foo',
         value: 145.0,
         partition: 3,
@@ -86,21 +85,21 @@ void main() {
           item,
           condition: '2 peope accepted and 1 denied',
           partsList: [1, 0, 1],
-          expectedValues: [item.value / 2, 0.0, item.value / 2],
+          expectedValues: [item.total / 2, 0.0, item.total / 2],
         );
 
         createSharedValueTest(
           item,
           condition: 'someone accepted and everyone else did not mark',
           partsList: [1, null, null],
-          expectedValues: [item.value, 0.0, 0.0],
+          expectedValues: [item.total, 0.0, 0.0],
         );
 
         createSharedValueTest(
           item,
           condition: 'someone accepted more than 1 part',
           partsList: [2, 1, null],
-          expectedValues: [item.value / 2, item.value / 2, 0.0],
+          expectedValues: [item.total / 2, item.total / 2, 0.0],
         );
 
         createSharedValueTest(
@@ -116,8 +115,8 @@ void main() {
           tax: 0.1,
           partsList: [1, 1, 0],
           expectedValues: [
-            item.value * (1 + 0.1) / 2,
-            item.value * (1 + 0.1) / 2,
+            item.total * (1 + 0.1) / 2,
+            item.total * (1 + 0.1) / 2,
             0.0
           ],
         );
@@ -128,16 +127,12 @@ void main() {
           tax: 0.1,
           taxOnly: true,
           partsList: [1, 1, 0],
-          expectedValues: [
-            item.value * 0.1 / 2,
-            item.value * 0.1 / 2,
-            0.0
-          ],
+          expectedValues: [item.total * 0.1 / 2, item.total * 0.1 / 2, 0.0],
         );
       });
 
       group('when partitioned', () {
-        var item = Item(name: 'foo', value: 145.0, partition: 3);
+        var item = SimpleItem(name: 'foo', value: 145.0, partition: 3);
 
         createSharedValueTest(
           partitionedItem,
@@ -151,21 +146,21 @@ void main() {
           condition: 'everybody accepted 1 part',
           partsList: [1, 1, 1],
           expectedValues:
-              List<double>.generate(3, (_) => item.value / item.partition),
+              List<double>.generate(3, (_) => item.total / item.partition),
         );
 
         createSharedValueTest(
           partitionedItem,
           condition: 'someone accepted 2 parts and everyone else did not mark',
           partsList: [2, null, null],
-          expectedValues: [item.value * 2 / item.partition, 0.0, 0.0],
+          expectedValues: [item.total * 2 / item.partition, 0.0, 0.0],
         );
 
         createSharedValueTest(
           partitionedItem,
           condition: 'someone accepted all parts and everyone else denied',
           partsList: [3, 0, 0],
-          expectedValues: [item.value, 0.0, 0.0],
+          expectedValues: [item.total, 0.0, 0.0],
         );
 
         createSharedValueTest(
@@ -181,8 +176,8 @@ void main() {
           tax: 0.1,
           partsList: [1, 2, 0],
           expectedValues: [
-            item.value * (1 + 0.1) / item.partition,
-            item.value * (1 + 0.1) * 2 / item.partition,
+            item.total * (1 + 0.1) / item.partition,
+            item.total * (1 + 0.1) * 2 / item.partition,
             0.0
           ],
         );
@@ -194,8 +189,8 @@ void main() {
           taxOnly: true,
           partsList: [1, 2, 0],
           expectedValues: [
-            item.value * 0.1 / item.partition,
-            item.value * 0.1 * 2 / item.partition,
+            item.total * 0.1 / item.partition,
+            item.total * 0.1 * 2 / item.partition,
             0.0
           ],
         );
@@ -203,7 +198,7 @@ void main() {
     });
 
     test('can be converted to and from a firestore object', () {
-      var item = Item(
+      var item = SimpleItem(
         name: 'foo',
         value: 145.0,
         partition: 3,
@@ -218,7 +213,8 @@ void main() {
     });
 
     test('can reset its assignee desicions', () {
-      var item = Item(name: 'foo', value: 145.0, assigneeUids: ['1', '2', '3']);
+      var item =
+          SimpleItem(name: 'foo', value: 145.0, assigneeUids: ['1', '2', '3']);
 
       item.assignees = [
         AssigneeDecision(uid: '1', parts: 1),
@@ -234,7 +230,7 @@ void main() {
     });
 
     test('can not set assignee decision higher than remaining partition', () {
-      var item = Item(name: 'foo', value: 145.0, partition: 3);
+      var item = SimpleItem(name: 'foo', value: 145.0, partition: 3);
 
       var originalParts = 1;
       var assignee = AssigneeDecision(uid: '1', parts: originalParts);

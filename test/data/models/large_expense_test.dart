@@ -14,7 +14,7 @@ void main() {
       expense.assigneeUids.add(uid);
     }
 
-    var item1 = Item(
+    var item1 = SimpleItem(
       name: 'Blaster',
       value: 12.97,
       isTaxable: true,
@@ -25,35 +25,35 @@ void main() {
     item1.setAssigneeDecision('2', 1);
     item1.setAssigneeDecision('3', 2);
 
-    var item2 = Item(name: 'Kinder', value: 0.86, isTaxable: true);
+    var item2 = SimpleItem(name: 'Kinder', value: 0.86, isTaxable: true);
     expense.addItem(item2);
     item2.setAssigneeDecision('1', 1);
     item2.setAssigneeDecision('2', 1);
     item2.setAssigneeDecision('3', 1);
 
-    var item3 = Item(name: 'Kinder', value: 0.86, isTaxable: true);
+    var item3 = SimpleItem(name: 'Kinder', value: 0.86, isTaxable: true);
     expense.addItem(item3);
     item3.setAssigneeDecision('1', 0);
     // no decision for assignee 2
     item3.setAssigneeDecision('3', 1);
 
-    var item4 = Item(name: 'Potatoes', value: 3.97);
+    var item4 = SimpleItem(name: 'Potatoes', value: 3.97);
     expense.addItem(item4);
     // no decisions made
 
-    var item5 = Item(name: 'Tomatoes', value: 3.97);
+    var item5 = SimpleItem(name: 'Tomatoes', value: 3.97);
     expense.addItem(item5);
     item5.setAssigneeDecision('1', 1);
     item5.setAssigneeDecision('2', 1);
     item5.setAssigneeDecision('3', 1);
 
-    var item6 = Item(name: 'Avocados', value: 4.97, partition: 5);
+    var item6 = SimpleItem(name: 'Avocados', value: 4.97, partition: 5);
     expense.addItem(item6);
     item6.setAssigneeDecision('1', 0);
     item6.setAssigneeDecision('2', 1);
     item6.setAssigneeDecision('3', 4);
 
-    var item7 = Item(name: 'Cucumbers', value: 1.97);
+    var item7 = SimpleItem(name: 'Cucumbers', value: 1.97);
     expense.addItem(item7);
     item7.setAssigneeDecision('1', 1);
     item7.setAssigneeDecision('2', 1);

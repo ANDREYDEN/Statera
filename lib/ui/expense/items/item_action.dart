@@ -25,12 +25,14 @@ class UpsertItemAction extends ItemAction {
   void handle(BuildContext context) {
     final expenseBloc = context.read<ExpenseBloc>();
 
-    showDialog(
-      context: context,
-      builder: (context) => UpsertItemDialog(
-        intialItem: item,
-        expenseBloc: expenseBloc,
-      ),
-    );
+    if (item is SimpleItem) {
+      showDialog(
+        context: context,
+        builder: (context) => UpsertItemDialog(
+          intialItem: item as SimpleItem,
+          expenseBloc: expenseBloc,
+        ),
+      );
+    }
   }
 }
