@@ -10,6 +10,7 @@ class GasItem extends Item {
     required this.distance,
     required this.gasPrice,
     required this.consumption,
+    super.assigneeUids,
   });
 
   @override

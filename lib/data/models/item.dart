@@ -131,7 +131,10 @@ abstract class Item {
 
   static Item fromFirestore(Map<String, dynamic> data) {
     var uuid = Uuid();
-    var type = data['type'] ?? ItemType.SimpleItem;
+    var type = ItemType.values.firstWhere(
+      (i) => i.toString() == data['type'],
+      orElse: () => ItemType.SimpleItem,
+    );
 
     Item item = Item.fake();
     switch (type) {

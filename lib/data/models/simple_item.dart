@@ -14,13 +14,6 @@ class SimpleItem extends Item {
     super.type = ItemType.SimpleItem;
   }
 
-  // SimpleItem.fake({super.partition = 1, }) {
-  //   var uuid = Uuid();
-  //   super.id = uuid.v1();
-  //   super.name = 'foo';
-  //   this.price = 145;
-  // }
-
   @override
   double get total => value;
 

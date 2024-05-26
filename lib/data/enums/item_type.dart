@@ -1,4 +1,6 @@
 enum ItemType {
   GasItem,
   SimpleItem
+
+  
 }
