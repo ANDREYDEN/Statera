@@ -167,6 +167,16 @@ class ListCover extends StatelessWidget {
               redirectInfo: PaymentRedirectInfo(authorUid: 'b'),
             ),
           ),
+          PaymentListItem(
+            payment: Payment(
+              groupId: 'asd',
+              payerId: 'b',
+              receiverId: 'a',
+              value: 123,
+              timeCreated: DateTime.now(),
+              reason: 'Custom payment reason',
+            ),
+          ),
         ],
       ),
     );
