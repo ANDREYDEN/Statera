@@ -7,6 +7,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/advanced_dropdown.dart';
+import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 part 'field_data.dart';
@@ -50,48 +51,6 @@ class _CRUDDialogState extends State<CRUDDialog> {
         ProtectedButton(onPressed: submit, child: Text('Save & add another'))
     ];
 
-    final narrowScreenActions = [
-      Column(
-        children: [
-          if (widget.allowAddAnother)
-            GestureDetector(
-              onTap: () => setState(() {
-                _addAnother = !_addAnother;
-              }),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text('Add another'),
-                  Checkbox(
-                    value: _addAnother,
-                    onChanged: (_) => setState(() {
-                      _addAnother = !_addAnother;
-                    }),
-                  )
-                ],
-              ),
-            ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(width: 8),
-              CancelButton(),
-              SizedBox(width: 16),
-              ProtectedButton(
-                onPressed: () => submit(
-                    closeAfterSubmit:
-                        (!widget.allowAddAnother || !_addAnother) &&
-                            widget.closeAfterSubmit),
-                child: Text('Save'),
-              ),
-              SizedBox(width: 8),
-            ],
-          ),
-        ],
-      ),
-    ];
-
     return AlertDialog(
       title: Text(widget.title),
       content: DialogWidth(
@@ -114,7 +73,21 @@ class _CRUDDialogState extends State<CRUDDialog> {
           ],
         ),
       ),
-      actions: isWide ? wideScreenActions : narrowScreenActions,
+      actions: isWide
+          ? wideScreenActions
+          : [
+              NarrowScreenActions(
+                allowAddAnother: widget.allowAddAnother,
+                onAddAnother: () => setState(() {
+                  _addAnother = !_addAnother;
+                }),
+                onSave: () => submit(
+                    closeAfterSubmit:
+                        (!widget.allowAddAnother || !_addAnother) &&
+                            widget.closeAfterSubmit),
+                addAnother: _addAnother,
+              )
+            ],
     );
   }
 
