@@ -15,14 +15,28 @@ part 'field_data.dart';
 class CRUDDialog extends StatefulWidget {
   final String title;
   final FutureOr<void> Function(Map<String, dynamic>) onSubmit;
-  final List<FieldData> fields;
+  late final List<ButtonSegment<String>> segments;
+  late final Map<String, List<FieldData>> fieldsMap;
   final bool closeAfterSubmit;
   final bool allowAddAnother;
 
-  const CRUDDialog({
+  CRUDDialog({
     Key? key,
     required this.title,
-    required this.fields,
+    required List<FieldData> fields,
+    required this.onSubmit,
+    this.closeAfterSubmit = true,
+    this.allowAddAnother = false,
+  }) : super(key: key) {
+    this.fieldsMap = {'default': fields};
+    this.segments = [];
+  }
+
+  CRUDDialog.segmented({
+    Key? key,
+    required this.title,
+    required this.segments,
+    required this.fieldsMap,
     required this.onSubmit,
     this.closeAfterSubmit = true,
     this.allowAddAnother = false,
@@ -35,66 +49,98 @@ class CRUDDialog extends StatefulWidget {
 class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
   bool _showAdvanced = false;
-  late bool _addAnother = true;
+  bool _addAnother = true;
+
+  late String _selectedValue;
+
+  List<FieldData> get _fields => widget.fieldsMap[_selectedValue]!;
+
+  @override
+  void initState() {
+    _selectedValue = widget.segments.firstOrNull?.value ?? 'default';
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isWide = context.read<LayoutState>().isWide;
-
-    final wideScreenActions = [
-      CancelButton(),
-      ProtectedButton(
-        onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
-        child: Text('Save'),
-      ),
-      if (widget.allowAddAnother)
-        ProtectedButton(onPressed: submit, child: Text('Save & add another'))
-    ];
-
     return AlertDialog(
       title: Text(widget.title),
       content: DialogWidth(
-        child: ListView(
-          shrinkWrap: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [...getFields((f) => !f.isAdvanced)],
-            ),
-            if (_advancedFieldsPresent)
-              AdvancedDropdown(
-                onTap: () => setState(() {
-                  _showAdvanced = !_showAdvanced;
-                }),
-                isCollapsed: _showAdvanced,
+            if (widget.segments.isNotEmpty)
+              SegmentedButton(
+                segments: widget.segments,
+                selected: {_selectedValue},
+                onSelectionChanged: _handleSegmentSelection,
               ),
-            if (_showAdvanced)
-              Column(children: [...getFields((f) => f.isAdvanced)]),
+            ListView(
+              shrinkWrap: true,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [..._getFields((f) => !f.isAdvanced)],
+                ),
+                if (_advancedFieldsPresent)
+                  AdvancedDropdown(
+                    onTap: () => setState(() {
+                      _showAdvanced = !_showAdvanced;
+                    }),
+                    isCollapsed: _showAdvanced,
+                  ),
+                if (_showAdvanced)
+                  Column(children: [..._getFields((f) => f.isAdvanced)]),
+              ],
+            ),
           ],
         ),
       ),
-      actions: isWide
-          ? wideScreenActions
-          : [
-              NarrowScreenActions(
-                allowAddAnother: widget.allowAddAnother,
-                onAddAnother: () => setState(() {
-                  _addAnother = !_addAnother;
-                }),
-                onSave: () => submit(
-                    closeAfterSubmit:
-                        (!widget.allowAddAnother || !_addAnother) &&
-                            widget.closeAfterSubmit),
-                addAnother: _addAnother,
-              )
-            ],
+      actions: getActions(context),
     );
   }
 
-  bool get _advancedFieldsPresent => widget.fields.any((f) => f.isAdvanced);
+  List<Widget> getActions(BuildContext context) {
+    final isWide = context.read<LayoutState>().isWide;
 
-  Iterable<Widget> getFields(bool Function(FieldData) criteria) sync* {
-    final selectedFields = widget.fields.where(criteria).toList();
+    if (isWide) {
+      return [
+        CancelButton(),
+        ProtectedButton(
+          onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
+          child: Text('Save'),
+        ),
+        if (widget.allowAddAnother)
+          ProtectedButton(onPressed: submit, child: Text('Save & add another'))
+      ];
+    }
+
+    return [
+      NarrowScreenActions(
+        allowAddAnother: widget.allowAddAnother,
+        onAddAnother: () => setState(() {
+          _addAnother = !_addAnother;
+        }),
+        onSave: () => submit(
+            closeAfterSubmit: (!widget.allowAddAnother || !_addAnother) &&
+                widget.closeAfterSubmit),
+        addAnother: _addAnother,
+      )
+    ];
+  }
+
+  bool get _advancedFieldsPresent => _fields.any((f) => f.isAdvanced);
+
+  void _handleSegmentSelection(Set<String> values) {
+    setState(() {
+      _selectedValue = values.single;
+    });
+    _focusOnFirstField();
+  }
+
+  Iterable<Widget> _getFields(bool Function(FieldData) criteria) sync* {
+    final selectedFields = _fields.where(criteria).toList();
     final fieldValueMap = selectedFields.fold<Map<String, dynamic>>(
       {},
       (acc, cur) => {...acc, cur.id: cur.data},
@@ -152,7 +198,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
   }
 
   Future submit({bool closeAfterSubmit = false}) async {
-    if (widget.fields.any((field) => field.getError().isNotEmpty)) {
+    if (_fields.any((field) => field.getError().isNotEmpty)) {
       setState(() {
         this._dirty = true;
       });
@@ -160,7 +206,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
     }
 
     await widget.onSubmit(
-      Map.fromEntries(widget.fields.map(
+      Map.fromEntries(_fields.map(
         (field) => MapEntry(field.id, field.data),
       )),
     );
@@ -168,11 +214,15 @@ class _CRUDDialogState extends State<CRUDDialog> {
     if (closeAfterSubmit) {
       Navigator.of(context).pop();
     } else {
-      widget.fields.first.focusNode.requestFocus();
+      _focusOnFirstField();
     }
 
-    widget.fields.forEach((field) {
+    _fields.forEach((field) {
       field.reset();
     });
+  }
+
+  void _focusOnFirstField() {
+    _fields.first.focusNode.requestFocus();
   }
 }
