@@ -25,7 +25,7 @@ abstract class Item {
     this.partition = 1,
     List<String>? assigneeUids,
     this.isTaxable = false,
-    this.type = ItemType.SimpleItem,
+    this.type = ItemType.simple,
   }) {
     var uuid = Uuid();
     this.id = uuid.v1();
@@ -126,25 +126,23 @@ abstract class Item {
       'partition': partition,
       'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
       'taxable': isTaxable,
+      'type': type.toFirestore()
     };
   }
 
   static Item fromFirestore(Map<String, dynamic> data) {
     var uuid = Uuid();
-    var type = ItemType.values.firstWhere(
-      (i) => i.toString() == data['type'],
-      orElse: () => ItemType.SimpleItem,
-    );
+    var type = ItemType.fromFirestore(data['type']) ?? ItemType.simple;
 
     Item item = Item.fake();
     switch (type) {
-      case ItemType.SimpleItem:
+      case ItemType.simple:
         item = SimpleItem(
           name: data['name'],
           value: double.parse(data['value'].toString()),
         );
         break;
-      case ItemType.GasItem:
+      case ItemType.gas:
         item = GasItem(
           name: data['name'],
           distance: double.parse(data['distance'].toString()),

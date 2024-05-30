@@ -19,7 +19,7 @@ class UpsertItemDialog extends StatefulWidget {
 }
 
 class _UpsertItemDialogState extends State<UpsertItemDialog> {
-  bool get addingItem => widget.intialItem == null;
+  bool get _addingItem => widget.intialItem == null;
 
   AuthBloc get authBloc => context.read<AuthBloc>();
 
@@ -32,7 +32,9 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
             .itemsAreTaxableByDefault;
 
     return CRUDDialog.segmented(
-      title: addingItem ? 'Add Item' : 'Edit Item',
+      title: _addingItem ? 'Add Item' : 'Edit Item',
+      segmentSelectionEnabled: _addingItem,
+      initialSelection: widget.intialItem?.type.name,
       segments: [
         ButtonSegment(value: 'simple', label: Text('Simple')),
         ButtonSegment(
@@ -120,16 +122,38 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
         ]
       },
       onSubmit: (values) {
-        final item = widget.intialItem ??
-            SimpleItem(
-              name: values['item_name']!,
-              value: values['item_value']!,
-            );
+        Item item = widget.intialItem ?? Item.fake();
+
+        final isSimpleItem = values['item_value'] != null;
+        if (isSimpleItem) {
+          item = widget.intialItem ??
+              SimpleItem(
+                name: values['item_name'],
+                value: values['item_value'],
+              );
+          final simpleItem = item as SimpleItem;
+          simpleItem.value = values['item_value'];
+        }
+
+        final isGasItem = values['item_distance'] != null;
+        if (isGasItem) {
+          item = widget.intialItem ??
+              GasItem(
+                name: values['item_name'],
+                distance: values['item_distance'],
+                gasPrice: values['item_gas_price'],
+                consumption: values['item_consumption'],
+              );
+          final simpleItem = item as GasItem;
+          simpleItem.distance = values['item_distance'];
+          simpleItem.gasPrice = values['item_gas_price'];
+          simpleItem.consumption = values['item_consumption'];
+        }
+
         item.name = values['item_name']!;
-        // item.value = values['item_value']!;
         item.isTaxable = values['item_taxable'] ?? false;
         var newPartition = values['item_partition']!;
-        if (addingItem || newPartition != widget.intialItem!.partition) {
+        if (_addingItem || newPartition != widget.intialItem!.partition) {
           item.resetAssigneeDecisions();
           item.partition = newPartition;
         }
@@ -138,7 +162,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
           UpdateRequested(
             issuerUid: authBloc.uid,
             update: (expense) {
-              if (addingItem) {
+              if (_addingItem) {
                 expense.addItem(item);
               } else {
                 expense.updateItem(item);
@@ -147,7 +171,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
           ),
         );
       },
-      allowAddAnother: addingItem,
+      allowAddAnother: _addingItem,
     );
   }
 }

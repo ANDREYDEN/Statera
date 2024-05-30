@@ -19,6 +19,8 @@ class CRUDDialog extends StatefulWidget {
   late final Map<String, List<FieldData>> fieldsMap;
   final bool closeAfterSubmit;
   final bool allowAddAnother;
+  late final bool segmentSelectionEnabled;
+  final String? initialSelection;
 
   CRUDDialog({
     Key? key,
@@ -27,9 +29,11 @@ class CRUDDialog extends StatefulWidget {
     required this.onSubmit,
     this.closeAfterSubmit = true,
     this.allowAddAnother = false,
+    this.initialSelection,
   }) : super(key: key) {
     this.fieldsMap = {'default': fields};
     this.segments = [];
+    this.segmentSelectionEnabled = true;
   }
 
   CRUDDialog.segmented({
@@ -40,6 +44,8 @@ class CRUDDialog extends StatefulWidget {
     required this.onSubmit,
     this.closeAfterSubmit = true,
     this.allowAddAnother = false,
+    this.segmentSelectionEnabled = true,
+    this.initialSelection,
   }) : super(key: key);
 
   @override
@@ -57,7 +63,9 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   @override
   void initState() {
-    _selectedValue = widget.segments.firstOrNull?.value ?? 'default';
+    _selectedValue = widget.initialSelection ??
+        widget.segments.firstOrNull?.value ??
+        'default';
 
     super.initState();
   }
@@ -74,7 +82,9 @@ class _CRUDDialogState extends State<CRUDDialog> {
               SegmentedButton(
                 segments: widget.segments,
                 selected: {_selectedValue},
-                onSelectionChanged: _handleSegmentSelection,
+                onSelectionChanged: widget.segmentSelectionEnabled
+                    ? _handleSegmentSelection
+                    : null,
               ),
             ListView(
               shrinkWrap: true,

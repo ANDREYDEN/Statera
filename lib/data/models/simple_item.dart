@@ -10,9 +10,7 @@ class SimpleItem extends Item {
     super.partition,
     super.assigneeUids,
     super.isTaxable,
-  }) {
-    super.type = ItemType.SimpleItem;
-  }
+  }) : super(type: ItemType.simple);
 
   @override
   double get total => value;

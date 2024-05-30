@@ -1,3 +1,4 @@
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/item.dart';
 
 class GasItem extends Item {
@@ -11,7 +12,7 @@ class GasItem extends Item {
     required this.gasPrice,
     required this.consumption,
     super.assigneeUids,
-  });
+  }) : super(type: ItemType.gas);
 
   @override
   double get total => distance * gasPrice * consumption / 100;
