@@ -39,7 +39,7 @@ async function removeUserFromGroup(uid: string, groupDoc: QueryDocumentSnapshot)
       balance,
     })
   } catch (e) {
-    console.log(`Failed to remove user from group (${groupDoc.id}): ${e}`)
+    console.error(`Failed to remove user from group (${groupDoc.id}): ${e}`)
   }
 }
 

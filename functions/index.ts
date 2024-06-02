@@ -15,6 +15,7 @@ import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
 import { Timestamp } from 'firebase-admin/firestore'
 import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
+require('firebase-functions/logger/compat')
 
 admin.initializeApp()
 

@@ -6,18 +6,18 @@ import { propertyChanged } from '../../utils'
 export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
   const targetPropertyChanged = propertyChanged(oldUserData, newUserData, 'name', 'photoURL', 'paymentInfo')
 
-  console.log({targetPropertyChanged})
+  console.log('updateUser params', {userId, oldUserData, newUserData, targetPropertyChanged})
   if (targetPropertyChanged) {
     try {
       await updateUsersInGroups(userId, newUserData)
-    } catch (e: any) {
-      console.log(`Something went wrong while updating user in groups: ${e.toString()}`)
+    } catch (e) {
+      console.error('Something went wrong while updating user in groups', e)
     }
 
     try {
       await updateAuthUser(userId, newUserData)
-    } catch (e: any) {
-      console.log(`Something went wrong while updating user in Auth: ${e.toString()}`)
+    } catch (e) {
+      console.error('Something went wrong while updating user in Auth', e)
     }
   }
 }
@@ -51,5 +51,5 @@ async function updateAuthUser(userId: string, userData: UserData) {
     photoURL: userData.photoURL,
     displayName: userData.name,
   })
-  console.log(`Updated auth user ${userId}`)
+  log(`Updated auth user ${userId}`)
 }
