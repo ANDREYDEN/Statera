@@ -29,6 +29,7 @@ module.exports = {
     'no-unused-vars': ['warn', { 'varsIgnorePattern': '^_', 'argsIgnorePattern': '^_' }],
     '@typescript-eslint/no-unused-vars': ['warn', { 'varsIgnorePattern': '^_', 'argsIgnorePattern': '^_' }],
     'max-len': ['warn', { 'code': 100 }],
-    'import/no-unresolved': ['warn']
+    'import/no-unresolved': ['warn'],
+    'indent': ['error', 2]
   },
 }

@@ -50,8 +50,8 @@ async function updateUsersInGroups(userId: string, userData: UserData) {
         return {
           ...member,
           name: userData.name,
-          photoURL: userData.photoURL,
-          paymentInfo: userData.paymentInfo,
+          photoURL: userData.photoURL ?? null,
+          paymentInfo: userData.paymentInfo ?? null,
         }
       }
       return member
@@ -67,5 +67,5 @@ async function updateAuthUser(userId: string, userData: UserData) {
     photoURL: userData.photoURL,
     displayName: userData.name,
   })
-  log(`Updated auth user ${userId}`)
+  console.log(`Updated auth user ${userId}`)
 }
