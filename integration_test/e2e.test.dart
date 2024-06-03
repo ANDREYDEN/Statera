@@ -8,10 +8,11 @@ import 'test_helpers.dart';
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
-  final isWide =
-      WidgetsBinding.instance.renderView.configuration.size.width > 1000;
 
   testWidgets('e2e test', (WidgetTester tester) async {
+    tester.binding.setSurfaceSize(Size(600, 1300));
+    final isWide = false;
+
     await app.main();
     await tester.pumpWidget(app.Statera());
     await tester.pumpAndSettle();

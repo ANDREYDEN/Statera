@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`analyzeReceipt can analyze LCBO receipt 1`] = `
-Array [
-  Object {
+[
+  {
     "deposit": 0.1,
     "id": "00491183",
     "name": "GEORGIAN BAY VODKA SMASH",
@@ -10,7 +10,7 @@ Array [
     "value": 3,
     "volume": 473,
   },
-  Object {
+  {
     "deposit": 0.2,
     "id": "00028049",
     "name": "ZIRKOVA UNITY VODKA",
@@ -18,7 +18,7 @@ Array [
     "value": 34.75,
     "volume": 750,
   },
-  Object {
+  {
     "deposit": 0.2,
     "id": "00446021",
     "name": "BACARDI COCONUT RUM",
@@ -26,7 +26,7 @@ Array [
     "value": 29,
     "volume": 750,
   },
-  Object {
+  {
     "deposit": 0.1,
     "id": "00267286",
     "name": "SAUZA GOLD",
@@ -34,7 +34,7 @@ Array [
     "value": 20.85,
     "volume": 375,
   },
-  Object {
+  {
     "deposit": 0.1,
     "id": "00019347",
     "name": "FOUNDER'S ORIGINAL BOURBON SOUR",
@@ -42,7 +42,7 @@ Array [
     "value": 2.85,
     "volume": 355,
   },
-  Object {
+  {
     "deposit": 0.1,
     "id": "00024319",
     "name": "DILLON'S TANGERINE LEMON & A HINT OF M",
@@ -50,7 +50,7 @@ Array [
     "value": 3.05,
     "volume": 473,
   },
-  Object {
+  {
     "deposit": 0.1,
     "id": "00024321",
     "name": "DILLON'S BLACKBERRY LEMON & A DASH OF",
@@ -58,7 +58,7 @@ Array [
     "value": 3.05,
     "volume": 473,
   },
-  Object {
+  {
     "deposit": 0.1,
     "id": "00019350",
     "name": "FOUNDER'S ORIGINAL TEQUILA PALOMA",
@@ -70,78 +70,78 @@ Array [
 `;
 
 exports[`analyzeReceipt can analyze Walmart receipt 1`] = `
-Array [
-  Object {
+[
+  {
     "name": "Yam / Sw Pot",
     "sku": "000000004074R",
     "value": 3.47,
   },
-  Object {
+  {
     "name": "Lib Grk 650",
     "sku": "006568412394R",
     "value": 5.98,
   },
-  Object {
+  {
     "name": "Hgdz Vncmlpr",
     "sku": "005500040742R",
     "value": 12,
   },
-  Object {
+  {
     "name": "Chk Bst Bnls",
     "sku": "060538876501R",
     "value": 1.97,
   },
-  Object {
+  {
     "name": "Cl Tuna Dill",
     "sku": "006136243483R",
     "value": 1.97,
   },
-  Object {
+  {
     "name": "Cl Tuna - Chil",
     "sku": "006136243485R",
     "value": 1.97,
   },
-  Object {
+  {
     "name": "Cl Tuna - Chil",
     "sku": "006136243485R",
     "value": 2.27,
   },
-  Object {
+  {
     "name": "Mini Carrots",
     "sku": "003338366602R",
     "value": 1.47,
   },
-  Object {
+  {
     "name": "Cucumber",
     "sku": "000000004593R",
     "value": 2.52,
   },
-  Object {
+  {
     "name": "Sqursh Zuce",
     "sku": "0000000040678",
     "value": 2.52,
   },
-  Object {
+  {
     "name": "Kiwi",
     "sku": "000000004030R",
     "value": 2.61,
   },
-  Object {
+  {
     "name": "Wldrf Salad",
     "sku": "088804800082R",
     "value": 6.97,
   },
-  Object {
+  {
     "name": "Onion Scal",
     "sku": "000000004068R",
     "value": 0.97,
   },
-  Object {
+  {
     "name": "Broc Stlk",
     "sku": "000000004060R",
     "value": 2.47,
   },
-  Object {
+  {
     "name": "Red Grapes",
     "sku": "000000004023R",
     "value": 3.75,

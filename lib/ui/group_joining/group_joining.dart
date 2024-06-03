@@ -27,13 +27,13 @@ class GroupJoining extends StatelessWidget {
                     children: [
                       Text(
                         'You are about to join',
-                        style: Theme.of(context).textTheme.headline6,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
                         group.name,
                         style: Theme.of(context)
                             .textTheme
-                            .headline6!
+                            .titleMedium!
                             .copyWith(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
