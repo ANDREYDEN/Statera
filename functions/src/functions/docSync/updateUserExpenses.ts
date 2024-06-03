@@ -2,9 +2,10 @@ import { firestore } from 'firebase-admin'
 import { DocumentSnapshot } from 'firebase-admin/firestore'
 import { Change } from 'firebase-functions/v1'
 import { calculateStage } from '../../utils/expenseUtils'
+import { Expense } from '../../types/expense'
 
 export async function updateUserExpenses(change: Change<DocumentSnapshot>) {
-  const expenseData = change.after.data() ?? change.before.data()
+  const expenseData = (change.after.data() ?? change.before.data()) as Expense
   const expenseDeleted = !change.after.exists
   if (!expenseData) return
 
