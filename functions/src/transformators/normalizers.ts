@@ -50,8 +50,8 @@ export function normalizeWalmartProducts(rows: string[][]): WalmartProduct[] {
     const codeIndex = row.indexOf('C-O-D-E')
     const nameElements = row.slice(0, codeIndex)
     const prettyNameElements = nameElements
-        .map(toPascalCase)
-        .filter((element) => element != '')
+      .map(toPascalCase)
+      .filter((element) => element != '')
     product.name = prettyNameElements.join(' ')
 
     return product

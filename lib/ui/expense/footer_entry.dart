@@ -14,7 +14,7 @@ class FooterEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.subtitle1!.copyWith(
+    final textStyle = Theme.of(context).textTheme.titleSmall!.copyWith(
           fontWeight: bold ? FontWeight.bold : null,
         );
 

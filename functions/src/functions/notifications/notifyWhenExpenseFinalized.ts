@@ -2,7 +2,9 @@ import { messaging } from 'firebase-admin'
 import { DocumentSnapshot } from 'firebase-admin/firestore'
 import { getExpenseNotificationTokens } from './notificationUtils'
 
-export async function notifyWhenExpenseFinalized(expenseSnap: DocumentSnapshot) {
+export async function notifyWhenExpenseFinalized(
+  expenseSnap: DocumentSnapshot
+) {
   if (!expenseSnap.exists) {
     console.log(`Expense ${expenseSnap.id} no longer exists`)
     return

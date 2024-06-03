@@ -1,7 +1,9 @@
-export function calculateStage(expense: any, assigneeId: string) {
-    if (expense.finalizedDate != null) return 2
+import { Expense } from '../types/expense'
 
-    if (expense.unmarkedAssigneeIds.includes(assigneeId)) return 0
+export function calculateStage(expense: Expense, assigneeId: string) {
+  if (expense.finalizedDate) return 2
 
-    return 1
+  if (expense.unmarkedAssigneeIds.includes(assigneeId)) return 0
+
+  return 1
 }

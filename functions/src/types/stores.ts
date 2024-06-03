@@ -1,13 +1,16 @@
 import {
-  filterProducts, filterWalmartProducts,
+  filterProducts,
+  filterWalmartProducts,
 } from '../transformators/filters'
 import { mergeWalmartProducts } from '../transformators/mergers'
 import {
   normalizeLCBOProducts,
-  normalizeProducts, normalizeWalmartProducts,
+  normalizeProducts,
+  normalizeWalmartProducts,
 } from '../transformators/normalizers'
 import {
-  improveNaming, improveWalmartNaming,
+  improveNaming,
+  improveWalmartNaming,
 } from '../transformators/readability'
 import { Product } from './products'
 
@@ -42,4 +45,4 @@ export const lcbo: Store = {
   improveNaming,
 }
 
-export const stores: {[name: string]: Store} = { walmart, lcbo }
+export const stores: { [name: string]: Store } = { walmart, lcbo }

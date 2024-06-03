@@ -21,7 +21,7 @@ function improveName(name: string): string {
 }
 
 export async function improveWalmartNaming(
-    products: WalmartProduct[]
+  products: WalmartProduct[]
 ): Promise<WalmartProduct[]> {
   const newProducts: WalmartProduct[] = []
   for (const p of products) {
@@ -32,7 +32,7 @@ export async function improveWalmartNaming(
 }
 
 async function improveWalmartName(
-    product: WalmartProduct
+  product: WalmartProduct
 ): Promise<WalmartProduct> {
   const improvedProduct = { ...product, name: improveName(product.name) }
   if (!product.sku) {
@@ -48,7 +48,9 @@ async function improveWalmartName(
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     // eslint-disable-next-line max-len
-    page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0')
+    page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
+    )
     await page.goto(productUrl)
 
     const element = await page.$('[data-automation="name"]')
@@ -59,9 +61,7 @@ async function improveWalmartName(
 
     return { ...product, name: productName }
   } catch (e) {
-    console.error(
-        `Failed to improve name for ${cleanSku}: ${e}`
-    )
+    console.error(`Failed to improve name for ${cleanSku}: ${e}`)
   }
 
   return improvedProduct

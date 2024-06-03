@@ -6,6 +6,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NODE_VERSION: 18
 
 jobs:
   test_flutter:
@@ -25,6 +26,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
@@ -64,6 +66,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
@@ -73,7 +76,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Copy .env
         env:
@@ -123,7 +126,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: npm i
@@ -151,6 +154,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
@@ -201,6 +205,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
