@@ -2,6 +2,7 @@ import { UserData } from '../../types/userData'
 import * as admin from 'firebase-admin'
 import { auth } from 'firebase-admin'
 import { propertyChanged } from '../../utils'
+import { Group } from '../../types/group'
 
 export async function updateUser(
   userId: string,
@@ -45,7 +46,7 @@ async function updateUsersInGroups(userId: string, userData: UserData) {
     .get()
 
   for (const groupDoc of groupsSnap.docs) {
-    const members = groupDoc.data().members.map((member: any) => {
+    const members = (groupDoc.data() as Group).members.map((member) => {
       if (member.uid === userId) {
         return {
           ...member,

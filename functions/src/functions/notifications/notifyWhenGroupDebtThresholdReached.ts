@@ -1,12 +1,13 @@
 import { messaging } from 'firebase-admin'
 import { Change } from 'firebase-functions/v1'
 import { getUsersNotificationTokens } from './notificationUtils'
+import { Group } from '../../types/group'
 
 export async function notifyWhenGroupDebtThresholdReached(
   groupSnap: Change<FirebaseFirestore.QueryDocumentSnapshot>
 ) {
-  const oldGroup = groupSnap.before.data()
-  const newGroup = groupSnap.after.data()
+  const oldGroup = groupSnap.before.data() as Group
+  const newGroup = groupSnap.after.data() as Group
 
   if (JSON.stringify(oldGroup.balance) === JSON.stringify(newGroup.balance)) {
     return
@@ -36,8 +37,8 @@ export async function notifyWhenGroupDebtThresholdReached(
 }
 
 function getUsersWithBalanceModificationsThatExceedThreshold(
-  oldGroup: any,
-  newGroup: any
+  oldGroup: Group,
+  newGroup: Group
 ): string[] {
   const oldThreshold = oldGroup.debtThreshold
   const newThreshold = newGroup.debtThreshold

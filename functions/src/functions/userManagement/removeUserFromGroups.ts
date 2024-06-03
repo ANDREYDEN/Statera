@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin'
 import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore'
+import { Expense } from '../../types/expense'
 
 export async function removeUserFromGroups(uid: string) {
   const app = admin.app()
@@ -58,13 +59,13 @@ async function removeUserFromOutstandingExpenses(uid: string, groupId: string) {
     .get()
 
   for (const expenseDoc of expenses.docs) {
-    const expense = expenseDoc.data()
+    const expense = expenseDoc.data() as Expense
 
     expense.assigneeIds = expense.assigneeIds.filter(
       (ids: string) => ids != uid
     )
     for (const item of expense.items) {
-      item.assignees = item.assignees.filter((item: any) => item.uid != uid)
+      item.assignees = item.assignees.filter((assignee) => assignee.uid != uid)
     }
 
     await expenseDoc.ref.set(expense)
