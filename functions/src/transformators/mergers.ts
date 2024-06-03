@@ -4,7 +4,7 @@ import { WalmartProduct } from '../types/products'
 export function mergeWalmartProducts(rows: WalmartProduct[]): WalmartProduct[] {
   for (let i = 0; i < rows.length - 1; i++) {
     const row = rows[i]
-    const nextRow = rows[i+1]
+    const nextRow = rows[i + 1]
     if (row.sku && !row.value) {
       row.value = nextRow.value
     }

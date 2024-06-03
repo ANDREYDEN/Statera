@@ -3,10 +3,25 @@ import * as admin from 'firebase-admin'
 import { auth } from 'firebase-admin'
 import { propertyChanged } from '../../utils'
 
-export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
-  const targetPropertyChanged = propertyChanged(oldUserData, newUserData, 'name', 'photoURL', 'paymentInfo')
+export async function updateUser(
+  userId: string,
+  oldUserData: UserData,
+  newUserData: UserData
+) {
+  const targetPropertyChanged = propertyChanged(
+    oldUserData,
+    newUserData,
+    'name',
+    'photoURL',
+    'paymentInfo'
+  )
 
-  console.log('updateUser params', { userId, oldUserData, newUserData, targetPropertyChanged })
+  console.log('updateUser params', {
+    userId,
+    oldUserData,
+    newUserData,
+    targetPropertyChanged,
+  })
   if (targetPropertyChanged) {
     try {
       await updateUsersInGroups(userId, newUserData)
@@ -23,10 +38,11 @@ export async function updateUser(userId: string, oldUserData: UserData, newUserD
 }
 
 async function updateUsersInGroups(userId: string, userData: UserData) {
-  const groupsSnap = await admin.firestore()
-      .collection('groups')
-      .where('memberIds', 'array-contains', userId)
-      .get()
+  const groupsSnap = await admin
+    .firestore()
+    .collection('groups')
+    .where('memberIds', 'array-contains', userId)
+    .get()
 
   for (const groupDoc of groupsSnap.docs) {
     const members = groupDoc.data().members.map((member: any) => {

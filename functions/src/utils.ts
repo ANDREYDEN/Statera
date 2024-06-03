@@ -4,12 +4,10 @@ import _ from 'lodash'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 
-export function verticalSegment(
-    label: IEntityAnnotation
-): VerticalSegment {
+export function verticalSegment(label: IEntityAnnotation): VerticalSegment {
   const corners = label.boundingPoly?.vertices ?? []
   const sortedCorners = corners.sort(
-      (corner, otherCorner) => (corner?.y ?? 0) - (otherCorner?.y ?? 0)
+    (corner, otherCorner) => (corner?.y ?? 0) - (otherCorner?.y ?? 0)
   )
   const getY = (i: number) => sortedCorners[i]?.y ?? 0
   const getX = (i: number) => sortedCorners[i]?.x ?? 0
@@ -33,6 +31,13 @@ export function toPascalCase(str: string): string {
 }
 
 // Returns true if any of the properties changed
-export function propertyChanged<T>(obj1: T, obj2: T, ...propertyNames: (keyof T)[]): boolean {
-  return propertyNames.some((propertyName) => JSON.stringify(obj1[propertyName]) != JSON.stringify(obj2[propertyName]))
+export function propertyChanged<T>(
+  obj1: T,
+  obj2: T,
+  ...propertyNames: (keyof T)[]
+): boolean {
+  return propertyNames.some(
+    (propertyName) =>
+      JSON.stringify(obj1[propertyName]) != JSON.stringify(obj2[propertyName])
+  )
 }

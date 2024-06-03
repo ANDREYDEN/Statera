@@ -14,7 +14,11 @@ export async function updateUserExpenses(change: Change<DocumentSnapshot>) {
   ]).values()
 
   for (const uid of relatedUids) {
-    const userExpenseRef = firestore().collection('users').doc(uid).collection('expenses').doc(change.after.id)
+    const userExpenseRef = firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('expenses')
+      .doc(change.after.id)
     if (expenseDeleted) {
       await userExpenseRef.delete()
     } else {

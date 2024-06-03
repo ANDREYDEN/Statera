@@ -5,7 +5,7 @@ export function filterProducts(products: Product[]): Product[] {
 }
 
 export function filterWalmartProducts(
-    products: WalmartProduct[]
+  products: WalmartProduct[]
 ): WalmartProduct[] {
   return products.filter((p) => p.sku && nameIsValid(p.name))
 }
