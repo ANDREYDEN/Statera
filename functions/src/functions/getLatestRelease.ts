@@ -3,9 +3,9 @@ import fetch from 'node-fetch'
 
 export async function getLatestRelease(platform: string): Promise<Release> {
   const listApps =
-    platform == 'android'
-      ? admin.projectManagement().listAndroidApps()
-      : admin.projectManagement().listIosApps()
+    platform == 'android' ?
+      admin.projectManagement().listAndroidApps() :
+      admin.projectManagement().listIosApps()
   const apps = await listApps
   if (!apps || apps.length === 0) throw new Error(`No ${platform} apps found`)
 

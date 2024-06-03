@@ -79,9 +79,9 @@ function buildRows(response: IAnnotateResponse): string[][] {
   const labels = response.textAnnotations?.slice(1) ?? []
 
   console.log(
-    labels.length > 0
-      ? `This image has some text: ${labels.length}`
-      : 'This image has no text'
+    labels.length > 0 ?
+      `This image has some text: ${labels.length}` :
+      'This image has no text'
   )
 
   const orientedLabels = rotateLabels(labels)
