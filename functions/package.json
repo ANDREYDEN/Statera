@@ -3,6 +3,7 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint --ext .ts . --fix",
+    "format": "prettier --write \"src/{**/*,*}.{js,ts,jsx,tsx,json}\"",
     "build": "tsc",
     "listen": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",

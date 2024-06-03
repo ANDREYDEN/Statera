@@ -6,7 +6,7 @@ import { propertyChanged } from '../../utils'
 export async function updateUser(userId: string, oldUserData: UserData, newUserData: UserData) {
   const targetPropertyChanged = propertyChanged(oldUserData, newUserData, 'name', 'photoURL', 'paymentInfo')
 
-  console.log('updateUser params', {userId, oldUserData, newUserData, targetPropertyChanged})
+  console.log('updateUser params', { userId, oldUserData, newUserData, targetPropertyChanged })
   if (targetPropertyChanged) {
     try {
       await updateUsersInGroups(userId, newUserData)
@@ -31,11 +31,11 @@ async function updateUsersInGroups(userId: string, userData: UserData) {
   for (const groupDoc of groupsSnap.docs) {
     const members = groupDoc.data().members.map((member: any) => {
       if (member.uid === userId) {
-        return { 
-          ...member, 
+        return {
+          ...member,
           name: userData.name,
           photoURL: userData.photoURL,
-          paymentInfo: userData.paymentInfo, 
+          paymentInfo: userData.paymentInfo,
         }
       }
       return member

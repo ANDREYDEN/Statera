@@ -39,7 +39,7 @@ export const handleExpenseUpdate = functions.firestore
 
       const oldFinalizedTimestamp = oldExpense.finalizedDate as (Timestamp | null)
       const newFinalizedTimestamp = newExpense.finalizedDate as (Timestamp | null)
-      
+
       if (oldFinalizedTimestamp?.toMillis != newFinalizedTimestamp?.toMillis) {
         if (newExpense.finalizedDate) {
           await notifyWhenExpenseFinalized(change.after)
