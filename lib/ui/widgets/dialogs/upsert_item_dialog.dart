@@ -7,34 +7,78 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
-class UpsertItemDialog extends StatefulWidget {
-  final Item? intialItem;
+class UpsertItemDialog extends StatelessWidget {
+  final Item? initialItem;
   final ExpenseBloc expenseBloc;
 
-  UpsertItemDialog({Key? key, this.intialItem, required this.expenseBloc})
+  UpsertItemDialog({Key? key, this.initialItem, required this.expenseBloc})
       : super(key: key);
 
+  R initialItemProperty<T extends Item, R>(
+    R? Function(T item) selector, {
+    required R or,
+  }) {
+    final tempItem = initialItem;
+    if (tempItem is! T) return or;
+
+    return selector(tempItem) ?? or;
+  }
+
   @override
-  State<UpsertItemDialog> createState() => _UpsertItemDialogState();
-}
+  build(BuildContext context) {
+    bool addingItem = initialItem == null;
 
-class _UpsertItemDialogState extends State<UpsertItemDialog> {
-  bool get _addingItem => widget.intialItem == null;
+    AuthBloc authBloc = context.read<AuthBloc>();
 
-  AuthBloc get authBloc => context.read<AuthBloc>();
-
-  @override
-  Widget build(BuildContext context) {
-    final itemTaxableByDefault = widget.expenseBloc.state is ExpenseLoaded &&
-        (widget.expenseBloc.state as ExpenseLoaded)
+    final itemTaxableByDefault = expenseBloc.state is ExpenseLoaded &&
+        (expenseBloc.state as ExpenseLoaded)
             .expense
             .settings
             .itemsAreTaxableByDefault;
 
+    final itemHasTax = expenseBloc.state is ExpenseLoaded &&
+        (expenseBloc.state as ExpenseLoaded).expense.hasTax;
+
+    final simpleItemFields = [
+      FieldData<double>(
+        id: 'item_value',
+        label: 'Item Value',
+        initialData: initialItemProperty((SimpleItem i) => i.value, or: 0.0),
+        validators: [FieldData.requiredValidator],
+        formatters: [CommaReplacerTextInputFormatter()],
+      ),
+    ];
+
+    final gasItemFields = [
+      FieldData<double>(
+        id: 'item_distance',
+        label: 'Distance',
+        initialData: initialItemProperty((GasItem i) => i.distance, or: 0.0),
+        validators: [FieldData.requiredValidator],
+        formatters: [CommaReplacerTextInputFormatter()],
+      ),
+      FieldData<double>(
+        id: 'item_gas_price',
+        label: 'Gas Price (\$/L)',
+        initialData: initialItemProperty((GasItem i) => i.gasPrice, or: 0.0),
+        validators: [FieldData.requiredValidator],
+        formatters: [CommaReplacerTextInputFormatter()],
+      ),
+      FieldData<double>(
+        id: 'item_consumption',
+        label: 'Consumption (L/100km)',
+        initialData: initialItemProperty((GasItem i) => i.consumption, or: 0.0),
+        validators: [FieldData.requiredValidator],
+        formatters: [CommaReplacerTextInputFormatter()],
+      ),
+    ];
+
+    final itemFieldsMap = {'simple': simpleItemFields, 'gas': gasItemFields};
+
     return CRUDDialog.segmented(
-      title: _addingItem ? 'Add Item' : 'Edit Item',
-      segmentSelectionEnabled: _addingItem,
-      initialSelection: widget.intialItem?.type.name,
+      title: addingItem ? 'Add Item' : 'Edit Item',
+      segmentSelectionEnabled: addingItem,
+      initialSelection: initialItem?.type.name,
       segments: [
         ButtonSegment(value: 'simple', label: Text('Simple')),
         ButtonSegment(
@@ -43,90 +87,41 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
           icon: Icon(Icons.local_gas_station),
         ),
       ],
-      fieldsMap: {
-        'simple': [
-          FieldData(
-            id: 'item_name',
-            label: 'Item Name',
-            initialData: widget.intialItem?.name ?? '',
-            validators: [FieldData.requiredValidator],
-          ),
-          FieldData<double>(
-            id: 'item_value',
-            label: 'Item Value',
-            initialData: widget.intialItem?.total ?? 0.0,
-            validators: [FieldData.requiredValidator],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData(
-            id: 'item_partition',
-            label: 'Item Parts',
-            initialData: widget.intialItem?.partition ?? 1,
-            validators: [FieldData.requiredValidator],
-            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
-            isAdvanced: true,
-          ),
-          if (widget.expenseBloc.state is ExpenseLoaded &&
-              (widget.expenseBloc.state as ExpenseLoaded).expense.hasTax)
+      fieldsMap: itemFieldsMap.map(
+        (segmentValue, itemFields) => MapEntry(
+          segmentValue,
+          [
             FieldData(
-              id: 'item_taxable',
-              label: 'Apply tax to item',
-              initialData: widget.intialItem?.isTaxable ?? itemTaxableByDefault,
+              id: 'item_name',
+              label: 'Item Name',
+              initialData: initialItem?.name ?? '',
+              validators: [FieldData.requiredValidator],
+            ),
+            ...itemFields,
+            FieldData(
+              id: 'item_partition',
+              label: 'Item Parts',
+              initialData: initialItem?.partition ?? 1,
+              validators: [FieldData.requiredValidator],
+              formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
               isAdvanced: true,
             ),
-        ],
-        'gas': [
-          FieldData(
-            id: 'item_name',
-            label: 'Item Name',
-            initialData: widget.intialItem?.name ?? '',
-            validators: [FieldData.requiredValidator],
-          ),
-          FieldData<double>(
-            id: 'item_distance',
-            label: 'Distance',
-            initialData: widget.intialItem?.total ?? 0.0,
-            validators: [FieldData.requiredValidator],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData<double>(
-            id: 'item_gas_price',
-            label: 'Gas Price (\$/L)',
-            initialData: widget.intialItem?.total ?? 0.0,
-            validators: [FieldData.requiredValidator],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData<double>(
-            id: 'item_consumption',
-            label: 'Consumption (L/100km)',
-            initialData: widget.intialItem?.total ?? 0.0,
-            validators: [FieldData.requiredValidator],
-            formatters: [CommaReplacerTextInputFormatter()],
-          ),
-          FieldData(
-            id: 'item_partition',
-            label: 'Item Parts',
-            initialData: widget.intialItem?.partition ?? 1,
-            validators: [FieldData.requiredValidator],
-            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
-            isAdvanced: true,
-          ),
-          if (widget.expenseBloc.state is ExpenseLoaded &&
-              (widget.expenseBloc.state as ExpenseLoaded).expense.hasTax)
-            FieldData(
-              id: 'item_taxable',
-              label: 'Apply tax to item',
-              initialData: widget.intialItem?.isTaxable ?? itemTaxableByDefault,
-              isAdvanced: true,
-            ),
-        ]
-      },
+            if (itemHasTax)
+              FieldData(
+                id: 'item_taxable',
+                label: 'Apply tax to item',
+                initialData: initialItem?.isTaxable ?? itemTaxableByDefault,
+                isAdvanced: true,
+              ),
+          ],
+        ),
+      ),
       onSubmit: (values) {
-        Item item = widget.intialItem ?? Item.fake();
+        Item item = initialItem ?? Item.fake();
 
         final isSimpleItem = values['item_value'] != null;
         if (isSimpleItem) {
-          item = widget.intialItem ??
+          item = initialItem ??
               SimpleItem(
                 name: values['item_name'],
                 value: values['item_value'],
@@ -137,32 +132,32 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
 
         final isGasItem = values['item_distance'] != null;
         if (isGasItem) {
-          item = widget.intialItem ??
+          item = initialItem ??
               GasItem(
                 name: values['item_name'],
                 distance: values['item_distance'],
                 gasPrice: values['item_gas_price'],
                 consumption: values['item_consumption'],
               );
-          final simpleItem = item as GasItem;
-          simpleItem.distance = values['item_distance'];
-          simpleItem.gasPrice = values['item_gas_price'];
-          simpleItem.consumption = values['item_consumption'];
+          final gasItem = item as GasItem;
+          gasItem.distance = values['item_distance'];
+          gasItem.gasPrice = values['item_gas_price'];
+          gasItem.consumption = values['item_consumption'];
         }
 
         item.name = values['item_name']!;
         item.isTaxable = values['item_taxable'] ?? false;
         var newPartition = values['item_partition']!;
-        if (_addingItem || newPartition != widget.intialItem!.partition) {
+        if (addingItem || newPartition != initialItem!.partition) {
           item.resetAssigneeDecisions();
           item.partition = newPartition;
         }
 
-        widget.expenseBloc.add(
+        expenseBloc.add(
           UpdateRequested(
             issuerUid: authBloc.uid,
             update: (expense) {
-              if (_addingItem) {
+              if (addingItem) {
                 expense.addItem(item);
               } else {
                 expense.updateItem(item);
@@ -171,7 +166,7 @@ class _UpsertItemDialogState extends State<UpsertItemDialog> {
           ),
         );
       },
-      allowAddAnother: _addingItem,
+      allowAddAnother: addingItem,
     );
   }
 }
