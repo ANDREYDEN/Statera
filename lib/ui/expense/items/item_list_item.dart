@@ -22,6 +22,25 @@ class ItemListItem extends StatelessWidget {
     this.expenseTax,
   }) : super(key: key);
 
+  Widget? get leading {
+    if (item.isDeniedByAll) {
+      return Tooltip(
+        message: 'This item was not marked by any of the assignees',
+        child: WarningIcon(),
+      );
+    }
+
+    return null;
+  }
+
+  Widget renderPrice(BuildContext context) {
+    return PriceText(
+      value: item.total,
+      textStyle: Theme.of(context).textTheme.titleMedium,
+      withTaxPostfix: expenseTax != null && item.isTaxable,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final uid = context.select((AuthBloc authBloc) => authBloc.uid);
@@ -29,12 +48,7 @@ class ItemListItem extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: item.isDeniedByAll
-              ? Tooltip(
-                  message: 'This item was not marked by any of the assignees',
-                  child: WarningIcon(),
-                )
-              : null,
+          leading: leading,
           title: Text(item.name),
           subtitle: (!showDecisions || item.confirmedParts == 0)
               ? null
@@ -43,11 +57,7 @@ class ItemListItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                PriceText(
-                  value: item.total,
-                  textStyle: Theme.of(context).textTheme.titleMedium,
-                  withTaxPostfix: expenseTax != null && item.isTaxable,
-                ),
+                renderPrice(context),
                 ElevatedButton(
                   onPressed: () =>
                       this.onChangePartition(item.getAssigneeParts(uid) - 1),
