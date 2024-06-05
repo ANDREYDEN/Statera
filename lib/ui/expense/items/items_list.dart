@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
-import 'package:statera/ui/expense/items/gas_item_list_item.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
@@ -52,45 +50,22 @@ class ItemsList extends StatelessWidget {
                                 _handleItemDelete(context, index),
                             confirmation:
                                 'Are you sure you want to delete this item?',
-                            child: item is SimpleItem
-                                ? ItemListItem(
-                                    item: item,
-                                    showDecisions:
-                                        expense.settings.showItemDecisions,
-                                    onLongPress:
-                                        expense.canBeUpdatedBy(authBloc.uid)
-                                            ? () => UpsertItemAction(item: item)
-                                                .safeHandle(context)
-                                            : null,
-                                    onChangePartition: !expense.finalized
-                                        ? (partition) =>
-                                            _handleItemPartitionChange(
-                                              context,
-                                              partition,
-                                              index,
-                                            )
-                                        : (p) {},
-                                    expenseTax: expense.settings.tax,
-                                  )
-                                : GasItemListItem(
-                                    item: item as GasItem,
-                                    showDecisions:
-                                        expense.settings.showItemDecisions,
-                                    onLongPress:
-                                        expense.canBeUpdatedBy(authBloc.uid)
-                                            ? () => UpsertItemAction(item: item)
-                                                .safeHandle(context)
-                                            : null,
-                                    onChangePartition: !expense.finalized
-                                        ? (partition) =>
-                                            _handleItemPartitionChange(
-                                              context,
-                                              partition,
-                                              index,
-                                            )
-                                        : (p) {},
-                                    expenseTax: expense.settings.tax,
-                                  ),
+                            child: ItemListItemFactory.create(
+                              item: item,
+                              showDecisions: expense.settings.showItemDecisions,
+                              onLongPress: expense.canBeUpdatedBy(authBloc.uid)
+                                  ? () => UpsertItemAction(item: item)
+                                      .safeHandle(context)
+                                  : null,
+                              onChangePartition: !expense.finalized
+                                  ? (partition) => _handleItemPartitionChange(
+                                        context,
+                                        partition,
+                                        index,
+                                      )
+                                  : (p) {},
+                              expenseTax: expense.settings.tax,
+                            ),
                           );
                         },
                       ),

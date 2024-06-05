@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/data/models/gas_item.dart';
 import 'package:statera/data/models/item.dart';
+import 'package:statera/ui/expense/items/gas_item_list_item.dart';
 import 'package:statera/ui/expense/items/item_decisions.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/warning_icon.dart';
@@ -114,6 +116,34 @@ class ItemListItem extends StatelessWidget {
           onLongPress: onLongPress,
         ),
       ],
+    );
+  }
+}
+
+class ItemListItemFactory {
+  static ItemListItem create({
+    Key? key,
+    required Item item,
+    bool showDecisions = false,
+    required void Function(int) onChangePartition,
+    void Function()? onLongPress,
+    double? expenseTax,
+  }) {
+    if (item is GasItem) {
+      return GasItemListItem(
+        item: item,
+        showDecisions: showDecisions,
+        onChangePartition: onChangePartition,
+        onLongPress: onLongPress,
+        expenseTax: expenseTax,
+      );
+    }
+    return ItemListItem(
+      item: item,
+      showDecisions: showDecisions,
+      onChangePartition: onChangePartition,
+      onLongPress: onLongPress,
+      expenseTax: expenseTax,
     );
   }
 }
