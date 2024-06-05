@@ -93,6 +93,8 @@ class Payment implements Comparable, Equatable {
 
   bool get hasRelatedRedirect => redirectInfo != null;
 
+  bool get hasReason => reason != null;
+
   String getFullReason(String uid, Group group) {
     if (reason != null) return reason!;
 

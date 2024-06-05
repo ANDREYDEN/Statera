@@ -1,14 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:statera/data/enums/enums.dart';
+import 'package:statera/data/models/gas_item.dart';
+import 'package:statera/data/models/simple_item.dart';
 import 'package:uuid/uuid.dart';
 
 import 'assignee_decision.dart';
 
-class Item {
+abstract class Item {
   late String id;
   late String name;
-  late double value;
+  ItemType type;
 
   /// Whether tax should be added to the item value
   bool isTaxable = false;
@@ -19,10 +22,10 @@ class Item {
 
   Item({
     required this.name,
-    required this.value,
     this.partition = 1,
     List<String>? assigneeUids,
     this.isTaxable = false,
+    this.type = ItemType.simple,
   }) {
     var uuid = Uuid();
     this.id = uuid.v1();
@@ -30,12 +33,11 @@ class Item {
         (assigneeUids ?? []).map((uid) => AssigneeDecision(uid: uid)).toList();
   }
 
-  Item.fake({this.partition = 1}) {
-    var uuid = Uuid();
-    this.id = uuid.v1();
-    this.name = 'foo';
-    this.value = 145;
+  factory Item.fake() {
+    return SimpleItem(name: 'foo', value: 0);
   }
+
+  double get total;
 
   get confirmedCount => assignees.fold<double>(
         0,
@@ -46,9 +48,9 @@ class Item {
   bool get isPartitioned => partition > 1;
 
   double getValueWithTax(double? tax) {
-    if (tax == null || !isTaxable) return value;
+    if (tax == null || !isTaxable) return total;
 
-    return value * (1 + tax);
+    return total * (1 + tax);
   }
 
   double getConfirmedValueFor({
@@ -56,8 +58,8 @@ class Item {
     double? tax,
     bool taxOnly = false,
   }) {
-    final baseValue = value * (taxOnly ? 0 : 1);
-    final taxValue = value * (isTaxable && tax != null ? tax : 0);
+    final baseValue = total * (taxOnly ? 0 : 1);
+    final taxValue = total * (isTaxable && tax != null ? tax : 0);
     final totalValue = baseValue + taxValue;
     final confirmedPartition = isPartitioned ? partition : confirmedParts;
 
@@ -121,26 +123,41 @@ class Item {
     return {
       'id': id,
       'name': name,
-      'value': value,
       'partition': partition,
       'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
       'taxable': isTaxable,
+      'type': type.toFirestore()
     };
   }
 
   static Item fromFirestore(Map<String, dynamic> data) {
     var uuid = Uuid();
-    var item = Item(
-      name: data['name'],
-      value: double.parse(data['value'].toString()),
-      partition: data['partition'] ?? 1,
-      isTaxable: data['taxable'] ?? false,
-    );
+    var type = ItemType.fromFirestore(data['type']) ?? ItemType.simple;
+
+    Item item = Item.fake();
+    switch (type) {
+      case ItemType.simple:
+        item = SimpleItem(
+          name: data['name'],
+          value: double.parse(data['value'].toString()),
+        );
+        break;
+      case ItemType.gas:
+        item = GasItem(
+          name: data['name'],
+          distance: double.parse(data['distance'].toString()),
+          gasPrice: double.parse(data['gasPrice'].toString()),
+          consumption: double.parse(data['consumption'].toString()),
+        );
+        break;
+    }
     item.id = data['id'] ?? uuid.v1();
     item.assignees = data['assignees']
         .map<AssigneeDecision>(
             (assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
         .toList();
+    item.partition = data['partition'] ?? 1;
+    item.isTaxable = data['taxable'] ?? false;
     return item;
   }
 
@@ -151,7 +168,7 @@ class Item {
     return other is Item &&
         other.id == id &&
         other.name == name &&
-        other.value == value &&
+        other.total == total &&
         other.partition == partition &&
         listEquals(other.assignees, assignees) &&
         other.isTaxable == isTaxable;
@@ -161,7 +178,7 @@ class Item {
   int get hashCode {
     return id.hashCode ^
         name.hashCode ^
-        value.hashCode ^
+        total.hashCode ^
         partition.hashCode ^
         assignees.fold(
           0,

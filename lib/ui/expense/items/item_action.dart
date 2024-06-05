@@ -28,7 +28,7 @@ class UpsertItemAction extends ItemAction {
     showDialog(
       context: context,
       builder: (context) => UpsertItemDialog(
-        intialItem: item,
+        initialItem: item,
         expenseBloc: expenseBloc,
       ),
     );

@@ -50,7 +50,7 @@ class ItemsList extends StatelessWidget {
                                 _handleItemDelete(context, index),
                             confirmation:
                                 'Are you sure you want to delete this item?',
-                            child: ItemListItem(
+                            child: ItemListItemFactory.create(
                               item: item,
                               showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)

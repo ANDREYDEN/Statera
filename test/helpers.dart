@@ -108,7 +108,7 @@ Expense createFinalizedExpense({required String authorUid}) {
 
 Expense createPendingExpense({required String authorUid}) {
   final pendingExpense = Expense(name: 'pending', authorUid: authorUid);
-  final completeItem = Item(name: 'Banana', value: 0.5);
+  final completeItem = SimpleItem(name: 'Banana', value: 0.5);
   completeItem.assignees.add(AssigneeDecision(uid: authorUid, parts: 1));
   pendingExpense.items.add(completeItem);
   return pendingExpense;
@@ -116,7 +116,7 @@ Expense createPendingExpense({required String authorUid}) {
 
 Expense createNotMarkedExpense({required String authorUid}) {
   final notMarkedExpense = Expense(name: 'not_marked', authorUid: authorUid);
-  final incompleteItem = Item(name: 'Apple', value: 0.5);
+  final incompleteItem = SimpleItem(name: 'Apple', value: 0.5);
   incompleteItem.assignees.add(AssigneeDecision(uid: authorUid));
   notMarkedExpense.items.add(incompleteItem);
   return notMarkedExpense;

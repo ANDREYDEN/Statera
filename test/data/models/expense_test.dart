@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/assignee.dart';
 import 'package:statera/data/models/expense.dart';
-import 'package:statera/data/models/item.dart';
+import 'package:statera/data/models/models.dart';
 
 void main() {
   group('Expense', () {
@@ -114,7 +114,7 @@ void main() {
       var secondAssigneeUid = 'second';
       expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
 
-      var item = Item(name: 'asd', value: 123);
+      var item = SimpleItem(name: 'asd', value: 123);
       expense.addItem(item);
 
       item.setAssigneeDecision(firstAssigneeUid, 1);
@@ -126,8 +126,8 @@ void main() {
     test('is marked by an assignee if all products are marked', () {
       expense.assigneeUids = [assigneeUid];
 
-      var item1 = Item(name: 'asd', value: 123);
-      var item2 = Item(name: 'asd', value: 123);
+      var item1 = SimpleItem(name: 'asd', value: 123);
+      var item2 = SimpleItem(name: 'asd', value: 123);
       expense.addItem(item1);
       expense.addItem(item2);
 
@@ -178,42 +178,42 @@ void main() {
     group('calculating totals', () {
       group('gets the total of its items', () {
         test('when no items have tax', () {
-          var item1 = Item(name: 'big', value: 124);
-          var item2 = Item(name: 'small', value: 42);
+          var item1 = SimpleItem(name: 'big', value: 124);
+          var item2 = SimpleItem(name: 'small', value: 42);
           expense.addItem(item1);
           expense.addItem(item2);
 
-          expect(expense.total, item1.value + item2.value);
+          expect(expense.total, item1.total + item2.total);
         });
 
         test('when some items have tax', () {
           var tax = 0.1;
           expense.settings.tax = tax;
-          var item1 = Item(name: 'big', value: 124);
-          var item2 = Item(name: 'small', value: 42, isTaxable: true);
+          var item1 = SimpleItem(name: 'big', value: 124);
+          var item2 = SimpleItem(name: 'small', value: 42, isTaxable: true);
           expense.addItem(item1);
           expense.addItem(item2);
 
-          expect(expense.total, item1.value + item2.value * (1 + tax));
+          expect(expense.total, item1.total + item2.total * (1 + tax));
         });
 
         test('when all items have tax', () {
           var tax = 0.1;
           expense.settings.tax = tax;
-          var item1 = Item(name: 'big', value: 124, isTaxable: true);
-          var item2 = Item(name: 'small', value: 42, isTaxable: true);
+          var item1 = SimpleItem(name: 'big', value: 124, isTaxable: true);
+          var item2 = SimpleItem(name: 'small', value: 42, isTaxable: true);
           expense.addItem(item1);
           expense.addItem(item2);
 
-          expect(expense.total, (item1.value + item2.value) * (1 + tax));
+          expect(expense.total, (item1.total + item2.total) * (1 + tax));
         });
       });
 
       group('gets confirmed totals for assignees', () {
         var firstAssigneeUid = 'first';
         var secondAssigneeUid = 'second';
-        var item1 = Item(name: 'big', value: 124);
-        var item2 = Item(name: 'small', value: 42, partition: 3);
+        var item1 = SimpleItem(name: 'big', value: 124);
+        var item2 = SimpleItem(name: 'small', value: 42, partition: 3);
 
         setUp(() {
           expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];

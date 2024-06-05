@@ -41,7 +41,7 @@ class PaymentListItem extends StatelessWidget {
     return GroupBuilder(
       builder: (context, group) {
         final paymentItem = ListTile(
-          isThreeLine: payment.hasRelatedExpense,
+          isThreeLine: payment.hasRelatedExpense || payment.hasReason,
           leading: Icon(
             _getIcon(),
             color: payment.isAdmin
@@ -61,6 +61,7 @@ class PaymentListItem extends StatelessWidget {
                     'Some time in the past',
               ),
               if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
+              if (payment.hasReason) Text(payment.reason!),
             ],
           ),
           trailing: Icon(

@@ -26,7 +26,7 @@ class Callables {
     return (response.data as List<dynamic>).map((itemData) {
       final value = double.tryParse(itemData['value'].toString()) ?? 0;
       final quantity = int.tryParse(itemData['quantity'].toString()) ?? 1;
-      return Item(
+      return SimpleItem(
         name: itemData['name'] ?? 'item',
         value: value,
         partition: quantity,
