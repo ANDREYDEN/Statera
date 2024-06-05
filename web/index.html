@@ -47,24 +47,6 @@
     }
   </style>
   
-  <script>
-    window.addEventListener('load', function(ev) {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register("/firebase-messaging-sw.js");
-      }
-
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
