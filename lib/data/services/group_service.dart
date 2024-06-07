@@ -67,18 +67,6 @@ class GroupRepository extends Firestore {
     });
   }
 
-  Stream<List<Group>> userGroupsStream(String? uid) {
-    return usersCollection
-        .where('memberIds', arrayContains: uid)
-        .snapshots()
-        .map((event) => event.docs
-            .map((doc) => Group.fromFirestore(
-                  doc.data() as Map<String, dynamic>,
-                  id: doc.id,
-                ))
-            .toList());
-  }
-
   /// Creates a new group and returns its Firestore id
   Future<String> createGroup(Group newGroup, CustomUser user) async {
     newGroup.addMember(user);

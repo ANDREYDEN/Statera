@@ -63,7 +63,7 @@ class GroupListBody extends StatelessWidget {
                           childAspectRatio: columnWidth / 100,
                           children: [
                             ...groups
-                                .map((group) => GroupListItem(group: group))
+                                .map((group) => GroupListItem(userGroup: group))
                                 .toList(),
                             SizedBox(height: 100) // leave space for FAB
                           ],

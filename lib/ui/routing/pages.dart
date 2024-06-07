@@ -36,6 +36,7 @@ final _groupsPagePath = PagePath(
     create: (context) => GroupsCubit(
       context.read<GroupRepository>(),
       context.read<UserRepository>(),
+      context.read<UserGroupRepository>(),
     )..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
