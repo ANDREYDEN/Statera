@@ -11,7 +11,7 @@ import 'package:statera/data/services/user_repository.mocks.dart';
 void main() {
   group('GroupCubit', () {
     late GroupCubit groupCubit;
-    late GroupService groupService;
+    late GroupRepository groupService;
     late ExpenseService expenseService;
     late UserRepository userRepository;
     final String testUserId = 'qwe145';

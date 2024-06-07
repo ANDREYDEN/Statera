@@ -27,7 +27,7 @@ main() {
       final finalizedExpensesRef = await firestore
           .collection('expenses')
           .add(finalizedExpense.toFirestore());
-      final groupService = GroupService(firestore);
+      final groupService = GroupRepository(firestore);
 
       final newUser = CustomUser.fake();
       await groupService.addMember(testGroup.code!, newUser);

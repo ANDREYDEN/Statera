@@ -17,7 +17,7 @@ class RepositoryRegistrant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groupService = GroupService(firestore);
+    final groupService = GroupRepository(firestore);
 
     return MultiRepositoryProvider(
       providers: [

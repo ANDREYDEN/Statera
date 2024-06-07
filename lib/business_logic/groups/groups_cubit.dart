@@ -9,7 +9,7 @@ import 'package:statera/data/services/services.dart';
 part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
-  final GroupService _groupService;
+  final GroupRepository _groupService;
   final UserRepository _userRepository;
   StreamSubscription? _groupsSubscription;
 

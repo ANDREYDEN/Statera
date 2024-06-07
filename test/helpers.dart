@@ -45,7 +45,7 @@ Future<void> customPump(
   WidgetTester tester, {
   ExpenseService? expenseService,
   UserExpenseRepository? userExpenseRepository,
-  GroupService? groupService,
+  GroupRepository? groupService,
   UserRepository? userRepository,
   AuthService? authService,
   FeatureService? featureService,

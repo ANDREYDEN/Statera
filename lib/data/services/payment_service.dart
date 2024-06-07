@@ -7,7 +7,7 @@ import 'package:statera/data/services/group_service.dart';
 
 @GenerateNiceMocks([MockSpec<PaymentService>()])
 class PaymentService extends Firestore {
-  final GroupService _groupService;
+  final GroupRepository _groupService;
 
   PaymentService(this._groupService, FirebaseFirestore firestoreInstance)
       : super(firestoreInstance);

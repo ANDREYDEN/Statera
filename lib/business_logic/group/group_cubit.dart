@@ -10,7 +10,7 @@ part 'group_state.dart';
 
 class GroupCubit extends Cubit<GroupState> {
   StreamSubscription? _groupSubscription;
-  final GroupService _groupService;
+  final GroupRepository _groupService;
   final ExpenseService _expenseService;
   final UserRepository _userRepository;
 

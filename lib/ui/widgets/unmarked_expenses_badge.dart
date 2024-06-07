@@ -20,7 +20,7 @@ class _UnmarkedExpensesBadgeState extends State<UnmarkedExpensesBadge> {
 
   @override
   void initState() {
-    final groupService = context.read<GroupService>();
+    final groupService = context.read<GroupRepository>();
     final uid = context.read<AuthBloc>().uid;
     unmarkedExpensesStream = groupService
         .listenForUnmarkedExpenses(widget.groupId, uid)
