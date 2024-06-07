@@ -10,10 +10,10 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
   const deviceName = const String.fromEnvironment('DEVICE_NAME');
-  final isWide =
-      WidgetsBinding.instance.renderView.configuration.size.width > 1000;
 
   testWidgets('Screenshot test', (WidgetTester tester) async {
+    final screenSize = tester.view.display.size;
+    final isWide = screenSize.width > 1000;
     await app.main();
     await tester.pumpWidget(app.Statera());
     await tester.pumpAndSettle();

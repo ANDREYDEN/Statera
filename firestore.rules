@@ -62,6 +62,10 @@ service cloud.firestore {
       allow read;
     }
 
+    match /users/{userId}/groups/{groupId} {
+      allow read, write: if request.auth != null;
+    }
+
     function fieldsChanged(fields) {
       return debug(request.resource.data.diff(resource.data).changedKeys()).hasOnly(fields);
     }
