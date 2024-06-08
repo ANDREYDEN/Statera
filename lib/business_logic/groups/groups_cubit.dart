@@ -50,6 +50,14 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
+  Future<void> toggleArchive(UserGroup userGroup, String uid) async {
+    final groupState = state;
+    if (groupState is GroupsLoaded) {
+      emit(GroupsProcessing(groups: groupState.groups));
+      await _userGroupRepository.toggleArchive(userGroup, uid);
+    }
+  }
+
   @override
   Future<void> close() {
     _groupsSubscription?.cancel();

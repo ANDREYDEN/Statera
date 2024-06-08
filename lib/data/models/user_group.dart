@@ -5,12 +5,14 @@ class UserGroup {
   String name;
   int unmarkedExpenses;
   int memberCount;
+  bool archived;
 
   UserGroup({
     required this.groupId,
     required this.name,
     this.unmarkedExpenses = 0,
     this.memberCount = 0,
+    this.archived = false,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -19,6 +21,7 @@ class UserGroup {
       'name': name,
       'unmarkedExpenses': unmarkedExpenses,
       'memberCount': memberCount,
+      'archived': archived,
     };
   }
 
@@ -27,8 +30,9 @@ class UserGroup {
     return UserGroup(
       groupId: data['groupId'],
       name: data['name'],
-      unmarkedExpenses: data['unmarkedExpenses'],
-      memberCount: data['memberCount'],
+      unmarkedExpenses: data['unmarkedExpenses'] ?? 0,
+      memberCount: data['memberCount'] ?? 0,
+      archived: data['archived'] ?? false,
     );
   }
 

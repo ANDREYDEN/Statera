@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
+import 'package:statera/ui/groups/actions/archive_group_action.dart';
+import 'package:statera/ui/widgets/buttons/actions_Button.dart';
 
 class GroupListItem extends StatelessWidget {
   final UserGroup userGroup;
@@ -30,6 +32,7 @@ class GroupListItem extends StatelessWidget {
                         isLabelVisible: this.userGroup.unmarkedExpenses > 0,
                         child: Text(
                           this.userGroup.name,
+                          style: Theme.of(context).textTheme.titleLarge,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -44,6 +47,9 @@ class GroupListItem extends StatelessWidget {
                   Text(this.userGroup.memberCount.toString()),
                 ],
               ),
+              ActionsButton(actions: [
+                ToggleArchiveUserGroupAction(userGroup),
+              ])
             ],
           ),
         ),

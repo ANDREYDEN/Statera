@@ -26,7 +26,7 @@ const auth = admin.auth();
                 memberCount: members.length,
                 unmarkedExpenses
             }
-            await memberDocRef.collection('groups').add(newUserGroup)
+            await memberDocRef.collection('groups').doc(groupDoc.id).set(newUserGroup)
             console.log(member.uid, newUserGroup)
         }
     }

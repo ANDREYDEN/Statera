@@ -48,11 +48,11 @@ class GroupListBody extends StatelessWidget {
             padding: isWide ? kWideMargin : kMobileMargin,
             child: Column(
               children: [
-                SizedBox.square(
-                  dimension: 16,
+                SizedBox(
+                  height: 4,
                   child: Visibility(
                     visible: groupsState is GroupsProcessing,
-                    child: Loader(),
+                    child: LinearProgressIndicator(),
                   ),
                 ),
                 Expanded(
