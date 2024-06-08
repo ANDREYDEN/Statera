@@ -14,11 +14,17 @@ const auth = admin.auth();
         const members = group.members
         for (const member of members) {
             const memberDocRef = db.collection('users').doc(member.uid)
+            const unmarkedExpensesQuerySnap = await db.collection('expenses')
+                .where('groupId', '==', groupDoc.id)
+                .where('unmarkedAssigneeIds', 'array-contains', member.uid)
+                .count()
+                .get()
+            const unmarkedExpenses = unmarkedExpensesQuerySnap.data().count
             const newUserGroup = {
                 groupId: groupDoc.id,
                 name: group.name,
                 memberCount: members.length,
-                unmarkedExpenses: 0
+                unmarkedExpenses
             }
             await memberDocRef.collection('groups').add(newUserGroup)
             console.log(member.uid, newUserGroup)

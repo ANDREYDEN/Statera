@@ -6,4 +6,5 @@ export type Expense = {
     finalizedDate?: string
     unmarkedAssigneeIds: string[]
     authorUid: string
+    groupId: string
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupListItem extends StatelessWidget {
   final UserGroup userGroup;
@@ -26,10 +25,13 @@ class GroupListItem extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
-                      child: UnmarkedExpensesBadge(
-                        groupId: this.userGroup.groupId,
-                        child: Text(this.userGroup.name,
-                            overflow: TextOverflow.ellipsis),
+                      child: Badge.count(
+                        count: this.userGroup.unmarkedExpenses,
+                        isLabelVisible: this.userGroup.unmarkedExpenses > 0,
+                        child: Text(
+                          this.userGroup.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     )
                   ],
