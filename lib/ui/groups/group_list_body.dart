@@ -40,7 +40,7 @@ class GroupListBody extends StatelessWidget {
         }
 
         if (groupsState is GroupsLoaded) {
-          final groups = groupsState.groups;
+          final groups = groupsState.groups.expand((e) => List.filled(10, e));
 
           final columnCount = isWide ? 3 : 1;
           final columnWidth = MediaQuery.of(context).size.width / columnCount;
@@ -51,6 +51,7 @@ class GroupListBody extends StatelessWidget {
           return Padding(
             padding: isWide ? kWideMargin : kMobileMargin,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
                   height: 4,
@@ -63,6 +64,7 @@ class GroupListBody extends StatelessWidget {
                   child: activeGroups.isEmpty
                       ? ListEmpty(text: 'Join or create a group!')
                       : GridView.count(
+                          shrinkWrap: true,
                           crossAxisCount: columnCount,
                           childAspectRatio: columnWidth / 100,
                           children: activeGroups
@@ -71,9 +73,10 @@ class GroupListBody extends StatelessWidget {
                         ),
                 ),
                 if (archivedGroups.isNotEmpty)
-                  Expanded(
+                  Flexible(
                     child: Collapsible(
-                      title: 'Archived',
+                      title: 'Archived (${archivedGroups.length})',
+                      titleTextStyle: Theme.of(context).textTheme.titleMedium,
                       child: GridView.count(
                         crossAxisCount: columnCount,
                         childAspectRatio: columnWidth / 100,
