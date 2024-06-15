@@ -1,7 +1,8 @@
+import { firestore } from 'firebase-admin'
+import { Change } from 'firebase-functions/v1'
 import { DocumentSnapshot } from 'firebase-functions/v1/firestore'
 import { Group } from '../../types/group'
-import { Change } from 'firebase-functions/v1'
-import { firestore } from 'firebase-admin'
+import { UserGroup } from '../../types/userGroup'
 
 export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSnapshot>) {
   const groupData = (change.after.data() ?? change.before.data()) as Group
@@ -22,17 +23,19 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
     if (groupDeleted) {
       await userGroupRef.delete()
     } else if (groupAdded) {
-      await userGroupRef.set({
+      const newUserGroup: UserGroup = {
         groupId,
         name: groupData.name,
         memberCount: groupData.members.length,
-      })
+      }
+      await userGroupRef.set(newUserGroup)
     } else {
-      await userGroupRef.update({
+      const userGroupUpdates: Partial<UserGroup> = {
         groupId,
         name: groupData.name,
         memberCount: groupData.members.length,
-      })
+      }
+      await userGroupRef.update(userGroupUpdates)
     }
   }
 }

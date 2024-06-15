@@ -139,6 +139,9 @@ jobs:
       - name: Build functions
         run: npm run build
 
+      - name: Start emulators
+        run: firebase emulators:start --only functions,firestore,auth & sleep 10
+
       - name: Run functions tests
         run: npm test
 
