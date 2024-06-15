@@ -6,12 +6,12 @@ import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 
 void main() {
   final expenseService = MockExpenseService();
-  final groupService = MockGroupService();
+  final groupService = MockGroupRepository();
   final userExpenseRepository = MockUserExpenseRepository();
   final groupId = 'testGroupId';
   final uid = 'testUserId';
@@ -33,7 +33,8 @@ void main() {
 
   group('ExpensesCubit', () {
     setUp(() async {
-      expensesCubit = ExpensesCubit(groupId, uid, userExpenseRepository, expenseService, groupService);
+      expensesCubit = ExpensesCubit(
+          groupId, uid, userExpenseRepository, expenseService, groupService);
     });
 
     test(

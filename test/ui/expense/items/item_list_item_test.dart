@@ -8,7 +8,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
@@ -54,7 +54,7 @@ void main() {
                 BlocProvider<AuthBloc>(create: (_) => AuthBloc(authService)),
                 BlocProvider<GroupCubit>(
                   create: (_) => GroupCubit(
-                    MockGroupService(),
+                    MockGroupRepository(),
                     MockExpenseService(),
                     MockUserRepository(),
                   )..loadGroup(Group(

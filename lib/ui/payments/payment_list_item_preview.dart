@@ -11,7 +11,7 @@ import 'package:statera/data/models/payment/payment.dart';
 import 'package:statera/data/models/payment/payment_expense_info.dart';
 import 'package:statera/data/models/payment/payment_redirect_info.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
@@ -55,7 +55,7 @@ class ListCover extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) => GroupCubit(
-            MockGroupService(),
+            MockGroupRepository(),
             MockExpenseService(),
             MockUserRepository(),
           )..loadGroup(Group(

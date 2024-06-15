@@ -3,7 +3,7 @@ import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment/payment.dart';
 import 'package:statera/data/services/firestore.dart';
-import 'package:statera/data/services/group_service.dart';
+import 'package:statera/data/services/group_repository.dart';
 
 @GenerateNiceMocks([MockSpec<PaymentService>()])
 class PaymentService extends Firestore {
