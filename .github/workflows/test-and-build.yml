@@ -139,8 +139,11 @@ jobs:
       - name: Build functions
         run: npm run build
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: Start emulators
-        run: firebase emulators:start --only functions,firestore,auth & sleep 10
+        run: firebase emulators:start --only functions,firestore,auth & sleep 20
 
       - name: Run functions tests
         run: npm test
