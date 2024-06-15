@@ -20,7 +20,7 @@ class GroupsCubit extends Cubit<GroupsState> {
     this._userGroupRepository,
   ) : super(GroupsLoading());
 
-  void load(String? userId) {
+  void load(String userId) {
     _groupsSubscription?.cancel();
     _groupsSubscription = _userGroupRepository
         .userGroupsStream(userId)
@@ -50,11 +50,11 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
-  Future<void> toggleArchive(UserGroup userGroup, String uid) async {
+  Future<void> update(String uid, UserGroup targetGroup) async {
     final groupState = state;
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
-      await _userGroupRepository.toggleArchive(userGroup, uid);
+      await _userGroupRepository.saveUserGroup(uid, targetGroup);
     }
   }
 

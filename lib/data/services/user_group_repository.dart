@@ -4,17 +4,12 @@ import 'package:statera/data/services/services.dart';
 class UserGroupRepository extends Firestore {
   UserGroupRepository(super.firestoreInstance);
 
-  Future<void> toggleArchive(UserGroup userGroup, String uid) async {
-    userGroup.archived = !userGroup.archived;
-    await getUserGroupsCollection(uid)
-        .doc(userGroup.groupId)
-        .set(userGroup.toFirestore());
+  Future<void> saveUserGroup(String uid, UserGroup userGroup) async {
+    await getUserGroup(uid, userGroup.groupId).set(userGroup.toFirestore());
   }
 
-  Stream<List<UserGroup>> userGroupsStream(String? uid) {
-    return usersCollection
-        .doc(uid)
-        .collection('groups')
+  Stream<List<UserGroup>> userGroupsStream(String uid) {
+    return getUserGroupsCollection(uid)
         .snapshots()
         .map((event) => event.docs.map(UserGroup.fromSnapshot).toList());
   }

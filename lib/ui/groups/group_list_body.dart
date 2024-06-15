@@ -40,7 +40,11 @@ class GroupListBody extends StatelessWidget {
         }
 
         if (groupsState is GroupsLoaded) {
-          final groups = groupsState.groups.expand((e) => List.filled(10, e));
+          final groups = groupsState.groups;
+          groups.sort((userGroup1, userGroup2) {
+            if (userGroup1.pinned && userGroup2.pinned) return 0;
+            return userGroup1.pinned ? -1 : 1;
+          });
 
           final columnCount = isWide ? 3 : 1;
           final columnWidth = MediaQuery.of(context).size.width / columnCount;

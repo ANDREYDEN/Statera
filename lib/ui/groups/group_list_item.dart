@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/groups/actions/archive_group_action.dart';
+import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
+import 'package:statera/ui/groups/actions/toggle_archive_user_group_action.dart';
 import 'package:statera/ui/widgets/buttons/actions_Button.dart';
 
 class GroupListItem extends StatelessWidget {
@@ -26,12 +27,14 @@ class GroupListItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (userGroup.pinned) Icon(Icons.push_pin),
+                    SizedBox(width: 5),
                     Flexible(
                       child: Badge.count(
-                        count: this.userGroup.unmarkedExpenses,
-                        isLabelVisible: this.userGroup.unmarkedExpenses > 0,
+                        count: userGroup.unmarkedExpenses,
+                        isLabelVisible: userGroup.unmarkedExpenses > 0,
                         child: Text(
-                          this.userGroup.name,
+                          userGroup.name,
                           style: Theme.of(context).textTheme.titleLarge,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -44,10 +47,11 @@ class GroupListItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.person),
-                  Text(this.userGroup.memberCount.toString()),
+                  Text(userGroup.memberCount.toString()),
                 ],
               ),
               ActionsButton(actions: [
+                if (!userGroup.archived) TogglePinUserGroupAction(userGroup),
                 ToggleArchiveUserGroupAction(userGroup),
               ])
             ],
