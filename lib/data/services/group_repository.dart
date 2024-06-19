@@ -5,11 +5,12 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
 
-@GenerateNiceMocks([MockSpec<GroupService>()])
-class GroupService extends Firestore {
+@GenerateNiceMocks([MockSpec<GroupRepository>()])
+class GroupRepository extends Firestore {
   late final DynamicLinkService _dynamicLinkRepository;
 
-  GroupService(FirebaseFirestore firestoreInstance) : super(firestoreInstance) {
+  GroupRepository(FirebaseFirestore firestoreInstance)
+      : super(firestoreInstance) {
     _dynamicLinkRepository = DynamicLinkService();
   }
 
@@ -64,18 +65,6 @@ class GroupService extends Firestore {
           id: groupSnap.id);
       return group.getMember(memberId);
     });
-  }
-
-  Stream<List<Group>> userGroupsStream(String? uid) {
-    return groupsCollection
-        .where('memberIds', arrayContains: uid)
-        .snapshots()
-        .map((event) => event.docs
-            .map((doc) => Group.fromFirestore(
-                  doc.data() as Map<String, dynamic>,
-                  id: doc.id,
-                ))
-            .toList());
   }
 
   /// Creates a new group and returns its Firestore id

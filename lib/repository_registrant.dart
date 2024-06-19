@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/data/services/feature_service.dart';
 
 import 'data/services/services.dart';
 
@@ -17,7 +16,7 @@ class RepositoryRegistrant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groupService = GroupService(firestore);
+    final groupService = GroupRepository(firestore);
 
     return MultiRepositoryProvider(
       providers: [
@@ -28,6 +27,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => NotificationService()),
         RepositoryProvider(create: (_) => PreferencesService()),
         RepositoryProvider(create: (_) => groupService),
+        RepositoryProvider(create: (_) => UserGroupRepository(firestore)),
         RepositoryProvider(
             create: (_) => PaymentService(groupService, firestore)),
         RepositoryProvider(create: (_) => ExpenseService(firestore)),

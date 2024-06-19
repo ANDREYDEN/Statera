@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:statera/data/models/group.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
+import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
+import 'package:statera/ui/groups/actions/toggle_archive_user_group_action.dart';
+import 'package:statera/ui/widgets/buttons/actions_button.dart';
 
 class GroupListItem extends StatelessWidget {
-  final Group group;
+  final UserGroup userGroup;
 
-  const GroupListItem({Key? key, required this.group}) : super(key: key);
+  const GroupListItem({Key? key, required this.userGroup}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,7 @@ class GroupListItem extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context)
-              .pushNamed(GroupPage.route + '/${this.group.id}');
+              .pushNamed(GroupPage.route + '/${this.userGroup.groupId}');
         },
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -25,11 +27,19 @@ class GroupListItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (userGroup.pinned) ...[
+                      Icon(Icons.push_pin),
+                      SizedBox(width: 5)
+                    ],
                     Flexible(
-                      child: UnmarkedExpensesBadge(
-                        groupId: this.group.id,
-                        child: Text(this.group.name,
-                            overflow: TextOverflow.ellipsis),
+                      child: Badge.count(
+                        count: userGroup.unmarkedExpenses,
+                        isLabelVisible: userGroup.unmarkedExpenses > 0,
+                        child: Text(
+                          userGroup.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     )
                   ],
@@ -39,9 +49,16 @@ class GroupListItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.person),
-                  Text(this.group.members.length.toString()),
+                  Text(userGroup.memberCount.toString()),
                 ],
               ),
+              ActionsButton(
+                tooltip: 'Group actions',
+                actions: [
+                  if (!userGroup.archived) TogglePinUserGroupAction(userGroup),
+                  ToggleArchiveUserGroupAction(userGroup),
+                ],
+              )
             ],
           ),
         ),

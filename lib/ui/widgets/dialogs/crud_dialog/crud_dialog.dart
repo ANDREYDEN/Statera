@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
-import 'package:statera/ui/widgets/dialogs/crud_dialog/advanced_dropdown.dart';
+import 'package:statera/ui/widgets/collapsible.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
@@ -54,7 +54,6 @@ class CRUDDialog extends StatefulWidget {
 
 class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
-  bool _showAdvanced = false;
   bool _addAnother = true;
 
   late String _selectedValue;
@@ -94,14 +93,11 @@ class _CRUDDialogState extends State<CRUDDialog> {
                   children: [..._getFields((f) => !f.isAdvanced)],
                 ),
                 if (_advancedFieldsPresent)
-                  AdvancedDropdown(
-                    onTap: () => setState(() {
-                      _showAdvanced = !_showAdvanced;
-                    }),
-                    isCollapsed: _showAdvanced,
+                  Collapsible(
+                    title: 'Advanced',
+                    child:
+                        Column(children: [..._getFields((f) => f.isAdvanced)]),
                   ),
-                if (_showAdvanced)
-                  Column(children: [..._getFields((f) => f.isAdvanced)]),
               ],
             ),
           ],

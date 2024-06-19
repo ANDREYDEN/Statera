@@ -14,7 +14,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final String _userId;
   late final UserExpenseRepository _userExpenseRepository;
   late final ExpenseService _expenseService;
-  late final GroupService _groupService;
+  late final GroupRepository _groupService;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
@@ -23,7 +23,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     String userId,
     UserExpenseRepository userExpenseRepository,
     ExpenseService expenseService,
-    GroupService groupService,
+    GroupRepository groupService,
   ) : super(ExpensesLoading()) {
     _userExpenseRepository = userExpenseRepository;
     _expenseService = expenseService;

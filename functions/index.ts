@@ -15,6 +15,8 @@ import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
 import { Timestamp } from 'firebase-admin/firestore'
 import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
+import { updateUserGroupsWhenExpenseChanges } from './src/functions/docSync/updateUserGroupsWhenExpenseChanges'
+import { updateUserGroupsWhenGroupChanges } from './src/functions/docSync/updateUserGroupsWhenGroupChanges'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -25,28 +27,6 @@ export const setTimestampOnPaymentCreation = functions.firestore
   .document('payments/{paymentId}')
   .onCreate(async (snap, _) => {
     await snap.ref.update({ timeCreated: snap.createTime })
-  })
-
-export const handleExpenseUpdate = functions.firestore
-  .document('expenses/{expenseId}')
-  .onWrite(async (change, _) => {
-    const oldExpense = change.before.data()
-    const newExpense = change.after.data()
-
-    await updateUserExpenses(change)
-
-    if (!newExpense || !oldExpense) return
-
-    const oldFinalizedTimestamp = oldExpense.finalizedDate as (Timestamp | null)
-    const newFinalizedTimestamp = newExpense.finalizedDate as (Timestamp | null)
-
-    if (oldFinalizedTimestamp?.toMillis != newFinalizedTimestamp?.toMillis) {
-      if (newExpense.finalizedDate) {
-        await notifyWhenExpenseFinalized(change.after)
-      } else {
-        await notifyWhenExpenseReverted(change.after)
-      }
-    }
   })
 
 export const getReceiptData = functions
@@ -91,10 +71,39 @@ export const notifyWhenExpenceIsCreated = functions.firestore
     return notifyWhenExpenseCreated(snap)
   })
 
+export const handleExpenseUpdate = functions.firestore
+  .document('expenses/{expenseId}')
+  .onWrite(async (change, _) => {
+    const oldExpense = change.before.data()
+    const newExpense = change.after.data()
+
+    await updateUserExpenses(change)
+    await updateUserGroupsWhenExpenseChanges(change)
+
+    if (!newExpense || !oldExpense) return
+
+    const oldFinalizedTimestamp = oldExpense.finalizedDate as (Timestamp | null)
+    const newFinalizedTimestamp = newExpense.finalizedDate as (Timestamp | null)
+
+    if (oldFinalizedTimestamp?.toMillis != newFinalizedTimestamp?.toMillis) {
+      if (newExpense.finalizedDate) {
+        await notifyWhenExpenseFinalized(change.after)
+      } else {
+        await notifyWhenExpenseReverted(change.after)
+      }
+    }
+  })
+
 export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
   .document('groups/{groupId}')
   .onUpdate((change, _) => {
     return notifyWhenGroupDebtThresholdReached(change)
+  })
+
+export const handleGroupUpdate = functions.firestore
+  .document('groups/{groupId}')
+  .onWrite((change, _) => {
+    return updateUserGroupsWhenGroupChanges(change)
   })
 
 export const notifyWhenExpenseIsCompleted = functions.https

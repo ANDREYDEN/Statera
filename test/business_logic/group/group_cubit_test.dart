@@ -4,14 +4,14 @@ import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 
 void main() {
   group('GroupCubit', () {
     late GroupCubit groupCubit;
-    late GroupService groupService;
+    late GroupRepository groupService;
     late ExpenseService expenseService;
     late UserRepository userRepository;
     final String testUserId = 'qwe145';
@@ -20,7 +20,7 @@ void main() {
     final Group testGroup = Group.empty(code: testCode);
 
     setUp(() {
-      groupService = MockGroupService();
+      groupService = MockGroupRepository();
       expenseService = MockExpenseService();
       userRepository = MockUserRepository();
       groupCubit = GroupCubit(groupService, expenseService, userRepository);

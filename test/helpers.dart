@@ -13,7 +13,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
-import 'package:statera/data/services/group_service.mocks.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
@@ -24,7 +24,7 @@ class MockUser extends Mock implements User {
       super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
 }
 
-final defaultGroupService = MockGroupService();
+final defaultGroupService = MockGroupRepository();
 final defaultExpenseService = MockExpenseService();
 final defaultUserExpensesRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
@@ -45,7 +45,7 @@ Future<void> customPump(
   WidgetTester tester, {
   ExpenseService? expenseService,
   UserExpenseRepository? userExpenseRepository,
-  GroupService? groupService,
+  GroupRepository? groupService,
   UserRepository? userRepository,
   AuthService? authService,
   FeatureService? featureService,

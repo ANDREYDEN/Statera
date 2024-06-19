@@ -9,18 +9,20 @@ import 'package:statera/data/services/services.dart';
 part 'groups_state.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
-  final GroupService _groupService;
+  final GroupRepository _groupRepository;
+  final UserGroupRepository _userGroupRepository;
   final UserRepository _userRepository;
   StreamSubscription? _groupsSubscription;
 
   GroupsCubit(
-    this._groupService,
+    this._groupRepository,
     this._userRepository,
+    this._userGroupRepository,
   ) : super(GroupsLoading());
 
-  void load(String? userId) {
+  void load(String userId) {
     _groupsSubscription?.cancel();
-    _groupsSubscription = _groupService
+    _groupsSubscription = _userGroupRepository
         .userGroupsStream(userId)
         .map((groups) => GroupsLoaded(groups: groups))
         .listen(
@@ -38,20 +40,21 @@ class GroupsCubit extends Cubit<GroupsState> {
     );
   }
 
-  updateGroup(Group group) async {
-    if (state is GroupsLoaded) {
-      emit(GroupsProcessing(groups: (state as GroupsLoaded).groups));
-      await _groupService.saveGroup(group);
-    }
-  }
-
   addGroup(Group group, String uid) async {
     final groupState = state;
     if (groupState is GroupsLoaded) {
       emit(GroupsProcessing(groups: groupState.groups));
       final user = await _userRepository.getUser(uid);
-      final groupId = await _groupService.createGroup(group, user);
-      await _groupService.generateInviteLink(group..id = groupId);
+      final groupId = await _groupRepository.createGroup(group, user);
+      await _groupRepository.generateInviteLink(group..id = groupId);
+    }
+  }
+
+  Future<void> update(String uid, UserGroup targetGroup) async {
+    final groupState = state;
+    if (groupState is GroupsLoaded) {
+      emit(GroupsProcessing(groups: groupState.groups));
+      await _userGroupRepository.saveUserGroup(uid, targetGroup);
     }
   }
 

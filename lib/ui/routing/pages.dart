@@ -34,8 +34,9 @@ final _groupsPagePath = PagePath(
   pattern: '^${GroupList.route}\$',
   builder: (context, _) => BlocProvider<GroupsCubit>(
     create: (context) => GroupsCubit(
-      context.read<GroupService>(),
+      context.read<GroupRepository>(),
       context.read<UserRepository>(),
+      context.read<UserGroupRepository>(),
     )..load(context.read<AuthBloc>().uid),
     child: GroupList(),
   ),
@@ -55,7 +56,7 @@ final List<PagePath> _paths = [
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
-            context.read<GroupService>(),
+            context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
           )..load(matches?[0]),
@@ -66,7 +67,7 @@ final List<PagePath> _paths = [
             context.read<AuthBloc>().uid,
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
-            context.read<GroupService>(),
+            context.read<GroupRepository>(),
           )..load(),
         ),
         BlocProvider(
@@ -102,7 +103,7 @@ final List<PagePath> _paths = [
         ),
         BlocProvider<GroupCubit>(
           create: (_) => GroupCubit(
-            context.read<GroupService>(),
+            context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
           )..loadFromExpense(matches?[0]),
@@ -118,7 +119,7 @@ final List<PagePath> _paths = [
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
-            context.read<GroupService>(),
+            context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
           )..load(matches?[0]),
@@ -142,7 +143,7 @@ final List<PagePath> _paths = [
     pattern: '^${GroupPage.route}/([\\w-]+)${GroupJoining.route}/([\\w-]+)\$',
     builder: (context, matches) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit(
-        context.read<GroupService>(),
+        context.read<GroupRepository>(),
         context.read<ExpenseService>(),
         context.read<UserRepository>(),
       )..load(matches?[0]),

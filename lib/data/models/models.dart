@@ -3,6 +3,7 @@ export 'assignee_decision.dart';
 export 'custom_user.dart';
 export 'expense.dart';
 export 'group.dart';
+export 'user_group.dart';
 export 'item.dart';
 export 'simple_item.dart';
 export 'gas_item.dart';

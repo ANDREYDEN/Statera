@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/widgets/collapsible.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/utils.dart';
@@ -40,35 +41,57 @@ class GroupListBody extends StatelessWidget {
 
         if (groupsState is GroupsLoaded) {
           final groups = groupsState.groups;
+          groups.sort((userGroup1, userGroup2) {
+            if (userGroup1.pinned && userGroup2.pinned) return 0;
+            return userGroup1.pinned ? -1 : 1;
+          });
 
           final columnCount = isWide ? 3 : 1;
           final columnWidth = MediaQuery.of(context).size.width / columnCount;
 
+          final archivedGroups = groups.where((group) => group.archived);
+          final activeGroups = groups.where((group) => !group.archived);
+
           return Padding(
             padding: isWide ? kWideMargin : kMobileMargin,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox.square(
-                  dimension: 16,
+                SizedBox(
+                  height: 4,
                   child: Visibility(
                     visible: groupsState is GroupsProcessing,
-                    child: Loader(),
+                    child: LinearProgressIndicator(),
                   ),
                 ),
-                Expanded(
-                  child: groups.isEmpty
+                Flexible(
+                  child: activeGroups.isEmpty
                       ? ListEmpty(text: 'Join or create a group!')
                       : GridView.count(
+                          shrinkWrap: true,
                           crossAxisCount: columnCount,
                           childAspectRatio: columnWidth / 100,
-                          children: [
-                            ...groups
-                                .map((group) => GroupListItem(group: group))
-                                .toList(),
-                            SizedBox(height: 100) // leave space for FAB
-                          ],
+                          children: activeGroups
+                              .map((group) => GroupListItem(userGroup: group))
+                              .toList(),
                         ),
                 ),
+                if (archivedGroups.isNotEmpty)
+                  Flexible(
+                    child: Collapsible(
+                      title: 'Archived (${archivedGroups.length})',
+                      titleTextStyle: Theme.of(context).textTheme.titleMedium,
+                      child: GridView.count(
+                        crossAxisCount: columnCount,
+                        childAspectRatio: columnWidth / 100,
+                        shrinkWrap: true,
+                        children: archivedGroups
+                            .map((group) => GroupListItem(userGroup: group))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 100), // leave space for FAB
               ],
             ),
           );

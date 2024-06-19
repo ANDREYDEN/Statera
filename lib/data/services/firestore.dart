@@ -18,6 +18,12 @@ class Firestore {
 
   CollectionReference get usersCollection => firestore.collection('users');
 
+  CollectionReference getUserGroupsCollection(String uid) =>
+      usersCollection.doc(uid).collection('groups');
+
+  DocumentReference getUserGroup(String uid, String groupId) =>
+      usersCollection.doc(uid).collection('groups').doc(groupId);
+
   Query expensesQuery({
     String? groupId,
     String? assigneeId,

@@ -7,12 +7,28 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const payments = await db.collection('payments').where('reason', '!=', null).get()
-    console.log(`Found ${payments.docs.length} payments`)
-    for (const payment of payments.docs) {
-        await payment.ref.update({
-            isAdmin: true
-        })
+    const groups = await db.collection('groups').get()
+    console.log(`Found ${groups.docs.length} groups`)
+    for (const groupDoc of groups.docs) {
+        const group = groupDoc.data()
+        const members = group.members
+        for (const member of members) {
+            const memberDocRef = db.collection('users').doc(member.uid)
+            const unmarkedExpensesQuerySnap = await db.collection('expenses')
+                .where('groupId', '==', groupDoc.id)
+                .where('unmarkedAssigneeIds', 'array-contains', member.uid)
+                .count()
+                .get()
+            const unmarkedExpenses = unmarkedExpensesQuerySnap.data().count
+            const newUserGroup = {
+                groupId: groupDoc.id,
+                name: group.name,
+                memberCount: members.length,
+                unmarkedExpenses
+            }
+            await memberDocRef.collection('groups').doc(groupDoc.id).set(newUserGroup)
+            console.log(member.uid, newUserGroup)
+        }
     }
 })();
 

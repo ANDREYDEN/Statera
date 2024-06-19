@@ -11,7 +11,7 @@ abstract class GroupsState extends Equatable {
 class GroupsLoading extends GroupsState {}
 
 class GroupsLoaded extends GroupsState {
-  final List<Group> groups;
+  final List<UserGroup> groups;
 
   const GroupsLoaded({required this.groups});
 
@@ -21,7 +21,7 @@ class GroupsLoaded extends GroupsState {
 
 /// After the groups were loaded; whenever the list is changing (creates, updates)
 class GroupsProcessing extends GroupsLoaded {
-  GroupsProcessing({required List<Group> groups}) : super(groups: groups);
+  GroupsProcessing({required List<UserGroup> groups}) : super(groups: groups);
 }
 
 class GroupsError extends GroupsState {
