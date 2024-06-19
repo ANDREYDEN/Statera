@@ -1,4 +1,4 @@
-import { firestore } from 'firebase-admin'
+import { FieldValue, getFirestore } from 'firebase-admin/firestore'
 import { Change } from 'firebase-functions/v1'
 import { DocumentSnapshot } from 'firebase-functions/v1/firestore'
 import { Expense } from '../../types/expense'
@@ -17,14 +17,15 @@ export async function updateUserGroupsWhenExpenseChanges(change: Change<Document
     if (wasUnmarked === becameUnmarked) continue
 
     const diff = wasUnmarked ? -1 : 1
-    const userGroupRef = firestore()
+    const db = getFirestore()
+    const userGroupRef = db
       .collection('users')
       .doc(uid!)
       .collection('groups')
       .doc(expenseData.groupId)
       // assuming a user group already exists
     await userGroupRef.update({
-      unmarkedExpenses: firestore.FieldValue.increment(diff),
+      unmarkedExpenses: FieldValue.increment(diff),
     })
   }
 }

@@ -17,21 +17,20 @@ class ListEmpty extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                this.text,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 24,
-                ),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              this.text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 24,
               ),
             ),
-            if (this.icon != null) this.icon!,
-          ],
+          ),
         ),
+        if (this.icon != null) this.icon!,
         if (this.action != null) this.action!,
       ],
     );

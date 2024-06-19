@@ -6,13 +6,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/groups/group_list_item.dart';
-import 'package:statera/ui/widgets/collapsible.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/utils.dart';
 
-class GroupListBody extends StatelessWidget {
+class GroupListBody extends StatefulWidget {
   const GroupListBody({super.key});
+
+  @override
+  State<GroupListBody> createState() => _GroupListBodyState();
+}
+
+class _GroupListBodyState extends State<GroupListBody> {
+  Set<String> _selectedGroupType = {'active'};
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +58,9 @@ class GroupListBody extends StatelessWidget {
           final archivedGroups = groups.where((group) => group.archived);
           final activeGroups = groups.where((group) => !group.archived);
 
+          final isActive = _selectedGroupType.contains('active');
+          final targetGroups = isActive ? activeGroups : archivedGroups;
+
           return Padding(
             padding: isWide ? kWideMargin : kMobileMargin,
             child: Column(
@@ -64,34 +73,45 @@ class GroupListBody extends StatelessWidget {
                     child: LinearProgressIndicator(),
                   ),
                 ),
-                Flexible(
-                  child: activeGroups.isEmpty
-                      ? ListEmpty(text: 'Join or create a group!')
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: SegmentedButton(
+                    segments: [
+                      ButtonSegment(
+                        value: 'active',
+                        label: Text('Active'),
+                        icon: Icon(Icons.groups),
+                      ),
+                      ButtonSegment(
+                        value: 'archived',
+                        label: Text('Archived'),
+                        icon: Icon(Icons.archive),
+                      )
+                    ],
+                    selected: _selectedGroupType,
+                    onSelectionChanged: (newSelectedGroupType) => setState(() {
+                      _selectedGroupType = newSelectedGroupType;
+                    }),
+                  ),
+                ),
+                Expanded(
+                  child: targetGroups.isEmpty
+                      ? ListEmpty(
+                          text: isActive
+                              ? 'Join or create a group!'
+                              : 'You have not archived any groups yet')
                       : GridView.count(
                           shrinkWrap: true,
                           crossAxisCount: columnCount,
                           childAspectRatio: columnWidth / 100,
-                          children: activeGroups
-                              .map((group) => GroupListItem(userGroup: group))
-                              .toList(),
+                          children: [
+                            ...targetGroups
+                                .map((group) => GroupListItem(userGroup: group))
+                                .toList(),
+                            SizedBox(height: 100), // leave space for FAB
+                          ],
                         ),
                 ),
-                if (archivedGroups.isNotEmpty)
-                  Flexible(
-                    child: Collapsible(
-                      title: 'Archived (${archivedGroups.length})',
-                      titleTextStyle: Theme.of(context).textTheme.titleMedium,
-                      child: GridView.count(
-                        crossAxisCount: columnCount,
-                        childAspectRatio: columnWidth / 100,
-                        shrinkWrap: true,
-                        children: archivedGroups
-                            .map((group) => GroupListItem(userGroup: group))
-                            .toList(),
-                      ),
-                    ),
-                  ),
-                SizedBox(height: 100), // leave space for FAB
               ],
             ),
           );

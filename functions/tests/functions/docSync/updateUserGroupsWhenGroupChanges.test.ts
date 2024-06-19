@@ -1,5 +1,7 @@
 import firebaseFunctionsTest from 'firebase-functions-test'
-import { updateUserGroupsWhenGroupChanges } from '../../../src/functions/docSync/updateUserGroupsWhenGroupChanges'
+import {
+  updateUserGroupsWhenGroupChanges,
+} from '../../../src/functions/docSync/updateUserGroupsWhenGroupChanges'
 import { Group } from '../../../src/types/group'
 
 import * as admin from 'firebase-admin'
@@ -26,7 +28,7 @@ describe('updateUserGroupsWhenGroupChanges', () => {
       debtThreshold: 50,
     }
     const before = { id: groupId, exists: false, data: () => undefined }
-    const after =  firestore.makeDocumentSnapshot(newGroup, `groups/${groupId}`)
+    const after = firestore.makeDocumentSnapshot(newGroup, `groups/${groupId}`)
     const change = { before, after } as unknown as Change<DocumentSnapshot>
 
     await updateUserGroupsWhenGroupChanges(change)
