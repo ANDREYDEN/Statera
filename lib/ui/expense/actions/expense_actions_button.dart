@@ -29,6 +29,6 @@ class ExpenseActionsButton extends StatelessWidget {
         RevertExpenseAction(expense)
     ];
 
-    return ActionsButton(actions: actions);
+    return ActionsButton(tooltip: 'Expense actions', actions: actions);
   }
 }

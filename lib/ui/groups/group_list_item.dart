@@ -27,8 +27,10 @@ class GroupListItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (userGroup.pinned) Icon(Icons.push_pin),
-                    SizedBox(width: 5),
+                    if (userGroup.pinned) ...[
+                      Icon(Icons.push_pin),
+                      SizedBox(width: 5)
+                    ],
                     Flexible(
                       child: Badge.count(
                         count: userGroup.unmarkedExpenses,
@@ -50,10 +52,13 @@ class GroupListItem extends StatelessWidget {
                   Text(userGroup.memberCount.toString()),
                 ],
               ),
-              ActionsButton(actions: [
-                if (!userGroup.archived) TogglePinUserGroupAction(userGroup),
-                ToggleArchiveUserGroupAction(userGroup),
-              ])
+              ActionsButton(
+                tooltip: 'Group actions',
+                actions: [
+                  if (!userGroup.archived) TogglePinUserGroupAction(userGroup),
+                  ToggleArchiveUserGroupAction(userGroup),
+                ],
+              )
             ],
           ),
         ),
