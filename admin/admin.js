@@ -14,6 +14,11 @@ const auth = admin.auth();
         const members = group.members
         for (const member of members) {
             const memberDocRef = db.collection('users').doc(member.uid)
+            const userGroupSnap = await memberDocRef.collection('groups').doc(groupDoc.id).get()
+            if (userGroupSnap.exists) {
+                continue
+            }
+
             const unmarkedExpensesQuerySnap = await db.collection('expenses')
                 .where('groupId', '==', groupDoc.id)
                 .where('unmarkedAssigneeIds', 'array-contains', member.uid)
@@ -26,7 +31,7 @@ const auth = admin.auth();
                 memberCount: members.length,
                 unmarkedExpenses
             }
-            await memberDocRef.collection('groups').doc(groupDoc.id).set(newUserGroup)
+            await userGroupSnap.ref.set(newUserGroup)
             console.log(member.uid, newUserGroup)
         }
     }
