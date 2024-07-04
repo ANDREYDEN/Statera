@@ -60,11 +60,11 @@ class ItemListItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 renderPrice(context),
-                ElevatedButton(
+                SizedBox(width: 10),
+                IconButton(
                   onPressed: () =>
                       this.onChangePartition(item.getAssigneeParts(uid) - 1),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
+                  style: IconButton.styleFrom(
                     backgroundColor: !item.isMarkedBy(uid)
                         ? Colors.grey[300]
                         : item.isMarkedBy(uid) &&
@@ -72,8 +72,9 @@ class ItemListItem extends StatelessWidget {
                             ? Colors.red[400]
                             : Colors.grey[500],
                     padding: EdgeInsets.all(0),
+                    visualDensity: VisualDensity.compact,
                   ),
-                  child: Icon(
+                  icon: Icon(
                     !item.isMarkedBy(uid) || !item.isPartitioned
                         ? Icons.close_rounded
                         : item.isMarkedBy(uid) &&
@@ -83,10 +84,16 @@ class ItemListItem extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-                Text(
-                  "${item.isMarkedBy(uid) ? item.getAssigneeParts(uid) : '-'}/${item.partition}",
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: Visibility(
+                    visible: item.partition > 1,
+                    child: Text(
+                      "${item.isMarkedBy(uid) ? item.getAssigneeParts(uid) : '-'}/${item.partition}",
+                    ),
+                  ),
                 ),
-                ElevatedButton(
+                IconButton(
                   onPressed: () =>
                       this.onChangePartition(item.getAssigneeParts(uid) + 1),
                   style: ElevatedButton.styleFrom(
@@ -98,8 +105,10 @@ class ItemListItem extends StatelessWidget {
                                 item.getAssigneeParts(uid) > 0
                             ? Colors.green[400]
                             : Colors.grey[500],
+                    padding: EdgeInsets.all(0),
+                    visualDensity: VisualDensity.compact,
                   ),
-                  child: Icon(
+                  icon: Icon(
                     !item.isMarkedBy(uid) || !item.isPartitioned
                         ? Icons.check_rounded
                         : item.undefinedParts == 0 &&

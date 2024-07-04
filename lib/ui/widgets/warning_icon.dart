@@ -15,6 +15,7 @@ class WarningIcon extends StatelessWidget {
         child: Icon(
           Icons.warning_amber_rounded,
           size: 20,
+          color: Colors.black,
         ),
       ),
     );

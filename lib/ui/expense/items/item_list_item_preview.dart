@@ -37,13 +37,22 @@ main() {
 }
 
 class ItemListItemPreview extends StatelessWidget {
-  const ItemListItemPreview({Key? key}) : super(key: key);
+  final me = CustomUser(uid: 'a', name: 'John Doe');
+  final other = CustomUser(uid: 'b', name: 'Adam Smith');
+  final another = CustomUser(uid: 'c', name: 'Kate Smith');
+
+  ItemListItemPreview({Key? key}) : super(key: key);
+
+  SimpleItem getSimpleItem() {
+    return SimpleItem(
+      name: 'Pizza',
+      value: 23.33,
+      assigneeUids: [me.uid, other.uid, another.uid],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final me = CustomUser(uid: 'a', name: 'John Doe');
-    final other = CustomUser(uid: 'b', name: 'Adam Smith');
-    final another = CustomUser(uid: 'c', name: 'Kate Smith');
     final tenUsers = List.generate(
       10,
       (index) => CustomUser(
@@ -57,11 +66,6 @@ class ItemListItemPreview extends StatelessWidget {
     when(user.uid).thenReturn(me.uid);
     when(authService.currentUser).thenReturn(user);
 
-    final simpleItem = SimpleItem(
-      name: 'Pizza',
-      value: 23.33,
-      assigneeUids: [me.uid, other.uid, another.uid],
-    );
     final partitionedItem = SimpleItem(
       name: 'Pizza',
       value: 23.33,
@@ -69,7 +73,7 @@ class ItemListItemPreview extends StatelessWidget {
       assigneeUids: [me.uid, other.uid, another.uid],
     );
     final simpleItemWithTenUsers = SimpleItem(
-      name: 'Long',
+      name: 'A lot of users and a very long name',
       value: 23.33,
       assigneeUids: tenUsers.map((u) => u.uid).toList(),
     );
@@ -86,7 +90,7 @@ class ItemListItemPreview extends StatelessWidget {
     );
 
     final gasItemWithTenUsers = GasItem(
-      name: 'Gas',
+      name: 'Some very long and boring gas name',
       distance: 200,
       gasPrice: 1.7,
       consumption: 7,
@@ -109,31 +113,36 @@ class ItemListItemPreview extends StatelessWidget {
               members: [me, other, another, ...tenUsers],
             )),
         ),
-        BlocProvider(
-          create: (_) => AuthBloc(authService),
-        ),
+        BlocProvider(create: (_) => AuthBloc(authService)),
         Provider.value(value: PreferencesService()),
       ],
       body: ListView(
         children: [
           ItemListItem(
-            item: simpleItem,
+            item: getSimpleItem(),
             onChangePartition: (_) {},
           ),
           ItemListItem(
-            item: simpleItem
+            item: getSimpleItem()
               ..setAssigneeDecision(me.uid, 0)
               ..setAssigneeDecision(other.uid, 1),
             onChangePartition: (_) {},
           ),
           ItemListItem(
-            item: simpleItem
+            item: getSimpleItem()
               ..setAssigneeDecision(me.uid, 1)
               ..setAssigneeDecision(other.uid, 1),
             onChangePartition: (_) {},
           ),
           ItemListItem(
-            item: simpleItem
+            item: getSimpleItem()
+              ..setAssigneeDecision(me.uid, 0)
+              ..setAssigneeDecision(other.uid, 0)
+              ..setAssigneeDecision(another.uid, 0),
+            onChangePartition: (_) {},
+          ),
+          ItemListItem(
+            item: getSimpleItem()
               ..setAssigneeDecision(me.uid, 1)
               ..setAssigneeDecision(other.uid, 1)
               ..setAssigneeDecision(another.uid, 1),

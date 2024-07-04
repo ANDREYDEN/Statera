@@ -17,13 +17,6 @@ class GasItemListItem extends ItemListItem {
   }
 
   @override
-  Widget? get leading {
-    final leading = super.leading;
-
-    return leading ?? Icon(Icons.local_gas_station);
-  }
-
-  @override
   Widget renderPrice(BuildContext context) {
     final priceWidget = super.renderPrice(context);
 
