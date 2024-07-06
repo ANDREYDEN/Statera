@@ -7,34 +7,15 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const groups = await db.collection('groups').get()
-    console.log(`Found ${groups.docs.length} groups`)
-    for (const groupDoc of groups.docs) {
-        const group = groupDoc.data()
-        const members = group.members
-        const expensesQuerySnap = await db.collection('expenses').where('groupId', '==', groupDoc.id).get()
-        const expenseDocs = expensesQuerySnap.docs
-        for (const expenseDoc of expenseDocs) {
-            const expense = expenseDoc.data()
-            const expenseParticipantIds = getParticipantIds(expense)
+    const expenses = await db.collection('expenses').where('author.uid', '!=', null).get()
+    console.log(`Updating ${expenses.docs.length} expenses`);
 
-            const membersNotPartOfExpense = members.filter(m => !expenseParticipantIds.includes(m.uid))
-            const targetIds = membersNotPartOfExpense.map(m => m.uid)
-
-            for (const uid of targetIds) {
-                try {
-                    const userExpenseDocRef = db.doc(`users/${uid}/expenses/${expenseDoc.id}`)
-                    const doc = await userExpenseDocRef.get()
-
-                    if (doc.exists) {
-                        console.log({ expenseId: expenseDoc.id, uid });
-                        await userExpenseDocRef.delete()
-                    }
-                } catch (e) {
-                    console.log(e)
-                }
-            }
-        }
+    for (const expenseDoc of expenses.docs) {
+        const expense = expenseDoc.data()
+        await expenseDoc.ref.update({
+            author: admin.firestore.FieldValue.delete(),
+            authorUid: expense.author.uid
+        })
     }
 })();
 
