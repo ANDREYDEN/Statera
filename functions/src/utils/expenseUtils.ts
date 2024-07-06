@@ -7,3 +7,9 @@ export function calculateStage(expense: Expense, assigneeId: string) {
 
   return 1
 }
+
+export function getParticipantIds(expense: Expense): string[] {
+  return [
+    ...new Set([...expense.assigneeIds, expense.authorUid]),
+  ].filter((e) => e)
+}
