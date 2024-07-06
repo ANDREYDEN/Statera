@@ -12,27 +12,28 @@ const auth = admin.auth();
     for (const groupDoc of groups.docs) {
         const group = groupDoc.data()
         const members = group.members
-        for (const member of members) {
-            const memberDocRef = db.collection('users').doc(member.uid)
-            const userGroupSnap = await memberDocRef.collection('groups').doc(groupDoc.id).get()
-            if (userGroupSnap.exists) {
-                continue
-            }
+        const expensesQuerySnap = await db.collection('expenses').where('groupId', '==', groupDoc.id).get()
+        const expenseDocs = expensesQuerySnap.docs
+        for (const expenseDoc of expenseDocs) {
+            const expense = expenseDoc.data()
+            const expenseParticipantIds = getParticipantIds(expense)
 
-            const unmarkedExpensesQuerySnap = await db.collection('expenses')
-                .where('groupId', '==', groupDoc.id)
-                .where('unmarkedAssigneeIds', 'array-contains', member.uid)
-                .count()
-                .get()
-            const unmarkedExpenses = unmarkedExpensesQuerySnap.data().count
-            const newUserGroup = {
-                groupId: groupDoc.id,
-                name: group.name,
-                memberCount: members.length,
-                unmarkedExpenses
+            const membersNotPartOfExpense = members.filter(m => !expenseParticipantIds.includes(m.uid))
+            const targetIds = membersNotPartOfExpense.map(m => m.uid)
+
+            for (const uid of targetIds) {
+                try {
+                    const userExpenseDocRef = db.doc(`users/${uid}/expenses/${expenseDoc.id}`)
+                    const doc = await userExpenseDocRef.get()
+
+                    if (doc.exists) {
+                        console.log({ expenseId: expenseDoc.id, uid });
+                        await userExpenseDocRef.delete()
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
             }
-            await userGroupSnap.ref.set(newUserGroup)
-            console.log(member.uid, newUserGroup)
         }
     }
 })();
@@ -199,4 +200,10 @@ function getHasItemsDeniedByAll(expense) {
     return expense.items.some(item => {
         return item.assignees.every(a => a.parts === 0)
     })
+}
+
+function getParticipantIds(expense) {
+    return [
+        ...new Set([...expense.assigneeIds, expense.authorUid]),
+    ].filter((e) => e)
 }

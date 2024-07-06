@@ -9,7 +9,6 @@ import { UserGroup } from '../../../src/types/userGroup'
 import { UserData } from '../../../src/types/userData'
 import { Change } from 'firebase-functions/v1'
 import { DocumentSnapshot } from 'firebase-functions/v1/firestore'
-import { CollectionReference } from 'firebase-admin/firestore'
 import { deleteAllData } from '../../testUtils'
 const { firestore } = firebaseFunctionsTest()
 
