@@ -1,33 +1,47 @@
 import { firestore } from 'firebase-admin'
 import { DocumentSnapshot } from 'firebase-admin/firestore'
 import { Change } from 'firebase-functions/v1'
-import { calculateStage } from '../../utils/expenseUtils'
+import { calculateStage, getParticipantIds } from '../../utils/expenseUtils'
 import { Expense } from '../../types/expense'
+import { UserExpense } from '../../types/userExpense'
 
 export async function updateUserExpenses(change: Change<DocumentSnapshot>) {
-  const expenseData = (change.after.data() ?? change.before.data()) as Expense
-  const expenseDeleted = !change.after.exists
-  if (!expenseData) return
+  const oldExpenseData = change.before.data() as (Expense | undefined)
+  const newExpenseData = change.after.data() as (Expense | undefined)
+  const expenseId = change.after.id
 
-  const relatedUids = new Set([
-    ...expenseData.assigneeIds,
-    expenseData.authorUid,
-  ]).values()
+  const oldParticipantIds = oldExpenseData ? getParticipantIds(oldExpenseData) : []
+  const newParticipantIds = newExpenseData ? getParticipantIds(newExpenseData) : []
 
-  for (const uid of relatedUids) {
-    const userExpenseRef = firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('expenses')
-      .doc(change.after.id)
-    if (expenseDeleted) {
-      await userExpenseRef.delete()
-    } else {
-      const stage = calculateStage(expenseData, uid)
-      await userExpenseRef.set({
-        ...expenseData,
-        stage,
-      })
+  const addedParticipantIds = newParticipantIds.filter((newUid) => !oldParticipantIds.includes(newUid))
+  const updatedParticipantIds = newParticipantIds.filter((newUid) => oldParticipantIds.includes(newUid))
+  const deletedParticipantIds = oldParticipantIds.filter((oldUid) => !newParticipantIds.includes(oldUid))
+
+  for (const uid of addedParticipantIds) {
+    const userExpenseRef = firestore().doc(`users/${uid}/expenses/${expenseId}`)
+
+    const newUserExpense: UserExpense = {
+      ...newExpenseData!,
+      stage: calculateStage(newExpenseData!, uid),
     }
+
+    await userExpenseRef.set(newUserExpense)
+  }
+
+  for (const uid of updatedParticipantIds) {
+    const userExpenseRef = firestore().doc(`users/${uid}/expenses/${expenseId}`)
+
+    const newUserExpense: UserExpense = {
+      ...newExpenseData!,
+      stage: calculateStage(newExpenseData!, uid),
+    }
+
+    await userExpenseRef.update(newUserExpense)
+  }
+
+  for (const uid of deletedParticipantIds) {
+    const userExpenseRef = firestore().doc(`users/${uid}/expenses/${expenseId}`)
+
+    await userExpenseRef.delete()
   }
 }

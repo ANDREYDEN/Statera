@@ -88,15 +88,14 @@ Future<bool> snackbarCatch(
 
   if (errorOccured) {
     print(exception);
-    FirebaseCrashlytics.instance.recordError(
+    await FirebaseCrashlytics.instance.recordError(
       exception,
       null,
       reason: 'Something went wrong',
     );
-    showSnackBar(
+    showErrorSnackBar(
       context,
       errorMessage ?? stringifyException(exception),
-      color: Theme.of(context).colorScheme.error,
     );
   } else if (successMessage != null && successMessage.isNotEmpty) {
     showSnackBar(
@@ -122,6 +121,7 @@ void showSnackBar(
   String content, {
   Duration duration = const Duration(seconds: 3),
   Color? color,
+  bool? showCloseIcon,
 }) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -130,7 +130,18 @@ void showSnackBar(
       backgroundColor: color,
       duration: duration,
       behavior: SnackBarBehavior.floating,
+      showCloseIcon: showCloseIcon,
     ),
+  );
+}
+
+void showErrorSnackBar(BuildContext context, String error) {
+  showSnackBar(
+    context,
+    error,
+    duration: Duration(days: 365),
+    color: Theme.of(context).colorScheme.error,
+    showCloseIcon: true,
   );
 }
 

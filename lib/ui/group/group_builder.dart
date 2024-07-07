@@ -25,10 +25,9 @@ class GroupBuilder extends StatelessWidget {
     return BlocConsumer<GroupCubit, GroupState>(
       listener: (groupContext, state) {
         if (state is GroupError) {
-          showSnackBar(
+          showErrorSnackBar(
             groupContext,
             state.error.toString(),
-            color: Colors.red,
           );
         }
 

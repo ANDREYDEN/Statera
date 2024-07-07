@@ -9,29 +9,13 @@ import { UserGroup } from '../../../src/types/userGroup'
 import { UserData } from '../../../src/types/userData'
 import { Change } from 'firebase-functions/v1'
 import { DocumentSnapshot } from 'firebase-functions/v1/firestore'
-import { CollectionReference } from 'firebase-admin/firestore'
+import { deleteAllData } from '../../testUtils'
 const { firestore } = firebaseFunctionsTest()
 
 admin.initializeApp()
 
 describe('updateUserGroupsWhenGroupChanges', () => {
-  async function deleteCollection(colRef: CollectionReference) {
-    const docs = await colRef.listDocuments()
-    for (const docRef of docs) {
-      const subCollections = await docRef.listCollections()
-      for (const subColRef of subCollections) {
-        await deleteCollection(subColRef)
-      }
-      await docRef.delete()
-    }
-  }
-
-  beforeEach(async () => {
-    const collections = await admin.firestore().listCollections()
-    for (const collectionRef of collections) {
-      await deleteCollection(collectionRef)
-    }
-  })
+  beforeEach(deleteAllData)
 
   it('creates user group when a group is created', async () => {
     const groupId = 'foo'

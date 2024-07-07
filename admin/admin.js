@@ -7,33 +7,15 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 (async () => {
-    const groups = await db.collection('groups').get()
-    console.log(`Found ${groups.docs.length} groups`)
-    for (const groupDoc of groups.docs) {
-        const group = groupDoc.data()
-        const members = group.members
-        for (const member of members) {
-            const memberDocRef = db.collection('users').doc(member.uid)
-            const userGroupSnap = await memberDocRef.collection('groups').doc(groupDoc.id).get()
-            if (userGroupSnap.exists) {
-                continue
-            }
+    const expenses = await db.collection('expenses').where('author.uid', '!=', null).get()
+    console.log(`Updating ${expenses.docs.length} expenses`);
 
-            const unmarkedExpensesQuerySnap = await db.collection('expenses')
-                .where('groupId', '==', groupDoc.id)
-                .where('unmarkedAssigneeIds', 'array-contains', member.uid)
-                .count()
-                .get()
-            const unmarkedExpenses = unmarkedExpensesQuerySnap.data().count
-            const newUserGroup = {
-                groupId: groupDoc.id,
-                name: group.name,
-                memberCount: members.length,
-                unmarkedExpenses
-            }
-            await userGroupSnap.ref.set(newUserGroup)
-            console.log(member.uid, newUserGroup)
-        }
+    for (const expenseDoc of expenses.docs) {
+        const expense = expenseDoc.data()
+        await expenseDoc.ref.update({
+            author: admin.firestore.FieldValue.delete(),
+            authorUid: expense.author.uid
+        })
     }
 })();
 
@@ -199,4 +181,10 @@ function getHasItemsDeniedByAll(expense) {
     return expense.items.some(item => {
         return item.assignees.every(a => a.parts === 0)
     })
+}
+
+function getParticipantIds(expense) {
+    return [
+        ...new Set([...expense.assigneeIds, expense.authorUid]),
+    ].filter((e) => e)
 }

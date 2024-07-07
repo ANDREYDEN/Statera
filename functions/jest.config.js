@@ -4,5 +4,6 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: [
     '**/tests/**/*.test.ts'
-  ]
+  ],
+  maxWorkers: 1,
 };

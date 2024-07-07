@@ -9,11 +9,17 @@ export async function updateUserGroupsWhenExpenseChanges(change: Change<Document
   const expenseData = (expenseAfter ?? expenseBefore)!
   if (!expenseData) return
 
-  const relatedUids = expenseData.assigneeIds
+  const relatedUids = [
+    ...new Set([
+      ...(expenseBefore?.assigneeIds ?? []),
+      ...(expenseAfter?.assigneeIds ?? []),
+    ]),
+  ]
 
   for (const uid of relatedUids) {
     const wasUnmarked = (expenseBefore?.unmarkedAssigneeIds ?? []).includes(uid)
     const becameUnmarked = (expenseAfter?.unmarkedAssigneeIds ?? []).includes(uid)
+
     if (wasUnmarked === becameUnmarked) continue
 
     const diff = wasUnmarked ? -1 : 1

@@ -177,11 +177,7 @@ class Expense {
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String id) {
-    // TODO: deprecate
-    final author = data['author'] == null
-        ? null
-        : CustomUser.fromFirestore(data['author']);
-    final authorUid = data['authorUid'] ?? author?.uid ?? '';
+    final authorUid = data['authorUid'];
     final settings = data['settings'] == null
         ? null
         : ExpenseSettings.fromFirestore(data['settings']);
