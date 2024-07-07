@@ -32,7 +32,7 @@ const kRequiredValidationMessage = "Can't be empty";
 
 const kUpdateBannerRefreshFrequency = Duration(hours: 1);
 
-const kNotificationsReminderCooldown = Duration(days: 2);
+const kNotificationsReminderCooldown = Duration(days: 30);
 
 const kMobileMargin = EdgeInsets.symmetric(horizontal: 10.0);
 
