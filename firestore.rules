@@ -27,12 +27,7 @@ service cloud.firestore {
     }
 
     match /expenses/{expenseId} {
-      // allow update: if isExpenseAssignee() && fieldsChanged(['items', 'unmarkedAssigneeIds'])
-      // allow update: if isExpenseAuthor() && fieldsChanged(['name', 'finalizedDate', 'date', 'settings', 'assigneeIds', 'authorUid', 'items', 'unmarkedAssigneeIds'])
-      allow update: if false
-
-      // allow read: if isExpenseAuthor() || isExpenseAssignee()
-      allow read: if request.auth.uid != null
+      allow read, update: if isExpenseAuthor() || isExpenseAssignee()
       
       allow create: if isMemberOfExpenseGroup(request.resource.data)
       
