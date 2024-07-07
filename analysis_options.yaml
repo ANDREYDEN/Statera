@@ -5,6 +5,7 @@ include:
 linter:
   rules:
     prefer_single_quotes: true
+    unawaited_futures: true
 
 analyzer:
   errors:

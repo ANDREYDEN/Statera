@@ -25,6 +25,11 @@ class _FinishedUpdating extends ExpenseEvent {
   const _FinishedUpdating(this.expense) : super();
 }
 
+class _UpdateErrorOccurred extends ExpenseEvent {
+  final Object error;
+  _UpdateErrorOccurred(this.error) : super();
+}
+
 class _ExpenseUpdatedFromDB extends ExpenseEvent {
   final Expense? expense;
   const _ExpenseUpdatedFromDB(this.expense) : super();

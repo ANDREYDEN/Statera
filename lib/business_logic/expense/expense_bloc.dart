@@ -19,6 +19,9 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<_FinishedUpdating>(
       (event, emit) => emit(ExpenseLoaded(expense: event.expense)),
     );
+    on<_UpdateErrorOccurred>(
+      (event, emit) => emit(ExpenseError(error: event.error)),
+    );
     on<_ExpenseUpdatedFromDB>(_handleExpenseUpdatedFromDB);
   }
 
@@ -45,7 +48,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
     updateTimer?.cancel();
     updateTimer = Timer(Duration(seconds: 2), () async {
-      await _expenseService.updateExpense(expense);
+      try {
+        await _expenseService.updateExpense(expense);
+      } catch (e) {
+        print(e);
+        add(_UpdateErrorOccurred(e));
+        throw e;
+      } finally {}
 
       // TODO: move to cloud functions (firestore trigger)
       if (!wasCompleted &&
