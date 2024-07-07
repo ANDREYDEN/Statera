@@ -27,7 +27,9 @@ service cloud.firestore {
     }
 
     match /expenses/{expenseId} {
-      allow read, update: if isExpenseAuthor() || isExpenseAssignee()
+      // allow read, update: if isExpenseAuthor() || isExpenseAssignee()
+      allow read: if true
+      allow update: if false
       
       allow create: if isMemberOfExpenseGroup(request.resource.data)
       

@@ -3,18 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/loader.dart';
-import 'package:statera/utils/utils.dart';
 
 class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
   final Widget Function(BuildContext, ExpenseError)? errorBuilder;
+  final void Function(BuildContext, ExpenseError)? onError;
   final Widget? loadingWidget;
 
   const ExpenseBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
-    this.loadingWidget,
+    this.loadingWidget, this.onError,
   }) : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class ExpenseBuilder extends StatelessWidget {
     return BlocConsumer<ExpenseBloc, ExpenseState>(
       listener: (context, state) {
         if (state is ExpenseError) {
-          showErrorSnackBar(context, 'Error occured: ${state.error}');
+          onError?.call(context, state);
         }
       },
       listenWhen: (previous, current) {

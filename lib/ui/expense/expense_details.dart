@@ -34,6 +34,9 @@ class ExpenseDetails extends StatelessWidget {
 
     return ExpenseBuilder(
       loadingWidget: ListEmpty(text: 'Pick an expense first'),
+      onError: (context, expenseErrorState) {
+        showErrorSnackBar(context, 'Error occured: ${expenseErrorState.error}');
+      },
       builder: (context, expense) {
         final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
 
