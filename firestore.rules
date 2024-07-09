@@ -15,6 +15,9 @@ service cloud.firestore {
 
       // only authorize admins to change group settings
     	allow update: if isGroupAdmin() && fieldsChanged(['name', 'currencySign', 'inviteLink', 'adminId', 'debtThreshold']);
+
+      // only authorize admins to delete a group
+      allow delete: if isGroupAdmin()
     }
 
     function isGroupAdmin() {
@@ -27,9 +30,7 @@ service cloud.firestore {
     }
 
     match /expenses/{expenseId} {
-      // allow read, update: if isExpenseAuthor() || isExpenseAssignee()
-      allow read: if true
-      allow update: if false
+      allow read, update: if isExpenseAuthor() || isExpenseAssignee()
       
       allow create: if isMemberOfExpenseGroup(request.resource.data)
       

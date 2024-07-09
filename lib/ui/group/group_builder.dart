@@ -4,13 +4,13 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/widgets/loader.dart';
-import 'package:statera/utils/utils.dart';
 
 class GroupBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Group) builder;
   final Widget Function(BuildContext, GroupError)? errorBuilder;
   final Widget? loadingWidget;
   final bool loadOnError;
+  final void Function(BuildContext, GroupError)? onError;
 
   const GroupBuilder({
     Key? key,
@@ -18,6 +18,7 @@ class GroupBuilder extends StatelessWidget {
     this.errorBuilder,
     this.loadingWidget,
     this.loadOnError = false,
+    this.onError,
   }) : super(key: key);
 
   @override
@@ -25,10 +26,7 @@ class GroupBuilder extends StatelessWidget {
     return BlocConsumer<GroupCubit, GroupState>(
       listener: (groupContext, state) {
         if (state is GroupError) {
-          showErrorSnackBar(
-            groupContext,
-            state.error.toString(),
-          );
+          onError?.call(groupContext, state);
         }
 
         if (state is GroupJoinSuccess) {

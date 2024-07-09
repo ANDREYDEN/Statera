@@ -14,6 +14,7 @@ import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
+import 'package:statera/utils/helpers.dart';
 
 class GroupSettings extends StatelessWidget {
   const GroupSettings({Key? key}) : super(key: key);
@@ -26,6 +27,8 @@ class GroupSettings extends StatelessWidget {
     final debtThresholdController = TextEditingController();
 
     return GroupBuilder(
+      onError: (context, groupError) =>
+          showErrorSnackBar(context, groupError.error.toString()),
       builder: (context, group) {
         debtThresholdController.text = group.debtThreshold.toString();
         final isAdmin = group.isAdmin(uid);

@@ -25,8 +25,8 @@ class DeleteGroupSetting extends StatelessWidget {
           title: 'You are about to DELETE the group "$groupName"',
           valueName: 'group name',
           value: groupName,
-          onConfirm: () {
-            groupCubit.delete();
+          onConfirm: () async {
+            await groupCubit.delete();
             Navigator.pop(context);
           },
         ),

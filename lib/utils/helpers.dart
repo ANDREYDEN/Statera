@@ -17,9 +17,12 @@ configureEmulators() async {
   );
   if (!kIsModeDebug) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
     return;
   }
-  ;
 
   final host = 'localhost';
   await FirebaseAuth.instance.useAuthEmulator(host, 9099);
