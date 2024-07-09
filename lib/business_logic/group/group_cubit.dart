@@ -99,9 +99,11 @@ class GroupCubit extends Cubit<GroupState> {
     final group = loadedState.group;
     emit(GroupLoading());
 
+    await _groupSubscription?.cancel();
     try {
       await _groupService.deleteGroup(group.id);
     } catch (error) {
+      load(group.id);
       await handleError(error);
     }
   }
@@ -117,8 +119,8 @@ class GroupCubit extends Cubit<GroupState> {
   }
 
   @override
-  Future<void> close() {
-    _groupSubscription?.cancel();
+  Future<void> close() async {
+    await _groupSubscription?.cancel();
     return super.close();
   }
 }
