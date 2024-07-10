@@ -1,8 +1,13 @@
 import * as admin from 'firebase-admin'
+import { Timestamp } from 'firebase-admin/firestore'
 import 'firebase-functions'
 import * as functions from 'firebase-functions'
 import { firestoreBackup } from './src/admin'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { deleteRelatedGroupData } from './src/functions/deleteRelatedGroupData'
+import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
+import { updateUserGroupsWhenExpenseChanges } from './src/functions/docSync/updateUserGroupsWhenExpenseChanges'
+import { updateUserGroupsWhenGroupChanges } from './src/functions/docSync/updateUserGroupsWhenGroupChanges'
 import { getLatestRelease } from './src/functions/getLatestRelease'
 import { notifyWhenExpenseCompleted } from './src/functions/notifications/notifyWhenExpenseCompleted'
 import { notifyWhenExpenseCreated } from './src/functions/notifications/notifyWhenExpenseCreated'
@@ -13,11 +18,6 @@ import { createUserDoc } from './src/functions/userManagement/createUserDoc'
 import { removeUserFromGroups } from './src/functions/userManagement/removeUserFromGroups'
 import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
-import { Timestamp } from 'firebase-admin/firestore'
-import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
-import { updateUserGroupsWhenExpenseChanges } from './src/functions/docSync/updateUserGroupsWhenExpenseChanges'
-import { updateUserGroupsWhenGroupChanges } from './src/functions/docSync/updateUserGroupsWhenGroupChanges'
-import { deleteRelatedGroupData } from './src/functions/deleteRelatedGroupData'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -75,11 +75,20 @@ export const notifyWhenExpenceIsCreated = functions.firestore
 export const handleExpenseUpdate = functions.firestore
   .document('expenses/{expenseId}')
   .onWrite(async (change, _) => {
+    try {
+      await updateUserExpenses(change)
+    } catch (e) {
+      console.error('Error while updating user expenses:', e)
+    }
+
+    try {
+      await updateUserGroupsWhenExpenseChanges(change)
+    } catch (e) {
+      console.error('Error while updating user groups: ', e)
+    }
+
     const oldExpense = change.before.data()
     const newExpense = change.after.data()
-
-    await updateUserExpenses(change)
-    await updateUserGroupsWhenExpenseChanges(change)
 
     if (!newExpense || !oldExpense) return
 

@@ -16,6 +16,7 @@ export async function updateUserGroupsWhenExpenseChanges(change: Change<Document
     ]),
   ]
 
+  const db = getFirestore()
   for (const uid of relatedUids) {
     const wasUnmarked = (expenseBefore?.unmarkedAssigneeIds ?? []).includes(uid)
     const becameUnmarked = (expenseAfter?.unmarkedAssigneeIds ?? []).includes(uid)
@@ -23,13 +24,18 @@ export async function updateUserGroupsWhenExpenseChanges(change: Change<Document
     if (wasUnmarked === becameUnmarked) continue
 
     const diff = wasUnmarked ? -1 : 1
-    const db = getFirestore()
     const userGroupRef = db
       .collection('users')
       .doc(uid!)
       .collection('groups')
       .doc(expenseData.groupId)
-      // assuming a user group already exists
+
+    const userGroupDocSnap = await userGroupRef.get()
+    if (!userGroupDocSnap.exists) {
+      console.warn(`Tried updating user group for user (${uid}) in group (${expenseData.groupId}), but it did not exist`)
+      continue
+    }
+
     await userGroupRef.update({
       unmarkedExpenses: FieldValue.increment(diff),
     })
