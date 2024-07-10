@@ -17,6 +17,7 @@ import { Timestamp } from 'firebase-admin/firestore'
 import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
 import { updateUserGroupsWhenExpenseChanges } from './src/functions/docSync/updateUserGroupsWhenExpenseChanges'
 import { updateUserGroupsWhenGroupChanges } from './src/functions/docSync/updateUserGroupsWhenGroupChanges'
+import { deleteRelatedGroupData } from './src/functions/deleteRelatedGroupData'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -102,8 +103,17 @@ export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
 
 export const handleGroupUpdate = functions.firestore
   .document('groups/{groupId}')
-  .onWrite((change, _) => {
-    return updateUserGroupsWhenGroupChanges(change)
+  .onWrite(async (change, _) => {
+    try {
+      await updateUserGroupsWhenGroupChanges(change)
+    } catch (e) {
+      console.error('Error while updating user groups:', e)
+    }
+
+    const groupDeleted = !change.after.exists
+    if (groupDeleted) {
+      await deleteRelatedGroupData(change.before.id)
+    }
   })
 
 export const notifyWhenExpenseIsCompleted = functions.https
