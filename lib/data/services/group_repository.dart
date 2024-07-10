@@ -49,9 +49,7 @@ class GroupRepository extends Firestore {
   }
 
   Future<void> deleteGroup(String? groupId) async {
-    var expensesSnap =
-        await expensesCollection.where('groupId', isEqualTo: groupId).get();
-    await Future.wait(expensesSnap.docs.map((doc) => doc.reference.delete()));
+    // a Cloud Function handles deleting related data
     await groupsCollection.doc(groupId).delete();
   }
 

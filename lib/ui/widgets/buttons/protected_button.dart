@@ -46,8 +46,11 @@ class _ProtectedButtonState extends State<ProtectedButton> {
             ? null
             : () async {
                 _actionStateController.add(true);
-                await widget.onPressed!();
-                _actionStateController.add(false);
+                try {
+                  await widget.onPressed!();
+                } finally {
+                  _actionStateController.add(false);
+                }
               };
 
         final content = actionInProgress

@@ -150,4 +150,30 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
       expect(freshUserGroup.unmarkedExpenses).toEqual(0)
     })
   })
+
+  it('handles user groups that do not exist', async () => {
+    const existingExpense:Expense = {
+      items: [],
+      assigneeIds: ['Kicked User', userId],
+      authorUid: userId,
+      groupId,
+      unmarkedAssigneeIds: ['Kicked User', userId],
+    }
+    const existingUserGroup: UserGroup = {
+      groupId,
+      name: 'Foo',
+      memberCount: 1,
+      unmarkedExpenses: 1,
+    }
+    const userGroupRef = admin.firestore().doc( `users/${userId}/groups/${groupId}`)
+    await userGroupRef.set(existingUserGroup)
+    const before = firestore.makeDocumentSnapshot(existingExpense, `expenses/${expenseId}`)
+    const after = { id: expenseId, exists: false, data: () => undefined }
+    const change = { before, after } as unknown as Change<DocumentSnapshot>
+
+    await updateUserGroupsWhenExpenseChanges(change)
+
+    const userGroupDocSnap = await userGroupRef.get()
+    expect(userGroupDocSnap.exists).toBe(true)
+  })
 })

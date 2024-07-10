@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,13 +31,8 @@ class GroupCubit extends Cubit<GroupState> {
         .map((group) => group == null
             ? GroupError(error: 'Group does not exist')
             : GroupLoaded(group: group))
-        .handleError((e) {
-      if (e is FirebaseException) {
-        emit(GroupError(error: 'Permission denied'));
-      } else {
-        emit(GroupError(error: 'Something went wrong'));
-      }
-    }).listen(emit);
+        .handleError(handleError)
+        .listen(emit);
   }
 
   void loadGroup(Group group) {
@@ -63,9 +59,9 @@ class GroupCubit extends Cubit<GroupState> {
     await _expenseService.removeAssigneeFromOutstandingExpenses(uid, group.id);
     group.removeMember(uid);
     if (group.members.isEmpty) {
-      _groupService.deleteGroup(group.id);
+      await _groupService.deleteGroup(group.id);
     } else {
-      _groupService.saveGroup(group);
+      await _groupService.saveGroup(group);
     }
   }
 
@@ -93,22 +89,38 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
-  void generateInviteLink() async {
+  Future<void> generateInviteLink() async {
     final group = loadedState.group;
     emit(GroupLoading());
     await _groupService.generateInviteLink(group);
   }
 
-  void delete() {
+  Future<void> delete() async {
     final group = loadedState.group;
     emit(GroupLoading());
 
-    _groupService.deleteGroup(group.id);
+    await _groupSubscription?.cancel();
+    try {
+      await _groupService.deleteGroup(group.id);
+    } catch (error) {
+      load(group.id);
+      await handleError(error);
+    }
+  }
+
+  Future<void> handleError(Object error) async {
+    if (error is FirebaseException) {
+      emit(GroupError(error: 'Permission denied'));
+    } else {
+      emit(GroupError(error: 'Something went wrong'));
+    }
+    await FirebaseCrashlytics.instance
+        .recordError(error, null, reason: 'Group error');
   }
 
   @override
-  Future<void> close() {
-    _groupSubscription?.cancel();
+  Future<void> close() async {
+    await _groupSubscription?.cancel();
     return super.close();
   }
 }

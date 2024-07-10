@@ -58,8 +58,11 @@ class _DangerDialogState extends State<DangerDialog> {
         ProtectedButton(
           onPressed: _confirmed
               ? () async {
-                  await widget.onConfirm();
-                  Navigator.pop(context, true);
+                  try {
+                    await widget.onConfirm();
+                  } finally {
+                    Navigator.pop(context, true);
+                  }
                 }
               : null,
           child: Text('Confirm'),
