@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
 import 'package:statera/ui/groups/actions/toggle_archive_user_group_action.dart';
+import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
 import 'package:statera/ui/groups/group_list_item/member_debt_indicator.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
 
@@ -35,6 +35,7 @@ class GroupListItem extends StatelessWidget {
                     Flexible(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Badge.count(
                             count: userGroup.unmarkedExpenses,
@@ -45,7 +46,12 @@ class GroupListItem extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          MemberDebtIndicator(userGroup: userGroup),
+                          Row(
+                            children: [
+                              MemberDebtIndicator.outward(userGroup: userGroup),
+                              MemberDebtIndicator.inward(userGroup: userGroup),
+                            ],
+                          ),
                         ],
                       ),
                     )

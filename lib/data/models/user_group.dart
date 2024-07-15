@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:statera/data/enums/enums.dart';
 import 'package:statera/utils/helpers.dart';
 
 class UserGroup {
@@ -31,7 +32,7 @@ class UserGroup {
     archived = true;
   }
 
-  double getDebt(String uid) {
+  double getDebt(DebtDirection debtDirection, String uid) {
     final balanceRef = balance;
     if (balanceRef == null) return 0;
 
@@ -39,11 +40,15 @@ class UserGroup {
       throw Exception('User ($uid) is not part of group ($name)');
     }
 
-    return balanceRef[uid]!.values.where((v) => v > 0).sum;
+    return balanceRef[uid]!
+        .values
+        .where((v) => (v > 0) ^ (debtDirection == DebtDirection.inward))
+        .sum
+        .abs();
   }
 
-  bool hasDebt(String uid) {
-    return !approxEqual(getDebt(uid).abs(), 0);
+  bool hasDebt(DebtDirection debtDirection, String uid) {
+    return !approxEqual(getDebt(debtDirection, uid), 0);
   }
 
   Map<String, dynamic> toFirestore() {
