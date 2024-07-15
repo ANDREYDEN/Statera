@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
-import 'package:statera/ui/groups/group_list_item.dart';
+import 'package:statera/ui/groups/group_list_item/group_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/utils.dart';
