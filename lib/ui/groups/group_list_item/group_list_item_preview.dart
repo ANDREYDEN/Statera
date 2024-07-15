@@ -37,12 +37,29 @@ class GroupListItemPreview extends StatelessWidget {
 
     final groupId = 'group-id';
     final simpleUserGroup = UserGroup(groupId: groupId, name: 'Simple');
-    final userGroupWithDebt = UserGroup(
+    final userGroupWithOutwardDebt = UserGroup(
       groupId: groupId,
-      name: 'With Debt',
+      name: 'With Outward Debt',
       balance: {
         'me': {'other': 5},
-        'other': {'me': 5}
+        'other': {'me': -5}
+      },
+    );
+    final userGroupWithInwardDebt = UserGroup(
+      groupId: groupId,
+      name: 'With Inward Debt',
+      balance: {
+        'me': {'other': -7},
+        'other': {'me': 7}
+      },
+    );
+    final userGroupWithOutwardAndInwardDebt = UserGroup(
+      groupId: groupId,
+      name: 'With All Kinds of Debt',
+      balance: {
+        'me': {'other': -5, 'another': 7},
+        'other': {'me': 5, 'another': 0},
+        'another': {'me': -7, 'other': 0}
       },
     );
 
@@ -65,7 +82,9 @@ class GroupListItemPreview extends StatelessWidget {
         child: Column(
           children: [
             GroupListItem(userGroup: simpleUserGroup),
-            GroupListItem(userGroup: userGroupWithDebt),
+            GroupListItem(userGroup: userGroupWithOutwardDebt),
+            GroupListItem(userGroup: userGroupWithInwardDebt),
+            GroupListItem(userGroup: userGroupWithOutwardAndInwardDebt),
           ],
         ),
       ),
