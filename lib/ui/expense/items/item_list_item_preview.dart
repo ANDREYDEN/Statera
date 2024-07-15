@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
@@ -18,18 +19,6 @@ import 'package:uuid/uuid.dart';
 class MockUser extends Mock implements User {
   String get uid =>
       super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
-}
-
-class AuthServiceMock extends Mock implements AuthService {
-  User? get currentUser => super
-      .noSuchMethod(Invocation.getter(#currentUser), returnValue: MockUser());
-
-  @override
-  Stream<User?> currentUserStream() => super.noSuchMethod(
-        Invocation.method(#currentUserStream, []),
-        returnValue: Stream<User?>.empty(),
-        returnValueForMissingStub: Stream<User?>.empty(),
-      ) as Stream<User?>;
 }
 
 main() {
@@ -61,7 +50,7 @@ class ItemListItemPreview extends StatelessWidget {
       ),
     );
 
-    final authService = AuthServiceMock();
+    final authService = MockAuthService();
     final user = MockUser();
     when(user.uid).thenReturn(me.uid);
     when(authService.currentUser).thenReturn(user);
