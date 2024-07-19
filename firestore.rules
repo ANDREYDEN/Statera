@@ -30,7 +30,9 @@ service cloud.firestore {
     }
 
     match /expenses/{expenseId} {
-      allow read, update: if isExpenseAuthor() || isExpenseAssignee()
+      // TODO: enable this when joining groups is handled by a Cloud Function
+      // allow read, update: if isExpenseAuthor() || isExpenseAssignee()
+      allow read, update: if request.auth != null; 
       
       allow create: if isMemberOfExpenseGroup(request.resource.data)
       
