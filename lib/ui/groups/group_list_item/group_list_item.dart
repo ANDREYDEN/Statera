@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
-import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
 import 'package:statera/ui/groups/actions/toggle_archive_user_group_action.dart';
+import 'package:statera/ui/groups/actions/toggle_pin_user_group_action.dart';
+import 'package:statera/ui/groups/group_list_item/member_debt_indicator.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
 
 class GroupListItem extends StatelessWidget {
@@ -32,14 +33,26 @@ class GroupListItem extends StatelessWidget {
                       SizedBox(width: 5)
                     ],
                     Flexible(
-                      child: Badge.count(
-                        count: userGroup.unmarkedExpenses,
-                        isLabelVisible: userGroup.unmarkedExpenses > 0,
-                        child: Text(
-                          userGroup.name,
-                          style: Theme.of(context).textTheme.titleLarge,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Badge.count(
+                            count: userGroup.unmarkedExpenses,
+                            isLabelVisible: userGroup.unmarkedExpenses > 0,
+                            child: Text(
+                              userGroup.name,
+                              style: Theme.of(context).textTheme.titleLarge,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              MemberDebtIndicator.outward(userGroup: userGroup),
+                              MemberDebtIndicator.inward(userGroup: userGroup),
+                            ],
+                          ),
+                        ],
                       ),
                     )
                   ],

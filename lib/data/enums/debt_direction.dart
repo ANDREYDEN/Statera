@@ -1,0 +1,1 @@
+enum DebtDirection { outward, inward }
