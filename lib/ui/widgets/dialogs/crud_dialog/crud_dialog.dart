@@ -7,6 +7,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/collapsible.dart';
+import 'package:statera/ui/widgets/collapsible_header.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
@@ -55,6 +56,7 @@ class CRUDDialog extends StatefulWidget {
 class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
   bool _addAnother = true;
+  bool _showAdvancedFields = false;
 
   late String _selectedValue;
 
@@ -85,20 +87,24 @@ class _CRUDDialogState extends State<CRUDDialog> {
                     ? _handleSegmentSelection
                     : null,
               ),
-            ListView(
-              shrinkWrap: true,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [..._getFields((f) => !f.isAdvanced)],
-                ),
-                if (_advancedFieldsPresent)
-                  Collapsible(
-                    title: 'Advanced',
-                    child:
-                        Column(children: [..._getFields((f) => f.isAdvanced)]),
-                  ),
-              ],
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  ..._getFields((f) => !f.isAdvanced),
+                  if (_advancedFieldsPresent)
+                    CollapsibleHeader(
+                      title: 'Advanced',
+                      onTap: () {
+                        setState(() {
+                          _showAdvancedFields = !_showAdvancedFields;
+                        });
+                      },
+                      isCollapsed: !_showAdvancedFields,
+                    ),
+                  if (_showAdvancedFields) ..._getFields((f) => f.isAdvanced),
+                ],
+              ),
             ),
           ],
         ),

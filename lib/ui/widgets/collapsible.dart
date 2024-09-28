@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:statera/ui/widgets/collapsible_header.dart';
 
 class Collapsible extends StatefulWidget {
   final String title;
@@ -24,31 +25,15 @@ class _CollapsibleState extends State<Collapsible> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
+        CollapsibleHeader(
+          title: widget.title,
+          titleTextStyle: widget.titleTextStyle,
           onTap: () {
             setState(() {
               isCollapsed = !isCollapsed;
             });
           },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                children: [
-                  Text(
-                    widget.title,
-                    style: widget.titleTextStyle,
-                  ),
-                  Icon(
-                    isCollapsed
-                        ? Icons.keyboard_arrow_down
-                        : Icons.keyboard_arrow_up,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          isCollapsed: isCollapsed,
         ),
         if (!isCollapsed) Flexible(child: widget.child)
       ],
