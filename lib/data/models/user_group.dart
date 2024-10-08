@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:statera/data/enums/enums.dart';
+import 'package:statera/data/utils/mapping_utils.dart';
 import 'package:statera/utils/helpers.dart';
 
 class UserGroup {
@@ -73,7 +74,7 @@ class UserGroup {
       memberCount: data['memberCount'] ?? 0,
       archived: data['archived'] ?? false,
       pinned: data['pinned'] ?? false,
-      balance: data['balance'],
+      balance: mapBalance(data['balance']),
     );
   }
 

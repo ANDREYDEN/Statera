@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/utils/mapping_utils.dart';
 import 'package:statera/data/value_objects/redirect.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -276,19 +277,7 @@ class Group {
       members: members,
       adminId: map['adminId'],
       code: map['code'],
-      balance: map['balance'] == null
-          ? null
-          : Map<String, Map<String, double>>.from(
-              map['balance'].map(
-                (uid, balance) => MapEntry(
-                  uid,
-                  Map<String, double>.from(
-                    (balance as Map<String, dynamic>).map((otherUid, value) =>
-                        MapEntry(otherUid, double.tryParse(value.toString()))),
-                  ),
-                ),
-              ),
-            ),
+      balance: mapBalance(map['balance']),
       currencySign: map['currencySign'],
       inviteLink: map['inviteLink'],
       debtThreshold: double.tryParse(map['debtThreshold'].toString()),
