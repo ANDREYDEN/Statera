@@ -10,7 +10,7 @@ void main() {
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   testWidgets('e2e test', (WidgetTester tester) async {
-    tester.binding.setSurfaceSize(Size(600, 1300));
+    await tester.binding.setSurfaceSize(Size(600, 1300));
     final isWide = false;
 
     await app.main();
@@ -23,14 +23,14 @@ void main() {
     expect(find.text('Statera'), findsOneWidget);
     await trySignIn(tester);
 
-    expect(find.text('Home'), findsOneWidget);
-
-    await tester.tap(find.text('Home'));
+    final groupListItem = find.text('Home');
+    expect(groupListItem, findsOneWidget);
+    await tester.tap(groupListItem);
     await tester.pumpAndSettle(Duration(seconds: 1));
 
-    expect(find.text('Isabel'), findsOneWidget);
-
-    await tester.tap(find.text('Isabel'));
+    final groupMemberListItem = find.text('Isabel');
+    expect(groupMemberListItem, findsOneWidget);
+    await tester.tap(groupMemberListItem);
     await tester.pumpAndSettle(Duration(seconds: 1));
 
     if (!isWide) {
@@ -41,9 +41,9 @@ void main() {
     await tester.tap(find.byIcon(Icons.receipt_long_outlined));
     await tester.pumpAndSettle();
 
-    expect(find.text('Groceries'), findsOneWidget);
-
-    await tester.tap(find.text('Groceries'));
+    final expenceListItem = find.text('Groceries');
+    expect(expenceListItem, findsOneWidget);
+    await tester.tap(expenceListItem);
     await tester.pumpAndSettle(Duration(seconds: 1));
   });
 }
