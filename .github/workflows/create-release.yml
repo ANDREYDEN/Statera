@@ -5,6 +5,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  FLUTTER_VERSION: 3.22.1
 
 jobs:
   web-build-artifact:
