@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/utils/utils.dart';
 
 class MemberDebtIndicator extends StatelessWidget {
   final UserGroup userGroup;
@@ -32,12 +33,13 @@ class MemberDebtIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     final isOutward = debtDirection == DebtDirection.outward;
+    final debt = userGroup.getDebt(debtDirection, uid);
 
     return Visibility(
-      visible: userGroup.hasDebt(debtDirection, uid),
+      visible: !approxEqual(debt, 0),
       child: Row(
         children: [
-          Text(userGroup.getDebt(debtDirection, uid).toStringAsFixed(2)),
+          Text(debt.toStringAsFixed(2)),
           Icon(
             isOutward
                 ? Icons.arrow_upward_rounded

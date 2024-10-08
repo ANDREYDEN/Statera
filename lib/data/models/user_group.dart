@@ -48,10 +48,6 @@ class UserGroup {
         .abs();
   }
 
-  bool hasDebt(DebtDirection debtDirection, String uid) {
-    return !approxEqual(getDebt(debtDirection, uid), 0);
-  }
-
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,

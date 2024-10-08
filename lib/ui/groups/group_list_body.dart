@@ -103,7 +103,7 @@ class _GroupListBodyState extends State<GroupListBody> {
                       : GridView.count(
                           shrinkWrap: true,
                           crossAxisCount: columnCount,
-                          childAspectRatio: columnWidth / 100,
+                          childAspectRatio: columnWidth / 110,
                           children: [
                             ...targetGroups
                                 .map((group) => GroupListItem(userGroup: group))
