@@ -70,3 +70,5 @@ receipts
 # testing
 screenshots/
 failed_screenshots/
+
+chromedriver/
