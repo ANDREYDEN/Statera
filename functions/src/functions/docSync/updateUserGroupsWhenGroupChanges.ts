@@ -31,6 +31,7 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
       groupId,
       name: newGroupData!.name,
       memberCount: newGroupData!.members.length,
+      balance: newGroupData?.balance,
     }
 
     await userGroupRef.set(newUserGroup)
@@ -47,6 +48,7 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
       groupId,
       name: newGroupData!.name,
       memberCount: newGroupData!.members.length,
+      balance: newGroupData?.balance,
     }
 
     await userGroupRef.update(newUserGroup)

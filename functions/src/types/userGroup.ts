@@ -3,4 +3,5 @@ export type UserGroup = {
     name: string
     memberCount: number
     unmarkedExpenses?: number
+    balance?: {[from: string]: {[to: string]: number }}
 }

@@ -26,7 +26,7 @@ describe('updateUserGroupsWhenGroupChanges', () => {
     await admin.firestore().collection('users').doc(user.uid!).set(user)
     const newGroup:Group = {
       name: 'Foo',
-      balance: {},
+      balance: { [user.uid!]: { 'user2': 145 } },
       members: [user],
       debtThreshold: 50,
     }
@@ -42,6 +42,7 @@ describe('updateUserGroupsWhenGroupChanges', () => {
       groupId,
       name: newGroup.name,
       memberCount: 1,
+      balance: newGroup.balance,
     })
   })
 
@@ -54,7 +55,7 @@ describe('updateUserGroupsWhenGroupChanges', () => {
     await admin.firestore().collection('users').doc(user.uid!).set(user)
     const existingGroup:Group = {
       name: 'Foo',
-      balance: {},
+      balance: { [user.uid!]: { 'user2': 145 } },
       members: [],
       debtThreshold: 50,
     }
@@ -73,6 +74,51 @@ describe('updateUserGroupsWhenGroupChanges', () => {
       groupId,
       name: existingGroup.name,
       memberCount: 1,
+      balance: existingGroup.balance,
+    })
+  })
+
+  it('updates user group when the group is updated', async () => {
+    const groupId = 'foo'
+    const user: UserData = {
+      uid: 'user1',
+      name: 'Bob',
+    }
+    await admin.firestore().collection('users').doc(user.uid!).set(user)
+
+    const existingGroup: Group = {
+      name: 'Foo',
+      members: [user],
+      debtThreshold: 50,
+      balance: {},
+    }
+
+    const existingUserGroup: UserGroup = {
+      groupId,
+      name: existingGroup.name,
+      memberCount: 1,
+      balance: {},
+    }
+    const userGroupPath = `users/${user.uid}/groups/${groupId}`
+    await admin.firestore().doc(userGroupPath).set(existingUserGroup)
+
+    const newBalance: Group['balance'] = { [user.uid!]: { 'user2': 145 } }
+    const before = firestore.makeDocumentSnapshot(existingGroup, `groups/${groupId}`)
+    const after = firestore.makeDocumentSnapshot(
+      { ...existingGroup, balance: newBalance },
+      `groups/${groupId}`
+    )
+    const change = { before, after } as unknown as Change<DocumentSnapshot>
+
+    await updateUserGroupsWhenGroupChanges(change)
+
+    const userGroupDocRef = await admin.firestore().doc(`users/${user.uid}/groups/${groupId}`).get()
+    const userGroup = userGroupDocRef.data() as UserGroup
+    expect(userGroup).toEqual({
+      groupId,
+      name: existingGroup.name,
+      memberCount: 1,
+      balance: newBalance,
     })
   })
 
