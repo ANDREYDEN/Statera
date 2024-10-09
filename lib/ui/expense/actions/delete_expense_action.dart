@@ -26,6 +26,9 @@ class DeleteExpenseAction extends ExpenseAction {
       ),
     );
 
+    final expenseBloc = context.read<ExpenseBloc>();
+    expenseBloc.unload();
+
     final expensesCubit = context.read<ExpensesCubit>();
     if (confirmed == true) await expensesCubit.deleteExpense(expense.id);
   }

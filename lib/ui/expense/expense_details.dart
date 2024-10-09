@@ -13,7 +13,6 @@ import 'package:statera/ui/expense/header/expense_price.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
-import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/utils/utils.dart';
@@ -33,7 +32,6 @@ class ExpenseDetails extends StatelessWidget {
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
-      loadingWidget: ListEmpty(text: 'Pick an expense first'),
       onError: (context, expenseErrorState) {
         showErrorSnackBar(context, 'Error occured: ${expenseErrorState.error}');
       },

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 
 class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
   final Widget Function(BuildContext, ExpenseError)? errorBuilder;
   final void Function(BuildContext, ExpenseError)? onError;
-  final Widget? loadingWidget;
 
   const ExpenseBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
-    this.loadingWidget, this.onError,
+    this.onError,
   }) : super(key: key);
 
   @override
@@ -29,8 +29,12 @@ class ExpenseBuilder extends StatelessWidget {
         return current is ExpenseError;
       },
       builder: (expenseContext, state) {
+        if (state is ExpenseNotSelected) {
+          return ListEmpty(text: 'Pick an expense first');
+        }
+
         if (state is ExpenseLoading) {
-          return loadingWidget ?? Center(child: Loader());
+          return Center(child: Loader());
         }
 
         if (state is ExpenseError) {

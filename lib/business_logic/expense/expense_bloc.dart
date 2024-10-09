@@ -14,7 +14,9 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpenseService _expenseService;
   Timer? updateTimer;
 
-  ExpenseBloc(this._expenseService) : super(ExpenseLoading()) {
+  ExpenseBloc(this._expenseService) : super(ExpenseNotSelected()) {
+    on<_LoadRequested>((_, emit) => emit(ExpenseLoading()));
+    on<_UnloadRequested>((_, emit) => emit(ExpenseNotSelected()));
     on<UpdateRequested>(_handleUpdate);
     on<_FinishedUpdating>(
       (event, emit) => emit(ExpenseLoaded(expense: event.expense)),
@@ -28,10 +30,16 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   StreamSubscription? _expenseSubscription;
 
   void load(String? expenseId) {
+    add(_LoadRequested());
     _expenseSubscription?.cancel();
     _expenseSubscription = _expenseService
         .expenseStream(expenseId)
         .listen((expense) => add(_ExpenseUpdatedFromDB(expense)));
+  }
+
+  void unload() {
+    add(_UnloadRequested());
+    _expenseSubscription?.cancel();
   }
 
   Future<void> _handleUpdate(

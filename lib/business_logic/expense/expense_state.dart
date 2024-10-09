@@ -4,6 +4,10 @@ abstract class ExpenseState {
   ExpenseState();
 }
 
+class ExpenseNotSelected extends ExpenseState {
+  ExpenseNotSelected() : super();
+}
+
 class ExpenseLoading extends ExpenseState {
   ExpenseLoading() : super();
 }

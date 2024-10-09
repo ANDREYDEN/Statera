@@ -7,7 +7,9 @@ abstract class ExpenseEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadRequested extends ExpenseEvent {}
+class _LoadRequested extends ExpenseEvent {}
+
+class _UnloadRequested extends ExpenseEvent {}
 
 class UpdateRequested extends ExpenseEvent {
   final String issuerUid;

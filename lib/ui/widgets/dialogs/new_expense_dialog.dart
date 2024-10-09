@@ -57,16 +57,16 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   }
 
   Future<void> _handleSubmit() async {
-    if (_nameIsValid && _pickedValidAssignees) {
-      _newExpense.name = _nameController.text;
-      _newExpense.updateAssignees(_memberController.value);
-      final newExpenseId = await expensesCubit.addExpense(
-        _newExpense,
-        groupCubit.loadedState.group.id,
-      );
-      widget.afterAddition(newExpenseId);
-      Navigator.of(context).pop();
-    }
+    if (!_nameIsValid || !_pickedValidAssignees) return;
+
+    _newExpense.name = _nameController.text;
+    _newExpense.updateAssignees(_memberController.value);
+    final newExpenseId = await expensesCubit.addExpense(
+      _newExpense,
+      groupCubit.loadedState.group.id,
+    );
+    Navigator.of(context).pop();
+    widget.afterAddition(newExpenseId);
   }
 
   @override

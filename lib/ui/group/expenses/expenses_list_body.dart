@@ -60,8 +60,10 @@ class ExpensesListBody extends StatelessWidget {
               isDismissible: !isWide && expense.canBeUpdatedBy(authBloc.uid),
               confirmation:
                   'Are you sure you want to delete this expense and all of its items?',
-              onDismissed: (_) =>
-                  context.read<ExpensesCubit>().deleteExpense(expense.id),
+              onDismissed: (_) {
+                expenses.remove(expense);
+                context.read<ExpensesCubit>().deleteExpense(expense.id);
+              },
               child: ExpenseListItem(
                 expense: expense,
                 processing: expensesState is ExpensesProcessing,
