@@ -1,0 +1,17 @@
+{
+    "folders": [
+        {
+            "name": "Main",
+            "path": "../",
+        },
+        {
+            "name": "Functions",
+            "path": "../functions"
+        },
+    ],
+    "settings": {
+        "files.exclude": {
+            "functions": true,
+        }
+    }
+}

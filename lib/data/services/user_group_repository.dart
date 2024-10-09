@@ -1,6 +1,8 @@
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/user_group.dart';
 import 'package:statera/data/services/services.dart';
 
+@GenerateNiceMocks([MockSpec<UserGroupRepository>()])
 class UserGroupRepository extends Firestore {
   UserGroupRepository(super.firestoreInstance);
 
