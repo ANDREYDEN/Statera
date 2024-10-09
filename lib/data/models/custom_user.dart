@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 
 class CustomUser {
   late String uid;
@@ -21,7 +22,7 @@ class CustomUser {
   }
 
   CustomUser.fake({String? name, String? uid, String? photoURL}) {
-    this.uid = uid ?? 'foo';
+    this.uid = uid ?? Uuid().v1();
     this.name = name ?? 'bar';
     this.photoURL = photoURL;
   }

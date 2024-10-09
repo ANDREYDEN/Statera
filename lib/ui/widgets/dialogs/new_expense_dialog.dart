@@ -41,16 +41,16 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
   late final Expense _newExpense;
   bool _dirty = false;
 
-  ExpensesCubit get expensesCubit => context.read<ExpensesCubit>();
-  GroupCubit get groupCubit => context.read<GroupCubit>();
+  ExpensesCubit get _expensesCubit => context.read<ExpensesCubit>();
+  GroupCubit get _groupCubit => context.read<GroupCubit>();
+  String get _currentUid => context.read<AuthBloc>().uid;
 
   bool get _nameIsValid => _nameController.text != '';
   bool get _pickedValidAssignees => _memberController.value.isNotEmpty;
 
   @override
   void initState() {
-    final authBloc = context.read<AuthBloc>();
-    _newExpense = Expense(name: '', authorUid: authBloc.uid);
+    _newExpense = Expense(name: '', authorUid: _currentUid);
     super.initState();
   }
 
@@ -59,9 +59,9 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
 
     _newExpense.name = _nameController.text;
     _newExpense.updateAssignees(_memberController.value);
-    final newExpenseId = await expensesCubit.addExpense(
+    final newExpenseId = await _expensesCubit.addExpense(
       _newExpense,
-      groupCubit.loadedState.group.id,
+      _groupCubit.loadedState.group.id,
     );
     Navigator.of(context).pop();
     widget.afterAddition?.call(newExpenseId);
@@ -103,8 +103,20 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
                 ],
               ),
             ),
-            Text(
-              'You have selected only 1 other member other than yourself. Consider making a payment instead.',
+            ListenableBuilder(
+              listenable: _memberController,
+              builder: (context, _) {
+                final numberOfOtherAssignees = _memberController.value
+                    .where((uid) => uid != _currentUid)
+                    .length;
+                final _pickedOnlyOneOtherAssignee = numberOfOtherAssignees == 1;
+                return Visibility(
+                  visible: _pickedOnlyOneOtherAssignee,
+                  child: Text(
+                    'You have selected only 1 other member other than yourself. Consider making a payment instead.',
+                  ),
+                );
+              },
             ),
           ],
         ),
