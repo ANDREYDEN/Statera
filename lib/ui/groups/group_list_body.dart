@@ -54,6 +54,8 @@ class _GroupListBodyState extends State<GroupListBody> {
 
           final columnCount = isWide ? 3 : 1;
           final columnWidth = MediaQuery.of(context).size.width / columnCount;
+          final rowHeight = 110;
+          final itemAspectRatio = clampDouble(columnWidth / rowHeight, 2, 6);
 
           final archivedGroups = groups.where((group) => group.archived);
           final activeGroups = groups.where((group) => !group.archived);
@@ -103,7 +105,7 @@ class _GroupListBodyState extends State<GroupListBody> {
                       : GridView.count(
                           shrinkWrap: true,
                           crossAxisCount: columnCount,
-                          childAspectRatio: columnWidth / 110,
+                          childAspectRatio: itemAspectRatio,
                           children: [
                             ...targetGroups
                                 .map((group) => GroupListItem(userGroup: group))
