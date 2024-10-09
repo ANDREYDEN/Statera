@@ -67,7 +67,7 @@ class _GroupPageState extends State<GroupPage> {
                 context,
                 afterAddition: (expenseId) {
                   Navigator.of(context)
-                      .popAndPushNamed('${ExpensePage.route}/$expenseId');
+                      .pushNamed('${ExpensePage.route}/$expenseId');
                 },
               ),
       bottomNavBar: isWide
