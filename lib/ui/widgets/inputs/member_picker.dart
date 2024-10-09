@@ -27,7 +27,8 @@ class MemberPicker extends StatefulWidget {
     this.allSelected = false,
     this.memberUids,
   })  : this.value = value ?? [],
-        this.controller = controller ?? MemberController(value: value ?? []),
+        this.controller =
+            controller ?? MemberController(initialValue: value ?? []),
         super(key: key);
 
   @override
@@ -52,7 +53,7 @@ class _MemberPickerState extends State<MemberPicker> {
         });
 
         if (widget.allSelected && !isDirty) {
-          widget.controller.value = members.map((e) => e.uid).toList();
+          widget.controller.set(members.map((e) => e.uid));
         }
 
         return ListView(
@@ -77,19 +78,19 @@ class _MemberPickerState extends State<MemberPicker> {
                 onTap: () {
                   setState(() {
                     isDirty = true;
-
-                    if (widget.singleSelection) {
-                      if (!widget.controller.value.contains(member.uid)) {
-                        widget.controller.value = [member.uid];
-                      }
-                    } else {
-                      if (widget.controller.value.contains(member.uid)) {
-                        widget.controller.value.remove(member.uid);
-                      } else {
-                        widget.controller.value.add(member.uid);
-                      }
-                    }
                   });
+
+                  if (widget.singleSelection) {
+                    if (!widget.controller.value.contains(member.uid)) {
+                      widget.controller.set([member.uid]);
+                    }
+                  } else {
+                    if (widget.controller.value.contains(member.uid)) {
+                      widget.controller.removeMember(member.uid);
+                    } else {
+                      widget.controller.addMember(member.uid);
+                    }
+                  }
                   widget.onChange?.call(widget.controller.value);
                 },
               );
@@ -101,6 +102,25 @@ class _MemberPickerState extends State<MemberPicker> {
   }
 }
 
-class MemberController extends ValueNotifier<List<String>> {
-  MemberController({List<String>? value}) : super(value ?? []);
+class MemberController extends ChangeNotifier {
+  late List<String> _members;
+  List<String> get value => _members;
+
+  MemberController({List<String> initialValue = const []}) {
+    _members = initialValue;
+  }
+
+  void set(Iterable<String> uids) {
+    _members = [...uids];
+  }
+
+  void addMember(String uid) {
+    _members.add(uid);
+    notifyListeners();
+  }
+
+  void removeMember(String uid) {
+    _members.remove(uid);
+    notifyListeners();
+  }
 }
