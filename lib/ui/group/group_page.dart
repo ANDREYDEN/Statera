@@ -63,7 +63,7 @@ class _GroupPageState extends State<GroupPage> {
       fabText: 'New Expense',
       onFabPressed: isWide || _selectedNavBarItemIndex != 1
           ? null
-          : () => showNewExpenseDialog(
+          : () => NewExpenseDialog.show(
                 context,
                 afterAddition: (expenseId) {
                   Navigator.of(context)

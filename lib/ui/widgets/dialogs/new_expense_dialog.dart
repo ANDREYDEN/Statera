@@ -10,31 +10,29 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/utils/utils.dart';
 
-showNewExpenseDialog(
-  BuildContext context, {
-  required Function(String?) afterAddition,
-}) {
-  showDialog(
-    context: context,
-    builder: (_) => MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: context.read<GroupCubit>()),
-        BlocProvider.value(value: context.read<ExpensesCubit>())
-      ],
-      child: NewExpenseDialog(afterAddition: afterAddition),
-    ),
-  );
-}
-
 class NewExpenseDialog extends StatefulWidget {
-  final Function(String?) afterAddition;
-  const NewExpenseDialog({
-    Key? key,
-    required this.afterAddition,
-  }) : super(key: key);
+  final Function(String?)? afterAddition;
+
+  const NewExpenseDialog({Key? key, this.afterAddition}) : super(key: key);
 
   @override
   State<NewExpenseDialog> createState() => _NewExpenseDialogState();
+
+  static show(
+    BuildContext context, {
+    required Function(String?) afterAddition,
+  }) {
+    showDialog(
+      context: context,
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: context.read<GroupCubit>()),
+          BlocProvider.value(value: context.read<ExpensesCubit>())
+        ],
+        child: NewExpenseDialog(afterAddition: afterAddition),
+      ),
+    );
+  }
 }
 
 class _NewExpenseDialogState extends State<NewExpenseDialog> {
@@ -66,7 +64,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
       groupCubit.loadedState.group.id,
     );
     Navigator.of(context).pop();
-    widget.afterAddition(newExpenseId);
+    widget.afterAddition?.call(newExpenseId);
   }
 
   @override
@@ -74,30 +72,39 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
     return AlertDialog(
       title: Text('New Expense'),
       content: DialogWidth(
-        child: ListView(
-          shrinkWrap: true,
+        child: Column(
           children: [
-            TextField(
-              autofocus: true,
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                errorText: _dirty && _nameController.text == ''
-                    ? kRequiredValidationMessage
-                    : null,
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  TextField(
+                    autofocus: true,
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      errorText: _dirty && _nameController.text == ''
+                          ? kRequiredValidationMessage
+                          : null,
+                    ),
+                    onChanged: (text) {
+                      setState(() {
+                        this._dirty = true;
+                      });
+                    },
+                    onSubmitted: (_) => _handleSubmit(),
+                  ),
+                  SizedBox(height: 20),
+                  Text('Pick Assignees'),
+                  MemberPicker(
+                    controller: _memberController,
+                    allSelected: true,
+                  ),
+                ],
               ),
-              onChanged: (text) {
-                setState(() {
-                  this._dirty = true;
-                });
-              },
-              onSubmitted: (_) => _handleSubmit(),
             ),
-            SizedBox(height: 20),
-            Text('Pick Assignees'),
-            MemberPicker(
-              controller: _memberController,
-              allSelected: true,
+            Text(
+              'You have selected only 1 other member other than yourself. Consider making a payment instead.',
             ),
           ],
         ),
