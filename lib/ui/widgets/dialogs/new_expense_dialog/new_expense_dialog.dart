@@ -7,6 +7,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
+import 'package:statera/ui/widgets/dialogs/new_expense_dialog/payment_warning.dart';
 import 'package:statera/ui/widgets/inputs/member_picker.dart';
 import 'package:statera/utils/utils.dart';
 
@@ -73,51 +74,36 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
       title: Text('New Expense'),
       content: DialogWidth(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  TextField(
-                    autofocus: true,
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Name',
-                      errorText: _dirty && _nameController.text == ''
-                          ? kRequiredValidationMessage
-                          : null,
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        this._dirty = true;
-                      });
-                    },
-                    onSubmitted: (_) => _handleSubmit(),
-                  ),
-                  SizedBox(height: 20),
-                  Text('Pick Assignees'),
-                  MemberPicker(
-                    controller: _memberController,
-                    allSelected: true,
-                  ),
-                ],
+            TextField(
+              autofocus: true,
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                errorText: _dirty && _nameController.text == ''
+                    ? kRequiredValidationMessage
+                    : null,
+              ),
+              onChanged: (text) {
+                setState(() {
+                  this._dirty = true;
+                });
+              },
+              onSubmitted: (_) => _handleSubmit(),
+            ),
+            SizedBox(height: 20),
+            Text('Pick Assignees'),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 300),
+              child: MemberPicker(
+                controller: _memberController,
+                allSelected: true,
               ),
             ),
-            ListenableBuilder(
-              listenable: _memberController,
-              builder: (context, _) {
-                final numberOfOtherAssignees = _memberController.value
-                    .where((uid) => uid != _currentUid)
-                    .length;
-                final _pickedOnlyOneOtherAssignee = numberOfOtherAssignees == 1;
-                return Visibility(
-                  visible: _pickedOnlyOneOtherAssignee,
-                  child: Text(
-                    'You have selected only 1 other member other than yourself. Consider making a payment instead.',
-                  ),
-                );
-              },
-            ),
+            SizedBox(height: 5),
+            PaymentWarning(memberController: _memberController),
           ],
         ),
       ),

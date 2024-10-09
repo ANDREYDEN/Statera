@@ -14,7 +14,7 @@ import 'package:statera/ui/group/nav_bar/group_bottom_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/group_side_nav_bar.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
-import 'package:statera/ui/widgets/dialogs/new_expense_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/new_expense_dialog/new_expense_dialog.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
