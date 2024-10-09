@@ -7,6 +7,8 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/repository_registrant.dart';
 
+import '../test/widget_tester_extensions.dart';
+
 Future<void> pumpPage(
   Widget page,
   WidgetTester tester, {
@@ -37,11 +39,7 @@ Future<void> trySignIn(WidgetTester tester) async {
   if (emailField.evaluate().isEmpty) return;
 
   await tester.enterText(emailField, 'john@example.com');
-  var passwordField = find.ancestor(
-    of: find.text('Password'),
-    matching: find.byType(TextField),
-  );
-  await tester.enterText(passwordField, 'Qweqwe1!');
+  await tester.enterTextByLabel('Password', 'Qweqwe1!');
   await tester.tap(find.text('Sign In'));
   await tester.pumpAndSettle();
 }

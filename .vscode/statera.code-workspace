@@ -12,6 +12,11 @@
     "settings": {
         "files.exclude": {
             "functions": true,
+        },
+        "jest.outputConfig": {
+            "revealOn": "run",
+            "revealWithFocus": "test-results",
+            "clearOnRun": "none"
         }
     }
 }
