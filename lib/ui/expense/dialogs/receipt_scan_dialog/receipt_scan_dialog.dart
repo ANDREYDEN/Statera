@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:statera/data/models/expense.dart';
@@ -32,7 +33,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   final ImagePicker _picker = ImagePicker();
   Store _selectedStore = Store.Other;
   bool _withNameImprovement = false;
-  String? _status;
+  int _currentStep = 1;
 
   FirebaseStorageRepository get _firebaseStorageRepository =>
       context.read<FirebaseStorageRepository>();
@@ -45,89 +46,93 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       title: 'Scan a receipt',
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: _status != null
-            ? Text(_status!)
-            : Column(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            StepIndicator(
+              steps: [
+                StepData(title: 'Choose a receipt'),
+                StepData(title: 'Uploading the receipt...'),
+                StepData(title: 'Analyzing the receipt...'),
+              ],
+              currentStep: _currentStep,
+            ),
+            DropdownButtonFormField<Store>(
+              value: _selectedStore,
+              onChanged: (store) {
+                setState(() {
+                  _selectedStore = store ?? _selectedStore;
+                });
+              },
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Store',
+              ),
+              items: Store.values
+                  .map((store) => DropdownMenuItem(
+                        child: Text(store.toString().split('.')[1]),
+                        value: store,
+                      ))
+                  .toList(),
+            ),
+            if (_selectedStore == Store.Walmart)
+              Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  StepIndicator(steps: 3, currentStep: 2),
-                  DropdownButtonFormField<Store>(
-                    value: _selectedStore,
-                    onChanged: (store) {
+                  SwitchListTile(
+                    value: _withNameImprovement,
+                    onChanged: (isOn) {
                       setState(() {
-                        _selectedStore = store ?? _selectedStore;
+                        _withNameImprovement = !_withNameImprovement;
                       });
                     },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Store',
-                    ),
-                    items: Store.values
-                        .map((store) => DropdownMenuItem(
-                              child: Text(store.toString().split('.')[1]),
-                              value: store,
-                            ))
-                        .toList(),
+                    title: Text('Improve product names'),
                   ),
-                  if (_selectedStore == Store.Walmart)
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SwitchListTile(
-                          value: _withNameImprovement,
-                          onChanged: (isOn) {
-                            setState(() {
-                              _withNameImprovement = !_withNameImprovement;
-                            });
-                          },
-                          title: Text('Improve product names'),
-                        ),
-                        if (_withNameImprovement)
-                          Text(
-                            'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                      ],
+                  if (_withNameImprovement)
+                    Text(
+                      'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
+                      style: TextStyle(fontSize: 12),
                     ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      CancelButton(),
-                      SizedBox(width: 5),
-                      FilledButton.tonal(
-                        onPressed: () => handleScan(ImageSource.camera),
-                        child: Icon(Icons.photo_camera),
-                      ),
-                      SizedBox(width: 5),
-                      FilledButton.tonal(
-                        onPressed: () => handleScan(ImageSource.gallery),
-                        child: Icon(Icons.collections),
-                      ),
-                    ],
-                  ),
                 ],
               ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                CancelButton(),
+                SizedBox(width: 5),
+                FilledButton.tonal(
+                  onPressed: () => handleScan(ImageSource.camera),
+                  child: Icon(Icons.photo_camera),
+                ),
+                SizedBox(width: 5),
+                FilledButton.tonal(
+                  onPressed: () => handleScan(ImageSource.gallery),
+                  child: Icon(Icons.collections),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void setStatus(String? status) {
+  void _incrementStep() {
     setState(() {
-      _status = status;
+      _currentStep++;
     });
   }
 
   void handleScan(ImageSource source) async {
-    setStatus('Picking image...');
-
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null)
       throw new Exception('Something went wrong while taking a photo');
 
     try {
-      setStatus('Uploading...');
+      _incrementStep();
 
+      await Future.delayed(1.seconds);
       String url = await _firebaseStorageRepository.uploadPickedFile(
         pickedFile,
         path: 'receipts/',
@@ -135,7 +140,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
       log('Uploaded receipt: $url');
 
-      setStatus('Analyzing receipt (this might take up to a minute)...');
+      _incrementStep();
 
       var scanSuccessful = await snackbarCatch(
         context,
@@ -154,6 +159,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
       if (scanSuccessful) {
         await _expenseService.updateExpense(widget.expense);
+        Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       ScaffoldMessenger.of(context)
@@ -163,9 +169,6 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         null,
         reason: 'Receipt upload failed',
       );
-    } finally {
-      setStatus(null);
-      Navigator.of(context).pop();
     }
   }
 }

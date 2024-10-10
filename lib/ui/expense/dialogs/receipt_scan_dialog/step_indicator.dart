@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class StepIndicator extends StatelessWidget {
-  final int steps;
+  final List<StepData> steps;
   final int currentStep;
 
   const StepIndicator({
@@ -14,21 +14,36 @@ class StepIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(0 < currentStep);
-    assert(currentStep < steps);
+    assert(currentStep <= steps.length);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ...List.filled(
-              currentStep - 1, StepBar(status: StepStatus.Completed)),
-          StepBar(status: StepStatus.InProgress),
-          ...List.filled(
-              steps - currentStep, StepBar(status: StepStatus.NotStarted)),
+          Row(
+            children: [
+              ...List.filled(
+                  currentStep - 1, StepBar(status: StepStatus.Completed)),
+              StepBar(status: StepStatus.InProgress),
+              ...List.filled(steps.length - currentStep,
+                  StepBar(status: StepStatus.NotStarted)),
+            ],
+          ),
+          Text(
+            steps[currentStep - 1].title,
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
   }
+}
+
+class StepData {
+  final String title;
+
+  StepData({required this.title});
 }
 
 class StepBar extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:statera/data/dtos/version.dart';
 import 'package:statera/data/models/models.dart';
 
@@ -17,6 +18,8 @@ class Callables {
     required String selectedStore,
     required bool withNameImprovement,
   }) async {
+    await Future.delayed(1.seconds);
+    return [];
     var response = await _getReceiptData({
       'receiptUrl': receiptUrl,
       'storeName': selectedStore,
