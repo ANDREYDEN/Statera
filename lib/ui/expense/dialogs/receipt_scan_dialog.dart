@@ -10,9 +10,10 @@ import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firebase_storage_repository.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
+import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/helpers.dart';
 
-enum Store { Walmart, LCBO, Other }
+enum Store { Other, Walmart, LCBO }
 
 class ReceiptScanDialog extends StatefulWidget {
   final Expense expense;
@@ -28,7 +29,7 @@ class ReceiptScanDialog extends StatefulWidget {
 
 class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   final ImagePicker _picker = ImagePicker();
-  Store _selectedStore = Store.Walmart;
+  Store _selectedStore = Store.Other;
   bool _withNameImprovement = false;
   String? _status;
 
@@ -39,64 +40,72 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Scan a receipt'),
-      content: _status != null
-          ? Text(_status!)
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButtonFormField<Store>(
-                  value: _selectedStore,
-                  onChanged: (store) {
-                    setState(() {
-                      _selectedStore = store ?? _selectedStore;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Store',
+    return PageScaffold(
+      title: 'Scan a receipt',
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: _status != null
+            ? Text(_status!)
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<Store>(
+                    value: _selectedStore,
+                    onChanged: (store) {
+                      setState(() {
+                        _selectedStore = store ?? _selectedStore;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Store',
+                    ),
+                    items: Store.values
+                        .map((store) => DropdownMenuItem(
+                              child: Text(store.toString().split('.')[1]),
+                              value: store,
+                            ))
+                        .toList(),
                   ),
-                  items: Store.values
-                      .map((store) => DropdownMenuItem(
-                            child: Text(store.toString().split('.')[1]),
-                            value: store,
-                          ))
-                      .toList(),
-                ),
-                if (_selectedStore == Store.Walmart)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SwitchListTile(
-                        value: _withNameImprovement,
-                        onChanged: (isOn) {
-                          setState(() {
-                            _withNameImprovement = !_withNameImprovement;
-                          });
-                        },
-                        title: Text('Improve product names'),
-                      ),
-                      if (_withNameImprovement)
-                        Text(
-                          'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
-                          style: TextStyle(fontSize: 12),
+                  if (_selectedStore == Store.Walmart)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SwitchListTile(
+                          value: _withNameImprovement,
+                          onChanged: (isOn) {
+                            setState(() {
+                              _withNameImprovement = !_withNameImprovement;
+                            });
+                          },
+                          title: Text('Improve product names'),
                         ),
+                        if (_withNameImprovement)
+                          Text(
+                            'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                      ],
+                    ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      CancelButton(),
+                      SizedBox(width: 5),
+                      FilledButton.tonal(
+                        onPressed: () => handleScan(ImageSource.camera),
+                        child: Icon(Icons.photo_camera),
+                      ),
+                      SizedBox(width: 5),
+                      FilledButton.tonal(
+                        onPressed: () => handleScan(ImageSource.gallery),
+                        child: Icon(Icons.collections),
+                      ),
                     ],
                   ),
-              ],
-            ),
-      actions: [
-        CancelButton(),
-        FilledButton.tonal(
-          onPressed: () => handleScan(ImageSource.camera),
-          child: Icon(Icons.photo_camera),
-        ),
-        FilledButton.tonal(
-          onPressed: () => handleScan(ImageSource.gallery),
-          child: Icon(Icons.collections),
-        ),
-      ],
+                ],
+              ),
+      ),
     );
   }
 
@@ -146,7 +155,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     } on Exception catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error while uploading: $e')));
-      FirebaseCrashlytics.instance.recordError(
+      await FirebaseCrashlytics.instance.recordError(
         e,
         null,
         reason: 'Receipt upload failed',
