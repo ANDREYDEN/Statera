@@ -37,6 +37,9 @@ class ExpenseDetails extends StatelessWidget {
       },
       builder: (context, expense) {
         final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
+        final showReceiptScannerButton = expense.hasNoItems &&
+            expenseCanBeUpdated &&
+            (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -47,13 +50,13 @@ class ExpenseDetails extends StatelessWidget {
                 child: ExpenseActionsButton(expense: expense),
               ),
             Header(),
-            if (expense.hasNoItems &&
-                expenseCanBeUpdated &&
-                defaultTargetPlatform != TargetPlatform.macOS)
+            if (showReceiptScannerButton)
               ElevatedButton.icon(
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (_) => ReceiptScanDialog(expense: expense),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    fullscreenDialog: true,
+                    builder: (_) => ReceiptScanDialog(expense: expense),
+                  ),
                 ),
                 label: Text('Upload receipt'),
                 icon: Icon(Icons.photo_camera),
