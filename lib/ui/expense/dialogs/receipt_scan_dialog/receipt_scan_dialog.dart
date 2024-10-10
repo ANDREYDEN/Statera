@@ -9,6 +9,7 @@ import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
 import 'package:statera/data/services/firebase_storage_repository.dart';
+import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/helpers.dart';
@@ -48,7 +49,9 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
             ? Text(_status!)
             : Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  StepIndicator(steps: 3, currentStep: 2),
                   DropdownButtonFormField<Store>(
                     value: _selectedStore,
                     onChanged: (store) {
