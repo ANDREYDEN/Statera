@@ -31,8 +31,8 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
   late ImagePicker _picker;
 
   AuthBloc get _authBloc => context.read<AuthBloc>();
-  FirebaseStorageRepository get _firebaseStorageRepository =>
-      context.read<FirebaseStorageRepository>();
+  FileStorageService get _firebaseStorageRepository =>
+      context.read<FileStorageService>();
   UserCubit get _userCubit => context.read<UserCubit>();
 
   @override

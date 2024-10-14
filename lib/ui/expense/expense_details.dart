@@ -52,12 +52,8 @@ class ExpenseDetails extends StatelessWidget {
             Header(),
             if (showReceiptScannerButton)
               ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    fullscreenDialog: true,
-                    builder: (_) => ReceiptScanDialog(expense: expense),
-                  ),
-                ),
+                onPressed: () =>
+                    ReceiptScanDialog(expense: expense).show(context),
                 label: Text('Upload receipt'),
                 icon: Icon(Icons.photo_camera),
               ),

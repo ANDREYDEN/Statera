@@ -9,7 +9,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/callables.dart';
 import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/firebase_storage_repository.dart';
+import 'package:statera/data/services/file_storage_service.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -27,6 +27,15 @@ class ReceiptScanDialog extends StatefulWidget {
 
   @override
   State<ReceiptScanDialog> createState() => _ReceiptScanDialogState();
+
+  Future<void> show(BuildContext context) {
+    return Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => this,
+      ),
+    );
+  }
 }
 
 class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
@@ -35,8 +44,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   bool _withNameImprovement = false;
   int _currentStep = 1;
 
-  FirebaseStorageRepository get _firebaseStorageRepository =>
-      context.read<FirebaseStorageRepository>();
+  FileStorageService get _fileStorageService =>
+      context.read<FileStorageService>();
 
   ExpenseService get _expenseService => context.read<ExpenseService>();
 
@@ -133,7 +142,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       _incrementStep();
 
       await Future.delayed(1.seconds);
-      String url = await _firebaseStorageRepository.uploadPickedFile(
+      String url = await _fileStorageService.uploadPickedFile(
         pickedFile,
         path: 'receipts/',
       );
