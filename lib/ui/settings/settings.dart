@@ -1,7 +1,6 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
@@ -28,27 +27,25 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> with WidgetsBindingObserver {
-  late ImagePicker _picker;
-
   AuthBloc get _authBloc => context.read<AuthBloc>();
-  FileStorageService get _firebaseStorageRepository =>
+  FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
+  FilePickerService get _filePickerService => context.read<FilePickerService>();
   UserCubit get _userCubit => context.read<UserCubit>();
 
   @override
   void initState() {
-    _picker = ImagePicker();
-
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   void _handlePickPhoto() async {
     try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await _filePickerService.pickImage(source: ImageFileSource.gallery);
       if (pickedFile == null) return;
 
-      String url = await _firebaseStorageRepository.uploadPickedFile(
+      String url = await _fileStorageService.uploadFile(
         pickedFile,
         path: 'profileUrls/',
       );

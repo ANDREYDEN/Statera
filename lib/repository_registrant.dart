@@ -24,6 +24,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => UserRepository(firestore)),
         RepositoryProvider(create: (_) => DynamicLinkService()),
         RepositoryProvider(create: (_) => FileStorageService()),
+        RepositoryProvider(create: (_) => FilePickerService()),
         RepositoryProvider(create: (_) => NotificationService()),
         RepositoryProvider(create: (_) => PreferencesService()),
         RepositoryProvider(create: (_) => groupService),

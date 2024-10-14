@@ -18,8 +18,6 @@ class Callables {
     required String selectedStore,
     required bool withNameImprovement,
   }) async {
-    await Future.delayed(1.seconds);
-    return [];
     var response = await _getReceiptData({
       'receiptUrl': receiptUrl,
       'storeName': selectedStore,

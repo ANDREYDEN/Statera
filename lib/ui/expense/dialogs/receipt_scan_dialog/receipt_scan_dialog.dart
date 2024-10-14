@@ -2,16 +2,11 @@ import 'dart:developer';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
-import 'package:statera/data/services/callables.dart';
-import 'package:statera/data/services/expense_service.dart';
-import 'package:statera/data/services/file_storage_service.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.dart';
-import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -39,13 +34,13 @@ class ReceiptScanDialog extends StatefulWidget {
 }
 
 class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
-  final ImagePicker _picker = ImagePicker();
   Store _selectedStore = Store.Other;
   bool _withNameImprovement = false;
   int _currentStep = 1;
 
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
+  FilePickerService get _filePickerService => context.read<FilePickerService>();
 
   ExpenseService get _expenseService => context.read<ExpenseService>();
 
@@ -108,19 +103,25 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
             SizedBox(height: 10),
             Row(
               children: [
-                CancelButton(),
-                SizedBox(width: 5),
-                FilledButton.tonal(
-                  onPressed: () => handleScan(ImageSource.camera),
-                  child: Icon(Icons.photo_camera),
+                Spacer(),
+                FilledButton.tonalIcon(
+                  icon: Icon(Icons.photo_camera),
+                  label: Text('Camera'),
+                  onPressed: () => handleScan(ImageFileSource.camera),
                 ),
-                SizedBox(width: 5),
-                FilledButton.tonal(
-                  onPressed: () => handleScan(ImageSource.gallery),
-                  child: Icon(Icons.collections),
+                SizedBox(width: 10),
+                Text('or'),
+                SizedBox(width: 10),
+                FilledButton.tonalIcon(
+                  icon: Icon(Icons.collections),
+                  label: Text('Gallery'),
+                  onPressed: () => handleScan(ImageFileSource.gallery),
                 ),
+                Spacer(),
               ],
             ),
+            SizedBox(height: 10),
+            FilledButton(onPressed: () {}, child: Text('Continue'))
           ],
         ),
       ),
@@ -133,19 +134,14 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     });
   }
 
-  void handleScan(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile == null)
-      throw new Exception('Something went wrong while taking a photo');
+  void handleScan(ImageFileSource source) async {
+    final pickedFile = await _filePickerService.pickImage(source: source);
 
     try {
       _incrementStep();
 
-      await Future.delayed(1.seconds);
-      String url = await _fileStorageService.uploadPickedFile(
-        pickedFile,
-        path: 'receipts/',
-      );
+      String url =
+          await _fileStorageService.uploadFile(pickedFile, path: 'receipts/');
 
       log('Uploaded receipt: $url');
 
@@ -171,8 +167,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error while uploading: $e')));
+      showErrorSnackBar(context, 'Error while uploading: $e');
       await FirebaseCrashlytics.instance.recordError(
         e,
         null,
