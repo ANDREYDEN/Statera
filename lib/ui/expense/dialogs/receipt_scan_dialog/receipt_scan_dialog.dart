@@ -41,6 +41,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
   FilePickerService get _filePickerService => context.read<FilePickerService>();
+  Callables get _callables => context.read<Callables>();
 
   ExpenseService get _expenseService => context.read<ExpenseService>();
 
@@ -150,7 +151,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       var scanSuccessful = await snackbarCatch(
         context,
         () async {
-          List<Item> items = await Callables.getReceiptData(
+          List<Item> items = await _callables.getReceiptData(
             receiptUrl: url,
             selectedStore:
                 _selectedStore.toString().split('.')[1].toLowerCase(),

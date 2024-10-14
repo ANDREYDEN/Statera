@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/data/models/expense.dart';
+import 'package:statera/data/services/callables.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/file_services/file_storage_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
@@ -26,12 +27,24 @@ class ReceiptScanDialogPreview extends StatelessWidget {
       await Future.delayed(1.seconds);
       return '';
     });
+
+    final mockCallables = MockCallables();
+    when(mockCallables.getReceiptData(
+      receiptUrl: anyNamed('receiptUrl'),
+      selectedStore: anyNamed('selectedStore'),
+      withNameImprovement: anyNamed('withNameImprovement'),
+    )).thenAnswer((_) async {
+      await Future.delayed(1.seconds);
+      return [];
+    });
+
     return Preview(
       providers: [
         Provider<FileStorageService>.value(value: mockFileStorageService),
+        Provider<Callables>.value(value: mockCallables),
+        Provider<ExpenseService>.value(value: MockExpenseService()),
         Provider.value(value: FilePickerService()),
         Provider.value(value: PreferencesService()),
-        Provider<ExpenseService>.value(value: MockExpenseService()),
       ],
       body: ReceiptScanDialog(expense: expense),
     );
