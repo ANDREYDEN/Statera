@@ -38,11 +38,16 @@ class ReceiptScanDialogPreview extends StatelessWidget {
       return [];
     });
 
+    final mockExpenseService = MockExpenseService();
+    when(mockExpenseService.updateExpense(any)).thenAnswer((_) async {
+      await Future.delayed(1.seconds);
+    });
+
     return Preview(
       providers: [
         Provider<FileStorageService>.value(value: mockFileStorageService),
         Provider<Callables>.value(value: mockCallables),
-        Provider<ExpenseService>.value(value: MockExpenseService()),
+        Provider<ExpenseService>.value(value: mockExpenseService),
         Provider.value(value: FilePickerService()),
         Provider.value(value: PreferencesService()),
       ],

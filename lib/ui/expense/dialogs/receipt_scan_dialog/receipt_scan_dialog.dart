@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,6 +58,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
                 StepData(title: 'Choose a receipt'),
                 StepData(title: 'Uploading the receipt...'),
                 StepData(title: 'Analyzing the receipt...'),
+                StepData(title: 'Updating expense...'),
               ],
               currentStep: _currentStep,
             ),
@@ -136,37 +135,24 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   }
 
   void handleScan(ImageFileSource source) async {
-    final pickedFile = await _filePickerService.pickImage(source: source);
-
     try {
+      final pickedFile = await _filePickerService.pickImage(source: source);
       _incrementStep();
 
       String url =
           await _fileStorageService.uploadFile(pickedFile, path: 'receipts/');
-
-      log('Uploaded receipt: $url');
-
       _incrementStep();
 
-      var scanSuccessful = await snackbarCatch(
-        context,
-        () async {
-          List<Item> items = await _callables.getReceiptData(
-            receiptUrl: url,
-            selectedStore:
-                _selectedStore.toString().split('.')[1].toLowerCase(),
-            withNameImprovement: _withNameImprovement,
-          );
-
-          items.forEach(widget.expense.addItem);
-        },
-        errorMessage: 'Something went wrong while processing your photo',
+      List<Item> items = await _callables.getReceiptData(
+        receiptUrl: url,
+        selectedStore: _selectedStore.toString().split('.')[1].toLowerCase(),
+        withNameImprovement: _withNameImprovement,
       );
+      _incrementStep();
 
-      if (scanSuccessful) {
-        await _expenseService.updateExpense(widget.expense);
-        Navigator.of(context).pop();
-      }
+      items.forEach(widget.expense.addItem);
+      await _expenseService.updateExpense(widget.expense);
+      Navigator.of(context).pop();
     } on Exception catch (e) {
       showErrorSnackBar(context, 'Error while uploading: $e');
       await FirebaseCrashlytics.instance.recordError(
