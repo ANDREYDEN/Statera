@@ -35,6 +35,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   Store _selectedStore = Store.Other;
   bool _withNameImprovement = false;
   int _currentStep = 1;
+  ImageFile? _receiptImage;
 
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
@@ -62,6 +63,47 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
               ],
               currentStep: _currentStep,
             ),
+            Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  child: (_receiptImage != null)
+                      ? Image.memory(
+                          _receiptImage!.bytes,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.receipt_long,
+                          size: 100,
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Spacer(),
+                FilledButton.tonalIcon(
+                  icon: Icon(Icons.photo_camera),
+                  label: Text('Camera'),
+                  onPressed: () => selectImage(ImageFileSource.camera),
+                ),
+                SizedBox(width: 10),
+                Text('or'),
+                SizedBox(width: 10),
+                FilledButton.tonalIcon(
+                  icon: Icon(Icons.collections),
+                  label: Text('Gallery'),
+                  onPressed: () => selectImage(ImageFileSource.gallery),
+                ),
+                Spacer(),
+              ],
+            ),
+            SizedBox(height: 20),
             DropdownButtonFormField<Store>(
               value: _selectedStore,
               onChanged: (store) {
@@ -93,35 +135,14 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
                     },
                     title: Text('Improve product names'),
                   ),
-                  if (_withNameImprovement)
-                    Text(
-                      'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
-                      style: TextStyle(fontSize: 12),
-                    ),
+                  Text(
+                    'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
+                    style: TextStyle(fontSize: 12),
+                  ),
                 ],
               ),
             SizedBox(height: 10),
-            Row(
-              children: [
-                Spacer(),
-                FilledButton.tonalIcon(
-                  icon: Icon(Icons.photo_camera),
-                  label: Text('Camera'),
-                  onPressed: () => handleScan(ImageFileSource.camera),
-                ),
-                SizedBox(width: 10),
-                Text('or'),
-                SizedBox(width: 10),
-                FilledButton.tonalIcon(
-                  icon: Icon(Icons.collections),
-                  label: Text('Gallery'),
-                  onPressed: () => handleScan(ImageFileSource.gallery),
-                ),
-                Spacer(),
-              ],
-            ),
-            SizedBox(height: 10),
-            FilledButton(onPressed: () {}, child: Text('Continue'))
+            FilledButton(onPressed: processImage, child: Text('Continue'))
           ],
         ),
       ),
@@ -134,13 +155,25 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     });
   }
 
-  void handleScan(ImageFileSource source) async {
+  void selectImage(ImageFileSource source) async {
+    final pickedImage = await _filePickerService.pickImage(source: source);
+    setState(() {
+      _receiptImage = pickedImage;
+    });
+  }
+
+  void processImage() async {
+    if (_receiptImage == null) {
+      return;
+    }
+
     try {
-      final pickedFile = await _filePickerService.pickImage(source: source);
       _incrementStep();
 
-      String url =
-          await _fileStorageService.uploadFile(pickedFile, path: 'receipts/');
+      final url = await _fileStorageService.uploadFile(
+        _receiptImage!,
+        path: 'receipts/',
+      );
       _incrementStep();
 
       List<Item> items = await _callables.getReceiptData(
