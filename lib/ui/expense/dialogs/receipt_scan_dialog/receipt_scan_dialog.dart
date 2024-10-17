@@ -5,10 +5,10 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.dart';
+import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store.dart';
+import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/helpers.dart';
-
-enum Store { Other, Walmart, LCBO }
 
 class ReceiptScanDialog extends StatefulWidget {
   final Expense expense;
@@ -32,7 +32,7 @@ class ReceiptScanDialog extends StatefulWidget {
 }
 
 class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
-  Store _selectedStore = Store.Other;
+  ValueNotifier<Store> _storeController = ValueNotifier(Store.other);
   bool _withNameImprovement = false;
   int _currentStep = 1;
   ImageFile? _receiptImage;
@@ -104,43 +104,34 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
               ],
             ),
             SizedBox(height: 20),
-            DropdownButtonFormField<Store>(
-              value: _selectedStore,
-              onChanged: (store) {
-                setState(() {
-                  _selectedStore = store ?? _selectedStore;
-                });
+            StoreInput(controller: _storeController),
+            ValueListenableBuilder(
+              valueListenable: _storeController,
+              builder: (context, value, _) {
+                if (value != Store.walmart) {
+                  return SizedBox.shrink();
+                }
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SwitchListTile(
+                      value: _withNameImprovement,
+                      onChanged: (isOn) {
+                        setState(() {
+                          _withNameImprovement = !_withNameImprovement;
+                        });
+                      },
+                      title: Text('Improve product names'),
+                    ),
+                    Text(
+                      'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                );
               },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Store',
-              ),
-              items: Store.values
-                  .map((store) => DropdownMenuItem(
-                        child: Text(store.toString().split('.')[1]),
-                        value: store,
-                      ))
-                  .toList(),
             ),
-            if (_selectedStore == Store.Walmart)
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SwitchListTile(
-                    value: _withNameImprovement,
-                    onChanged: (isOn) {
-                      setState(() {
-                        _withNameImprovement = !_withNameImprovement;
-                      });
-                    },
-                    title: Text('Improve product names'),
-                  ),
-                  Text(
-                    'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
             SizedBox(height: 10),
             FilledButton(onPressed: processImage, child: Text('Continue'))
           ],
@@ -178,7 +169,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
 
       List<Item> items = await _callables.getReceiptData(
         receiptUrl: url,
-        selectedStore: _selectedStore.toString().split('.')[1].toLowerCase(),
+        selectedStore: _storeController.value.title.toLowerCase(),
         withNameImprovement: _withNameImprovement,
       );
       _incrementStep();
