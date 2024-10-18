@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/receipt_picker.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store_input.dart';
+import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/with_name_improvement_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -23,23 +25,19 @@ class ReceiptScanDialog extends StatefulWidget {
 
   Future<void> show(BuildContext context) {
     return Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        fullscreenDialog: true,
-        builder: (_) => this,
-      ),
+      MaterialPageRoute<void>(fullscreenDialog: true, builder: (_) => this),
     );
   }
 }
 
 class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   ValueNotifier<Store> _storeController = ValueNotifier(Store.other);
-  bool _withNameImprovement = false;
+  ValueNotifier<bool> _withNameImprovementController = ValueNotifier(false);
+  ValueNotifier<ImageFile?> _receiptImageController = ValueNotifier(null);
   int _currentStep = 1;
-  ImageFile? _receiptImage;
 
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
-  FilePickerService get _filePickerService => context.read<FilePickerService>();
   Callables get _callables => context.read<Callables>();
 
   ExpenseService get _expenseService => context.read<ExpenseService>();
@@ -63,72 +61,17 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
               ],
               currentStep: _currentStep,
             ),
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  child: (_receiptImage != null)
-                      ? Image.memory(
-                          _receiptImage!.bytes,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.receipt_long,
-                          size: 100,
-                          color: Theme.of(context).colorScheme.onInverseSurface,
-                        ),
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Spacer(),
-                FilledButton.tonalIcon(
-                  icon: Icon(Icons.photo_camera),
-                  label: Text('Camera'),
-                  onPressed: () => selectImage(ImageFileSource.camera),
-                ),
-                SizedBox(width: 10),
-                Text('or'),
-                SizedBox(width: 10),
-                FilledButton.tonalIcon(
-                  icon: Icon(Icons.collections),
-                  label: Text('Gallery'),
-                  onPressed: () => selectImage(ImageFileSource.gallery),
-                ),
-                Spacer(),
-              ],
-            ),
+            ReceiptPicker(controller: _receiptImageController),
             SizedBox(height: 20),
             StoreInput(controller: _storeController),
             ValueListenableBuilder(
               valueListenable: _storeController,
               builder: (context, value, _) {
-                if (value != Store.walmart) {
-                  return SizedBox.shrink();
-                }
-
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SwitchListTile(
-                      value: _withNameImprovement,
-                      onChanged: (isOn) {
-                        setState(() {
-                          _withNameImprovement = !_withNameImprovement;
-                        });
-                      },
-                      title: Text('Improve product names'),
-                    ),
-                    Text(
-                      'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
+                return Visibility(
+                  visible: value == Store.walmart,
+                  child: WithNameImprovementInput(
+                    controller: _withNameImprovementController,
+                  ),
                 );
               },
             ),
@@ -146,15 +89,8 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     });
   }
 
-  void selectImage(ImageFileSource source) async {
-    final pickedImage = await _filePickerService.pickImage(source: source);
-    setState(() {
-      _receiptImage = pickedImage;
-    });
-  }
-
   void processImage() async {
-    if (_receiptImage == null) {
+    if (_receiptImageController.value == null) {
       return;
     }
 
@@ -162,7 +98,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       _incrementStep();
 
       final url = await _fileStorageService.uploadFile(
-        _receiptImage!,
+        _receiptImageController.value!,
         path: 'receipts/',
       );
       _incrementStep();
@@ -170,7 +106,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
       List<Item> items = await _callables.getReceiptData(
         receiptUrl: url,
         selectedStore: _storeController.value.title.toLowerCase(),
-        withNameImprovement: _withNameImprovement,
+        withNameImprovement: _withNameImprovementController.value,
       );
       _incrementStep();
 
