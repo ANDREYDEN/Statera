@@ -3,18 +3,20 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 class StepIndicator extends StatelessWidget {
   final List<StepData> steps;
-  final int currentStep;
+  final int currentStepNumber;
 
   const StepIndicator({
     super.key,
     required this.steps,
-    required this.currentStep,
+    required this.currentStepNumber,
   });
 
   @override
   Widget build(BuildContext context) {
-    assert(0 < currentStep);
-    assert(currentStep <= steps.length);
+    assert(0 < currentStepNumber);
+    assert(currentStepNumber <= steps.length);
+
+    final currentStep = steps[currentStepNumber - 1];
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -24,16 +26,28 @@ class StepIndicator extends StatelessWidget {
           Row(
             children: [
               ...List.filled(
-                  currentStep - 1, StepBar(status: StepStatus.Completed)),
+                currentStepNumber - 1,
+                StepBar(status: StepStatus.Completed),
+              ),
               StepBar(status: StepStatus.InProgress),
-              ...List.filled(steps.length - currentStep,
-                  StepBar(status: StepStatus.NotStarted)),
+              ...List.filled(
+                steps.length - currentStepNumber,
+                StepBar(status: StepStatus.NotStarted),
+              ),
             ],
           ),
-          Text(
-            steps[currentStep - 1].title,
-            textAlign: TextAlign.center,
-          ),
+          if (currentStep.backgroundProcessed) ...[
+            SizedBox(height: 20),
+            Text(
+              currentStep.title,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineLarge,
+            )
+          ] else
+            Text(
+              currentStep.title,
+              textAlign: TextAlign.center,
+            ),
         ],
       ),
     );
@@ -42,8 +56,9 @@ class StepIndicator extends StatelessWidget {
 
 class StepData {
   final String title;
+  final bool backgroundProcessed;
 
-  StepData({required this.title});
+  StepData({required this.title, this.backgroundProcessed = true});
 }
 
 class StepBar extends StatelessWidget {

@@ -55,28 +55,44 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
             StepIndicator(
               steps: [
                 StepData(title: 'Choose a receipt'),
-                StepData(title: 'Uploading the receipt...'),
-                StepData(title: 'Analyzing the receipt...'),
-                StepData(title: 'Updating expense...'),
+                StepData(
+                  title: 'Uploading the receipt...',
+                  backgroundProcessed: true,
+                ),
+                StepData(
+                  title: 'Analyzing the receipt...',
+                  backgroundProcessed: true,
+                ),
+                StepData(
+                  title: 'Updating expense...',
+                  backgroundProcessed: true,
+                ),
               ],
-              currentStep: _currentStep,
+              currentStepNumber: _currentStep,
             ),
-            ReceiptPicker(controller: _receiptImageController),
-            SizedBox(height: 20),
-            StoreInput(controller: _storeController),
-            ValueListenableBuilder(
-              valueListenable: _storeController,
-              builder: (context, value, _) {
-                return Visibility(
-                  visible: value == Store.walmart,
-                  child: WithNameImprovementInput(
-                    controller: _withNameImprovementController,
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 10),
-            FilledButton(onPressed: processImage, child: Text('Continue'))
+            if (_currentStep == 1) ...[
+              ReceiptPicker(controller: _receiptImageController),
+              SizedBox(height: 20),
+              StoreInput(controller: _storeController),
+              ValueListenableBuilder(
+                valueListenable: _storeController,
+                builder: (_, value, child) =>
+                    value == Store.walmart ? child! : SizedBox.shrink(),
+                child: WithNameImprovementInput(
+                  controller: _withNameImprovementController,
+                ),
+              ),
+              SizedBox(height: 10),
+              ValueListenableBuilder(
+                valueListenable: _receiptImageController,
+                builder: (context, receiptImage, _) {
+                  return FilledButton(
+                    onPressed: receiptImage == null ? null : processImage,
+                    child: Text('Continue'),
+                  );
+                },
+              )
+            ]
           ],
         ),
       ),
