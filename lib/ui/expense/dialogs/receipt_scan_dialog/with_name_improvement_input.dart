@@ -11,12 +11,17 @@ class WithNameImprovementInput extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SwitchListTile(
-          value: controller.value,
-          onChanged: (isOn) {
-            controller.value = isOn;
+        ValueListenableBuilder(
+          valueListenable: controller,
+          builder: (_, value, __) {
+            return SwitchListTile(
+              value: value,
+              onChanged: (isOn) {
+                controller.value = isOn;
+              },
+              title: Text('Improve product names'),
+            );
           },
-          title: Text('Improve product names'),
         ),
         Text(
           'Checking this option will attempt to provide human readable names for Walmart products. This will also significantly increase the loading time.',

@@ -58,7 +58,9 @@ class StepData {
   final String title;
   final bool backgroundProcessed;
 
-  StepData({required this.title, this.backgroundProcessed = true});
+  const StepData({required this.title, this.backgroundProcessed = false});
+  const StepData.background({required this.title})
+      : this.backgroundProcessed = true;
 }
 
 class StepBar extends StatelessWidget {

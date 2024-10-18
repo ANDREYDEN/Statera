@@ -39,8 +39,14 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
   Callables get _callables => context.read<Callables>();
-
   ExpenseService get _expenseService => context.read<ExpenseService>();
+
+  static const List<StepData> steps = const [
+    StepData(title: 'Choose a receipt'),
+    StepData.background(title: 'Uploading the receipt...'),
+    StepData.background(title: 'Analyzing the receipt...'),
+    StepData.background(title: 'Updating expense...'),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -52,24 +58,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            StepIndicator(
-              steps: [
-                StepData(title: 'Choose a receipt'),
-                StepData(
-                  title: 'Uploading the receipt...',
-                  backgroundProcessed: true,
-                ),
-                StepData(
-                  title: 'Analyzing the receipt...',
-                  backgroundProcessed: true,
-                ),
-                StepData(
-                  title: 'Updating expense...',
-                  backgroundProcessed: true,
-                ),
-              ],
-              currentStepNumber: _currentStep,
-            ),
+            StepIndicator(steps: steps, currentStepNumber: _currentStep),
             if (_currentStep == 1) ...[
               ReceiptPicker(controller: _receiptImageController),
               SizedBox(height: 20),
@@ -87,7 +76,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
                 valueListenable: _receiptImageController,
                 builder: (context, receiptImage, _) {
                   return FilledButton(
-                    onPressed: receiptImage == null ? null : processImage,
+                    onPressed: receiptImage == null ? null : _processImage,
                     child: Text('Continue'),
                   );
                 },
@@ -105,7 +94,7 @@ class _ReceiptScanDialogState extends State<ReceiptScanDialog> {
     });
   }
 
-  void processImage() async {
+  void _processImage() async {
     if (_receiptImageController.value == null) {
       return;
     }
