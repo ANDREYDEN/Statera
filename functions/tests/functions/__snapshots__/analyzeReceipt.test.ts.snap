@@ -148,3 +148,141 @@ exports[`analyzeReceipt can analyze Walmart receipt 1`] = `
   },
 ]
 `;
+
+exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
+[
+  {
+    "name": "KNOX GELATINE",
+    "value": 4.29,
+  },
+  {
+    "name": "IRRS.MODENA BALS",
+    "value": 4.49,
+  },
+  {
+    "name": "MINI CUCUMBER",
+    "value": 4.99,
+  },
+  {
+    "name": "RASPBERRY 170G",
+    "value": 4.99,
+  },
+  {
+    "name": "IR.ART.FIG - PORT",
+    "value": 9.99,
+  },
+  {
+    "name": "BR SMOKED HAM",
+    "value": 5.86,
+  },
+  {
+    "name": "Saving",
+    "value": 1.57,
+  },
+  {
+    "name": "HA.HOT PEPPERETT",
+    "value": 2.69,
+  },
+  {
+    "name": "Saving",
+    "value": 0.3,
+  },
+  {
+    "name": "PARLOUR VAN . SAND H",
+    "value": 2.99,
+  },
+  {
+    "name": "Saving",
+    "value": 4,
+  },
+  {
+    "name": "SEL.GARLIC FINE",
+    "value": 3.49,
+  },
+  {
+    "name": "Saving",
+    "value": 0.5,
+  },
+  {
+    "name": "GAYLEA COTT.CHSE",
+    "value": 5.49,
+  },
+  {
+    "name": "BLACKDI.LACT.F.M",
+    "value": 7.49,
+  },
+  {
+    "name": "LARGE WHOLE WHEA",
+    "value": 4.99,
+  },
+  {
+    "name": "Saving",
+    "value": 1.3,
+  },
+  {
+    "name": "LIVELY PEACH CHE H",
+    "value": 2.96,
+  },
+  {
+    "name": "BTL DEPOSIT W",
+    "value": 0.1,
+  },
+  {
+    "name": "UNPASTEURIZ.GRAP",
+    "value": 6.99,
+  },
+  {
+    "name": "HST ( ) %",
+    "value": 0.77,
+  },
+  {
+    "name": "CREDIT CR",
+    "value": 80.62,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
+[
+  {
+    "name": "BLACKBERRY",
+    "value": 3.49,
+  },
+  {
+    "name": "Saving",
+    "value": 1.5,
+  },
+  {
+    "name": "BLUEBERRY 170G",
+    "value": 3.99,
+  },
+  {
+    "name": "NATREL LACT.F.2 %",
+    "value": 5.99,
+  },
+  {
+    "name": "Saving",
+    "value": 0.7,
+  },
+  {
+    "name": "PRSN MLTGRN",
+    "value": 2.99,
+  },
+  {
+    "name": "DBL.DUTCH SYRUP-",
+    "value": 3.29,
+  },
+  {
+    "name": "Saving",
+    "value": 0.4,
+  },
+  {
+    "name": "CREDIT CR",
+    "value": 18.85,
+  },
+  {
+    "name": "Promotional discounts",
+    "value": 3.5,
+  },
+]
+`;
