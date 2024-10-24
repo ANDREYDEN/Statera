@@ -1,9 +1,9 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
+import { google } from '@google-cloud/vision/build/protos/protos'
+import { BoxWithText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
-import { verticalSegment } from '../utils'
-import { google } from '@google-cloud/vision/build/protos/protos'
-import { VerticalSegment } from '../types/geometry'
+import { center, isWithin, toBoxWithText } from '../utils/geometryUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -76,41 +76,34 @@ function rotateLabels(labels: IEntityAnnotation[]) {
 
 function buildRows(response: IAnnotateResponse): string[][] {
   // first element contains information about all lines
-  const labels = response.textAnnotations?.slice(1) ?? []
+  const annotations = response.textAnnotations?.slice(1) ?? []
 
   console.log(
-    labels.length > 0 ?
-      `This image has some text: ${labels.length}` :
+    annotations.length > 0 ?
+      `This image has some text: ${annotations.length}` :
       'This image has no text'
   )
 
-  const orientedLabels = rotateLabels(labels)
+  const orientedAnnotations = rotateLabels(annotations)
 
-  type LabelBox = VerticalSegment & { description: string }
-  let lines: LabelBox[][] = []
+  let rows: BoxWithText[][] = []
+  orientedAnnotations.forEach((annotation) => {
+    const boxWithText = toBoxWithText(annotation)
 
-  orientedLabels.forEach((label) => {
-    const labelSegment = verticalSegment(label)
-    const center = (labelSegment.yTop + labelSegment.yBottom) / 2
-    const labelBox = {
-      ...labelSegment,
-      description: label.description ?? '',
-    }
-
-    for (const line of lines) {
-      if (line[0].yTop < center && center < line[0].yBottom) {
-        line.push(labelBox)
+    for (const line of rows) {
+      if (isWithin(center(boxWithText), line[0])) {
+        line.push(boxWithText)
         return
       }
     }
 
-    lines.push([labelBox])
+    rows.push([boxWithText])
   })
 
-  lines = lines.map((line) =>
-    line.sort((element1, element2) => element1.x - element2.x)
+  rows = rows.map((row) =>
+    row.sort((element1, element2) => element1.x - element2.x)
   )
-  lines = lines.sort((line1, line2) => line1[0].yTop - line2[0].yTop)
+  rows.sort((row1, row2) => row1[0].yTop - row2[0].yTop)
 
-  return lines.map((line) => line.map((label) => label.description))
+  return rows.map((row) => row.map((label) => label.content ?? ''))
 }
