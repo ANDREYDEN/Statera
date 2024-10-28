@@ -176,32 +176,16 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "value": 5.86,
   },
   {
-    "name": "Saving",
-    "value": 1.57,
-  },
-  {
     "name": "HA.HOT PEPPERETT",
     "value": 2.69,
   },
   {
-    "name": "Saving",
-    "value": 0.3,
-  },
-  {
-    "name": "PARLOUR VAN . SAND H",
+    "name": "PARLOUR VAN . SAND",
     "value": 2.99,
-  },
-  {
-    "name": "Saving",
-    "value": 4,
   },
   {
     "name": "SEL.GARLIC FINE",
     "value": 3.49,
-  },
-  {
-    "name": "Saving",
-    "value": 0.5,
   },
   {
     "name": "GAYLEA COTT.CHSE",
@@ -216,11 +200,7 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "value": 4.99,
   },
   {
-    "name": "Saving",
-    "value": 1.3,
-  },
-  {
-    "name": "LIVELY PEACH CHE H",
+    "name": "LIVELY PEACH CHE",
     "value": 2.96,
   },
   {
@@ -232,7 +212,7 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "value": 6.99,
   },
   {
-    "name": "HST ( ) %",
+    "name": "5.95 HST ( 13.000",
     "value": 0.77,
   },
   {
@@ -249,10 +229,6 @@ exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
     "value": 3.49,
   },
   {
-    "name": "Saving",
-    "value": 1.5,
-  },
-  {
     "name": "BLUEBERRY 170G",
     "value": 3.99,
   },
@@ -261,20 +237,12 @@ exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
     "value": 5.99,
   },
   {
-    "name": "Saving",
-    "value": 0.7,
-  },
-  {
     "name": "PRSN MLTGRN",
     "value": 2.99,
   },
   {
     "name": "DBL.DUTCH SYRUP-",
     "value": 3.29,
-  },
-  {
-    "name": "Saving",
-    "value": 0.4,
   },
   {
     "name": "CREDIT CR",

@@ -1,6 +1,7 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
-import { BoxWithText } from '../types/geometry'
+import { max, min } from 'lodash'
+import { BoxWithText, RowOfText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
 import { center, isWithin, toBoxWithText } from '../utils/geometryUtils'
@@ -74,7 +75,7 @@ function rotateLabels(labels: IEntityAnnotation[]) {
   })
 }
 
-function buildRows(response: IAnnotateResponse): string[][] {
+function buildRows(response: IAnnotateResponse): RowOfText[] {
   // first element contains information about all lines
   const annotations = response.textAnnotations?.slice(1) ?? []
 
@@ -105,5 +106,12 @@ function buildRows(response: IAnnotateResponse): string[][] {
   )
   rows.sort((row1, row2) => row1[0].yTop - row2[0].yTop)
 
-  return rows.map((row) => row.map((label) => label.content ?? ''))
+  const avgRowStart = min(rows.map((row) => row[0].xLeft)) ?? 0
+  const avgRowEnd = max(rows.map((row) => row[row.length - 1].xRight)) ?? 0
+  const receiptMiddle = (avgRowStart + avgRowEnd) / 2
+
+  return rows.map((row) => ({
+    leftText: row.filter((box) => box.xLeft < receiptMiddle).map((box) => box.content ?? ''),
+    rightText: row.filter((box) => box.xLeft >= receiptMiddle).map((box) => box.content ?? ''),
+  }))
 }

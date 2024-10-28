@@ -12,13 +12,14 @@ import {
   improveNaming,
   improveWalmartNaming,
 } from '../transformators/readability'
+import { RowOfText } from './geometry'
 import { Product } from './products'
 
 type ProductsConverter = (products: Product[]) => Product[]
 type AsyncProductsConverter = (products: Product[]) => Promise<Product[]>
 
 export type Store = {
-  normalize: (rows: string[][]) => Product[]
+  normalize: (rows: RowOfText[]) => Product[]
   filter: ProductsConverter
   merge: ProductsConverter
   improveNaming: AsyncProductsConverter
