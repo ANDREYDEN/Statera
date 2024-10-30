@@ -211,14 +211,6 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "name": "UNPASTEURIZ.GRAP",
     "value": 6.99,
   },
-  {
-    "name": "5.95 HST ( 13.000",
-    "value": 0.77,
-  },
-  {
-    "name": "CREDIT CR",
-    "value": 80.62,
-  },
 ]
 `;
 
@@ -243,14 +235,6 @@ exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
   {
     "name": "DBL.DUTCH SYRUP-",
     "value": 3.29,
-  },
-  {
-    "name": "CREDIT CR",
-    "value": 18.85,
-  },
-  {
-    "name": "Promotional discounts",
-    "value": 3.5,
   },
 ]
 `;
