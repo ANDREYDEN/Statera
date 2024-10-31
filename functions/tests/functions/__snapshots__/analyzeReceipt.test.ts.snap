@@ -168,6 +168,18 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "value": 4.99,
   },
   {
+    "name": "HONEYCRISP APPLE",
+    "value": 4.36,
+  },
+  {
+    "name": "GREEN",
+    "value": 1.62,
+  },
+  {
+    "name": "YELLOW SWEET PEP",
+    "value": 2.07,
+  },
+  {
     "name": "IR.ART.FIG - PORT",
     "value": 9.99,
   },

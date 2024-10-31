@@ -32,6 +32,6 @@ export function isWithin(position: number, boxWithText: BoxWithText) {
   return boxWithText.yTop < position && position < boxWithText.yBottom
 }
 
-export function center(boxWithText: BoxWithText) {
+export function yCenter(boxWithText: BoxWithText) {
   return (boxWithText.yTop + boxWithText.yBottom) / 2
 }

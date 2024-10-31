@@ -4,7 +4,7 @@ import { max, min } from 'lodash'
 import { BoxWithText, RowOfText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, stores } from '../types/stores'
-import { center, isWithin, toBoxWithText } from '../utils/geometryUtils'
+import { yCenter, isWithin, toBoxWithText } from '../utils/geometryUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -92,7 +92,7 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
     const boxWithText = toBoxWithText(annotation)
 
     for (const line of rows) {
-      if (isWithin(center(boxWithText), line[0])) {
+      if (isWithin(yCenter(boxWithText), line[0])) {
         line.push(boxWithText)
         return
       }

@@ -37,14 +37,14 @@ describe('analyzeReceipt', () => {
 
   it('can analyze short Metro receipt', async () => {
     textDetection.mockResolvedValue(metroReceiptShortData)
-    const products = await analyzeReceipt('https://example.com', 'other')
+    const products = await analyzeReceipt('https://example.com', 'metro')
 
     expect(products).toMatchSnapshot()
   })
 
   it('can analyze medium Metro receipt', async () => {
     textDetection.mockResolvedValue(metroReceiptMediumData)
-    const products = await analyzeReceipt('https://example.com', 'other')
+    const products = await analyzeReceipt('https://example.com', 'metro')
 
     expect(products).toMatchSnapshot()
   })

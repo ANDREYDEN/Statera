@@ -2,7 +2,7 @@ import {
   filterProducts,
   filterWalmartProducts,
 } from '../transformators/filters'
-import { mergeWalmartProducts } from '../transformators/mergers'
+import { mergeMetroProducts, mergeWalmartProducts } from '../transformators/mergers'
 import {
   normalizeLCBOProducts,
   normalizeProducts,
@@ -46,4 +46,11 @@ export const lcbo: Store = {
   improveNaming,
 }
 
-export const stores: { [name: string]: Store } = { walmart, lcbo }
+export const metro: Store = {
+  normalize: normalizeProducts,
+  filter: filterProducts,
+  merge: mergeMetroProducts,
+  improveNaming: improveNaming,
+}
+
+export const stores: { [name: string]: Store } = { walmart, lcbo, metro }
