@@ -250,3 +250,69 @@ exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
   },
 ]
 `;
+
+exports[`analyzeReceipt can analyze tilted to left receipt 1`] = `
+[
+  {
+    "name": "( 416 #",
+    "value": 3.99,
+  },
+  {
+    "name": "OE",
+    "value": 2.99,
+  },
+  {
+    "name": "DRINK",
+    "value": 5.06,
+  },
+  {
+    "name": "CRANBERRY 11.00",
+    "value": 10.52,
+  },
+  {
+    "name": "= / kg",
+    "value": 4.99,
+  },
+  {
+    "name": "1.195 2.62",
+    "value": 4.54,
+  },
+  {
+    "name": "Saving",
+    "value": 12.63,
+  },
+  {
+    "name": "DAIRY . 3.00",
+    "value": 0.52,
+  },
+  {
+    "name": "Saving LARGE",
+    "value": 45.24,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze tilted to right receipt 1`] = `
+[
+  {
+    "name": "-0.005 kg",
+    "value": 11,
+  },
+  {
+    "name": "1.195 kg",
+    "value": 3.99,
+  },
+  {
+    "name": "2.62 Net",
+    "value": 2.99,
+  },
+  {
+    "name": "Saving",
+    "value": 8.8,
+  },
+  {
+    "name": "SEAFOOD",
+    "value": 5.06,
+  },
+]
+`;

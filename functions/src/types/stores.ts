@@ -53,4 +53,5 @@ export const metro: Store = {
   improveNaming: improveNaming,
 }
 
-export const stores: { [name: string]: Store } = { walmart, lcbo, metro }
+export type StoreName = 'walmart' | 'lcbo' | 'metro'
+export const stores: { [name in StoreName]: Store } = { walmart, lcbo, metro }

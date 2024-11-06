@@ -1,10 +1,13 @@
-import { analyzeReceipt } from '../../src/functions/analyzeReceipt'
+import { analyzeReceipt, IAnnotateResponse } from '../../src/functions/analyzeReceipt'
 import lcboReceiptShortData from '../__stubs__/receipt_data/lcbo/short/data.json'
 import walmartReceiptLongData from '../__stubs__/receipt_data/walmart/long/data.json'
 import walmartReceiptMediumData from '../__stubs__/receipt_data/walmart/medium/data.json'
 import walmartReceiptMediumExpected from '../__stubs__/receipt_data/walmart/medium/expected.json'
 import metroReceiptShortData from '../__stubs__/receipt_data/metro/short/data.json'
 import metroReceiptMediumData from '../__stubs__/receipt_data/metro/medium/data.json'
+import tiltedReceiptRightData from '../__stubs__/receipt_data/tilted/tilted_right/data.json'
+import tiltedReceiptLeftData from '../__stubs__/receipt_data/tilted/tilted_left/data.json'
+import { StoreName } from '../../src/types/stores'
 
 const textDetection = jest.fn()
 jest.mock('@google-cloud/vision', () => ({
@@ -21,30 +24,16 @@ describe('analyzeReceipt', () => {
     expect(products).toEqual(walmartReceiptMediumExpected)
   })
 
-  it('can analyze long Walmart receipt', async () => {
-    textDetection.mockResolvedValue(walmartReceiptLongData)
-    const products = await analyzeReceipt('https://example.com', 'walmart')
-
-    expect(products).toMatchSnapshot()
-  })
-
-  it('can analyze short LCBO receipt', async () => {
-    textDetection.mockResolvedValue(lcboReceiptShortData)
-    const products = await analyzeReceipt('https://example.com', 'lcbo')
-
-    expect(products).toMatchSnapshot()
-  })
-
-  it('can analyze short Metro receipt', async () => {
-    textDetection.mockResolvedValue(metroReceiptShortData)
-    const products = await analyzeReceipt('https://example.com', 'metro')
-
-    expect(products).toMatchSnapshot()
-  })
-
-  it('can analyze medium Metro receipt', async () => {
-    textDetection.mockResolvedValue(metroReceiptMediumData)
-    const products = await analyzeReceipt('https://example.com', 'metro')
+  it.each<{ title: string, visionResponse: IAnnotateResponse[], store: StoreName }>([
+    { title: 'long Walmart', visionResponse: walmartReceiptLongData, store: 'walmart' },
+    { title: 'short LCBO', visionResponse: lcboReceiptShortData, store: 'lcbo' },
+    { title: 'short Metro', visionResponse: metroReceiptShortData, store: 'metro' },
+    { title: 'medium Metro', visionResponse: metroReceiptMediumData, store: 'metro' },
+    { title: 'tilted to left', visionResponse: tiltedReceiptLeftData, store: 'metro' },
+    { title: 'tilted to right', visionResponse: tiltedReceiptRightData, store: 'metro' },
+  ])('can analyze $title receipt', async ({ visionResponse, store }) => {
+    textDetection.mockResolvedValue(visionResponse)
+    const products = await analyzeReceipt('https://example.com', store)
 
     expect(products).toMatchSnapshot()
   })
