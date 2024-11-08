@@ -12,3 +12,8 @@ export type RowOfText = {
   leftText: string[]
   rightText: string[]
 }
+
+export type Vector = {
+  x: number
+  y: number
+}

@@ -1,7 +1,7 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
 import { max, min } from 'lodash'
-import { BoxWithText, RowOfText } from '../types/geometry'
+import { BoxWithText, RowOfText, Vector } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
 import { yCenter, isWithin, toBoxWithText } from '../utils/geometryUtils'
@@ -39,61 +39,21 @@ export async function analyzeReceipt(
   return products
 }
 
-function rotateLabels(labels: IEntityAnnotation[]) {
-  const longLabel = labels.find(
-    (l) => l.description?.length && l.description.length > 5
-  )
-  const longLabelVertices = longLabel?.boundingPoly?.vertices
-  if (!longLabelVertices || longLabelVertices.length != 4) return labels
-
-  const xCoords = longLabel
-    .boundingPoly!.vertices!.map((v) => v.x)
-    .sort((a, b) => a! - b!)
-  const yCoords = longLabel
-    .boundingPoly!.vertices!.map((v) => v.y)
-    .sort((a, b) => a! - b!)
-  const longLabelWidth =
-    (xCoords[2]! + xCoords[3]!) / 2 - (xCoords[0]! + xCoords[1]!) / 2
-  const longLabelHeight =
-    (yCoords[2]! + yCoords[3]!) / 2 - (yCoords[0]! + yCoords[1]!) / 2
-  const needsRotation = longLabelWidth < longLabelHeight
-  if (!needsRotation) return labels
-
-  console.log('Rotating labels...')
-  return labels.map((l) => {
-    const rotatedVertices = l.boundingPoly?.vertices?.map((v) => ({
-      x: v.y,
-      y: v.x,
-    }))
-
-    return {
-      ...l,
-      boundingPoly: {
-        vertices: rotatedVertices,
-      },
-    }
-  })
-}
-
 function buildRows(response: IAnnotateResponse): RowOfText[] {
   // first element contains information about all lines
   const annotations = response.textAnnotations?.slice(1) ?? []
+  console.log(`Detected ${annotations.length} text parts`)
 
-  console.log(
-    annotations.length > 0 ?
-      `This image has some text: ${annotations.length}` :
-      'This image has no text'
-  )
+  const horizontalAnnotations = fixVerticalAnnotations(annotations)
+  const boxesWithText = horizontalAnnotations.map(toBoxWithText)
+  const leveledBoxesWithText = rotateAnnotations(boxesWithText)
 
-  const orientedAnnotations = rotateLabels(annotations)
 
   let rows: BoxWithText[][] = []
-  orientedAnnotations.forEach((annotation) => {
-    const boxWithText = toBoxWithText(annotation)
-
-    for (const line of rows) {
-      if (isWithin(yCenter(boxWithText), line[0])) {
-        line.push(boxWithText)
+  leveledBoxesWithText.forEach((boxWithText) => {
+    for (const row of rows) {
+      if (isWithin(yCenter(boxWithText), row[0])) {
+        row.push(boxWithText)
         return
       }
     }
@@ -114,4 +74,48 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
     leftText: row.filter((box) => box.xLeft < receiptMiddle).map((box) => box.content ?? ''),
     rightText: row.filter((box) => box.xLeft >= receiptMiddle).map((box) => box.content ?? ''),
   }))
+}
+
+function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[] {
+  const longLabel = labels.find(
+    (l) => l.description?.length && l.description.length > 5
+  )
+  const longLabelVertices = longLabel?.boundingPoly?.vertices
+  if (!longLabelVertices || longLabelVertices.length != 4) return labels
+
+  const xCoords = longLabel
+    .boundingPoly!.vertices!.map((v) => v.x)
+    .sort((a, b) => a! - b!)
+  const yCoords = longLabel
+    .boundingPoly!.vertices!.map((v) => v.y)
+    .sort((a, b) => a! - b!)
+  const longLabelWidth =
+    (xCoords[2]! + xCoords[3]!) / 2 - (xCoords[0]! + xCoords[1]!) / 2
+  const longLabelHeight =
+    (yCoords[2]! + yCoords[3]!) / 2 - (yCoords[0]! + yCoords[1]!) / 2
+  const needsRotation = longLabelWidth < longLabelHeight
+  if (!needsRotation) return labels
+
+  console.log('Flipping annotations...')
+  return labels.map((l) => {
+    const rotatedVertices = l.boundingPoly?.vertices?.map((v) => ({
+      x: v.y,
+      y: v.x,
+    }))
+
+    return {
+      ...l,
+      boundingPoly: {
+        vertices: rotatedVertices,
+      },
+    }
+  })
+}
+
+function rotateAnnotations(annotations: BoxWithText[]): BoxWithText[] {
+  return annotations
+}
+
+function getBoxDirection(boxWithText: BoxWithText): Vector {
+  return { x: 0, y: 0 }
 }

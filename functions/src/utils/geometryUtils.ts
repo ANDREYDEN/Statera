@@ -1,6 +1,6 @@
 
 import { google } from '@google-cloud/vision/build/protos/protos'
-import { BoxWithText } from '../types/geometry'
+import { BoxWithText, Vector } from '../types/geometry'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 type IVertex = google.cloud.vision.v1.IVertex
@@ -34,4 +34,12 @@ export function isWithin(position: number, boxWithText: BoxWithText) {
 
 export function yCenter(boxWithText: BoxWithText) {
   return (boxWithText.yTop + boxWithText.yBottom) / 2
+}
+
+export function add(a: Vector, b: Vector) {
+  return { x: a.x + b.x, y: a.y + b.y }
+}
+
+export function sub(a: Vector, b: Vector) {
+  return { x: a.x - b.x, y: a.y - b.y }
 }
