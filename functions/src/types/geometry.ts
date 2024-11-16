@@ -1,10 +1,9 @@
 export type BoxWithText = {
-  yTop: number
-  yBottom: number
-  xLeft: number
-  xRight: number
-  x: number
-  y: number
+  top: Vector
+  bottom: Vector
+  left: Vector
+  right: Vector
+  center: Vector
   content?: string | null
 }
 

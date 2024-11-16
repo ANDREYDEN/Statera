@@ -11,29 +11,40 @@ export function toBoxWithText(annotation: IEntityAnnotation): BoxWithText {
 
   const y = (v: IVertex) => v?.y ?? 0
   const x = (v: IVertex) => v?.x ?? 0
+  const mid = (a: number, b: number) => (a + b) / 2
 
-  const yTop = (y(topLeft) + y(topRight)) / 2
-  const yBottom = (y(bottomLeft) + y(bottomRight)) / 2
-  const xLeft = (x(topLeft) + x(bottomLeft)) / 2
-  const xRight = (x(topRight) + x(bottomRight)) / 2
-
+  const top: Vector = {
+    x: mid(x(topLeft), x(topRight)),
+    y: mid(y(topLeft), y(topRight)),
+  }
+  const bottom: Vector = {
+    x: mid(x(bottomLeft), x(bottomRight)),
+    y: mid(y(bottomLeft), y(bottomRight)),
+  }
+  const left: Vector = {
+    x: mid(x(bottomLeft), x(topLeft)),
+    y: mid(y(bottomLeft), y(bottomRight)),
+  }
+  const right: Vector = {
+    x: mid(x(bottomRight), x(topRight)),
+    y: mid(y(bottomRight), y(bottomRight)),
+  }
+  const center: Vector = {
+    x: mid(top.x, bottom.x),
+    y: mid(left.y, right.y),
+  }
   return {
-    yTop,
-    yBottom,
-    y: (yTop + yBottom) / 2,
-    xLeft,
-    xRight,
-    x: (xLeft + xRight) / 2,
+    top, bottom, right, left, center,
     content: annotation.description,
   }
 }
 
 export function isWithin(position: number, boxWithText: BoxWithText) {
-  return boxWithText.yTop < position && position < boxWithText.yBottom
+  return boxWithText.top.y < position && position < boxWithText.bottom.y
 }
 
 export function yCenter(boxWithText: BoxWithText) {
-  return (boxWithText.yTop + boxWithText.yBottom) / 2
+  return (boxWithText.top.y + boxWithText.bottom.y) / 2
 }
 
 export function add(a: Vector, b: Vector) {

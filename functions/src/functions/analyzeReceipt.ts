@@ -1,10 +1,10 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
 import { max, min } from 'lodash'
-import { BoxWithText, RowOfText, Vector } from '../types/geometry'
+import { BoxWithText, RowOfText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
-import { yCenter, isWithin, toBoxWithText } from '../utils/geometryUtils'
+import { isWithin, toBoxWithText, yCenter } from '../utils/geometryUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 export type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -62,17 +62,17 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
   })
 
   rows = rows.map((row) =>
-    row.sort((element1, element2) => element1.x - element2.x)
+    row.sort((element1, element2) => element1.center.x - element2.center.x)
   )
-  rows.sort((row1, row2) => row1[0].yTop - row2[0].yTop)
+  rows.sort((row1, row2) => row1[0].top.y - row2[0].top.y)
 
-  const avgRowStart = min(rows.map((row) => row[0].xLeft)) ?? 0
-  const avgRowEnd = max(rows.map((row) => row[row.length - 1].xRight)) ?? 0
+  const avgRowStart = min(rows.map((row) => row[0].left.x)) ?? 0
+  const avgRowEnd = max(rows.map((row) => row[row.length - 1].right.x)) ?? 0
   const receiptMiddle = (avgRowStart + avgRowEnd) / 2
 
   return rows.map((row) => ({
-    leftText: row.filter((box) => box.xLeft < receiptMiddle).map((box) => box.content ?? ''),
-    rightText: row.filter((box) => box.xLeft >= receiptMiddle).map((box) => box.content ?? ''),
+    leftText: row.filter((box) => box.left.x < receiptMiddle).map((box) => box.content ?? ''),
+    rightText: row.filter((box) => box.left.x >= receiptMiddle).map((box) => box.content ?? ''),
   }))
 }
 
@@ -116,6 +116,6 @@ function rotateAnnotations(annotations: BoxWithText[]): BoxWithText[] {
   return annotations
 }
 
-function getBoxDirection(boxWithText: BoxWithText): Vector {
-  return { x: 0, y: 0 }
-}
+// function getBoxDirection(boxWithText: BoxWithText): Vector {
+//   return { x: 0, y: 0 }
+// }
