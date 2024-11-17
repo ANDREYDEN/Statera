@@ -1,10 +1,11 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
 import { max, min } from 'lodash'
-import { BoxWithText, RowOfText } from '../types/geometry'
+import { BoxWithText, RowOfText, Vector } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
-import { isWithin, toBoxWithText, yCenter } from '../utils/geometryUtils'
+import { isWithin, rotateToHorizontal, sub, toBoxWithText } from '../utils/geometryUtils'
+import { avg } from '../utils/mathUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 export type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -48,11 +49,12 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
   const boxesWithText = horizontalAnnotations.map(toBoxWithText)
   const leveledBoxesWithText = rotateAnnotations(boxesWithText)
 
+  console.log({ leveledBoxesWithText: leveledBoxesWithText.map((b) => ({ ty: b.top.y, by: b.bottom.y, cy: b.center.y, content: b.content })) })
 
   let rows: BoxWithText[][] = []
   leveledBoxesWithText.forEach((boxWithText) => {
     for (const row of rows) {
-      if (isWithin(yCenter(boxWithText), row[0])) {
+      if (isWithin(boxWithText.center.y, row[0])) {
         row.push(boxWithText)
         return
       }
@@ -113,9 +115,24 @@ function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[
 }
 
 function rotateAnnotations(annotations: BoxWithText[]): BoxWithText[] {
-  return annotations
+  const directions = annotations.map(getBoxDirection)
+  const avgDirection: Vector = {
+    x: avg(...directions.map((d) => d.x)),
+    y: avg(...directions.map((d) => d.y)),
+  }
+  if (!avgDirection) return []
+
+  console.log('TEST', JSON.stringify(rotateToHorizontal({
+    top: { y: 3.5, x: 1.5 },
+    bottom: { y: 4.5, x: 2.5 },
+    right: { y: 3.5, x: 2.5 },
+    left: { y: 4.5, x: 1.5 },
+    center: { y: 4, x: 2 },
+    content: 'test',
+  }), null, 2))
+  return annotations.map(rotateToHorizontal)
 }
 
-// function getBoxDirection(boxWithText: BoxWithText): Vector {
-//   return { x: 0, y: 0 }
-// }
+function getBoxDirection(boxWithText: BoxWithText): Vector {
+  return sub(boxWithText.right, boxWithText.left)
+}

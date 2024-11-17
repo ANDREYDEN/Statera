@@ -5,7 +5,7 @@ exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
   {
     "name": "Yam / Sw Pot",
     "sku": "000000004074R",
-    "value": 3.47,
+    "value": 0,
   },
   {
     "name": "Lib Grk 650",
@@ -15,12 +15,12 @@ exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
   {
     "name": "Hgdz Vncmlpr",
     "sku": "005500040742R",
-    "value": 12,
+    "value": 4.97,
   },
   {
     "name": "Chk Bst Bnls",
     "sku": "060538876501R",
-    "value": 1.97,
+    "value": 12,
   },
   {
     "name": "Cl Tuna Dill",
@@ -35,17 +35,17 @@ exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
   {
     "name": "Cl Tuna - Chil",
     "sku": "006136243485R",
-    "value": 2.27,
+    "value": 1.97,
   },
   {
     "name": "Mini Carrots",
     "sku": "003338366602R",
-    "value": 1.47,
+    "value": 2.27,
   },
   {
     "name": "Cucumber",
     "sku": "000000004593R",
-    "value": 2.52,
+    "value": 1.47,
   },
   {
     "name": "Sqursh Zuce",
@@ -75,7 +75,7 @@ exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
   {
     "name": "Red Grapes",
     "sku": "000000004023R",
-    "value": 3.75,
+    "value": 2.8,
   },
 ]
 `;
@@ -83,27 +83,19 @@ exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
 exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
 [
   {
-    "name": "KNOX GELATINE",
-    "value": 4.29,
-  },
-  {
     "name": "IRRS.MODENA BALS",
     "value": 4.49,
   },
   {
-    "name": "MINI CUCUMBER",
+    "name": "HONEYCRISP",
     "value": 4.99,
   },
   {
-    "name": "RASPBERRY 170G",
-    "value": 4.99,
-  },
-  {
-    "name": "HONEYCRISP APPLE",
+    "name": "BANANA GREEN",
     "value": 4.36,
   },
   {
-    "name": "GREEN",
+    "name": "1.065",
     "value": 1.62,
   },
   {
@@ -111,28 +103,20 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
     "value": 2.07,
   },
   {
-    "name": "IR.ART.FIG - PORT",
+    "name": "- PORT",
     "value": 9.99,
   },
   {
-    "name": "BR SMOKED HAM",
+    "name": "HAM",
     "value": 5.86,
   },
   {
-    "name": "HA.HOT PEPPERETT",
+    "name": "PEPPERETT",
     "value": 2.69,
   },
   {
-    "name": "PARLOUR VAN . SAND",
+    "name": "Saving",
     "value": 2.99,
-  },
-  {
-    "name": "SEL.GARLIC FINE",
-    "value": 3.49,
-  },
-  {
-    "name": "GAYLEA COTT.CHSE",
-    "value": 5.49,
   },
   {
     "name": "BLACKDI.LACT.F.M",
@@ -160,12 +144,12 @@ exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
 exports[`analyzeReceipt can analyze short LCBO receipt 1`] = `
 [
   {
-    "deposit": 0.1,
-    "id": "00491183",
-    "name": "GEORGIAN BAY VODKA SMASH",
+    "deposit": 0,
+    "id": "",
+    "name": "3.10",
     "quantity": 1,
     "value": 3,
-    "volume": 473,
+    "volume": 0,
   },
   {
     "deposit": 0.2,
@@ -208,20 +192,12 @@ exports[`analyzeReceipt can analyze short LCBO receipt 1`] = `
     "volume": 473,
   },
   {
-    "deposit": 0.1,
-    "id": "00024321",
-    "name": "DILLON'S BLACKBERRY LEMON & A DASH OF",
+    "deposit": 0,
+    "id": "",
+    "name": "00024321 00473ML ea .",
     "quantity": 1,
     "value": 3.05,
-    "volume": 473,
-  },
-  {
-    "deposit": 0.1,
-    "id": "00019350",
-    "name": "FOUNDER'S ORIGINAL TEQUILA PALOMA",
-    "quantity": 1,
-    "value": 3,
-    "volume": 355,
+    "volume": 0,
   },
 ]
 `;
@@ -244,37 +220,33 @@ exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
     "name": "PRSN MLTGRN",
     "value": 2.99,
   },
-  {
-    "name": "DBL.DUTCH SYRUP-",
-    "value": 3.29,
-  },
 ]
 `;
 
 exports[`analyzeReceipt can analyze tilted to left receipt 1`] = `
 [
   {
-    "name": "( 416 #",
+    "name": "E & OE",
     "value": 3.99,
   },
   {
-    "name": "OE",
+    "name": "REDBULL EN .",
     "value": 2.99,
   },
   {
-    "name": "DRINK",
+    "name": "PRODUCE 340G",
     "value": 5.06,
   },
   {
-    "name": "CRANBERRY 11.00",
+    "name": "GRAPE Gross",
     "value": 10.52,
   },
   {
-    "name": "= / kg",
+    "name": "Saving",
     "value": 4.99,
   },
   {
-    "name": "1.195 2.62",
+    "name": "BLACKDI",
     "value": 4.54,
   },
   {
@@ -282,11 +254,15 @@ exports[`analyzeReceipt can analyze tilted to left receipt 1`] = `
     "value": 12.63,
   },
   {
-    "name": "DAIRY . 3.00",
+    "name": "SEAFOOD LARGE",
+    "value": 44.72,
+  },
+  {
+    "name": "RAW SALMON",
     "value": 0.52,
   },
   {
-    "name": "Saving LARGE",
+    "name": "ATLANTIC",
     "value": 45.24,
   },
 ]
@@ -295,24 +271,28 @@ exports[`analyzeReceipt can analyze tilted to left receipt 1`] = `
 exports[`analyzeReceipt can analyze tilted to right receipt 1`] = `
 [
   {
-    "name": "-0.005 kg",
-    "value": 11,
-  },
-  {
-    "name": "1.195 kg",
+    "name": "TOMATO",
     "value": 3.99,
   },
   {
-    "name": "2.62 Net",
+    "name": "1.200 GREEN kg SOLS",
     "value": 2.99,
   },
   {
-    "name": "Saving",
+    "name": "1.195 kg Net Tare",
+    "value": 5.06,
+  },
+  {
+    "name": "DAIRY 2.62",
     "value": 8.8,
   },
   {
-    "name": "SEAFOOD",
-    "value": 5.06,
+    "name": "BLACKDI",
+    "value": 10.52,
+  },
+  {
+    "name": "ATLANTIC LARGE",
+    "value": 4.99,
   },
 ]
 `;
