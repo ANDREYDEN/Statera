@@ -40,8 +40,12 @@ export function toBoxWithText(annotation: IEntityAnnotation): BoxWithText {
   }
 }
 
-export function isWithin(position: number, boxWithText: BoxWithText) {
-  return boxWithText.top.y < position && position < boxWithText.bottom.y
+export function isHorizontallyAligned(line: [Vector, Vector], box2: BoxWithText): boolean {
+  const normalizedLine = sub(line[1], line[0])
+  const normalizedRight = sub(sub(box2.right, line[0]), box2.left)
+  if (normalizedRight.x < 0) return false
+
+  return Math.abs(tan(normalizedLine) - tan(normalizedRight)) < 0.05
 }
 
 export function add(a: Vector, b: Vector): Vector {
@@ -54,6 +58,10 @@ export function sub(a: Vector, b: Vector): Vector {
 
 export function len(v: Vector): number {
   return Math.sqrt(sqr(v.x) + sqr(v.y))
+}
+
+export function tan(v: Vector): number {
+  return v.y / v.x
 }
 
 export function rotateAntiClockwise(v:Vector, angle: number) : Vector {

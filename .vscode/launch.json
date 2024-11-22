@@ -22,18 +22,6 @@
             "name": "Flutter: production",
             "request": "launch",
             "type": "dart"
-        },
-        {
-            "name": "Run Functions Tests",
-            "request": "launch",
-            "type": "node",
-            "runtimeArgs": [
-                "--inspect-brk",
-                "${workspaceRoot}/node_modules/.bin/jest",
-                "--runInBand"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

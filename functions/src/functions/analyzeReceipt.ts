@@ -4,7 +4,7 @@ import { max, min } from 'lodash'
 import { BoxWithText, RowOfText, Vector } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
-import { isWithin, rotateToHorizontal, sub, toBoxWithText } from '../utils/geometryUtils'
+import { isHorizontallyAligned, rotateToHorizontal, sub, toBoxWithText } from '../utils/geometryUtils'
 import { avg } from '../utils/mathUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
@@ -19,7 +19,7 @@ export async function analyzeReceipt(
   console.log('Reading text from the image...')
 
   const client = new ImageAnnotatorClient()
-  const [result] = await client.textDetection(receiptUrl)
+  const [result] = await client.documentTextDetection(receiptUrl)
 
   const rows = buildRows(result)
   console.log('Image text data:', rows)
@@ -41,20 +41,21 @@ export async function analyzeReceipt(
 }
 
 function buildRows(response: IAnnotateResponse): RowOfText[] {
-  // first element contains information about all lines
-  const annotations = response.textAnnotations?.slice(1) ?? []
+  const annotations = getBlockAnnotations(response)
   console.log(`Detected ${annotations.length} text parts`)
 
   const horizontalAnnotations = fixVerticalAnnotations(annotations)
   const boxesWithText = horizontalAnnotations.map(toBoxWithText)
-  const leveledBoxesWithText = rotateAnnotations(boxesWithText)
+  // const leveledBoxesWithText = rotateAnnotations(boxesWithText)
 
-  console.log({ leveledBoxesWithText: leveledBoxesWithText.map((b) => ({ ty: b.top.y, by: b.bottom.y, cy: b.center.y, content: b.content })) })
+  // console.log({ leveledBoxesWithText: leveledBoxesWithText.map((b) => ({ ty: b.top.y, by: b.bottom.y, cy: b.center.y, content: b.content })) })
 
   let rows: BoxWithText[][] = []
-  leveledBoxesWithText.forEach((boxWithText) => {
+  boxesWithText.forEach((boxWithText) => {
+    console.log(rows.map((r) => r.map((e) => e.content)))
+
     for (const row of rows) {
-      if (isWithin(boxWithText.center.y, row[0])) {
+      if (isHorizontallyAligned([row[0].left, row[row.length - 1].right], boxWithText)) {
         row.push(boxWithText)
         return
       }
@@ -76,6 +77,24 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
     leftText: row.filter((box) => box.left.x < receiptMiddle).map((box) => box.content ?? ''),
     rightText: row.filter((box) => box.left.x >= receiptMiddle).map((box) => box.content ?? ''),
   }))
+}
+
+function getBlockAnnotations(response: IAnnotateResponse): IEntityAnnotation[] {
+  const page = response.fullTextAnnotation?.pages?.[0]
+  if (!page) return []
+  return page.blocks
+    ?.map((block) => ({
+      boundingPoly: block.boundingBox,
+      description: block.paragraphs
+        ?.map((para) => para.words
+          ?.map((word) => word.symbols
+            ?.map((s) => s.text)
+            .join('')
+          )
+          .join(' ')
+        )
+        .join(' '),
+    })) ?? []
 }
 
 function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[] {
