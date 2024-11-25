@@ -25,12 +25,12 @@ describe('analyzeReceipt', () => {
   })
 
   it.only.each<{ title: string, visionResponse: IAnnotateResponse, store: StoreName }>([
-    // { title: 'long Walmart', visionResponse: walmartReceiptLongData, store: 'walmart' },
-    // { title: 'short LCBO', visionResponse: lcboReceiptShortData, store: 'lcbo' },
-    // { title: 'short Metro', visionResponse: metroReceiptShortData, store: 'metro' },
-    // { title: 'medium Metro', visionResponse: metroReceiptMediumData, store: 'metro' },
+    // { title: 'long Walmart', visionResponse: walmartReceiptLongData as IAnnotateResponse, store: 'walmart' },
+    // { title: 'short LCBO', visionResponse: lcboReceiptShortData as IAnnotateResponse, store: 'lcbo' },
+    // { title: 'short Metro', visionResponse: metroReceiptShortData as IAnnotateResponse, store: 'metro' },
+    // { title: 'medium Metro', visionResponse: metroReceiptMediumData as IAnnotateResponse, store: 'metro' },
     { title: 'tilted to left', visionResponse: tiltedReceiptLeftData as IAnnotateResponse, store: 'metro' },
-    // { title: 'tilted to right', visionResponse: tiltedReceiptRightData, store: 'metro' },
+    // { title: 'tilted to right', visionResponse: tiltedReceiptRightData as IAnnotateResponse, store: 'metro' },
   ])('can analyze $title receipt', async ({ visionResponse, store }) => {
     documentTextDetection.mockResolvedValue([visionResponse])
     const products = await analyzeReceipt('https://example.com', store)

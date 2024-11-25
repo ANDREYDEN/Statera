@@ -3,7 +3,7 @@ import { google } from '@google-cloud/vision/build/protos/protos'
 import { BoxWithText, Vector } from '../types/geometry'
 import { avg, sqr } from './mathUtils'
 
-type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
+export type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 type IVertex = google.cloud.vision.v1.IVertex
 
 export function toBoxWithText(annotation: IEntityAnnotation): BoxWithText {
@@ -24,11 +24,11 @@ export function toBoxWithText(annotation: IEntityAnnotation): BoxWithText {
   }
   const left: Vector = {
     x: mid(x(bottomLeft), x(topLeft)),
-    y: mid(y(bottomLeft), y(bottomRight)),
+    y: mid(y(bottomLeft), y(topLeft)),
   }
   const right: Vector = {
     x: mid(x(bottomRight), x(topRight)),
-    y: mid(y(bottomRight), y(bottomRight)),
+    y: mid(y(bottomRight), y(topRight)),
   }
   const center: Vector = {
     x: mid(top.x, bottom.x),
@@ -40,12 +40,12 @@ export function toBoxWithText(annotation: IEntityAnnotation): BoxWithText {
   }
 }
 
-export function isHorizontallyAligned(line: [Vector, Vector], box2: BoxWithText): boolean {
+export function distanceToRow(row: BoxWithText[], box2: BoxWithText): number {
+  const line = [row[0].left, row[row.length - 1].right]
   const normalizedLine = sub(line[1], line[0])
-  const normalizedRight = sub(sub(box2.right, line[0]), box2.left)
-  if (normalizedRight.x < 0) return false
+  const normalizedCenter = sub(box2.center, line[0])
 
-  return Math.abs(tan(normalizedLine) - tan(normalizedRight)) < 0.05
+  return distanceToVectorLine(normalizedCenter, normalizedLine)
 }
 
 export function add(a: Vector, b: Vector): Vector {
@@ -62,6 +62,15 @@ export function len(v: Vector): number {
 
 export function tan(v: Vector): number {
   return v.y / v.x
+}
+
+export function height(box: BoxWithText): number {
+  return len(sub(box.top, box.bottom))
+}
+
+function distanceToVectorLine(point: Vector, vector: Vector): number {
+  const d1 = len(vector)
+  return Math.abs(point.x*vector.y - vector.x*point.y) / d1
 }
 
 export function rotateAntiClockwise(v:Vector, angle: number) : Vector {
