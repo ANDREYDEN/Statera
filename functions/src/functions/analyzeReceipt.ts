@@ -1,11 +1,10 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
 import { max, min } from 'lodash'
-import { BoxWithText, RowOfText, Vector } from '../types/geometry'
+import { BoxWithText, RowOfText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
-import { distanceToRow, height, rotateToHorizontal, sub, toBoxWithText } from '../utils/geometryUtils'
-import { avg } from '../utils/mathUtils'
+import { distanceToRow, height, toBoxWithText } from '../utils/geometryUtils'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 export type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -41,29 +40,12 @@ export async function analyzeReceipt(
 }
 
 function buildRows(response: IAnnotateResponse): RowOfText[] {
-  const annotations = getBlockAnnotations(response)
+  const annotations = getWordAnnotations(response)
   console.log(`Detected ${annotations.length} text parts`)
 
   const horizontalAnnotations = fixVerticalAnnotations(annotations)
   const boxesWithText = horizontalAnnotations.map(toBoxWithText)
-  // const leveledBoxesWithText = rotateAnnotations(boxesWithText)
-
-  let rows: BoxWithText[][] = []
-  boxesWithText.forEach((boxWithText) => {
-    const minDist = height(boxWithText)
-    let chosenRow = null
-    for (const row of rows) {
-      const curDist = distanceToRow(row, boxWithText)
-      if (curDist < minDist) {
-        chosenRow = row
-      }
-    }
-    if (chosenRow) {
-      chosenRow.push(boxWithText)
-    } else {
-      rows.push([boxWithText])
-    }
-  })
+  let rows = placeBoxesIntoRows(boxesWithText)
 
   rows = rows.map((row) =>
     row.sort((element1, element2) => element1.center.x - element2.center.x)
@@ -80,7 +62,28 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
   }))
 }
 
-function getBlockAnnotations(response: IAnnotateResponse): IEntityAnnotation[] {
+function placeBoxesIntoRows(boxes: BoxWithText[]): BoxWithText[][] {
+  const rows: BoxWithText[][] = []
+  boxes.forEach((box) => {
+    const minDist = height(box)
+    let chosenRow = null
+    for (const row of rows) {
+      const curDist = distanceToRow(row, box)
+      if (curDist < minDist) {
+        chosenRow = row
+      }
+    }
+    if (chosenRow) {
+      chosenRow.push(box)
+    } else {
+      rows.push([box])
+    }
+  })
+
+  return rows
+}
+
+function getWordAnnotations(response: IAnnotateResponse): IEntityAnnotation[] {
   const page = response.fullTextAnnotation?.pages?.[0]
   if (!page) return []
   return page.blocks
@@ -130,27 +133,4 @@ function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[
       },
     }
   })
-}
-
-function rotateAnnotations(annotations: BoxWithText[]): BoxWithText[] {
-  const directions = annotations.map(getBoxDirection)
-  const avgDirection: Vector = {
-    x: avg(...directions.map((d) => d.x)),
-    y: avg(...directions.map((d) => d.y)),
-  }
-  if (!avgDirection) return []
-
-  console.log('TEST', JSON.stringify(rotateToHorizontal({
-    top: { y: 3.5, x: 1.5 },
-    bottom: { y: 4.5, x: 2.5 },
-    right: { y: 3.5, x: 2.5 },
-    left: { y: 4.5, x: 1.5 },
-    center: { y: 4, x: 2 },
-    content: 'test',
-  }), null, 2))
-  return annotations.map(rotateToHorizontal)
-}
-
-function getBoxDirection(boxWithText: BoxWithText): Vector {
-  return sub(boxWithText.right, boxWithText.left)
 }
