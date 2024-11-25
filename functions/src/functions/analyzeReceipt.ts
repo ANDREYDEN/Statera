@@ -84,18 +84,16 @@ function getBlockAnnotations(response: IAnnotateResponse): IEntityAnnotation[] {
   const page = response.fullTextAnnotation?.pages?.[0]
   if (!page) return []
   return page.blocks
-    ?.map((block) => ({
-      boundingPoly: block.boundingBox,
-      description: block.paragraphs
-        ?.map((para) => para.words
-          ?.map((word) => word.symbols
+    ?.flatMap((block) => block.paragraphs
+      ?.flatMap((para) => para.words
+        ?.map((word) => ({
+          boundingPoly: word.boundingBox,
+          description: word.symbols
             ?.map((s) => s.text)
-            .join('')
-          )
-          .join(' ')
-        )
-        .join(' '),
-    })) ?? []
+            .join(''),
+        })) ?? []
+      ) ?? [],
+    ) ?? []
 }
 
 function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[] {

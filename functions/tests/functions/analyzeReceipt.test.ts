@@ -18,19 +18,19 @@ jest.mock('@google-cloud/vision', () => ({
 
 describe('analyzeReceipt', () => {
   it('can analyze a medium Walmart receipt', async () => {
-    documentTextDetection.mockResolvedValue(walmartReceiptMediumData)
+    documentTextDetection.mockResolvedValue([walmartReceiptMediumData])
     const products = await analyzeReceipt('https://example.com', 'walmart')
 
     expect(products).toEqual(walmartReceiptMediumExpected)
   })
 
-  it.only.each<{ title: string, visionResponse: IAnnotateResponse, store: StoreName }>([
-    // { title: 'long Walmart', visionResponse: walmartReceiptLongData as IAnnotateResponse, store: 'walmart' },
-    // { title: 'short LCBO', visionResponse: lcboReceiptShortData as IAnnotateResponse, store: 'lcbo' },
-    // { title: 'short Metro', visionResponse: metroReceiptShortData as IAnnotateResponse, store: 'metro' },
-    // { title: 'medium Metro', visionResponse: metroReceiptMediumData as IAnnotateResponse, store: 'metro' },
+  it.each<{ title: string, visionResponse: IAnnotateResponse, store: StoreName }>([
+    { title: 'long Walmart', visionResponse: walmartReceiptLongData as IAnnotateResponse, store: 'walmart' },
+    { title: 'short LCBO', visionResponse: lcboReceiptShortData as IAnnotateResponse, store: 'lcbo' },
+    { title: 'short Metro', visionResponse: metroReceiptShortData as IAnnotateResponse, store: 'metro' },
+    { title: 'medium Metro', visionResponse: metroReceiptMediumData as IAnnotateResponse, store: 'metro' },
     { title: 'tilted to left', visionResponse: tiltedReceiptLeftData as IAnnotateResponse, store: 'metro' },
-    // { title: 'tilted to right', visionResponse: tiltedReceiptRightData as IAnnotateResponse, store: 'metro' },
+    { title: 'tilted to right', visionResponse: tiltedReceiptRightData as IAnnotateResponse, store: 'metro' },
   ])('can analyze $title receipt', async ({ visionResponse, store }) => {
     documentTextDetection.mockResolvedValue([visionResponse])
     const products = await analyzeReceipt('https://example.com', store)
