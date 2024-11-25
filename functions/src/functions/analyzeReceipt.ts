@@ -5,6 +5,7 @@ import { BoxWithText, RowOfText } from '../types/geometry'
 import { Product } from '../types/products'
 import { defaultStore, StoreName, stores } from '../types/stores'
 import { distanceToRow, height, toBoxWithText } from '../utils/geometryUtils'
+import fetch from 'node-fetch'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation
 export type IAnnotateResponse = google.cloud.vision.v1.IAnnotateImageResponse
@@ -17,10 +18,8 @@ export async function analyzeReceipt(
   console.log(`Analyzing receipt at ${receiptUrl}`)
   console.log('Reading text from the image...')
 
-  const client = new ImageAnnotatorClient()
-  const [result] = await client.documentTextDetection(receiptUrl)
-
-  const rows = buildRows(result)
+  const annotationResponse = await getTextDataFromImage(receiptUrl)
+  const rows = buildRows(annotationResponse)
   console.log('Image text data:', rows)
 
   const store = stores[storeName] ?? defaultStore
@@ -37,6 +36,15 @@ export async function analyzeReceipt(
   }
 
   return products
+}
+
+async function getTextDataFromImage(url: string): Promise<IAnnotateResponse> {
+  const safeUrl = url.replace('localhost', '127.0.0.1')
+  const response = await fetch(safeUrl)
+  const buffer = await response.buffer()
+  const client = new ImageAnnotatorClient()
+  const [result] = await client.documentTextDetection(buffer)
+  return result
 }
 
 function buildRows(response: IAnnotateResponse): RowOfText[] {

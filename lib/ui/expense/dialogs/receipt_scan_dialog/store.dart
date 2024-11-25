@@ -1,7 +1,8 @@
 enum Store {
   other(title: 'Other'),
   walmart(title: 'Walmart'),
-  lcbo(title: 'LCBO');
+  lcbo(title: 'LCBO'),
+  metro(title: 'Metro');
 
   const Store({required this.title});
 
