@@ -13,7 +13,7 @@ class NewExpenseButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
       child: FilledButton(
-        onPressed: () => showNewExpenseDialog(
+        onPressed: () => NewExpenseDialog.show(
           context,
           afterAddition: expenseBloc.load,
         ),
