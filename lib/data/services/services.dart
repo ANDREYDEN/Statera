@@ -14,3 +14,4 @@ export 'preferences_service.dart';
 export 'user_expense_repository.dart';
 export 'feature_service.dart';
 export 'callables.dart';
+export 'error_service.dart';

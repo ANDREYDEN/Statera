@@ -4,11 +4,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 class StepIndicator extends StatelessWidget {
   final List<StepData> steps;
   final int currentStepNumber;
+  final String? error;
 
   const StepIndicator({
     super.key,
     required this.steps,
     required this.currentStepNumber,
+    this.error,
   });
 
   @override
@@ -17,6 +19,7 @@ class StepIndicator extends StatelessWidget {
     assert(currentStepNumber <= steps.length);
 
     final currentStep = steps[currentStepNumber - 1];
+    final isError = error != null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -29,7 +32,9 @@ class StepIndicator extends StatelessWidget {
                 currentStepNumber - 1,
                 StepBar(status: StepStatus.Completed),
               ),
-              StepBar(status: StepStatus.InProgress),
+              StepBar(
+                status: isError ? StepStatus.Failed : StepStatus.InProgress,
+              ),
               ...List.filled(
                 steps.length - currentStepNumber,
                 StepBar(status: StepStatus.NotStarted),

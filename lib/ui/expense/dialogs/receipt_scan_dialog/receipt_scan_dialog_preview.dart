@@ -29,14 +29,20 @@ class ReceiptScanDialogPreview extends StatelessWidget {
     });
 
     final mockCallables = MockCallables();
+    // when(mockCallables.getReceiptData(
+    //   receiptUrl: anyNamed('receiptUrl'),
+    //   selectedStore: anyNamed('selectedStore'),
+    //   withNameImprovement: anyNamed('withNameImprovement'),
+    // )).thenAnswer((_) async {
+    //   await Future.delayed(1.seconds);
+    //   return [];
+    // });
+
     when(mockCallables.getReceiptData(
       receiptUrl: anyNamed('receiptUrl'),
       selectedStore: anyNamed('selectedStore'),
       withNameImprovement: anyNamed('withNameImprovement'),
-    )).thenAnswer((_) async {
-      await Future.delayed(1.seconds);
-      return [];
-    });
+    )).thenThrow(Exception('Failed to get receipt data'));
 
     final mockExpenseService = MockExpenseService();
     when(mockExpenseService.updateExpense(any)).thenAnswer((_) async {
@@ -51,7 +57,12 @@ class ReceiptScanDialogPreview extends StatelessWidget {
         Provider.value(value: FilePickerService()),
         Provider.value(value: PreferencesService()),
       ],
-      body: ReceiptScanDialog(expense: expense),
+      body: Builder(
+        builder: (ctx) => ElevatedButton(
+          child: Text('scan'),
+          onPressed: () => ReceiptScanDialog(expense: expense).show(ctx),
+        ),
+      ),
     );
   }
 }
