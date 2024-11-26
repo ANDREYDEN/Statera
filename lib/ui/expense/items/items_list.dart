@@ -19,22 +19,12 @@ class ItemsList extends StatelessWidget {
 
     return ExpenseBuilder(
       builder: (context, expense) {
-        final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
-
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: isWide ? 20 : 0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (isWide && expenseCanBeUpdated)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
-                  child: FilledButton(
-                    onPressed: () => UpsertItemAction().safeHandle(context),
-                    child: Icon(Icons.add),
-                  ),
-                ),
               Expanded(
                 child: expense.hasNoItems
                     ? ListEmpty(text: 'Add items to this expense')
