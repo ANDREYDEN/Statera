@@ -23,7 +23,8 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => AuthService()),
         RepositoryProvider(create: (_) => UserRepository(firestore)),
         RepositoryProvider(create: (_) => DynamicLinkService()),
-        RepositoryProvider(create: (_) => FirebaseStorageRepository()),
+        RepositoryProvider(create: (_) => FileStorageService()),
+        RepositoryProvider(create: (_) => FilePickerService()),
         RepositoryProvider(create: (_) => NotificationService()),
         RepositoryProvider(create: (_) => PreferencesService()),
         RepositoryProvider(create: (_) => groupService),
@@ -33,6 +34,7 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => ExpenseService(firestore)),
         RepositoryProvider(create: (_) => UserExpenseRepository(firestore)),
         RepositoryProvider(create: (_) => FeatureService()),
+        RepositoryProvider(create: (_) => Callables()),
       ],
       child: child,
     );

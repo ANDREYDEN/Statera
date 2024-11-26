@@ -2,7 +2,7 @@ import {
   filterProducts,
   filterWalmartProducts,
 } from '../transformators/filters'
-import { mergeWalmartProducts } from '../transformators/mergers'
+import { mergeMetroProducts, mergeWalmartProducts } from '../transformators/mergers'
 import {
   normalizeLCBOProducts,
   normalizeProducts,
@@ -12,13 +12,14 @@ import {
   improveNaming,
   improveWalmartNaming,
 } from '../transformators/readability'
+import { RowOfText } from './geometry'
 import { Product } from './products'
 
 type ProductsConverter = (products: Product[]) => Product[]
 type AsyncProductsConverter = (products: Product[]) => Promise<Product[]>
 
 export type Store = {
-  normalize: (rows: string[][]) => Product[]
+  normalize: (rows: RowOfText[]) => Product[]
   filter: ProductsConverter
   merge: ProductsConverter
   improveNaming: AsyncProductsConverter
@@ -45,4 +46,12 @@ export const lcbo: Store = {
   improveNaming,
 }
 
-export const stores: { [name: string]: Store } = { walmart, lcbo }
+export const metro: Store = {
+  normalize: normalizeProducts,
+  filter: filterProducts,
+  merge: mergeMetroProducts,
+  improveNaming: improveNaming,
+}
+
+export type StoreName = 'walmart' | 'lcbo' | 'metro'
+export const stores: { [name in StoreName]: Store } = { walmart, lcbo, metro }

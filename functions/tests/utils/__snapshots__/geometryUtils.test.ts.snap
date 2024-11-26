@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`geometryUtils toBoxWithText converts annotation to box with text 1`] = `
+{
+  "bottom": {
+    "x": 129,
+    "y": 299,
+  },
+  "center": {
+    "x": 126.5,
+    "y": 290.5,
+  },
+  "content": "E & OE",
+  "left": {
+    "x": 105.5,
+    "y": 296.5,
+  },
+  "right": {
+    "x": 147.5,
+    "y": 284.5,
+  },
+  "top": {
+    "x": 124,
+    "y": 282,
+  },
+}
+`;

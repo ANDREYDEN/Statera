@@ -1,6 +1,163 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`analyzeReceipt can analyze LCBO receipt 1`] = `
+exports[`analyzeReceipt can analyze long Walmart receipt 1`] = `
+[
+  {
+    "name": "Yam / Sw Pot",
+    "sku": "000000004074R",
+    "value": 3.47,
+  },
+  {
+    "name": "Lib Grk 650",
+    "sku": "006568412394R",
+    "value": 5.98,
+  },
+  {
+    "name": "Hgdz Vncmlpr",
+    "sku": "005500040742R",
+    "value": 4.97,
+  },
+  {
+    "name": "Chk Bst Bnls",
+    "sku": "060538876501R",
+    "value": 12,
+  },
+  {
+    "name": "Cl Tuna Dill",
+    "sku": "006136243483R",
+    "value": 1.97,
+  },
+  {
+    "name": "Cl Tuna - Chil",
+    "sku": "006136243485R",
+    "value": 1.97,
+  },
+  {
+    "name": "Cl Tuna - Chil",
+    "sku": "006136243485R",
+    "value": 1.97,
+  },
+  {
+    "name": "Mini Carrots",
+    "sku": "003338366602R",
+    "value": 2.27,
+  },
+  {
+    "name": "Cucumber",
+    "sku": "000000004593R",
+    "value": 1.47,
+  },
+  {
+    "name": "Sqursh Zucc",
+    "sku": "0000000040678",
+    "value": 2.52,
+  },
+  {
+    "name": "Kiwi",
+    "sku": "000000004030R",
+    "value": 2.61,
+  },
+  {
+    "name": "Wldrf Salad",
+    "sku": "088804800082R",
+    "value": 6.97,
+  },
+  {
+    "name": "Onion Scal",
+    "sku": "000000004068R",
+    "value": 0.97,
+  },
+  {
+    "name": "Broc Stlk",
+    "sku": "000000004060R",
+    "value": 2.47,
+  },
+  {
+    "name": "Red Grapes",
+    "sku": "000000004023R",
+    "value": 3.75,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze medium Metro receipt 1`] = `
+[
+  {
+    "name": "GROCERY",
+    "value": 4.29,
+  },
+  {
+    "name": "KNOX GELATINE",
+    "value": 4.49,
+  },
+  {
+    "name": "PRODUCE",
+    "value": 4.99,
+  },
+  {
+    "name": "MINI CUCUMBER",
+    "value": 4.99,
+  },
+  {
+    "name": "HONEYCRISP APPLE",
+    "value": 4.36,
+  },
+  {
+    "name": "BANANA GREEN",
+    "value": 1.62,
+  },
+  {
+    "name": "YELLOW SWEET PEP",
+    "value": 2.07,
+  },
+  {
+    "name": "DELI",
+    "value": 9.99,
+  },
+  {
+    "name": "IR.ART.FIG - PORT",
+    "value": 5.86,
+  },
+  {
+    "name": "Saving 1.57",
+    "value": 2.69,
+  },
+  {
+    "name": "PARLOUR VAN . SAND",
+    "value": 2.99,
+  },
+  {
+    "name": "SEL.GARLIC FINE",
+    "value": 3.49,
+  },
+  {
+    "name": "GAYLEA COTT.CHSE",
+    "value": 5.49,
+  },
+  {
+    "name": "BLACKDI.LACT.F.M",
+    "value": 7.49,
+  },
+  {
+    "name": "LARGE WHOLE WHEA",
+    "value": 4.99,
+  },
+  {
+    "name": "LIVELY PEACH CHE",
+    "value": 2.96,
+  },
+  {
+    "name": "BTL DEPOSIT W",
+    "value": 0.1,
+  },
+  {
+    "name": "UNPASTEURIZ.GRAP",
+    "value": 6.99,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze short LCBO receipt 1`] = `
 [
   {
     "deposit": 0.1,
@@ -59,92 +216,103 @@ exports[`analyzeReceipt can analyze LCBO receipt 1`] = `
     "volume": 473,
   },
   {
-    "deposit": 0.1,
-    "id": "00019350",
-    "name": "FOUNDER'S ORIGINAL TEQUILA PALOMA",
+    "deposit": 0,
+    "id": "",
+    "name": "3.10",
     "quantity": 1,
     "value": 3,
-    "volume": 355,
+    "volume": 0,
   },
 ]
 `;
 
-exports[`analyzeReceipt can analyze Walmart receipt 1`] = `
+exports[`analyzeReceipt can analyze short Metro receipt 1`] = `
 [
   {
-    "name": "Yam / Sw Pot",
-    "sku": "000000004074R",
-    "value": 3.47,
+    "name": "BLACKBERRY",
+    "value": 3.49,
   },
   {
-    "name": "Lib Grk 650",
-    "sku": "006568412394R",
-    "value": 5.98,
+    "name": "BLUEBERRY 170G",
+    "value": 3.99,
   },
   {
-    "name": "Hgdz Vncmlpr",
-    "sku": "005500040742R",
-    "value": 12,
+    "name": "NATREL LACT.F.2 %",
+    "value": 5.99,
   },
   {
-    "name": "Chk Bst Bnls",
-    "sku": "060538876501R",
-    "value": 1.97,
+    "name": "PRSN MLTGRN",
+    "value": 2.99,
   },
   {
-    "name": "Cl Tuna Dill",
-    "sku": "006136243483R",
-    "value": 1.97,
+    "name": "DBL.DUTCH SYRUP-",
+    "value": 3.29,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze tilted to left receipt 1`] = `
+[
+  {
+    "name": "REDBULL EN . DRINK",
+    "value": 3.99,
   },
   {
-    "name": "Cl Tuna - Chil",
-    "sku": "006136243485R",
-    "value": 1.97,
+    "name": "CRANBERRY 340G",
+    "value": 2.99,
   },
   {
-    "name": "Cl Tuna - Chil",
-    "sku": "006136243485R",
-    "value": 2.27,
+    "name": "HEIRLOOM TOMATO",
+    "value": 5.06,
   },
   {
-    "name": "Mini Carrots",
-    "sku": "003338366602R",
-    "value": 1.47,
+    "name": "DAIRY Saving 2.62",
+    "value": 10.52,
   },
   {
-    "name": "Cucumber",
-    "sku": "000000004593R",
-    "value": 2.52,
+    "name": "BLACKDI . LACT.F.M",
+    "value": 4.99,
   },
   {
-    "name": "Sqursh Zuce",
-    "sku": "0000000040678",
-    "value": 2.52,
+    "name": "RAW SHRIMP LARGE",
+    "value": 4.54,
   },
   {
-    "name": "Kiwi",
-    "sku": "000000004030R",
-    "value": 2.61,
+    "name": "ATLANTIC SALMON",
+    "value": 12.63,
+  },
+]
+`;
+
+exports[`analyzeReceipt can analyze tilted to right receipt 1`] = `
+[
+  {
+    "name": "REDBULL",
+    "value": 3.99,
   },
   {
-    "name": "Wldrf Salad",
-    "sku": "088804800082R",
-    "value": 6.97,
+    "name": "CRANBERRY",
+    "value": 2.99,
   },
   {
-    "name": "Onion Scal",
-    "sku": "000000004068R",
-    "value": 0.97,
+    "name": "0.460",
+    "value": 5.06,
   },
   {
-    "name": "Broc Stlk",
-    "sku": "000000004060R",
-    "value": 2.47,
+    "name": "1.195 kg Net",
+    "value": 10.52,
   },
   {
-    "name": "Red Grapes",
-    "sku": "000000004023R",
-    "value": 3.75,
+    "name": "BLACKDI LACT.F.M",
+    "value": 4.99,
+  },
+  {
+    "name": "RAW SHRIMP LARGE",
+    "value": 4.54,
+  },
+  {
+    "name": "ATLANTIC SALMON",
+    "value": 12.63,
   },
 ]
 `;

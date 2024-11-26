@@ -1,7 +1,9 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/dtos/version.dart';
 import 'package:statera/data/models/models.dart';
 
+@GenerateNiceMocks([MockSpec<Callables>()])
 class Callables {
   static HttpsCallable _getReceiptData =
       FirebaseFunctions.instance.httpsCallable('getReceiptData');
@@ -12,7 +14,7 @@ class Callables {
   static HttpsCallable _getLatestVersion =
       FirebaseFunctions.instance.httpsCallable('getLatestAppVersion');
 
-  static Future<List<Item>> getReceiptData({
+  Future<List<Item>> getReceiptData({
     required String receiptUrl,
     required String selectedStore,
     required bool withNameImprovement,

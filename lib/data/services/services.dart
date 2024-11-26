@@ -1,6 +1,8 @@
 export 'auth_service.dart';
 export 'user_repository.dart';
-export 'firebase_storage_repository.dart';
+export 'file_services/file_storage_service.dart';
+export 'file_services/file_picker_service.dart';
+export 'file_services/image_file.dart';
 export 'dynamic_link_service.dart';
 export 'firestore.dart';
 export 'expense_service.dart';
@@ -11,3 +13,5 @@ export 'notification_service.dart';
 export 'preferences_service.dart';
 export 'user_expense_repository.dart';
 export 'feature_service.dart';
+export 'callables.dart';
+export 'error_service.dart';
