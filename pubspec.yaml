@@ -25,17 +25,16 @@ dependencies:
     sdk: flutter
 
   provider: ^6.0.0
-  firebase_core: ^2.8.0
-  firebase_auth: ^4.3.0
-  firebase_storage: ^11.0.0
-  firebase_crashlytics: ^3.0.0
-  firebase_dynamic_links: ^5.0.0
-  firebase_messaging: ^14.3.0
-  firebase_analytics: ^10.1.0
-  firebase_remote_config: ^4.0.0
-  cloud_firestore: ^4.5.0
-  cloud_functions: ^4.0.0
-  fake_cloud_firestore: ^2.4.0
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.0
+  firebase_storage: ^12.3.0
+  firebase_crashlytics: ^4.1.0
+  firebase_messaging: ^15.1.0
+  firebase_analytics: ^11.0.0
+  firebase_remote_config: ^5.1.0
+  cloud_firestore: ^5.5.0
+  cloud_functions: ^5.1.0
+  fake_cloud_firestore: ^3.1.0
   google_sign_in: ^6.0.2
   sign_in_with_apple: ^4.0.0
   build_runner: ^2.0.6
@@ -57,7 +56,7 @@ dependencies:
   flutter_animate: ^4.1.1+1
   flutter_colorpicker: ^1.1.0
   intl: ^0.18.1
-  web: ^0.5.0
+  web: ^1.0.0
 
 dev_dependencies:
   integration_test:
