@@ -57,12 +57,29 @@ Statera helps you organize your expenses and does the math for you. Scan receipt
 ### Commands
 - `flutter run` - runs the project
 - `flutterfire configure` - initializes the connection between you Firebase project and this Flutter project
-- `derry emulate` - runs Firebase emulators fr local development
+- `derry emulate` - runs Firebase emulators for local development
 - `derry test` - runs the tests
 
 Full list of commands can be found in the `pubspec.yaml` file
 
 ## Development
+
+To run the project locally follow these steps:
+1. Install Flutter dependencies:
+    ```
+    flutter pub get
+    ```
+2. Run Firebase emulators:
+    ```
+    derry emulate
+    ```
+3. Run the project:
+
+    `derry run-emulate` - prompts to choose the device
+
+    `derry run-web-emulate` - runs in Chrome
+
+    > :information_source: If using VSCode, launch configurations exist for running the app with Firebase emulators (Flutter: emulate) and with production data (Flutter: production)
 
 ## Testing
 
