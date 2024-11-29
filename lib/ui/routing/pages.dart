@@ -187,7 +187,7 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
 
   if (isMobilePlatform()) {
     final dynamicLinkRepository = context.read<DynamicLinkService>();
-    dynamicLinkRepository.listen(context);
+    // dynamicLinkRepository.listen(context);
   }
 
   return path.isPublic

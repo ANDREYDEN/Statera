@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -33,14 +32,14 @@ class AppLaunchHandler {
   /// Handles the dynamic link [linkData] from a particular app [context].
   /// This method ensures that each dynamic link will be handled exactly once
   /// (ignoring all invocations for a given period of time)
-  static void handleDynamicLink(PendingDynamicLinkData linkData, BuildContext context) {
-    if (!canHandleLaunch) return;
-    _lastLaunchHandledAt = DateTime.now();
+  // static void handleDynamicLink(PendingDynamicLinkData linkData, BuildContext context) {
+  //   if (!canHandleLaunch) return;
+  //   _lastLaunchHandledAt = DateTime.now();
 
-    log('handling dynamic link ${linkData.link.path}');
+  //   log('handling dynamic link ${linkData.link.path}');
 
-    Navigator.pushNamed(context, linkData.link.path);
-  }
+  //   Navigator.pushNamed(context, linkData.link.path);
+  // }
 
   static String? getPath(RemoteMessage? message) {
     if (message == null) return null;

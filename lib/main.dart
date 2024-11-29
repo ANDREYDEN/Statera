@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
@@ -36,9 +35,7 @@ Future<void> main() async {
 
   configureEmulators();
 
-  final initialDynamicLink = isMobilePlatform()
-      ? await FirebaseDynamicLinks.instance.getInitialLink()
-      : null;
+  final initialDynamicLink = null;
   final dynamicLinkPath = initialDynamicLink?.link.path;
   final initialNotificationMessage =
       await FirebaseMessaging.instance.getInitialMessage();
