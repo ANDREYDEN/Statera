@@ -49,19 +49,6 @@ Statera helps you organize your expenses and does the math for you. Scan receipt
 - Create an iOS/Android app in the Firebase console
 - Include your `google-services.json` and `GoogleService-Info.plist` to the proper places as described in the [docs](https://firebase.google.com/docs/flutter/setup?platform=android)
 
-### Environment
-
-- A `.env` file is required and must not be empty
-- Copy the `.env.example` file and fill in the values
-
-### Commands
-- `flutter run` - runs the project
-- `flutterfire configure` - initializes the connection between you Firebase project and this Flutter project
-- `derry emulate` - runs Firebase emulators for local development
-- `derry test` - runs the tests
-
-Full list of commands can be found in the `pubspec.yaml` file
-
 ## Development
 
 To run the project locally follow these steps:
@@ -73,13 +60,28 @@ To run the project locally follow these steps:
     ```
     derry emulate
     ```
-3. Run the project:
+3. Create `.env`:
+    ```
+    cp .env.example .env
+    ```
+
+    Environment variable description:
+    - `WEB_PUSH_VAPID_KEY` (optional) - used to enable web push notification
+4. Run the project:
 
     `derry run-emulate` - prompts to choose the device
 
     `derry run-web-emulate` - runs in Chrome
 
     > :information_source: If using VSCode, launch configurations exist for running the app with Firebase emulators (Flutter: emulate) and with production data (Flutter: production)
+
+### Commands
+- `flutter run` - runs the project
+- `flutterfire configure` - initializes the connection between you Firebase project and this Flutter project
+- `derry emulate` - runs Firebase emulators for local development
+- `derry test` - runs the tests
+
+Full list of commands can be found in the `pubspec.yaml` file
 
 ## Testing
 
