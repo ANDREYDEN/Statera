@@ -7,21 +7,12 @@ class MockHttpClient extends Mock implements http.Client {}
 
 void main() {
   group('DynamicLinkService', () {
-    final dynamicLinkRepository = DynamicLinkService();
-    final mockHttpClient = MockHttpClient();
-
-    setUpAll(() {
-      registerFallbackValue(Uri.parse('https://example.com'));
-      when(() => mockHttpClient.post(any(), body: any(named: 'body')))
-          .thenAnswer((invocation) async =>
-              Future.value(http.Response('{ "shortLink": "foo" }', 200)));
-    });
+    final dynamicLinkService = DynamicLinkService();
 
     test('can handle null url', () async {
       final testPath = null;
 
-      String url =
-          await dynamicLinkRepository.generateDynamicLink(path: testPath);
+      String url = await dynamicLinkService.generateDynamicLink(path: testPath);
 
       expect(url, isNotNull);
     });
@@ -31,15 +22,11 @@ void main() {
       () async {
         String testPath = '/groups/invite';
 
-        await dynamicLinkRepository.generateDynamicLink(path: testPath);
+        final link =
+            await dynamicLinkService.generateDynamicLink(path: testPath);
 
-        final link = verify(() =>
-                mockHttpClient.post(any(), body: captureAny(named: 'body')))
-            .captured
-            .first['dynamicLinkInfo']['link'];
-        expect(link.path, endsWith('/' + testPath));
+        expect(link, endsWith(testPath));
       },
-      skip: true,
     );
 
     test(
@@ -47,15 +34,11 @@ void main() {
       () async {
         String testPath = 'groups/invite';
 
-        await dynamicLinkRepository.generateDynamicLink(path: testPath);
+        final link =
+            await dynamicLinkService.generateDynamicLink(path: testPath);
 
-        final link = verify(() =>
-                mockHttpClient.post(any(), body: captureAny(named: 'body')))
-            .captured
-            .first['dynamicLinkInfo']['link'];
-        expect(link.path, endsWith('/' + testPath));
+        expect(link, endsWith('/' + testPath));
       },
-      skip: true,
     );
   });
 }
