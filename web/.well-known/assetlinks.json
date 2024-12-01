@@ -1,0 +1,16 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "Statera",
+            "package_name": "com.statera.statera",
+            "sha256_cert_fingerprints": [
+                "21:3E:BC:ED:96:E4:BF:C4:A5:DD:F1:A6:5F:04:62:19:B2:15:F5:C4:CF:E5:32:E6:B4:A3:56:3D:83:89:6C:11",
+                "8C:9C:62:FF:9B:5E:60:18:86:5E:9B:03:1E:69:DA:A2:D2:96:7F:F8:B7:78:95:34:0D:DF:FE:40:5F:AD:5B:86",
+                "93:3A:6B:0E:0B:88:F1:30:AB:A5:1F:4C:7F:AC:79:4D:0E:46:0B:09:3A:26:B6:56:AE:61:22:47:85:2E:5A:4E"
+            ]
+        }
+    }
+]
