@@ -22,6 +22,7 @@ import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
+import 'package:statera/utils/app_launch_handler.dart';
 import 'package:statera/utils/helpers.dart';
 
 final _landingPagePath = PagePath(
@@ -187,7 +188,9 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
 
   if (isMobilePlatform()) {
     final dynamicLinkService = context.read<DynamicLinkService>();
-    // dynamicLinkService.listen(context);
+    dynamicLinkService.listen((path) {
+      AppLaunchHandler.handleDynamicLink(path, context);
+    });
   }
 
   return path.isPublic
