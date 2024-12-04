@@ -44,8 +44,8 @@
 
                 <!-- If a user clicks on a shared link that uses the "http" scheme, your
                     app should be able to delegate that traffic to "https". -->
-                <data android:scheme="https" android:host="statera-0.web.app" />
                 <data android:scheme="http" android:host="statera-0.web.app" />
+                <data android:scheme="https" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

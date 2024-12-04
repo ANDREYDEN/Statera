@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:app_links/app_links.dart';
+// import 'package:app_links/app_links.dart';
 
 class DynamicLinkService {
   void listen(Function(String path) linkHandler) {
-    final appLinks = AppLinks();
+    // final appLinks = AppLinks();
 
-    appLinks.uriLinkStream.listen((uri) {
-      linkHandler(uri.path);
-    });
+    // appLinks.uriLinkStream.listen((uri) {
+    //   linkHandler(uri.path);
+    // });
   }
 
   Future<String> generateDynamicLink({

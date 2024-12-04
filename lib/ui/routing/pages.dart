@@ -187,10 +187,10 @@ Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
   );
 
   if (isMobilePlatform()) {
-    final dynamicLinkService = context.read<DynamicLinkService>();
-    dynamicLinkService.listen((path) {
-      AppLaunchHandler.handleDynamicLink(path, context);
-    });
+    // final dynamicLinkService = context.read<DynamicLinkService>();
+    // dynamicLinkService.listen((path) {
+    //   AppLaunchHandler.handleDynamicLink(path, context);
+    // });
   }
 
   return path.isPublic
