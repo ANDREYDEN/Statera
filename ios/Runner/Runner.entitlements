@@ -11,7 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:statera.page.link</string>
-		<string>applinks:statera.web.app</string>
+		<string>applinks:statera-0.web.app</string>
 	</array>
 </dict>
 </plist>
