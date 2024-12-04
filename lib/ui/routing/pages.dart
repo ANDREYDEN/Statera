@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
@@ -19,52 +19,51 @@ import 'package:statera/ui/group_joining/group_joining.dart';
 import 'package:statera/ui/groups/group_list.dart';
 import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
-import 'package:statera/ui/routing/page_path.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
-import 'package:statera/utils/app_launch_handler.dart';
-import 'package:statera/utils/helpers.dart';
 
-final _landingPagePath = PagePath(
-  pattern: '^${LandingPage.route}\$',
-  isPublic: true,
-  builder: (context, matches) => LandingPage(),
-);
+Widget _renderPage(
+  Widget widget, {
+  bool isPublic = false,
+  bool isHomePage = false,
+}) {
+  return isPublic ? widget : AuthGuard(isHomePage: isHomePage, child: widget);
+}
 
-final _groupsPagePath = PagePath(
-  pattern: '^${GroupList.route}\$',
-  builder: (context, _) => BlocProvider<GroupsCubit>(
-    create: (context) => GroupsCubit(
-      context.read<GroupRepository>(),
-      context.read<UserRepository>(),
-      context.read<UserGroupRepository>(),
-    )..load(context.read<AuthBloc>().uid),
-    child: GroupList(),
+final router = GoRouter(routes: [
+  GoRoute(
+    path: LandingPage.route,
+    builder: (context, _) => _renderPage(LandingPage()),
   ),
-);
-
-final List<PagePath> _paths = [
-  _landingPagePath,
-  PagePath(
-    pattern: '^${SupportPage.route}\$',
-    isPublic: true,
-    builder: (context, matches) => SupportPage(),
+  GoRoute(
+    path: SupportPage.route,
+    builder: (context, _) => _renderPage(SupportPage()),
   ),
-  _groupsPagePath,
-  PagePath(
-    pattern: '^${GroupPage.route}/([\\w-]+)\$',
-    builder: (context, matches) => MultiProvider(
+  GoRoute(
+    path: GroupList.route,
+    builder: (context, _) => BlocProvider<GroupsCubit>(
+      create: (context) => GroupsCubit(
+        context.read<GroupRepository>(),
+        context.read<UserRepository>(),
+        context.read<UserGroupRepository>(),
+      )..load(context.read<AuthBloc>().uid),
+      child: GroupList(),
+    ),
+  ),
+  GoRoute(
+    path: '${GroupPage.route}/groupId',
+    builder: (context, state) => MultiProvider(
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
-          )..load(matches?[0]),
+          )..load(state.pathParameters['groupId']),
         ),
         BlocProvider(
           create: (context) => ExpensesCubit(
-            matches?[0],
+            state.pathParameters['groupId'],
             context.read<AuthBloc>().uid,
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
@@ -74,17 +73,17 @@ final List<PagePath> _paths = [
         BlocProvider(
           create: (context) => NewPaymentsCubit(context.read<PaymentService>())
             ..load(
-              groupId: matches?[0],
+              groupId: state.pathParameters['groupId'],
               uid: context.read<AuthBloc>().uid,
             ),
         ),
       ],
-      child: GroupPage(groupId: matches?[0]),
+      child: GroupPage(groupId: state.pathParameters['groupId']),
     ),
   ),
-  PagePath(
-    pattern: '^${Settings.route}\$',
-    builder: (context, matches) => MultiBlocProvider(
+  GoRoute(
+    path: Settings.route,
+    builder: (context, state) => MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => UserCubit(context.read<UserRepository>())
@@ -94,109 +93,61 @@ final List<PagePath> _paths = [
       child: Settings(),
     ),
   ),
-  PagePath(
-    pattern: '^${ExpensePage.route}/([\\w-]+)\$',
-    builder: (context, matches) => MultiProvider(
+  GoRoute(
+    path: '${ExpensePage.route}/:expenseId',
+    builder: (context, state) => MultiProvider(
       providers: [
         BlocProvider<ExpenseBloc>(
-          create: (_) =>
-              ExpenseBloc(context.read<ExpenseService>())..load(matches?[0]),
+          create: (_) => ExpenseBloc(context.read<ExpenseService>())
+            ..load(state.pathParameters['expenseId']),
         ),
         BlocProvider<GroupCubit>(
           create: (_) => GroupCubit(
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
-          )..loadFromExpense(matches?[0]),
+          )..loadFromExpense(state.pathParameters['expenseId']),
         )
       ],
       child: ExpensePage(),
     ),
   ),
-  PagePath(
-    pattern:
-        '^${GroupPage.route}/([\\w-]+)${PaymentListPage.route}/([\\w-]+)\$',
-    builder: (context, matches) => MultiBlocProvider(
+  GoRoute(
+    path: '${GroupPage.route}/:groupId${PaymentListPage.route}/:paymentId',
+    builder: (context, state) => MultiBlocProvider(
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
-          )..load(matches?[0]),
+          )..load(state.pathParameters['groupId']),
         ),
         BlocProvider<OwingCubit>(
-          create: (context) => OwingCubit()..select(matches?[1] ?? ''),
+          create: (context) =>
+              OwingCubit()..select(state.pathParameters['paymentId'] ?? ''),
         ),
         BlocProvider(
           create: (context) => PaymentsCubit(context.read<PaymentService>())
             ..load(
-              groupId: matches?[0] ?? '',
+              groupId: state.pathParameters['groupId'] ?? '',
               uid: context.select<AuthBloc, String>((authBloc) => authBloc.uid),
-              otherUid: matches?[1] ?? '',
+              otherUid: state.pathParameters['paymentId'] ?? '',
             ),
         ),
       ],
       child: PaymentListPage(),
     ),
   ),
-  PagePath(
-    pattern: '^${GroupPage.route}/([\\w-]+)${GroupJoining.route}/([\\w-]+)\$',
-    builder: (context, matches) => BlocProvider<GroupCubit>(
+  GoRoute(
+    path: '${GroupPage.route}/:groupId${GroupJoining.route}/:code',
+    builder: (context, state) => BlocProvider<GroupCubit>(
       create: (context) => GroupCubit(
         context.read<GroupRepository>(),
         context.read<ExpenseService>(),
         context.read<UserRepository>(),
-      )..load(matches?[0]),
-      child: GroupJoining(code: matches?[1]),
+      )..load(state.pathParameters['groupId']),
+      child: GroupJoining(code: state.pathParameters['code']),
     ),
   )
-];
-
-Route<dynamic> onGenerateRoute(RouteSettings settings) {
-  var route = settings.name ?? '/404';
-  var builder;
-
-  // try to match route to page
-  for (PagePath path in _paths) {
-    final regExpPattern = RegExp(path.pattern);
-    if (regExpPattern.hasMatch(route)) {
-      final firstMatch = regExpPattern.firstMatch(route);
-      builder = (context) => _renderPage(path, context, match: firstMatch);
-      break;
-    }
-  }
-
-  // navigate home if nothing matched
-  if (builder == null) {
-    builder = (context) => kIsWeb
-        ? _renderPage(_landingPagePath, context)
-        : _renderPage(_groupsPagePath, context);
-    route = GroupList.route;
-  }
-
-  return MaterialPageRoute(
-    settings: RouteSettings(name: route, arguments: settings.arguments),
-    builder: builder,
-  );
-}
-
-Widget _renderPage(PagePath path, BuildContext context, {RegExpMatch? match}) {
-  final matches = match?.groups(
-    List.generate(match.groupCount, (index) => index + 1),
-  );
-
-  if (isMobilePlatform()) {
-    // final dynamicLinkService = context.read<DynamicLinkService>();
-    // dynamicLinkService.listen((path) {
-    //   AppLaunchHandler.handleDynamicLink(path, context);
-    // });
-  }
-
-  return path.isPublic
-      ? path.builder(context, matches)
-      : AuthGuard(
-          isHomePage: path == _groupsPagePath,
-          builder: () => path.builder(context, matches),
-        );
-}
+]);
