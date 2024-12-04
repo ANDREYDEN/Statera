@@ -4,7 +4,7 @@
             "delegate_permission/common.handle_all_urls"
         ],
         "target": {
-            "namespace": "Statera",
+            "namespace": "android_app",
             "package_name": "com.statera.statera",
             "sha256_cert_fingerprints": [
                 "21:3E:BC:ED:96:E4:BF:C4:A5:DD:F1:A6:5F:04:62:19:B2:15:F5:C4:CF:E5:32:E6:B4:A3:56:3D:83:89:6C:11",
