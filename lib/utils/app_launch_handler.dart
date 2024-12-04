@@ -12,7 +12,7 @@ class AppLaunchHandler {
       _lastLaunchHandledAt == null ||
       DateTime.now().difference(_lastLaunchHandledAt!) > cooldown;
 
-  static void ensureCanHandleLaunch() {
+  static void _ensureCanHandleLaunch() {
     if (!canHandleLaunch) return;
     _lastLaunchHandledAt = DateTime.now();
   }
@@ -20,7 +20,11 @@ class AppLaunchHandler {
   /// Handles the notification [message] (tapping on a notification) from a particular app [context].
   /// This method ensures that each notification will be handled exactly once
   /// (ignoring all invocations for a given period of time)
-  static void handleNotificationMessage(RemoteMessage message, BuildContext context) {
+  static void handleNotificationMessage(
+    RemoteMessage message,
+    BuildContext context,
+  ) {
+    _ensureCanHandleLaunch();
     log('handling message ${message.data}');
 
     final path = getPath(message);
@@ -29,17 +33,15 @@ class AppLaunchHandler {
     Navigator.pushNamed(context, path);
   }
 
-  /// Handles the dynamic link [linkData] from a particular app [context].
+  /// Handles the dynamic link [path] from a particular app [context].
   /// This method ensures that each dynamic link will be handled exactly once
   /// (ignoring all invocations for a given period of time)
-  // static void handleDynamicLink(PendingDynamicLinkData linkData, BuildContext context) {
-  //   if (!canHandleLaunch) return;
-  //   _lastLaunchHandledAt = DateTime.now();
+  static void handleDynamicLink(String path, BuildContext context) {
+    _ensureCanHandleLaunch();
+    log('handling dynamic link $path');
 
-  //   log('handling dynamic link ${linkData.link.path}');
-
-  //   Navigator.pushNamed(context, linkData.link.path);
-  // }
+    Navigator.pushNamed(context, path);
+  }
 
   static String? getPath(RemoteMessage? message) {
     if (message == null) return null;

@@ -1,8 +1,16 @@
 import 'dart:async';
 
-import 'package:statera/utils/utils.dart';
+import 'package:app_links/app_links.dart';
 
 class DynamicLinkService {
+  void listen(Function(String path) linkHandler) {
+    final appLinks = AppLinks();
+
+    appLinks.uriLinkStream.listen((uri) {
+      linkHandler(uri.path);
+    });
+  }
+
   Future<String> generateDynamicLink({
     String? path,
     String? socialTitle,
@@ -16,7 +24,6 @@ class DynamicLinkService {
       path = '/' + path;
     }
 
-    final base = kIsModeDebug ? '127.0.0.1' : 'https://statera-0.web.app';
-    return '$base$path';
+    return 'https://statera-0.web.app$path';
   }
 }
