@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
@@ -30,10 +31,7 @@ class GroupBuilder extends StatelessWidget {
         }
 
         if (state is GroupJoinSuccess) {
-          Navigator.pushReplacementNamed(
-            context,
-            '${GroupPage.route}/${state.group.id}',
-          );
+          context.go('${GroupPage.route}/${state.group.id}');
         }
       },
       listenWhen: (before, after) =>

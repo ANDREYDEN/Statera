@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/src/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
@@ -31,7 +32,7 @@ class GroupJoiningActions extends StatelessWidget {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               } else {
-                Navigator.pushReplacementNamed(context, GroupList.route);
+                context.go(GroupList.route);
               }
             },
           ),

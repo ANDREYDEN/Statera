@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
@@ -66,8 +67,7 @@ class _GroupPageState extends State<GroupPage> {
           : () => NewExpenseDialog.show(
                 context,
                 afterAddition: (expenseId) {
-                  Navigator.of(context)
-                      .pushNamed('${ExpensePage.route}/$expenseId');
+                  context.go('${ExpensePage.route}/$expenseId');
                 },
               ),
       bottomNavBar: isWide

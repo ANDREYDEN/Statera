@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
@@ -45,7 +46,7 @@ class OwingListItem extends StatelessWidget {
           child: ListTile(
             onTap: () => isWide
                 ? owingCubit.select(member.uid)
-                : Navigator.of(context).pushNamed(paymentPageRoute),
+                : context.go(paymentPageRoute),
             selected: selectedMemberUid == member.uid,
             selectedTileColor:
                 Theme.of(context).colorScheme.primary.withAlpha(50),

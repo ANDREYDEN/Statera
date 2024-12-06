@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 import '../groups/group_list.dart';
@@ -15,8 +16,7 @@ class PageNotFound extends StatelessWidget {
           children: [
             Text('404 - nothing interesting here'),
             TextButton(
-              onPressed: () =>
-                  Navigator.of(context).popAndPushNamed(GroupList.route),
+              onPressed: () => context.go(GroupList.route),
               child: Text('Back home'),
             )
           ],
