@@ -51,7 +51,7 @@ final router = GoRouter(routes: [
     ),
   ),
   GoRoute(
-    path: '${GroupPage.route}/groupId',
+    path: '${GroupPage.route}/:groupId',
     builder: (context, state) => MultiProvider(
       providers: [
         BlocProvider<GroupCubit>(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/groups/actions/toggle_archive_user_group_action.dart';
@@ -17,8 +18,7 @@ class GroupListItem extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          Navigator.of(context)
-              .pushNamed(GroupPage.route + '/${this.userGroup.groupId}');
+          context.go(GroupPage.route + '/${this.userGroup.groupId}');
         },
         child: Padding(
           padding: const EdgeInsets.all(20.0),

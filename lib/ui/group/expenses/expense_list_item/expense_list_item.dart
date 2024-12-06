@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
@@ -37,7 +38,7 @@ class ExpenseListItem extends StatelessWidget {
       if (processing) return null;
       if (isWide) return expenseBloc.load(expense.id);
 
-      Navigator.of(context).pushNamed(ExpensePage.route + '/${expense.id}');
+      context.go(ExpensePage.route + '/${expense.id}');
     }
 
     void _handleLongPress() {

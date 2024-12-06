@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 
 class AppLaunchHandler {
   static const Duration cooldown = Duration(seconds: 1);
@@ -30,7 +31,7 @@ class AppLaunchHandler {
     final path = getPath(message);
     if (path == null) return;
 
-    Navigator.pushNamed(context, path);
+    context.go(path);
   }
 
   /// Handles the dynamic link [path] from a particular app [context].
@@ -40,7 +41,7 @@ class AppLaunchHandler {
     _ensureCanHandleLaunch();
     log('handling dynamic link $path');
 
-    Navigator.pushNamed(context, path);
+    context.go(path);
   }
 
   static String? getPath(RemoteMessage? message) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/expense/expense_page.dart';
@@ -20,8 +21,7 @@ class PaymentDetailsDialog extends StatelessWidget {
   }) : super(key: key);
 
   void _navigateToExpense(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('${ExpensePage.route}/${payment.relatedExpense!.id}');
+    context.go('${ExpensePage.route}/${payment.relatedExpense!.id}');
   }
 
   @override
