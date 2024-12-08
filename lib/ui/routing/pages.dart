@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,164 @@ import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 
+// TODO: implement redirection
+final router = GoRouter(
+  initialLocation: kIsWeb ? '/' : '/groups',
+  routes: [
+    GoRoute(
+      name: LandingPage.name,
+      path: '/',
+      builder: (_, __) => _renderPage(LandingPage(), isPublic: true),
+    ),
+    GoRoute(
+      name: GroupList.name,
+      path: '/groups',
+      builder: (_, __) => _renderPage(
+        BlocProvider<GroupsCubit>(
+          create: (context) => GroupsCubit(
+            context.read<GroupRepository>(),
+            context.read<UserRepository>(),
+            context.read<UserGroupRepository>(),
+          )..load(context.read<AuthBloc>().uid),
+          child: GroupList(),
+        ),
+      ),
+      routes: [
+        GoRoute(
+          name: SupportPage.name,
+          path: 'support',
+          builder: (_, __) => _renderPage(
+            SupportPage(),
+            isPublic: true,
+            isHomePage: true,
+          ),
+        ),
+        GoRoute(
+          name: GroupPage.name,
+          path: ':groupId',
+          builder: (_, state) => _renderPage(
+            MultiProvider(
+              providers: [
+                BlocProvider<GroupCubit>(
+                  create: (context) => GroupCubit(
+                    context.read<GroupRepository>(),
+                    context.read<ExpenseService>(),
+                    context.read<UserRepository>(),
+                  )..load(state.pathParameters['groupId']),
+                ),
+                BlocProvider(
+                  create: (context) => ExpensesCubit(
+                    state.pathParameters['groupId'],
+                    context.read<AuthBloc>().uid,
+                    context.read<UserExpenseRepository>(),
+                    context.read<ExpenseService>(),
+                    context.read<GroupRepository>(),
+                  )..load(),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      NewPaymentsCubit(context.read<PaymentService>())
+                        ..load(
+                          groupId: state.pathParameters['groupId'],
+                          uid: context.read<AuthBloc>().uid,
+                        ),
+                ),
+              ],
+              child: GroupPage(groupId: state.pathParameters['groupId']),
+            ),
+          ),
+          routes: [
+            GoRoute(
+              name: ExpensePage.name,
+              path: 'expenses/:expenseId',
+              builder: (_, state) => _renderPage(
+                MultiProvider(
+                  providers: [
+                    BlocProvider<ExpenseBloc>(
+                      create: (context) =>
+                          ExpenseBloc(context.read<ExpenseService>())
+                            ..load(state.pathParameters['expenseId']),
+                    ),
+                    BlocProvider<GroupCubit>(
+                      create: (context) => GroupCubit(
+                        context.read<GroupRepository>(),
+                        context.read<ExpenseService>(),
+                        context.read<UserRepository>(),
+                      )..loadFromExpense(state.pathParameters['expenseId']),
+                    )
+                  ],
+                  child: ExpensePage(),
+                ),
+              ),
+            ),
+            GoRoute(
+              name: PaymentListPage.name,
+              path: 'payments/:memberId',
+              builder: (_, state) => _renderPage(
+                MultiBlocProvider(
+                  providers: [
+                    BlocProvider<GroupCubit>(
+                      create: (context) => GroupCubit(
+                        context.read<GroupRepository>(),
+                        context.read<ExpenseService>(),
+                        context.read<UserRepository>(),
+                      )..load(state.pathParameters['groupId']),
+                    ),
+                    BlocProvider<OwingCubit>(
+                      create: (context) => OwingCubit()
+                        ..select(state.pathParameters['memberId'] ?? ''),
+                    ),
+                    BlocProvider(
+                      create: (context) =>
+                          PaymentsCubit(context.read<PaymentService>())
+                            ..load(
+                              groupId: state.pathParameters['groupId'] ?? '',
+                              uid: context.select<AuthBloc, String>(
+                                  (authBloc) => authBloc.uid),
+                              otherUid: state.pathParameters['paymentId'] ?? '',
+                            ),
+                    ),
+                  ],
+                  child: PaymentListPage(),
+                ),
+              ),
+            ),
+            GoRoute(
+              name: GroupJoining.name,
+              path: 'join/:code',
+              builder: (_, state) => _renderPage(
+                BlocProvider<GroupCubit>(
+                  create: (context) => GroupCubit(
+                    context.read<GroupRepository>(),
+                    context.read<ExpenseService>(),
+                    context.read<UserRepository>(),
+                  )..load(state.pathParameters['groupId']),
+                  child: GroupJoining(code: state.pathParameters['code']),
+                ),
+              ),
+            )
+          ],
+        ),
+        GoRoute(
+          name: Settings.name,
+          path: 'settings',
+          builder: (_, state) => _renderPage(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => UserCubit(context.read<UserRepository>())
+                    ..load(context.read<AuthBloc>().uid),
+                )
+              ],
+              child: Settings(),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ],
+);
+
 Widget _renderPage(
   Widget widget, {
   bool isPublic = false,
@@ -29,125 +188,3 @@ Widget _renderPage(
 }) {
   return isPublic ? widget : AuthGuard(isHomePage: isHomePage, child: widget);
 }
-
-final router = GoRouter(routes: [
-  GoRoute(
-    path: LandingPage.route,
-    builder: (context, _) => _renderPage(LandingPage()),
-  ),
-  GoRoute(
-    path: SupportPage.route,
-    builder: (context, _) => _renderPage(SupportPage()),
-  ),
-  GoRoute(
-    path: GroupList.route,
-    builder: (context, _) => BlocProvider<GroupsCubit>(
-      create: (context) => GroupsCubit(
-        context.read<GroupRepository>(),
-        context.read<UserRepository>(),
-        context.read<UserGroupRepository>(),
-      )..load(context.read<AuthBloc>().uid),
-      child: GroupList(),
-    ),
-  ),
-  GoRoute(
-    path: '${GroupPage.route}/:groupId',
-    builder: (context, state) => MultiProvider(
-      providers: [
-        BlocProvider<GroupCubit>(
-          create: (context) => GroupCubit(
-            context.read<GroupRepository>(),
-            context.read<ExpenseService>(),
-            context.read<UserRepository>(),
-          )..load(state.pathParameters['groupId']),
-        ),
-        BlocProvider(
-          create: (context) => ExpensesCubit(
-            state.pathParameters['groupId'],
-            context.read<AuthBloc>().uid,
-            context.read<UserExpenseRepository>(),
-            context.read<ExpenseService>(),
-            context.read<GroupRepository>(),
-          )..load(),
-        ),
-        BlocProvider(
-          create: (context) => NewPaymentsCubit(context.read<PaymentService>())
-            ..load(
-              groupId: state.pathParameters['groupId'],
-              uid: context.read<AuthBloc>().uid,
-            ),
-        ),
-      ],
-      child: GroupPage(groupId: state.pathParameters['groupId']),
-    ),
-  ),
-  GoRoute(
-    path: Settings.route,
-    builder: (context, state) => MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => UserCubit(context.read<UserRepository>())
-            ..load(context.read<AuthBloc>().uid),
-        )
-      ],
-      child: Settings(),
-    ),
-  ),
-  GoRoute(
-    path: '${ExpensePage.route}/:expenseId',
-    builder: (context, state) => MultiProvider(
-      providers: [
-        BlocProvider<ExpenseBloc>(
-          create: (_) => ExpenseBloc(context.read<ExpenseService>())
-            ..load(state.pathParameters['expenseId']),
-        ),
-        BlocProvider<GroupCubit>(
-          create: (_) => GroupCubit(
-            context.read<GroupRepository>(),
-            context.read<ExpenseService>(),
-            context.read<UserRepository>(),
-          )..loadFromExpense(state.pathParameters['expenseId']),
-        )
-      ],
-      child: ExpensePage(),
-    ),
-  ),
-  GoRoute(
-    path: '${GroupPage.route}/:groupId${PaymentListPage.route}/:paymentId',
-    builder: (context, state) => MultiBlocProvider(
-      providers: [
-        BlocProvider<GroupCubit>(
-          create: (context) => GroupCubit(
-            context.read<GroupRepository>(),
-            context.read<ExpenseService>(),
-            context.read<UserRepository>(),
-          )..load(state.pathParameters['groupId']),
-        ),
-        BlocProvider<OwingCubit>(
-          create: (context) =>
-              OwingCubit()..select(state.pathParameters['paymentId'] ?? ''),
-        ),
-        BlocProvider(
-          create: (context) => PaymentsCubit(context.read<PaymentService>())
-            ..load(
-              groupId: state.pathParameters['groupId'] ?? '',
-              uid: context.select<AuthBloc, String>((authBloc) => authBloc.uid),
-              otherUid: state.pathParameters['paymentId'] ?? '',
-            ),
-        ),
-      ],
-      child: PaymentListPage(),
-    ),
-  ),
-  GoRoute(
-    path: '${GroupPage.route}/:groupId${GroupJoining.route}/:code',
-    builder: (context, state) => BlocProvider<GroupCubit>(
-      create: (context) => GroupCubit(
-        context.read<GroupRepository>(),
-        context.read<ExpenseService>(),
-        context.read<UserRepository>(),
-      )..load(state.pathParameters['groupId']),
-      child: GroupJoining(code: state.pathParameters['code']),
-    ),
-  )
-]);

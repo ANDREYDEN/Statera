@@ -34,29 +34,19 @@ class AppLaunchHandler {
     context.go(path);
   }
 
-  /// Handles the dynamic link [path] from a particular app [context].
-  /// This method ensures that each dynamic link will be handled exactly once
-  /// (ignoring all invocations for a given period of time)
-  static void handleDynamicLink(String path, BuildContext context) {
-    _ensureCanHandleLaunch();
-    log('handling dynamic link $path');
-
-    context.go(path);
-  }
-
   static String? getPath(RemoteMessage? message) {
     if (message == null) return null;
     switch (message.data['type']) {
       case 'expense_created':
       case 'expense_finalized':
         if (message.data['expenseId'] != null) {
-          return '/expense/${message.data['expenseId']}';
+          return '/groups/${message.data['groupId']}/expenses/${message.data['expenseId']}';
         }
         break;
       case 'group_debt_threshold_reached':
       case 'expense_completed':
         if (message.data['groupId'] != null) {
-          return '/group/${message.data['groupId']}';
+          return '/groups/${message.data['groupId']}';
         }
         break;
       default:

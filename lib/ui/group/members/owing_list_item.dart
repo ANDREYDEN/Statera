@@ -5,11 +5,10 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
-import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/group/members/new_payments_badge.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
-import 'package:statera/ui/widgets/user_avatar.dart';
 import 'package:statera/ui/widgets/price_text.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 
 class OwingListItem extends StatelessWidget {
   final CustomUser member;
@@ -34,8 +33,6 @@ class OwingListItem extends StatelessWidget {
 
     return GroupBuilder(
       builder: (context, group) {
-        final paymentPageRoute =
-            '${GroupPage.route}/${group.id}${PaymentListPage.route}/${member.uid}';
         final owingColor = this.owing >= group.debtThreshold
             ? Theme.of(context).colorScheme.error
             : null;
@@ -46,7 +43,13 @@ class OwingListItem extends StatelessWidget {
           child: ListTile(
             onTap: () => isWide
                 ? owingCubit.select(member.uid)
-                : context.go(paymentPageRoute),
+                : context.goNamed(
+                    PaymentListPage.name,
+                    pathParameters: {
+                      'groupId': group.id!,
+                      'memberId': member.uid
+                    },
+                  ),
             selected: selectedMemberUid == member.uid,
             selectedTileColor:
                 Theme.of(context).colorScheme.primary.withAlpha(50),

@@ -18,7 +18,7 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
 class GroupList extends StatelessWidget {
-  static const String route = '/groups';
+  static const String name = 'GroupList';
 
   const GroupList({Key? key}) : super(key: key);
 
@@ -30,11 +30,11 @@ class GroupList extends StatelessWidget {
           title: kAppName,
           actions: [
             IconButton(
-              onPressed: () => context.go(SupportPage.route),
+              onPressed: () => context.goNamed(SupportPage.name),
               icon: Icon(Icons.info_outline_rounded),
             ),
             IconButton(
-              onPressed: () => context.go(Settings.route),
+              onPressed: () => context.goNamed(Settings.name),
               icon: Icon(Icons.settings_outlined),
             ),
           ],

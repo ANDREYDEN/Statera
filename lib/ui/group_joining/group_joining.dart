@@ -5,8 +5,7 @@ import 'package:statera/ui/group_joining/group_joining_actions.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class GroupJoining extends StatelessWidget {
-  static String route = '/join';
-
+  static const String name = 'GroupJoining';
   final String? code;
 
   const GroupJoining({Key? key, this.code}) : super(key: key);

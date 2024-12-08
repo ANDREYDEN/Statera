@@ -20,7 +20,7 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
-  static const String route = '/group';
+  static const String name = 'Group';
   static final scaffoldKey = GlobalKey<ScaffoldState>();
   final String? groupId;
 
@@ -67,7 +67,13 @@ class _GroupPageState extends State<GroupPage> {
           : () => NewExpenseDialog.show(
                 context,
                 afterAddition: (expenseId) {
-                  context.go('${ExpensePage.route}/$expenseId');
+                  context.goNamed(
+                    ExpensePage.name,
+                    pathParameters: {
+                      'expenseId': expenseId!,
+                      'groupId': widget.groupId!
+                    },
+                  );
                 },
               ),
       bottomNavBar: isWide

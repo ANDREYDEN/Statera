@@ -16,7 +16,6 @@ void main(List<String> args) {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: ThemeMode.system,
-        initialRoute: GroupList.route,
         debugShowCheckedModeBanner: false,
         home: LandingPage(),
       );
@@ -25,7 +24,7 @@ void main(List<String> args) {
 }
 
 class LandingPage extends StatefulWidget {
-  static const String route = '/';
+  static const String name = 'Landing';
 
   const LandingPage({Key? key}) : super(key: key);
 
@@ -52,7 +51,7 @@ class _LandingPageState extends State<LandingPage>
       title: 'Statera',
       actions: [
         TextButton.icon(
-          onPressed: () => context.go(GroupList.route),
+          onPressed: () => context.goNamed(GroupList.name),
           icon: Icon(Icons.login),
           label: Text('Log in'),
           style: TextButton.styleFrom(
@@ -120,7 +119,7 @@ class _LandingPageState extends State<LandingPage>
                         ? null
                         : () {
                             if (_selectedOption.platform == null) {
-                              context.go(GroupList.route);
+                              context.goNamed(GroupList.name);
                               return;
                             }
 

@@ -31,7 +31,10 @@ class GroupBuilder extends StatelessWidget {
         }
 
         if (state is GroupJoinSuccess) {
-          context.go('${GroupPage.route}/${state.group.id}');
+          context.goNamed(
+            GroupPage.name,
+            pathParameters: {'groupId': state.group.id!},
+          );
         }
       },
       listenWhen: (before, after) =>

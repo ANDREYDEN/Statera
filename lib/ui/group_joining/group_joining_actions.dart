@@ -29,11 +29,7 @@ class GroupJoiningActions extends StatelessWidget {
         Expanded(
           child: CancelButton(
             onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                context.go(GroupList.route);
-              }
+              context.goNamed(GroupList.name);
             },
           ),
         ),

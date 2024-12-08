@@ -15,7 +15,7 @@ class GroupJoiningErrorState extends StatelessWidget {
         Text(error),
         SizedBox(height: 30),
         ElevatedButton(
-          onPressed: () => context.go(GroupList.route),
+          onPressed: () => context.goNamed(GroupList.name),
           child: Text('Back'),
         )
       ],

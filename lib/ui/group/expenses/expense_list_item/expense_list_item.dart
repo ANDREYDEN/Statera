@@ -38,7 +38,10 @@ class ExpenseListItem extends StatelessWidget {
       if (processing) return null;
       if (isWide) return expenseBloc.load(expense.id);
 
-      context.go(ExpensePage.route + '/${expense.id}');
+      context.goNamed(
+        ExpensePage.name,
+        pathParameters: {'expenseId': expense.id, 'groupId': expense.groupId!},
+      );
     }
 
     void _handleLongPress() {
