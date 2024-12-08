@@ -3,7 +3,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,8 +12,6 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/firebase_options.dart';
 import 'package:statera/repository_registrant.dart';
 import 'package:statera/ui/custom_layout_builder.dart';
-import 'package:statera/ui/groups/group_list.dart';
-import 'package:statera/ui/landing/landing_page.dart';
 import 'package:statera/ui/routing/pages.dart';
 import 'package:statera/utils/utils.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -53,11 +50,6 @@ class Statera extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultRoute = kIsWeb
-        ? LandingPage.route
-        // see https://api.flutter.dev/flutter/material/MaterialApp/initialRoute.html for explanation
-        : GroupList.route.replaceFirst('/', '');
-
     return RepositoryRegistrant(
       firestore: FirebaseFirestore.instance,
       child: BlocProvider(
@@ -65,13 +57,12 @@ class Statera extends StatelessWidget {
         child: CustomThemeBuilder(
           builder: (lightTheme, darkTheme) {
             return CustomLayoutBuilder(
-              child: MaterialApp(
+              child: MaterialApp.router(
                 title: kAppName,
                 theme: lightTheme,
                 darkTheme: darkTheme,
                 themeMode: ThemeMode.system,
-                initialRoute: initialRoute ?? defaultRoute,
-                onGenerateRoute: onGenerateRoute,
+                routerConfig: router,
                 debugShowCheckedModeBanner: false,
               ),
             );

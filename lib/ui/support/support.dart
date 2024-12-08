@@ -6,7 +6,7 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class SupportPage extends StatelessWidget {
-  static final String route = '/support';
+  static const String name = 'Support';
 
   const SupportPage({Key? key}) : super(key: key);
 

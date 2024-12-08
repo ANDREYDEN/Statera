@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
@@ -17,7 +18,7 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
 class GroupList extends StatelessWidget {
-  static const String route = '/groups';
+  static const String name = 'GroupList';
 
   const GroupList({Key? key}) : super(key: key);
 
@@ -29,11 +30,11 @@ class GroupList extends StatelessWidget {
           title: kAppName,
           actions: [
             IconButton(
-              onPressed: () => Navigator.pushNamed(context, SupportPage.route),
+              onPressed: () => context.goNamed(SupportPage.name),
               icon: Icon(Icons.info_outline_rounded),
             ),
             IconButton(
-              onPressed: () => Navigator.pushNamed(context, Settings.route),
+              onPressed: () => context.goNamed(Settings.name),
               icon: Icon(Icons.settings_outlined),
             ),
           ],

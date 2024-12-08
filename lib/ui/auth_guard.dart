@@ -7,13 +7,13 @@ import 'package:statera/ui/authentication/sign_in.dart';
 import 'package:statera/ui/notifications_initializer.dart';
 
 class AuthGuard extends StatelessWidget {
-  final Widget Function() builder;
+  final Widget child;
   final bool isHomePage;
 
   const AuthGuard({
     Key? key,
-    required this.builder,
     required this.isHomePage,
+    required this.child,
   }) : super(key: key);
 
   @override
@@ -27,10 +27,7 @@ class AuthGuard extends StatelessWidget {
           );
         }
 
-        return NotificationsInitializer(
-          isHomePage: isHomePage,
-          child: this.builder(),
-        );
+        return NotificationsInitializer(isHomePage: isHomePage, child: child);
       },
     );
   }

@@ -1,0 +1,16 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appId": "X29A5VS44D.com.statera.statera",
+                "paths": [
+                    "NOT /__/auth/action/",
+                    "NOT /__/auth/handler/",
+                    "NOT /_/*",
+                    "/*"
+                ]
+            }
+        ]
+    }
+}

@@ -1,21 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:statera/firebase_options.dart';
-import 'package:statera/utils/utils.dart';
+// import 'package:app_links/app_links.dart';
 
 class DynamicLinkService {
-  // Future<StreamSubscription<PendingDynamicLinkData>> listen(
-  //   BuildContext context,
-  // ) async {
-  //   return FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) => AppLaunchHandler.handleDynamicLink(dynamicLinkData, context))
-  //     ..onError((error) {
-  //       FirebaseCrashlytics.instance.recordFlutterError(error);
-  //     });
-  // }
+  void listen(Function(String path) linkHandler) {
+    // final appLinks = AppLinks();
+
+    // appLinks.uriLinkStream.listen((uri) {
+    //   linkHandler(uri.path);
+    // });
+  }
 
   Future<String> generateDynamicLink({
     String? path,
@@ -23,52 +17,13 @@ class DynamicLinkService {
     String? socialDescription,
     String? socialImageLink,
   }) async {
+    // TODO: bring back social media features
     path ??= '/';
 
     if (!path.startsWith('/')) {
       path = '/' + path;
     }
 
-    final uri = Uri(
-      scheme: 'https',
-      host: 'firebasedynamiclinks.googleapis.com',
-      path: 'v1/shortLinks',
-      queryParameters: {'key': DefaultFirebaseOptions.currentPlatform.apiKey},
-    );
-
-    final client = http.Client();
-    final response = await client.post(
-      uri,
-      body: json.encode({
-        'suffix': {
-          'option': 'UNGUESSABLE',
-        },
-        'dynamicLinkInfo': {
-          'domainUriPrefix': 'https://statera.page.link',
-          'link': 'https://statera-0.web.app$path',
-          'androidInfo': {
-            'androidPackageName': 'com.statera.statera',
-          },
-          'iosInfo': {
-            'iosBundleId': 'com.statera.statera',
-            'iosAppStoreId': '1609503817'
-          },
-          'socialMetaTagInfo': {
-            if (socialTitle != null) 'socialTitle': socialTitle,
-            if (socialDescription != null)
-              'socialDescription': socialDescription,
-            if (socialImageLink != null) 'socialImageLink': socialImageLink
-          }
-        }
-      }),
-    );
-
-    if (response.statusCode < 200 || response.statusCode >= 400) {
-      throw Exception(
-        'Something went wrong while creating a dynamic link: ${response.body}',
-      );
-    }
-
-    return json.decode(response.body)['shortLink'];
+    return 'https://statera-0.web.app$path';
   }
 }
