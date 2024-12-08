@@ -21,7 +21,13 @@ class PaymentDetailsDialog extends StatelessWidget {
   }) : super(key: key);
 
   void _navigateToExpense(BuildContext context) {
-    context.go('${ExpensePage.route}/${payment.relatedExpense!.id}');
+    context.goNamed(
+      ExpensePage.name,
+      pathParameters: {
+        'groupId': payment.groupId!,
+        'expenseId': payment.relatedExpense!.id!
+      },
+    );
   }
 
   @override

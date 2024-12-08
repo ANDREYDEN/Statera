@@ -16,7 +16,7 @@ class PageNotFound extends StatelessWidget {
           children: [
             Text('404 - nothing interesting here'),
             TextButton(
-              onPressed: () => context.go(GroupList.route),
+              onPressed: () => context.goNamed(GroupList.name),
               child: Text('Back home'),
             )
           ],

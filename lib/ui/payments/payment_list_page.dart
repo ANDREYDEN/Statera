@@ -7,7 +7,7 @@ import 'package:statera/ui/payments/payment_list.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class PaymentListPage extends StatelessWidget {
-  static const String route = '/payments';
+  static const String name = 'Payments';
 
   const PaymentListPage({Key? key}) : super(key: key);
 

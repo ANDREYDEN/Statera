@@ -18,7 +18,10 @@ class GroupListItem extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          context.go(GroupPage.route + '/${this.userGroup.groupId}');
+          context.goNamed(
+            GroupPage.name,
+            pathParameters: {'groupId': this.userGroup.groupId},
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(20.0),
