@@ -45,6 +45,7 @@ class AppLaunchHandler {
         break;
       case 'group_debt_threshold_reached':
       case 'expense_completed':
+      case 'expense_reverted':
         if (message.data['groupId'] != null) {
           return '/groups/${message.data['groupId']}';
         }

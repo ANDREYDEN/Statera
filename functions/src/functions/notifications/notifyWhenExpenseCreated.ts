@@ -14,7 +14,7 @@ export async function notifyWhenExpenseCreated(
 
   if (userTokens.length === 0) return null
 
-  return messaging().sendMulticast({
+  return messaging().sendEachForMulticast({
     tokens: userTokens as string[],
     notification: {
       title: 'New Expense',
@@ -23,6 +23,7 @@ export async function notifyWhenExpenseCreated(
     data: {
       type: 'expense_created',
       expenseId: expenseSnap.id,
+      groupId,
     },
   })
 }

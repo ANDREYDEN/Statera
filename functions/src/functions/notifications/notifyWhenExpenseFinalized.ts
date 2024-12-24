@@ -17,7 +17,7 @@ export async function notifyWhenExpenseFinalized(
 
   if (authorTokens.length === 0) return null
 
-  return messaging().sendMulticast({
+  return messaging().sendEachForMulticast({
     tokens: authorTokens as string[],
     notification: {
       title: 'Expense finalized',
@@ -26,6 +26,7 @@ export async function notifyWhenExpenseFinalized(
     data: {
       type: 'expense_finalized',
       groupId,
+      expenseId: expenseSnap.id,
     },
   })
 }

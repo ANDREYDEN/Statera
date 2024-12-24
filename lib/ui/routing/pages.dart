@@ -44,6 +44,7 @@ final router = GoRouter(
           )..load(context.read<AuthBloc>().uid),
           child: GroupList(),
         ),
+        isHomePage: true,
       ),
       routes: [
         GoRoute(
@@ -52,7 +53,21 @@ final router = GoRouter(
           builder: (_, __) => _renderPage(
             SupportPage(),
             isPublic: true,
-            isHomePage: true,
+          ),
+        ),
+        GoRoute(
+          name: Settings.name,
+          path: 'settings',
+          builder: (_, state) => _renderPage(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => UserCubit(context.read<UserRepository>())
+                    ..load(context.read<AuthBloc>().uid),
+                )
+              ],
+              child: Settings(),
+            ),
           ),
         ),
         GoRoute(
@@ -160,21 +175,6 @@ final router = GoRouter(
               ),
             )
           ],
-        ),
-        GoRoute(
-          name: Settings.name,
-          path: 'settings',
-          builder: (_, state) => _renderPage(
-            MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => UserCubit(context.read<UserRepository>())
-                    ..load(context.read<AuthBloc>().uid),
-                )
-              ],
-              child: Settings(),
-            ),
-          ),
         ),
       ],
     ),

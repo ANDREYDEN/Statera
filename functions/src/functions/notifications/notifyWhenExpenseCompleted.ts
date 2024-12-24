@@ -20,7 +20,7 @@ export async function notifyWhenExpenseCompleted(expenseId: string) {
 
   if (authorTokens.length === 0) return null
 
-  return messaging().sendMulticast({
+  return messaging().sendEachForMulticast({
     tokens: authorTokens as string[],
     notification: {
       title: 'Expense completed',

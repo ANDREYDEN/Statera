@@ -9,8 +9,11 @@ class NotificationsInitializer extends StatelessWidget {
   final Widget child;
   final bool isHomePage;
 
-  const NotificationsInitializer(
-      {super.key, required this.child, required this.isHomePage});
+  const NotificationsInitializer({
+    super.key,
+    required this.child,
+    required this.isHomePage,
+  });
 
   @override
   Widget build(BuildContext context) {
