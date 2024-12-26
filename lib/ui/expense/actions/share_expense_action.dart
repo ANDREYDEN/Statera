@@ -13,8 +13,8 @@ class ShareExpenseAction extends ExpenseAction {
   @protected
   FutureOr<void> handle(BuildContext context) async {
     await snackbarCatch(context, () async {
-      final dynamicLinkRepository = context.read<DynamicLinkService>();
-      final link = await dynamicLinkRepository.generateDynamicLink(
+      final dynamicLinkService = context.read<DynamicLinkService>();
+      final link = await dynamicLinkService.generateDynamicLink(
         path: ModalRoute.of(context)!.settings.name,
       );
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
@@ -19,7 +20,7 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupPage extends StatefulWidget {
-  static const String route = '/group';
+  static const String name = 'Group';
   static final scaffoldKey = GlobalKey<ScaffoldState>();
   final String? groupId;
 
@@ -66,8 +67,13 @@ class _GroupPageState extends State<GroupPage> {
           : () => NewExpenseDialog.show(
                 context,
                 afterAddition: (expenseId) {
-                  Navigator.of(context)
-                      .pushNamed('${ExpensePage.route}/$expenseId');
+                  context.goNamed(
+                    ExpensePage.name,
+                    pathParameters: {
+                      'expenseId': expenseId!,
+                      'groupId': widget.groupId!
+                    },
+                  );
                 },
               ),
       bottomNavBar: isWide

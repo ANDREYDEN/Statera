@@ -9,7 +9,7 @@ import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatelessWidget {
-  static const String route = '/expense';
+  static const String name = 'Expense';
 
   const ExpensePage({Key? key}) : super(key: key);
 

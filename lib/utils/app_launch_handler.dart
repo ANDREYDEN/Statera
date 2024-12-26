@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 
 class AppLaunchHandler {
   static const Duration cooldown = Duration(seconds: 1);
@@ -12,7 +13,7 @@ class AppLaunchHandler {
       _lastLaunchHandledAt == null ||
       DateTime.now().difference(_lastLaunchHandledAt!) > cooldown;
 
-  static void ensureCanHandleLaunch() {
+  static void _ensureCanHandleLaunch() {
     if (!canHandleLaunch) return;
     _lastLaunchHandledAt = DateTime.now();
   }
@@ -20,26 +21,18 @@ class AppLaunchHandler {
   /// Handles the notification [message] (tapping on a notification) from a particular app [context].
   /// This method ensures that each notification will be handled exactly once
   /// (ignoring all invocations for a given period of time)
-  static void handleNotificationMessage(RemoteMessage message, BuildContext context) {
+  static void handleNotificationMessage(
+    RemoteMessage message,
+    BuildContext context,
+  ) {
+    _ensureCanHandleLaunch();
     log('handling message ${message.data}');
 
     final path = getPath(message);
     if (path == null) return;
 
-    Navigator.pushNamed(context, path);
+    context.go(path);
   }
-
-  /// Handles the dynamic link [linkData] from a particular app [context].
-  /// This method ensures that each dynamic link will be handled exactly once
-  /// (ignoring all invocations for a given period of time)
-  // static void handleDynamicLink(PendingDynamicLinkData linkData, BuildContext context) {
-  //   if (!canHandleLaunch) return;
-  //   _lastLaunchHandledAt = DateTime.now();
-
-  //   log('handling dynamic link ${linkData.link.path}');
-
-  //   Navigator.pushNamed(context, linkData.link.path);
-  // }
 
   static String? getPath(RemoteMessage? message) {
     if (message == null) return null;
@@ -47,13 +40,14 @@ class AppLaunchHandler {
       case 'expense_created':
       case 'expense_finalized':
         if (message.data['expenseId'] != null) {
-          return '/expense/${message.data['expenseId']}';
+          return '/groups/${message.data['groupId']}/expenses/${message.data['expenseId']}';
         }
         break;
       case 'group_debt_threshold_reached':
       case 'expense_completed':
+      case 'expense_reverted':
         if (message.data['groupId'] != null) {
-          return '/group/${message.data['groupId']}';
+          return '/groups/${message.data['groupId']}';
         }
         break;
       default:

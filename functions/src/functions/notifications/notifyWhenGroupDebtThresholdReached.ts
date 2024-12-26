@@ -23,7 +23,7 @@ export async function notifyWhenGroupDebtThresholdReached(
 
   if (userTokens.length === 0) return
 
-  return messaging().sendMulticast({
+  return messaging().sendEachForMulticast({
     tokens: userTokens as string[],
     notification: {
       title: 'Debt threshold reached',

@@ -15,7 +15,7 @@ export async function notifyWhenExpenseReverted(expenseSnap: DocumentSnapshot) {
 
   if (authorTokens.length === 0) return null
 
-  return messaging().sendMulticast({
+  return messaging().sendEachForMulticast({
     tokens: authorTokens as string[],
     notification: {
       title: 'Expense Reverted',

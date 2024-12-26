@@ -7,11 +7,11 @@ import 'package:statera/data/services/services.dart';
 
 @GenerateNiceMocks([MockSpec<GroupRepository>()])
 class GroupRepository extends Firestore {
-  late final DynamicLinkService _dynamicLinkRepository;
+  late final DynamicLinkService _dynamicLinkService;
 
   GroupRepository(FirebaseFirestore firestoreInstance)
       : super(firestoreInstance) {
-    _dynamicLinkRepository = DynamicLinkService();
+    _dynamicLinkService = DynamicLinkService();
   }
 
   Future<Group> getGroup(String? groupCode) async {
@@ -101,7 +101,7 @@ class GroupRepository extends Firestore {
     if (group.id == null)
       throw Exception('Failed to generate invite link: group does not exist');
 
-    final link = await _dynamicLinkRepository.generateDynamicLink(
+    final link = await _dynamicLinkService.generateDynamicLink(
       path: 'group/${group.id}/join/${group.code}',
       socialTitle: 'Join "${group.name}"',
       socialDescription: 'This is an invite to join a new group in Statera',

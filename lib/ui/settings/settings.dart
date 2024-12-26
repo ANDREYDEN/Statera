@@ -18,7 +18,7 @@ import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 class Settings extends StatefulWidget {
-  static const String route = '/settings';
+  static const String name = 'Settings';
 
   const Settings({Key? key}) : super(key: key);
 
