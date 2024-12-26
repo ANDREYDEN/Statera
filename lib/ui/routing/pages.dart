@@ -23,7 +23,6 @@ import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 
-// TODO: implement redirection
 final router = GoRouter(
   initialLocation: kIsWeb ? '/' : '/groups',
   routes: [
