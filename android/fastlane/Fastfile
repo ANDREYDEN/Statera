@@ -30,7 +30,8 @@ platform :android do
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       # release_notes_file: "release_notes.txt",
-      apk_path: "../build/outputs/apk/release/app-release.apk",
+      android_artifact_type: "AAB",
+      android_artifact_path: "../build/outputs/aab/release/app-release.aab",
       groups: "friends",
       debug: true
     )
