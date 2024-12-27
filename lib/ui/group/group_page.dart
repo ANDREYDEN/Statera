@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expenses/expenses_cubit.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
@@ -25,6 +30,37 @@ class GroupPage extends StatefulWidget {
   final String? groupId;
 
   const GroupPage({Key? key, this.groupId}) : super(key: key);
+
+  static Widget init(String? groupId) {
+    return MultiProvider(
+      providers: [
+        BlocProvider<GroupCubit>(
+          create: (context) => GroupCubit(
+            context.read<GroupRepository>(),
+            context.read<ExpenseService>(),
+            context.read<UserRepository>(),
+          )..load(groupId),
+        ),
+        BlocProvider(
+          create: (context) => ExpensesCubit(
+            groupId,
+            context.read<AuthBloc>().uid,
+            context.read<UserExpenseRepository>(),
+            context.read<ExpenseService>(),
+            context.read<GroupRepository>(),
+          )..load(),
+        ),
+        BlocProvider(
+          create: (context) => NewPaymentsCubit(context.read<PaymentService>())
+            ..load(
+              groupId: groupId,
+              uid: context.read<AuthBloc>().uid,
+            ),
+        ),
+      ],
+      child: GroupPage(groupId: groupId),
+    );
+  }
 
   @override
   State<GroupPage> createState() => _GroupPageState();

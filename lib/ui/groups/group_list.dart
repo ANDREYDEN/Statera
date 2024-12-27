@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
@@ -21,6 +22,17 @@ class GroupList extends StatelessWidget {
   static const String name = 'GroupList';
 
   const GroupList({Key? key}) : super(key: key);
+
+  static Widget init() {
+    return BlocProvider<GroupsCubit>(
+      create: (context) => GroupsCubit(
+        context.read<GroupRepository>(),
+        context.read<UserRepository>(),
+        context.read<UserGroupRepository>(),
+      )..load(context.read<AuthBloc>().uid),
+      child: GroupList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

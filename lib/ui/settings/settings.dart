@@ -22,6 +22,18 @@ class Settings extends StatefulWidget {
 
   const Settings({Key? key}) : super(key: key);
 
+  static Widget init() {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => UserCubit(context.read<UserRepository>())
+            ..load(context.read<AuthBloc>().uid),
+        )
+      ],
+      child: Settings(),
+    );
+  }
+
   @override
   State<Settings> createState() => _SettingsState();
 }

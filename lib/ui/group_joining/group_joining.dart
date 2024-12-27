@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group_joining/error_state.dart';
 import 'package:statera/ui/group_joining/group_joining_actions.dart';
@@ -9,6 +12,16 @@ class GroupJoining extends StatelessWidget {
   final String? code;
 
   const GroupJoining({Key? key, this.code}) : super(key: key);
+  static Widget init(String? groupId, String? code) {
+    return BlocProvider<GroupCubit>(
+      create: (context) => GroupCubit(
+        context.read<GroupRepository>(),
+        context.read<ExpenseService>(),
+        context.read<UserRepository>(),
+      )..load(groupId),
+      child: GroupJoining(code: code),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

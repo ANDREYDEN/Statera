@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
@@ -12,6 +15,25 @@ class ExpensePage extends StatelessWidget {
   static const String name = 'Expense';
 
   const ExpensePage({Key? key}) : super(key: key);
+
+  static Widget init(String? expenseId) {
+    return MultiProvider(
+      providers: [
+        BlocProvider<ExpenseBloc>(
+          create: (context) =>
+              ExpenseBloc(context.read<ExpenseService>())..load(expenseId),
+        ),
+        BlocProvider<GroupCubit>(
+          create: (context) => GroupCubit(
+            context.read<GroupRepository>(),
+            context.read<ExpenseService>(),
+            context.read<UserRepository>(),
+          )..loadFromExpense(expenseId),
+        )
+      ],
+      child: ExpensePage(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
