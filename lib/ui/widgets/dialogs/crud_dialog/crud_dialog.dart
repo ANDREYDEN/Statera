@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
-import 'package:statera/ui/widgets/collapsible.dart';
 import 'package:statera/ui/widgets/collapsible_header.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';

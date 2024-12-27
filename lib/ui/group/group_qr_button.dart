@@ -21,22 +21,20 @@ class GroupQRButton extends StatelessWidget {
 
         return IconButton(
           icon: Icon(Icons.qr_code_rounded),
-          onPressed: () async {
-            showDialog(
-              context: context,
-              builder: (_) {
-                final dialog = GroupInviteDialog(
-                  onGenerate: () {
-                    groupCubit.generateInviteLink();
-                  },
-                );
-                return BlocProvider<GroupCubit>.value(
-                  value: groupCubit,
-                  child: dialog,
-                );
-              },
-            );
-          },
+          onPressed: () => showDialog(
+            context: context,
+            builder: (_) {
+              final dialog = GroupInviteDialog(
+                onGenerate: () {
+                  groupCubit.generateInviteLink();
+                },
+              );
+              return BlocProvider<GroupCubit>.value(
+                value: groupCubit,
+                child: dialog,
+              );
+            },
+          ),
         );
       },
     );

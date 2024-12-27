@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/group/nav_bar/nav_bar_item_data.dart';
-import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
 class GroupBottomNavBar extends StatelessWidget {
   final int currentIndex;

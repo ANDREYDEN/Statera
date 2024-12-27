@@ -15,15 +15,15 @@ class AssigneeDecision {
 
   Map<String, dynamic> toFirestore() {
     return {
-      "uid": uid,
-      "parts": _parts,
+      'uid': uid,
+      'parts': _parts,
     };
   }
 
   static AssigneeDecision fromFirestore(Map<String, dynamic> data) {
     return AssigneeDecision(
-      uid: data["uid"],
-      parts: data["parts"],
+      uid: data['uid'],
+      parts: data['parts'],
     );
   }
 

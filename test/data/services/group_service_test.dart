@@ -8,7 +8,6 @@ main() {
     test('does not add new member to finalized expenses', () async {
       final firestore = FakeFirebaseFirestore();
 
-      // TODO: extract into a utility constructor
       final admin = CustomUser.fake(uid: 'admin');
       final testGroup = Group(
         name: 'Foo',

@@ -11,7 +11,6 @@ main() {
         final firestore = FakeFirebaseFirestore();
 
         final groupId = 'testGroup';
-        // TODO: extract into a utility constructor
         final pendingExpense = Expense(
           authorUid: 'foo',
           name: 'bar',

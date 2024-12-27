@@ -15,7 +15,7 @@ class CustomStreamBuilder<T> extends StatelessWidget {
       stream: this.stream,
       builder: (context, snap) {
         if (snap.hasError) {
-          return Text("Error: ${snap.error}");
+          return Text('Error: ${snap.error}');
         }
 
         if (!snap.hasData || snap.connectionState == ConnectionState.waiting) {

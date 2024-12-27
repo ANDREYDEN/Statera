@@ -43,7 +43,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
     try {
       final pickedFile =
           await _filePickerService.pickImage(source: ImageFileSource.gallery);
-      if (pickedFile == null) return;
 
       String url = await _fileStorageService.uploadFile(
         pickedFile,
@@ -55,7 +54,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error while updating profile: $e'),
       ));
-      FirebaseCrashlytics.instance.recordError(
+      await FirebaseCrashlytics.instance.recordError(
         e,
         null,
         reason: 'Profile image update failed',

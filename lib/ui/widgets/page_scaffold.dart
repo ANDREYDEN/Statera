@@ -36,7 +36,8 @@ class PageScaffold extends StatelessWidget {
         ((_, titleWidgetBuilder) => titleWidgetBuilder(this.title ?? ''));
 
     return PopScope(
-      onPopInvoked: onPop,
+      onPopInvokedWithResult:
+          onPop == null ? null : (didPop, _) => onPop!.call(didPop),
       child: Scaffold(
         bottomNavigationBar: this.bottomNavBar,
         appBar: AppBar(

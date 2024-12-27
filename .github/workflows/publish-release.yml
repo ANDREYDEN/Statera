@@ -91,5 +91,5 @@ jobs:
           working-directory: android
 
       - name: Create App Distribution Release
-        run: sudo fastlane run firebase_app_distribution app:${{ secrets.ANDROID_APP_ID }} android_artifact_path:../android.aab groups:friends debug:true
+        run: sudo fastlane run firebase_app_distribution app:${{ secrets.ANDROID_APP_ID }} android_artifact_type:AAB android_artifact_path:../android.aab groups:friends debug:true
         working-directory: android

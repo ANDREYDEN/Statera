@@ -8,7 +8,6 @@ import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.da
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store_input.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/with_name_improvement_input.dart';
-import 'package:statera/ui/routing/pages.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/ok_button.dart';
 

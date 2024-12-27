@@ -63,7 +63,7 @@ class SignInCubit extends Cubit<SignInState> {
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
     } on Exception catch (genericError) {
-      FirebaseCrashlytics.instance.recordError(
+      await FirebaseCrashlytics.instance.recordError(
         genericError,
         null,
         reason: 'Sign In with Google Failed',
