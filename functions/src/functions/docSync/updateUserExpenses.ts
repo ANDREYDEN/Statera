@@ -6,6 +6,7 @@ import { Expense } from '../../types/expense'
 import { UserExpense } from '../../types/userExpense'
 
 export async function updateUserExpenses(change: Change<DocumentSnapshot>) {
+  await new Promise((res, _) => setTimeout(res, 2000))
   const oldExpenseData = change.before.data() as (Expense | undefined)
   const newExpenseData = change.after.data() as (Expense | undefined)
   const expenseId = change.after.id

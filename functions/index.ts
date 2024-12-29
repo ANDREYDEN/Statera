@@ -17,7 +17,9 @@ import { notifyWhenGroupDebtThresholdReached } from './src/functions/notificatio
 import { createUserDoc } from './src/functions/userManagement/createUserDoc'
 import { removeUserFromGroups } from './src/functions/userManagement/removeUserFromGroups'
 import { updateUser } from './src/functions/userManagement/updateUser'
+import { Expense } from './src/types/expense'
 import { UserData } from './src/types/userData'
+import { isExpenseCompleted } from './src/utils/expenseUtils'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -101,6 +103,10 @@ export const handleExpenseUpdate = functions.firestore
       } else {
         await notifyWhenExpenseReverted(change.after)
       }
+    } else if (!newFinalizedTimestamp) {
+      if (!isExpenseCompleted(oldExpense as Expense) && isExpenseCompleted(newExpense as Expense)) {
+        await notifyWhenExpenseCompleted(change.after.id)
+      }
     }
   })
 
@@ -127,8 +133,7 @@ export const handleGroupUpdate = functions.firestore
 
 export const notifyWhenExpenseIsCompleted = functions.https
   .onCall((data, _) => {
-    if (!data.expenseId) throw new Error('parameter expenseId is required')
-    return notifyWhenExpenseCompleted(data.expenseId)
+    // TODO: deprecate. Left in for backwards compatibility
   })
 
 export const getLatestAppVersion = functions.https.onCall(async (data, _) => {
