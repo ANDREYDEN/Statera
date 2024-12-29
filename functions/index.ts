@@ -20,6 +20,7 @@ import { updateUser } from './src/functions/userManagement/updateUser'
 import { Expense } from './src/types/expense'
 import { UserData } from './src/types/userData'
 import { isExpenseCompleted } from './src/utils/expenseUtils'
+import { notifyWhenExpenseUpdated } from './src/functions/notifications/notifyWhenExpenseUpdated'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -89,25 +90,11 @@ export const handleExpenseUpdate = functions.firestore
       console.error('Error while updating user groups: ', e)
     }
 
-    const oldExpense = change.before.data()
-    const newExpense = change.after.data()
+    const oldExpenseSnap = change.before
+    const newExpenseSnap = change.after
+    if (!newExpenseSnap || !oldExpenseSnap) return
 
-    if (!newExpense || !oldExpense) return
-
-    const oldFinalizedTimestamp = oldExpense.finalizedDate as (Timestamp | null)
-    const newFinalizedTimestamp = newExpense.finalizedDate as (Timestamp | null)
-
-    if (oldFinalizedTimestamp?.toMillis != newFinalizedTimestamp?.toMillis) {
-      if (newExpense.finalizedDate) {
-        await notifyWhenExpenseFinalized(change.after)
-      } else {
-        await notifyWhenExpenseReverted(change.after)
-      }
-    } else if (!newFinalizedTimestamp) {
-      if (!isExpenseCompleted(oldExpense as Expense) && isExpenseCompleted(newExpense as Expense)) {
-        await notifyWhenExpenseCompleted(change.after.id)
-      }
-    }
+    await notifyWhenExpenseUpdated(oldExpenseSnap, newExpenseSnap )
   })
 
 export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
