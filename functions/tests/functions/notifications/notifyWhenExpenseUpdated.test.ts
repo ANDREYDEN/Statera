@@ -4,6 +4,8 @@ import { notifyWhenExpenseReverted } from '../../../src/functions/notifications/
 import { notifyWhenExpenseUpdated } from '../../../src/functions/notifications/notifyWhenExpenseUpdated'
 
 import { DocumentSnapshot } from 'firebase-admin/firestore'
+import { ExpenseFactory } from '../../factories/expenseFactory'
+import { ItemFactory } from '../../factories/itemFactory'
 jest.mock('../../../src/functions/notifications/notifyWhenExpenseFinalized')
 jest.mock('../../../src/functions/notifications/notifyWhenExpenseReverted')
 jest.mock('../../../src/functions/notifications/notifyWhenExpenseCompleted')
@@ -55,39 +57,29 @@ describe('notifyWhenExpenseUpdated', () => {
 
   it('should notify when expense is completed', async () => {
     const oldExpenseSnap = {
-      data: jest.fn(() => ({
+      data: jest.fn(() => (ExpenseFactory.create({
         finalizedDate: null,
         items: [
-          {
-            name: 'Item 1',
+          ItemFactory.create({
             assignees: [
-              {
-                uid: 'Assignee 1',
-                parts: null,
-              },
+              { uid: 'Assignee 1', parts: null },
             ],
-            partition: 1,
-          },
+          }),
         ],
-      })),
+      }))),
     }
     const newExpenseSnap = {
       id: 'asd',
-      data: jest.fn(() => ({
+      data: jest.fn(() => (ExpenseFactory.create({
         finalizedDate: null,
         items: [
-          {
-            name: 'Item 1',
+          ItemFactory.create({
             assignees: [
-              {
-                uid: 'Assignee 1',
-                parts: 1,
-              },
+              { uid: 'Assignee 1', parts: 1 },
             ],
-            partition: 1,
-          },
+          }),
         ],
-      })),
+      }))),
     }
 
     await notifyWhenExpenseUpdated(

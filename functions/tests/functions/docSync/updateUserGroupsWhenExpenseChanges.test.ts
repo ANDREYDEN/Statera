@@ -7,6 +7,7 @@ import { updateUserGroupsWhenExpenseChanges } from '../../../src/functions/docSy
 import { Expense } from '../../../src/types/expense'
 import { UserData } from '../../../src/types/userData'
 import { UserGroup } from '../../../src/types/userGroup'
+import { ExpenseFactory } from '../../factories/expenseFactory'
 const { firestore } = firebaseFunctionsTest()
 
 admin.initializeApp()
@@ -21,13 +22,13 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
   const expenseId = 'expense_foo'
 
   it('sets unmarked expenses count when an expense is created', async () => {
-    const newExpense:Expense = {
+    const newExpense:Expense = ExpenseFactory.create({
       items: [],
       assigneeIds: [userId],
       authorUid: userId,
       groupId,
       unmarkedAssigneeIds: [userId],
-    }
+    })
     const existingUserGroup: UserGroup = {
       groupId,
       name: 'Foo',
@@ -60,13 +61,13 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
       name: 'Bob',
     }
     const expenseId = 'expense_foo'
-    const existingExpense:Expense = {
+    const existingExpense:Expense = ExpenseFactory.create({
       items: [],
       assigneeIds: [userId],
       authorUid: userId,
       groupId,
       unmarkedAssigneeIds: existingUnmarkedAssigneeIds,
-    }
+    })
     const newExpense:Expense = {
       ...existingExpense,
       unmarkedAssigneeIds: newUnmarkedAssigneeIds,
@@ -92,13 +93,13 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
 
   describe('decreases unmarked expenses count when', () => {
     it('user is removed from an expense', async () => {
-      const existingExpense:Expense = {
+      const existingExpense:Expense = ExpenseFactory.create({
         items: [],
         assigneeIds: [userId],
         authorUid: userId,
         groupId,
         unmarkedAssigneeIds: [userId],
-      }
+      })
       const newExpense:Expense = {
         ...existingExpense,
         assigneeIds: [],
@@ -124,13 +125,13 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
     })
 
     it('an expense is deleted', async () => {
-      const existingExpense:Expense = {
+      const existingExpense:Expense = ExpenseFactory.create({
         items: [],
         assigneeIds: [userId],
         authorUid: userId,
         groupId,
         unmarkedAssigneeIds: [userId],
-      }
+      })
       const existingUserGroup: UserGroup = {
         groupId,
         name: 'Foo',
@@ -152,13 +153,13 @@ describe('updateUserGroupsWhenExpenseChanges', () => {
   })
 
   it('handles user groups that do not exist', async () => {
-    const existingExpense:Expense = {
+    const existingExpense:Expense = ExpenseFactory.create({
       items: [],
       assigneeIds: ['Kicked User', userId],
       authorUid: userId,
       groupId,
       unmarkedAssigneeIds: ['Kicked User', userId],
-    }
+    })
     const existingUserGroup: UserGroup = {
       groupId,
       name: 'Foo',
