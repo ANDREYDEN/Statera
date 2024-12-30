@@ -62,12 +62,6 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         throw e;
       } finally {}
 
-      // TODO: move to cloud functions (firestore trigger)
-      if (!wasCompleted &&
-          expense.completed &&
-          event.issuerUid != expense.authorUid) {
-        await Callables.notifyWhenExpenseCompleted(expenseId: expense.id);
-      }
       add(_FinishedUpdating(expense));
     });
   }
