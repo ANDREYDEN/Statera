@@ -50,5 +50,27 @@ void main() {
       paymentSuggestion = find.textContaining(paymentSuggestionText);
       expect(paymentSuggestion, findsNothing);
     });
+
+    testWidgets('matches snapshot when there are a lot of members',
+        (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(400, 600));
+      final currentUser = CustomUser.fake(name: 'Current User');
+      final group = Group(
+        name: 'Group',
+        members:
+            List.generate(10, (index) => CustomUser.fake(name: 'User $index')),
+      );
+      await customPump(
+        NewExpenseDialog(),
+        tester,
+        group: group,
+        currentUserId: currentUser.uid,
+      );
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byType(NewExpenseDialog),
+        matchesGoldenFile('new_expense_dialog.png'),
+      );
+    });
   });
 }

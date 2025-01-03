@@ -95,8 +95,7 @@ class _NewExpenseDialogState extends State<NewExpenseDialog> {
             ),
             SizedBox(height: 20),
             Text('Pick Assignees'),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 300),
+            Flexible(
               child: MemberPicker(
                 controller: _memberController,
                 allSelected: true,
