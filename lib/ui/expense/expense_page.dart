@@ -18,6 +18,7 @@ class ExpensePage extends StatelessWidget {
 
   static Widget init(String? expenseId) {
     return MultiProvider(
+      key: Key(expenseId ?? 'unknown'),
       providers: [
         BlocProvider<ExpenseBloc>(
           create: (context) =>
