@@ -33,6 +33,7 @@ class GroupPage extends StatefulWidget {
 
   static Widget init(String? groupId) {
     return MultiProvider(
+      key: Key(groupId ?? 'unknown'),
       providers: [
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(
