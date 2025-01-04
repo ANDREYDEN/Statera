@@ -49,6 +49,13 @@ jobs:
 
       - name: Run tests
         run: flutter test
+      
+      - name: Upload test failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-failure-screenshots
+          path: ./test/**/failures/
 
   run_integration_tests:
     name: Run Integration tests

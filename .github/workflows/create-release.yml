@@ -43,7 +43,7 @@ jobs:
         run: flutter build web
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-out
           path: build/web
@@ -101,7 +101,7 @@ jobs:
         run: flutter build appbundle
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-out
           path: build/app/outputs/bundle/release/app-release.aab
