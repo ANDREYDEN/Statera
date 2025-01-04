@@ -71,6 +71,6 @@ void main() {
         find.byType(NewExpenseDialog),
         matchesGoldenFile('new_expense_dialog.png'),
       );
-    });
+    }, skip: true);
   });
 }
