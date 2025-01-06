@@ -20,7 +20,7 @@ class NotificationsInitializer extends StatelessWidget {
     final notificationsRepository = context.read<NotificationService>();
     final userRepository = context.read<UserRepository>();
     final notificationsCubit = NotificationsCubit(
-      notificationsRepository: notificationsRepository,
+      notificationsService: notificationsRepository,
       userRepository: userRepository,
     )..load(context);
     final uid = context.read<AuthBloc>().uid;
@@ -28,7 +28,7 @@ class NotificationsInitializer extends StatelessWidget {
     if (!kCheckNotifications) {
       return BlocProvider<NotificationsCubit>(
         create: (context) => NotificationsCubit(
-          notificationsRepository: notificationsRepository,
+          notificationsService: notificationsRepository,
           userRepository: userRepository,
           allowed: true,
         )..load(context),
