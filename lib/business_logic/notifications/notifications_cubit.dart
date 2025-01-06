@@ -12,10 +12,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   NotificationsCubit({
     required UserRepository userRepository,
-    required NotificationService notificationsRepository,
+    required NotificationService notificationsService,
     bool allowed = false,
   }) : super(NotificationsState(allowed)) {
-    _notificationService = notificationsRepository;
+    _notificationService = notificationsService;
     _userRepostiry = userRepository;
   }
 
@@ -40,6 +40,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   void _listenForNotifications(BuildContext context) {
+    _notificationService.checkForLaunchingNotification(
+      onMessage: (message) =>
+          AppLaunchHandler.handleNotificationMessage(message, context),
+    );
     _notificationService.listenForNotification(
       onMessage: (message) =>
           AppLaunchHandler.handleNotificationMessage(message, context),
