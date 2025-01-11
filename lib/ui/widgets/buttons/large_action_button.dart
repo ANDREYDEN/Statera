@@ -33,6 +33,7 @@ class LargeActionButton extends StatelessWidget {
       label: Padding(
         padding: const EdgeInsets.only(left: 10.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(title, style: Theme.of(context).textTheme.titleLarge),
             if (description != null)

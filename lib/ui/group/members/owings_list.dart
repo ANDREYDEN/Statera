@@ -32,8 +32,8 @@ class OwingsList extends StatelessWidget {
               final owings = group.getOwingsForUser(authBloc.uid);
               if (owings.isEmpty) {
                 return ListEmpty(
-                  text: 'Start by inviting people to your group...',
-                  action: GroupQRButton(),
+                  text: 'Start by inviting people to your group',
+                  actions: [GroupQRButton()],
                 );
               }
 
