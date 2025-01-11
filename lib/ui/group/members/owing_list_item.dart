@@ -83,7 +83,7 @@ class OwingListItem extends StatelessWidget {
               trailing: isGroupMember
                   ? ActionsButton(
                       tooltip: 'Whatsss up?',
-                      actions: [KickMemberAction(user: this.member)],
+                      actions: [KickMemberAction(this.member)],
                     )
                   : null),
         );
