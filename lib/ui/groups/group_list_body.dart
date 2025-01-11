@@ -26,7 +26,7 @@ class _GroupListBodyState extends State<GroupListBody> {
     final isWide = context.select((LayoutState state) => state.isWide);
     final platformContext = context.read<PlatformContext>();
 
-    if (platformContext.isWindows) {
+    if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb) {
       return Center(
         child: Text('Main app functionality is currently in development...'),
       );
