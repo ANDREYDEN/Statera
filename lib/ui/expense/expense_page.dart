@@ -60,7 +60,7 @@ class ExpensePage extends StatelessWidget {
 
           return PageScaffold(
             fabText: 'New Item',
-            onFabPressed: expenseCanBeUpdated
+            onFabPressed: expenseCanBeUpdated && expense.items.isNotEmpty
                 ? () => UpsertItemAction().safeHandle(context)
                 : null,
             actions: [ExpenseActionsButton(expense: expense)],

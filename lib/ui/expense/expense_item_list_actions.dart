@@ -43,15 +43,17 @@ class ExpenseItemListActions extends StatelessWidget {
 
 class Or extends StatelessWidget {
   final List<Widget> children;
+  final Axis axis;
 
-  const Or({super.key, required this.children});
+  const Or({super.key, required this.children, this.axis = Axis.horizontal});
 
   @override
   Widget build(BuildContext context) {
     if (children.isEmpty) return SizedBox.shrink();
     if (children.length == 1) return children[0];
 
-    return Row(
+    return Flex(
+      direction: axis,
       mainAxisSize: MainAxisSize.min,
       children: [
         children[0],

@@ -42,7 +42,6 @@ class ExpenseDetails extends StatelessWidget {
                 child: ExpenseActionsButton(expense: expense),
               ),
             Header(),
-            ExpenseItemListActions(expense: expense),
             SizedBox(height: 10),
             Flexible(child: ItemsList()),
             if (expense.items.isNotEmpty) Footer(),
