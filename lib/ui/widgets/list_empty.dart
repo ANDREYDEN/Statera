@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class ListEmpty extends StatelessWidget {
   final String text;
   final Icon? icon;
-  final Widget? action;
+  final List<Widget> actions;
 
   const ListEmpty({
     Key? key,
     required this.text,
     this.icon,
-    this.action,
+    this.actions = const [],
   }) : super(key: key);
 
   @override
@@ -23,15 +23,23 @@ class ListEmpty extends StatelessWidget {
             child: Text(
               this.text,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 24,
-              ),
+              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                    color: Colors.grey[400],
+                  ),
             ),
           ),
         ),
         if (this.icon != null) this.icon!,
-        if (this.action != null) this.action!,
+        if (this.actions.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions
+                    .expand((a) => [a, SizedBox(width: 5)])
+                    .take(2 * actions.length - 1)
+                    .toList()),
+          )
       ],
     );
   }

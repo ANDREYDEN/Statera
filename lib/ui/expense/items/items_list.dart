@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/ui/expense/empty_expense_items_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
-import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 
 class ItemsList extends StatelessWidget {
@@ -27,7 +27,7 @@ class ItemsList extends StatelessWidget {
             children: [
               Expanded(
                 child: expense.hasNoItems
-                    ? ListEmpty(text: 'Add items to this expense')
+                    ? EmptyExpenseItemsList(expense: expense)
                     : ListView.builder(
                         itemCount: expense.items.length,
                         itemBuilder: (context, index) {

@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
+import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
@@ -24,6 +24,7 @@ class _SignInState extends State<SignIn> {
     return BlocBuilder<SignInCubit, SignInState>(
       builder: (context, signInState) {
         final signInCubit = context.read<SignInCubit>();
+        final platformContext = context.read<PlatformContext>();
 
         return PageScaffold(
           title: kAppName,
@@ -116,10 +117,9 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                     // TODO: Add Google icon
-                    if (kIsWeb ||
-                        defaultTargetPlatform == TargetPlatform.iOS ||
-                        defaultTargetPlatform == TargetPlatform.android ||
-                        defaultTargetPlatform == TargetPlatform.windows)
+                    if (platformContext.isWeb ||
+                        platformContext.isMobile ||
+                        platformContext.isWindows)
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null
@@ -136,7 +136,7 @@ class _SignInState extends State<SignIn> {
                         ),
                       ),
                     SizedBox(height: 8),
-                    if (isApplePlatform())
+                    if (platformContext.isApple)
                       ElevatedButton(
                         onPressed: signInState is SignInLoading
                             ? null
