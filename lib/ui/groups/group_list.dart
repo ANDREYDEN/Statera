@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +10,7 @@ import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
 import 'package:statera/ui/groups/update_banner.dart';
+import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/settings/settings.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
@@ -36,6 +36,8 @@ class GroupList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var platformContext = context.read<PlatformContext>();
+
     return Greeting(
       child: NotificationsReminder(
         child: PageScaffold(
@@ -51,9 +53,8 @@ class GroupList extends StatelessWidget {
             ),
           ],
           fabText: 'New Group',
-          onFabPressed: defaultTargetPlatform == TargetPlatform.windows
-              ? null
-              : () => _createGroup(context),
+          onFabPressed:
+              platformContext.isWindows ? null : () => _createGroup(context),
           child: Column(
             children: [
               UpdateBanner(),

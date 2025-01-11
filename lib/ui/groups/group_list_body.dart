@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/groups/group_list_item/group_list_item.dart';
+import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/utils/utils.dart';
@@ -23,8 +24,9 @@ class _GroupListBodyState extends State<GroupListBody> {
   @override
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
+    final platformContext = context.read<PlatformContext>();
 
-    if (defaultTargetPlatform == TargetPlatform.windows) {
+    if (platformContext.isWindows) {
       return Center(
         child: Text('Main app functionality is currently in development...'),
       );

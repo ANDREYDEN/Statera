@@ -174,11 +174,6 @@ MaterialColor createMaterialColor(Color color) {
   return MaterialColor(color.value, swatch);
 }
 
-isApplePlatform() {
-  return defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.macOS;
-}
-
 String currentPlatformName =
     kIsWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];
 

@@ -12,4 +12,7 @@ class PlatformContext {
 
   bool get isMobile => isIOS || isAndroid;
   bool get isApple => isIOS || isMacOS;
+
+  String get platformName =>
+      isWeb ? 'web' : defaultTargetPlatform.toString().split('.')[1];
 }
