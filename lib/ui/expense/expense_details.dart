@@ -8,7 +8,6 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
-import 'package:statera/ui/expense/expense_item_list_actions.dart';
 import 'package:statera/ui/expense/header/expense_price.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/group/group_builder.dart';

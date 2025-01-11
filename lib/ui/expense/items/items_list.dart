@@ -27,7 +27,15 @@ class ItemsList extends StatelessWidget {
             children: [
               Expanded(
                 child: expense.hasNoItems
-                    ? Center(child: ExpenseItemListActions(expense: expense))
+                    ? Center(
+                        child: isWide
+                            ? IntrinsicHeight(
+                                child: ExpenseItemListActions(expense: expense),
+                              )
+                            : IntrinsicWidth(
+                                child: ExpenseItemListActions(expense: expense),
+                              ),
+                      )
                     : ListView.builder(
                         itemCount: expense.items.length,
                         itemBuilder: (context, index) {

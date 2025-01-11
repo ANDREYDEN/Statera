@@ -85,6 +85,7 @@ class Expense {
   }
 
   get hasNoItems => this.items.isEmpty;
+  get hasItems => this.items.isNotEmpty;
 
   void addAssignee(String newAssigneeUid) {
     this.items.forEach((item) {

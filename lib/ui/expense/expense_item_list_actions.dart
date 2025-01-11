@@ -6,6 +6,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/receipt_scan_dialog.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
+import 'package:statera/ui/widgets/buttons/large_action_button.dart';
 
 class ExpenseItemListActions extends StatelessWidget {
   final Expense expense;
@@ -22,22 +23,28 @@ class ExpenseItemListActions extends StatelessWidget {
         expenseCanBeUpdated &&
         (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS);
 
-    final addNewItemButton = FilledButton.icon(
+    final addNewItemButton = LargeActionButton(
       onPressed: () => UpsertItemAction().safeHandle(context),
-      label: Text('Add Item'),
-      icon: Icon(Icons.add),
+      title: 'Add Item',
+      description: 'Start by adding the first item',
+      icon: Icons.add,
     );
 
-    final scanReceiptButton = ElevatedButton.icon(
+    final scanReceiptButton = LargeActionButton(
       onPressed: () => ReceiptScanDialog(expense: expense).show(context),
-      label: Text('Upload receipt'),
-      icon: Icon(Icons.photo_camera),
+      title: 'Upload Receipt',
+      description: 'Fill out the expense by taking a photo of a receipt',
+      icon: Icons.photo_camera,
+      width: 300,
     );
 
-    return Or(children: [
-      if (isWide && expenseCanBeUpdated) addNewItemButton,
-      if (showReceiptScannerButton) scanReceiptButton
-    ]);
+    return Or(
+      axis: isWide ? Axis.horizontal : Axis.vertical,
+      children: [
+        if (expenseCanBeUpdated) addNewItemButton,
+        if (showReceiptScannerButton) scanReceiptButton
+      ],
+    );
   }
 }
 
@@ -55,13 +62,25 @@ class Or extends StatelessWidget {
     return Flex(
       direction: axis,
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        children[0],
+        Flexible(child: children[0]),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text('or'),
+          padding: EdgeInsets.symmetric(
+            horizontal: axis == Axis.horizontal ? 10.0 : 0,
+            vertical: axis == Axis.vertical ? 10.0 : 0,
+          ),
+          child: Center(
+            child: Text(
+              'or',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 24,
+              ),
+            ),
+          ),
         ),
-        children[1]
+        Flexible(child: children[1])
       ],
     );
   }
