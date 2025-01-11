@@ -18,6 +18,7 @@ import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
+import 'package:statera/ui/platform_context.dart';
 
 class MockUser extends Mock implements User {
   String get uid =>
@@ -52,6 +53,7 @@ Future<void> customPump(
   String? currentUserId,
   Group? group,
   List<Expense>? expenses,
+  PlatformContext? platformContext,
 }) async {
   when(defaultCurrentUser.uid)
       .thenReturn(currentUserId ?? defaultCurrentUserId);
@@ -72,6 +74,7 @@ Future<void> customPump(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        Provider(create: (_) => platformContext ?? PlatformContext()),
         Provider(create: (_) => LayoutState.narrow()),
         Provider(create: (_) => featureService ?? featureServiceMock),
         BlocProvider(
