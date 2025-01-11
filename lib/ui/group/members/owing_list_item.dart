@@ -7,6 +7,7 @@ import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/actions/kick_member_action.dart';
+import 'package:statera/ui/group/members/actions/transfer_ownership_action.dart';
 import 'package:statera/ui/group/members/new_payments_badge.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
@@ -83,7 +84,10 @@ class OwingListItem extends StatelessWidget {
               trailing: isGroupMember
                   ? ActionsButton(
                       tooltip: 'Whatsss up?',
-                      actions: [KickMemberAction(this.member)],
+                      actions: [
+                        KickMemberAction(this.member),
+                        TransferOwnershipAction(this.member)
+                      ],
                     )
                   : null),
         );
