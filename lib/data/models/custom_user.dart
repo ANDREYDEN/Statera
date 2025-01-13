@@ -27,6 +27,8 @@ class CustomUser {
     this.photoURL = photoURL;
   }
 
+  bool get needsAttention => name == 'anonymous' || paymentInfo == null;
+
   static CustomUser fromUserDoc(DocumentSnapshot<Object?> doc) {
     final docData = doc.data() as Map<String, dynamic>;
     return CustomUser(
