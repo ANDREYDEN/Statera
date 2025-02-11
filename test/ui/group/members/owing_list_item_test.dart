@@ -54,6 +54,19 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
+    testWidgets('shows kick member and transfer ownership option in menu',
+        (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(Size(600, 1200));
+      await pumpOwingListItem(tester);
+
+      final icon = find.byIcon(Icons.more_vert);
+      await tester.tap(icon);
+      await tester.pump();
+
+      expect(find.text('Kick Member'), findsOneWidget);
+      expect(find.text('Transfer Ownership'), findsOneWidget);
+    });
+
     testWidgets('doesnt show options to non admins',
         (WidgetTester tester) async {
       group = Group(
