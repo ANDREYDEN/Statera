@@ -22,9 +22,9 @@ class TransferOwnershipAction extends MemberAction {
       context: context,
       builder: (context) => DangerDialog(
         title: 'You are about to Transfer Ownership to "${user.name}"',
-        valueName: 'memeber name',
+        valueName: 'member name',
         value: user.name,
-        onConfirm: () async {
+        onConfirm: () {
           groupCubit.update((group) {
             group.adminUid = this.user.uid;
           });
