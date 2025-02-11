@@ -11,21 +11,24 @@ import '../../../helpers.dart';
 
 void main() {
   group('Owing list Item', () {
-    testWidgets('shows options for admins', (WidgetTester tester) async {
-      final currentUser =
-          CustomUser(uid: defaultCurrentUserId, name: 'Current User');
-      final memberUser = CustomUser.fake();
+    late CustomUser currentUser;
+    late CustomUser memberUser;
+    late Group group;
+    late OwingListItem owingListItem;
 
-      // Create a group where the current user is an admin
-      final testGroup = Group(
+    setUp(() {
+      currentUser = CustomUser(uid: defaultCurrentUserId, name: 'Current User');
+      memberUser = CustomUser.fake();
+      group = Group(
         id: 'test_group',
         name: 'Test Group',
         members: [currentUser, memberUser],
         adminId: defaultCurrentUserId,
       );
+      owingListItem = OwingListItem(member: memberUser, owing: 10);
+    });
 
-      final owingListItem = OwingListItem(member: memberUser, owing: 10);
-
+    Future<void> pumpOwingListItem(WidgetTester tester) async {
       await customPump(
         MultiProvider(
           providers: [
@@ -40,12 +43,29 @@ void main() {
         ),
         tester,
         currentUserId: defaultCurrentUserId,
-        group: testGroup,
+        group: group,
       );
 
       await tester.pump();
+    }
 
+    testWidgets('shows options for admins', (WidgetTester tester) async {
+      await pumpOwingListItem(tester);
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    });
+
+    testWidgets('doesnt show options to non admins',
+        (WidgetTester tester) async {
+      group = Group(
+        id: 'test_group',
+        name: 'Test Group',
+        members: [currentUser, memberUser],
+        adminId: memberUser.uid, // Make the member user the admin instead
+      );
+
+      await pumpOwingListItem(tester);
+
+      expect(find.byIcon(Icons.more_vert), findsNothing);
     });
   });
 }
