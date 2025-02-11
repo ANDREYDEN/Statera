@@ -26,7 +26,7 @@ class KickMemberAction extends MemberAction {
       context: context,
       builder: (context) => DangerDialog(
         title: 'You are about to KICK member "${user.name}"',
-        valueName: 'memeber name',
+        valueName: 'member name',
         value: user.name,
         onConfirm: () async {
           await groupCubit.removeMember(user.uid);
