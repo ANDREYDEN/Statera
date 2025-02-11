@@ -30,22 +30,25 @@ void main() {
 
     Future<void> pumpOwingListItem(WidgetTester tester) async {
       await customPump(
-        MultiProvider(
-          providers: [
-            Provider<OwingCubit>(
-              create: (context) => OwingCubit(),
+        MaterialApp(
+          home: Scaffold(
+            body: MultiProvider(
+              providers: [
+                Provider<OwingCubit>(
+                  create: (context) => OwingCubit(),
+                ),
+                Provider<NewPaymentsCubit>(
+                  create: (context) => NewPaymentsCubit(defaultPaymentService),
+                ),
+              ],
+              child: owingListItem,
             ),
-            Provider<NewPaymentsCubit>(
-              create: (context) => NewPaymentsCubit(defaultPaymentService),
-            ),
-          ],
-          child: owingListItem,
+          ),
         ),
         tester,
         currentUserId: defaultCurrentUserId,
         group: group,
       );
-
       await tester.pump();
     }
 
@@ -56,7 +59,6 @@ void main() {
 
     testWidgets('shows kick member and transfer ownership option in menu',
         (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(Size(600, 1200));
       await pumpOwingListItem(tester);
 
       final icon = find.byIcon(Icons.more_vert);
@@ -67,13 +69,33 @@ void main() {
       expect(find.text('Transfer Ownership'), findsOneWidget);
     });
 
+    testWidgets('shows kick member confirmation dialog',
+        (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 1200));
+      await pumpOwingListItem(tester);
+
+      final icon = find.byIcon(Icons.more_vert);
+      await tester.tap(icon);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      await tester.tap(find.text('Kick Member'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(
+        find.text('You are about to KICK member "${memberUser.name}"'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('doesnt show options to non admins',
         (WidgetTester tester) async {
       group = Group(
         id: 'test_group',
         name: 'Test Group',
         members: [currentUser, memberUser],
-        adminId: memberUser.uid, // Make the member user the admin instead
+        adminId: memberUser.uid,
       );
 
       await pumpOwingListItem(tester);
