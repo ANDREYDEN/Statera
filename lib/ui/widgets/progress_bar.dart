@@ -12,6 +12,13 @@ class ProgressBar extends StatelessWidget {
 
   ProgressBar({Key? key, required this.progressParts}) : super(key: key);
 
+  ProgressBar.progress({Key? key, required int progress})
+      : progressParts = [
+          ProgressPart(progress: progress, color: Colors.green),
+          ProgressPart(progress: 100 - progress, color: Colors.grey[300]!)
+        ],
+        super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(

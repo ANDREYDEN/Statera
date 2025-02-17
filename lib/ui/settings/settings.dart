@@ -89,10 +89,11 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
           ),
           children: [
             SectionTitle('Profile Information'),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: ProfileCompletion(user: user),
-            ),
+            if (user.incompletedProfileParts.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: ProfileCompletion(user: user),
+              ),
             Align(
               alignment: Alignment.center,
               child: Stack(

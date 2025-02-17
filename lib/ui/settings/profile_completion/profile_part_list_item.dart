@@ -9,15 +9,24 @@ class ProfilePartListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(profilePart.name),
+      title: Text(
+        profilePart.name,
+        style: profilePart.isCompleted
+            ? Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(decoration: TextDecoration.lineThrough)
+            : null,
+      ),
       subtitle:
           profilePart.isCompleted ? null : Text(profilePart.incompleteMessage),
       leading: Icon(
         profilePart.isCompleted
-            ? Icons.check_box_rounded
-            : Icons.check_box_outline_blank_rounded,
+            ? Icons.check_circle_rounded
+            : Icons.circle_outlined,
       ),
       titleAlignment: ListTileTitleAlignment.top,
+      dense: profilePart.isCompleted,
     );
   }
 }

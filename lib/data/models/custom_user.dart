@@ -36,6 +36,11 @@ class CustomUser {
           isCompleted: name != 'anonymous',
         ),
         ProfilePart(
+          name: 'Set a Profile Picture',
+          incompleteMessage: 'Make it easier for others to recognize you',
+          isCompleted: photoURL != null,
+        ),
+        ProfilePart(
           name: 'Set Payment Information',
           incompleteMessage:
               'Please provide your payment information so that others know how to pay you',
@@ -45,6 +50,12 @@ class CustomUser {
 
   List<ProfilePart> get incompletedProfileParts =>
       profileParts.where((part) => !part.isCompleted).toList();
+
+  List<ProfilePart> get completedProfileParts =>
+      profileParts.where((part) => part.isCompleted).toList();
+
+  int get completionPercentage =>
+      (completedProfileParts.length / profileParts.length * 100).toInt();
 
   static CustomUser fromUserDoc(DocumentSnapshot<Object?> doc) {
     final docData = doc.data() as Map<String, dynamic>;

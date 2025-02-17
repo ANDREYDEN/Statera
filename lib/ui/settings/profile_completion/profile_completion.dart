@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/settings/profile_completion/profile_part_list_item.dart';
+import 'package:statera/ui/widgets/progress_bar.dart';
 
 class ProfileCompletion extends StatelessWidget {
   final CustomUser user;
@@ -20,16 +21,42 @@ class ProfileCompletion extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  'Profile Completion',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              ...user.profileParts
-                  .map((part) => ProfilePartListItem(profilePart: part))
-                  .toList(),
+              Row(
+                children: [
+                  Flexible(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Profile Completion',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          '${user.completionPercentage}%',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                        ProgressBar.progress(
+                          progress: user.completionPercentage,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        ...user.incompletedProfileParts
+                            .map((part) =>
+                                ProfilePartListItem(profilePart: part))
+                            .toList(),
+                        ...user.completedProfileParts
+                            .map((part) =>
+                                ProfilePartListItem(profilePart: part))
+                            .toList(),
+                      ],
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),
