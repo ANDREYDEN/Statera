@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/settings/profile_completion/profile_part_list_item.dart';
-import 'package:statera/ui/widgets/progress_bar.dart';
 
 class ProfileCompletion extends StatelessWidget {
   final CustomUser user;
@@ -16,47 +15,42 @@ class ProfileCompletion extends StatelessWidget {
       ),
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Flexible(
-                    child: Column(
-                      children: [
-                        Text(
-                          'Profile Completion',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          '${user.completionPercentage}%',
-                          style: Theme.of(context).textTheme.displayLarge,
-                        ),
-                        ProgressBar.progress(
-                          progress: user.completionPercentage,
-                        ),
-                      ],
+              Flexible(
+                child: Column(
+                  children: [
+                    Text(
+                      'Profile Completion',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
-                  Flexible(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        ...user.incompletedProfileParts
-                            .map((part) =>
-                                ProfilePartListItem(profilePart: part))
-                            .toList(),
-                        ...user.completedProfileParts
-                            .map((part) =>
-                                ProfilePartListItem(profilePart: part))
-                            .toList(),
-                      ],
+                    Text(
+                      '${user.completionPercentage}%',
+                      style: Theme.of(context).textTheme.displayLarge,
                     ),
-                  ),
-                ],
-              )
+                    LinearProgressIndicator(
+                      value: user.completionPercentage / 100,
+                      borderRadius: BorderRadius.circular(100),
+                      minHeight: 10,
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
+              Flexible(
+                flex: 2,
+                child: Column(
+                  children: [
+                    ...user.incompletedProfileParts
+                        .map((part) => ProfilePartListItem(profilePart: part))
+                        .toList(),
+                    ...user.completedProfileParts
+                        .map((part) => ProfilePartListItem(profilePart: part))
+                        .toList(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
