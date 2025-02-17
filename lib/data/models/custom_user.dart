@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:statera/data/value_objects/profile_part.dart';
 import 'package:uuid/uuid.dart';
 
 class CustomUser {
@@ -27,7 +28,23 @@ class CustomUser {
     this.photoURL = photoURL;
   }
 
-  bool get needsAttention => name == 'anonymous' || paymentInfo == null;
+  List<ProfilePart> get profileParts => [
+        ProfilePart(
+          name: 'Set a username',
+          incompleteMessage:
+              'Please provide a username, otherwise you would be visible to others as "anonymous"',
+          isCompleted: name != 'anonymous',
+        ),
+        ProfilePart(
+          name: 'Set Payment Information',
+          incompleteMessage:
+              'Please provide your payment information so that others know how to pay you',
+          isCompleted: paymentInfo != null,
+        ),
+      ];
+
+  List<ProfilePart> get incompletedProfileParts =>
+      profileParts.where((part) => !part.isCompleted).toList();
 
   static CustomUser fromUserDoc(DocumentSnapshot<Object?> doc) {
     final docData = doc.data() as Map<String, dynamic>;

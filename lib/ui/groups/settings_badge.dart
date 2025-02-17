@@ -9,11 +9,14 @@ class SettingsBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return UserBuilder(builder: (context, user) {
-      if (!user.needsAttention) {
+      if (user.incompletedProfileParts.isEmpty) {
         return child;
       }
 
-      return Badge(child: child, label: Text('!'));
+      return Badge.count(
+        child: child,
+        count: user.incompletedProfileParts.length,
+      );
     });
   }
 }
