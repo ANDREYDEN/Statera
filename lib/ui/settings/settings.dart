@@ -85,7 +85,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         return ListView(
           padding: EdgeInsets.symmetric(
             vertical: 20,
-            horizontal: isWide ? MediaQuery.of(context).size.width / 3 : 20,
+            horizontal: isWide ? MediaQuery.of(context).size.width / 3.5 : 20,
           ),
           children: [
             SectionTitle('Profile Information'),
@@ -98,7 +98,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
               alignment: Alignment.center,
               child: Stack(
                 children: [
-                  UserAvatar(author: user, dimension: 100),
+                  UserAvatar(author: user, dimension: 200),
                   Positioned(
                     right: 0,
                     bottom: 0,
