@@ -127,7 +127,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
               },
             ),
             SizedBox(height: 40),
-            NotificationsSetting(),
+            // NotificationsSetting(),
             SizedBox(height: 40),
             SectionTitle('General'),
             PrimaryColorPicker(),

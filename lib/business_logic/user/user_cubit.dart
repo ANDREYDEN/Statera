@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'user_state.dart';
 
+@GenerateNiceMocks([MockSpec<UserCubit>()])
 class UserCubit extends Cubit<UserState> {
   StreamSubscription? _userSubscription;
   final UserRepository _userRepository;
