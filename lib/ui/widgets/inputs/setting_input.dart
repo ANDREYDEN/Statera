@@ -44,35 +44,38 @@ class _SettingInputState extends State<SettingInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            initialValue: widget.initialValue,
-            decoration: InputDecoration(
-              label: Text(widget.label),
-              errorText: _error,
-              helperText: widget.helperText,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              initialValue: widget.initialValue,
+              decoration: InputDecoration(
+                label: Text(widget.label),
+                errorText: _error,
+                helperText: widget.helperText,
+              ),
+              inputFormatters: widget.formatters,
+              onChanged: (value) {
+                setState(() {
+                  _newValue = value;
+                  _error = _getError();
+                });
+              },
+              onFieldSubmitted: (_) => widget.onPressed(_newValue),
             ),
-            inputFormatters: widget.formatters,
-            onChanged: (value) {
-              setState(() {
-                _newValue = value;
-                _error = _getError();
-              });
-            },
-            onFieldSubmitted: (_) => widget.onPressed(_newValue),
           ),
-        ),
-        if (_newValue != widget.initialValue && _error == null) ...[
-          SizedBox(width: 4),
-          IconButton.filledTonal(
-            icon: Icon(Icons.check_rounded),
-            color: Colors.green,
-            onPressed: () => widget.onPressed(_newValue),
-          )
-        ]
-      ],
+          if (_newValue != widget.initialValue && _error == null) ...[
+            SizedBox(width: 4),
+            IconButton.filledTonal(
+              icon: Icon(Icons.check_rounded),
+              color: Colors.green,
+              onPressed: () => widget.onPressed(_newValue),
+            )
+          ]
+        ],
+      ),
     );
   }
 }

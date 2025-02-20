@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/services/services.dart';
 
+@GenerateNiceMocks([MockSpec<SeedColorCubit>()])
 class SeedColorCubit extends Cubit<Color> {
   PreferencesService _preferencesService;
 

@@ -10,6 +10,7 @@ import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
 import 'package:statera/ui/settings/notifications_setting.dart';
 import 'package:statera/ui/settings/primary_color_picker.dart';
+import 'package:statera/ui/settings/profile_completion/profile_completion.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
@@ -84,15 +85,20 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
         return ListView(
           padding: EdgeInsets.symmetric(
             vertical: 20,
-            horizontal: isWide ? MediaQuery.of(context).size.width / 3 : 20,
+            horizontal: isWide ? MediaQuery.of(context).size.width / 3.5 : 20,
           ),
           children: [
             SectionTitle('Profile Information'),
+            if (user.incompletedProfileParts.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: ProfileCompletion(user: user),
+              ),
             Align(
               alignment: Alignment.center,
               child: Stack(
                 children: [
-                  UserAvatar(author: user, dimension: 100),
+                  UserAvatar(author: user, dimension: 200),
                   Positioned(
                     right: 0,
                     bottom: 0,
@@ -121,7 +127,7 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
               },
             ),
             SizedBox(height: 40),
-            NotificationsSetting(),
+            // NotificationsSetting(),
             SizedBox(height: 40),
             SectionTitle('General'),
             PrimaryColorPicker(),

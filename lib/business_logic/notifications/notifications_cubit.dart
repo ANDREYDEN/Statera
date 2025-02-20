@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
 
 part 'notifications_state.dart';
 
+@GenerateNiceMocks([MockSpec<NotificationsCubit>()])
 class NotificationsCubit extends Cubit<NotificationsState> {
   late final NotificationService _notificationService;
   late final UserRepository _userRepostiry;
