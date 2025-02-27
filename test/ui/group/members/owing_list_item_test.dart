@@ -18,16 +18,23 @@ void main() {
   group('Owing list Item', () {
     final mockPaymentService = MockPaymentService();
     final mockGroupService = MockGroupRepository();
-    final CustomUser currentUser =
-        CustomUser(uid: defaultCurrentUserId, name: 'Current User');
 
-    final CustomUser memberUser = CustomUser.fake();
-    late Group group = Group(
-      id: 'test_group',
-      name: 'Test Group',
-      members: [currentUser, memberUser],
-      adminId: defaultCurrentUserId,
-    );
+    late CustomUser currentUser;
+    late CustomUser memberUser;
+    late Group group;
+    late OwingListItem owingListItem;
+
+    setUp(() {
+      currentUser = CustomUser(uid: defaultCurrentUserId, name: 'Current User');
+      memberUser = CustomUser.fake();
+      group = Group(
+        id: 'test_group',
+        name: 'Test Group',
+        members: [currentUser, memberUser],
+        adminId: defaultCurrentUserId,
+      );
+      owingListItem = OwingListItem(member: memberUser, owing: 10);
+    });
 
     when(mockGroupService.groupStream(any))
         .thenAnswer((_) => Stream.fromIterable([group]));
@@ -46,8 +53,6 @@ void main() {
             )
           ]
         ]));
-
-    final owingListItem = OwingListItem(member: memberUser, owing: 10);
 
     Future<void> pumpOwingListItem(WidgetTester tester) async {
       await customPump(owingListItem, tester,
@@ -124,6 +129,18 @@ void main() {
             'You are about to Transfer Ownership to "${memberUser.name}"'),
         findsOneWidget,
       );
+
+      final test = find.byType(TextField);
+      expect(test, findsOneWidget);
+      await tester.enterText(find.byType(TextField), memberUser.name);
+      await tester.pumpAndSettle();
+
+      final confirmButton = find.ancestor(
+          of: find.text('Confirm'), matching: find.byType(FilledButton));
+      expect(tester.widget<FilledButton>(confirmButton).enabled, isTrue);
+      await tester.tap(confirmButton);
+
+      verify(mockGroupService.saveGroup(any)).called(1);
     });
 
     testWidgets('doesnt show options to non admins',
