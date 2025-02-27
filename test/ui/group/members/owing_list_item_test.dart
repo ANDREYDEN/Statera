@@ -102,14 +102,11 @@ void main() {
       await tester.tap(find.text('Transfer Ownership'));
       await tester.pumpAndSettle();
 
-      // Verify dialog appears with correct text
       expect(
         find.text(
             'You are about to Transfer Ownership to "${memberUser.name}"'),
         findsOneWidget,
       );
-
-      // await tester.binding.setSurfaceSize(null);
     });
 
     testWidgets('doesnt show options to non admins',
