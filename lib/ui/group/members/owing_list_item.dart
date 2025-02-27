@@ -83,7 +83,7 @@ class OwingListItem extends StatelessWidget {
               ),
               trailing: isGroupMember
                   ? ActionsButton(
-                      tooltip: 'Whatsss up?',
+                      tooltip: 'Admin Actions',
                       actions: [
                         KickMemberAction(this.member),
                         TransferOwnershipAction(this.member)
