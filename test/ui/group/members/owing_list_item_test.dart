@@ -4,15 +4,20 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
 
 import '../../../helpers.dart';
 
+class MockGroupCubit extends Mock implements GroupCubit {}
+
 void main() {
   group('Owing list Item', () {
     final mockPaymentService = MockPaymentService();
+    final mockGroupService = MockGroupRepository();
     final CustomUser currentUser =
         CustomUser(uid: defaultCurrentUserId, name: 'Current User');
 
@@ -23,6 +28,10 @@ void main() {
       members: [currentUser, memberUser],
       adminId: defaultCurrentUserId,
     );
+
+    when(mockGroupService.groupStream(any))
+        .thenAnswer((_) => Stream.fromIterable([group]));
+
     when(mockPaymentService.paymentsStream(
       groupId: group.id,
       userId1: currentUser.uid,
@@ -41,20 +50,18 @@ void main() {
     final owingListItem = OwingListItem(member: memberUser, owing: 10);
 
     Future<void> pumpOwingListItem(WidgetTester tester) async {
-      await customPump(
-        owingListItem,
-        tester,
-        currentUserId: defaultCurrentUserId,
-        group: group,
-        extraProviders: [
-          Provider<OwingCubit>(
-            create: (context) => OwingCubit(),
-          ),
-          Provider<NewPaymentsCubit>(
-              create: (context) => NewPaymentsCubit(mockPaymentService)
-                ..load(groupId: group.id, uid: currentUser.uid)),
-        ],
-      );
+      await customPump(owingListItem, tester,
+          currentUserId: defaultCurrentUserId,
+          group: group,
+          extraProviders: [
+            Provider<OwingCubit>(
+              create: (context) => OwingCubit(),
+            ),
+            Provider<NewPaymentsCubit>(
+                create: (context) => NewPaymentsCubit(mockPaymentService)
+                  ..load(groupId: group.id, uid: currentUser.uid)),
+          ],
+          groupService: mockGroupService);
       await tester.pump();
     }
 
@@ -90,6 +97,16 @@ void main() {
         find.text('You are about to KICK member "${memberUser.name}"'),
         findsOneWidget,
       );
+
+      await tester.enterText(find.byType(TextField), memberUser.name);
+      await tester.pumpAndSettle();
+
+      final confirmButton = find.ancestor(
+          of: find.text('Confirm'), matching: find.byType(FilledButton));
+      expect(tester.widget<FilledButton>(confirmButton).enabled, isTrue);
+      await tester.tap(confirmButton);
+
+      verify(mockGroupService.saveGroup(any)).called(1);
     });
 
     testWidgets('shows transfer ownership confirmation dialog',
