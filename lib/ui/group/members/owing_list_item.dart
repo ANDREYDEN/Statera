@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/members/actions/kick_member_action.dart';
+import 'package:statera/ui/group/members/actions/transfer_ownership_action.dart';
 import 'package:statera/ui/group/members/new_payments_badge.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
+import 'package:statera/ui/widgets/buttons/actions_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
@@ -24,6 +28,7 @@ class OwingListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final owingCubit = context.watch<OwingCubit>();
     final isWide = context.read<LayoutState>().isWide;
+    final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     String? selectedMemberUid = null;
 
@@ -36,7 +41,8 @@ class OwingListItem extends StatelessWidget {
         final owingColor = this.owing >= group.debtThreshold
             ? Theme.of(context).colorScheme.error
             : null;
-        final isAdmin = group.admin.uid == this.member.uid;
+        final isCurrentMemberAdmin = group.admin.uid == this.member.uid;
+        final isGroupMember = group.isAdmin(uid);
 
         return MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -59,10 +65,11 @@ class OwingListItem extends StatelessWidget {
                   child: UserAvatar(
                     author: this.member,
                     withName: true,
-                    withIcon: isAdmin,
-                    icon: isAdmin ? Icons.star : null,
-                    iconColor: isAdmin ? Colors.yellow : null,
-                    iconBackgroudColor: isAdmin ? Colors.black : null,
+                    withIcon: isCurrentMemberAdmin,
+                    icon: isCurrentMemberAdmin ? Icons.star : null,
+                    iconColor: isCurrentMemberAdmin ? Colors.yellow : null,
+                    iconBackgroudColor:
+                        isCurrentMemberAdmin ? Colors.black : null,
                   ),
                 ),
                 NewPaymentsBadge(
@@ -74,6 +81,15 @@ class OwingListItem extends StatelessWidget {
                 ),
               ],
             ),
+            trailing: isGroupMember
+                ? ActionsButton(
+                    tooltip: 'Admin Actions',
+                    actions: [
+                      KickMemberAction(this.member),
+                      TransferOwnershipAction(this.member)
+                    ],
+                  )
+                : null,
           ),
         );
       },

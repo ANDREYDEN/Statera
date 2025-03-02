@@ -54,6 +54,7 @@ Future<void> customPump(
   Group? group,
   List<Expense>? expenses,
   PlatformContext? platformContext,
+  List<Provider>? extraProviders,
 }) async {
   when(defaultCurrentUser.uid)
       .thenReturn(currentUserId ?? defaultCurrentUserId);
@@ -96,7 +97,8 @@ Future<void> customPump(
           )..load(),
         ),
         BlocProvider(
-            create: (context) => AuthBloc(authService ?? defaultAuthService))
+            create: (context) => AuthBloc(authService ?? defaultAuthService)),
+        ...extraProviders ?? []
       ],
       child: MaterialApp(home: Scaffold(body: widget)),
     ),

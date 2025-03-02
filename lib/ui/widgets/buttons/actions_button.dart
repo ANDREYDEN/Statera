@@ -24,7 +24,7 @@ class ActionsButton extends StatelessWidget {
               children: [
                 Icon(action.icon, color: action.getIconColor(context)),
                 SizedBox(width: 4),
-                Text(action.name),
+                Flexible(child: Text(action.name)),
               ],
             ),
           );
