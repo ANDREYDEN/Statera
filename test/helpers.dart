@@ -41,18 +41,21 @@ final defaultGroup = Group(
   ],
 );
 
-Future<void> customPump(Widget widget, WidgetTester tester,
-    {ExpenseService? expenseService,
-    UserExpenseRepository? userExpenseRepository,
-    GroupRepository? groupService,
-    UserRepository? userRepository,
-    AuthService? authService,
-    FeatureService? featureService,
-    String? currentUserId,
-    Group? group,
-    List<Expense>? expenses,
-    PlatformContext? platformContext,
-    List<Provider>? extraProviders}) async {
+Future<void> customPump(
+  Widget widget,
+  WidgetTester tester, {
+  ExpenseService? expenseService,
+  UserExpenseRepository? userExpenseRepository,
+  GroupRepository? groupService,
+  UserRepository? userRepository,
+  AuthService? authService,
+  FeatureService? featureService,
+  String? currentUserId,
+  Group? group,
+  List<Expense>? expenses,
+  PlatformContext? platformContext,
+  List<Provider>? extraProviders,
+}) async {
   when(defaultCurrentUser.uid)
       .thenReturn(currentUserId ?? defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);

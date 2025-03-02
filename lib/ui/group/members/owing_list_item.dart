@@ -47,49 +47,50 @@ class OwingListItem extends StatelessWidget {
         return MouseRegion(
           cursor: SystemMouseCursors.click,
           child: ListTile(
-              onTap: () => isWide
-                  ? owingCubit.select(member.uid)
-                  : context.goNamed(
-                      PaymentListPage.name,
-                      pathParameters: {
-                        'groupId': group.id!,
-                        'memberId': member.uid
-                      },
-                    ),
-              selected: selectedMemberUid == member.uid,
-              selectedTileColor:
-                  Theme.of(context).colorScheme.primary.withAlpha(50),
-              title: Row(
-                children: [
-                  Expanded(
-                    child: UserAvatar(
-                      author: this.member,
-                      withName: true,
-                      withIcon: isCurrentMemberAdmin,
-                      icon: isCurrentMemberAdmin ? Icons.star : null,
-                      iconColor: isCurrentMemberAdmin ? Colors.yellow : null,
-                      iconBackgroudColor:
-                          isCurrentMemberAdmin ? Colors.black : null,
-                    ),
+            onTap: () => isWide
+                ? owingCubit.select(member.uid)
+                : context.goNamed(
+                    PaymentListPage.name,
+                    pathParameters: {
+                      'groupId': group.id!,
+                      'memberId': member.uid
+                    },
                   ),
-                  NewPaymentsBadge(
-                    memberId: member.uid,
-                    child: PriceText(
-                      value: this.owing,
-                      textStyle: TextStyle(fontSize: 18, color: owingColor),
-                    ),
+            selected: selectedMemberUid == member.uid,
+            selectedTileColor:
+                Theme.of(context).colorScheme.primary.withAlpha(50),
+            title: Row(
+              children: [
+                Expanded(
+                  child: UserAvatar(
+                    author: this.member,
+                    withName: true,
+                    withIcon: isCurrentMemberAdmin,
+                    icon: isCurrentMemberAdmin ? Icons.star : null,
+                    iconColor: isCurrentMemberAdmin ? Colors.yellow : null,
+                    iconBackgroudColor:
+                        isCurrentMemberAdmin ? Colors.black : null,
                   ),
-                ],
-              ),
-              trailing: isGroupMember
-                  ? ActionsButton(
-                      tooltip: 'Admin Actions',
-                      actions: [
-                        KickMemberAction(this.member),
-                        TransferOwnershipAction(this.member)
-                      ],
-                    )
-                  : null),
+                ),
+                NewPaymentsBadge(
+                  memberId: member.uid,
+                  child: PriceText(
+                    value: this.owing,
+                    textStyle: TextStyle(fontSize: 18, color: owingColor),
+                  ),
+                ),
+              ],
+            ),
+            trailing: isGroupMember
+                ? ActionsButton(
+                    tooltip: 'Admin Actions',
+                    actions: [
+                      KickMemberAction(this.member),
+                      TransferOwnershipAction(this.member)
+                    ],
+                  )
+                : null,
+          ),
         );
       },
     );
