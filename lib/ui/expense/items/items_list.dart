@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
-import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/empty_expense_items_list.dart';
@@ -73,15 +72,12 @@ class ItemsList extends StatelessWidget {
   void _handleItemDelete(BuildContext context, Expense expense, int index) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
-    final expensesCubit = context.read<ExpensesCubit>();
 
     final updatedExpense = expense..items.removeAt(index);
 
     expenseBloc.add(
       UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
-
-    expensesCubit.updateExpense(updatedExpense);
   }
 
   void _handleItemPartitionChange(
@@ -92,7 +88,6 @@ class ItemsList extends StatelessWidget {
   ) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
-    final expensesCubit = context.read<ExpensesCubit>();
 
     final updatedExpense = expense
       ..items[index].setAssigneeDecision(authBloc.uid, parts);
@@ -100,7 +95,5 @@ class ItemsList extends StatelessWidget {
     expenseBloc.add(
       UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
-
-    expensesCubit.updateExpense(updatedExpense);
   }
 }
