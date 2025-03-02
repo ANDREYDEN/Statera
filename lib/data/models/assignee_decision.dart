@@ -20,6 +20,13 @@ class AssigneeDecision {
     };
   }
 
+  static AssigneeDecision from(AssigneeDecision other) {
+    return AssigneeDecision(
+      uid: other.uid,
+      parts: other._parts,
+    );
+  }
+
   static AssigneeDecision fromFirestore(Map<String, dynamic> data) {
     return AssigneeDecision(
       uid: data['uid'],

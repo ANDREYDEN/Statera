@@ -71,6 +71,8 @@ class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
 
+  ExpensesCubit get _expensesCubit => context.read<ExpensesCubit>();
+
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
 
@@ -129,7 +131,13 @@ class _GroupPageState extends State<GroupPage> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) => ExpenseBloc(context.read<ExpenseService>())),
+            create: (context) => ExpenseBloc(
+              context.read<ExpenseService>(),
+              onExpenseUpdated: (expense) {
+                _expensesCubit.updateExpense(expense);
+              },
+            ),
+          ),
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide
