@@ -34,25 +34,25 @@ void main() {
         adminId: defaultCurrentUserId,
       );
       owingListItem = OwingListItem(member: memberUser, owing: 10);
+
+      when(mockGroupService.groupStream(any))
+          .thenAnswer((_) => Stream.fromIterable([group]));
+
+      when(mockPaymentService.paymentsStream(
+        groupId: group.id,
+        userId1: currentUser.uid,
+        newFor: currentUser.uid,
+      )).thenAnswer((_) => Stream.fromIterable([
+            [
+              Payment(
+                groupId: group.id,
+                payerId: currentUser.uid,
+                receiverId: memberUser.uid,
+                value: 145,
+              )
+            ]
+          ]));
     });
-
-    when(mockGroupService.groupStream(any))
-        .thenAnswer((_) => Stream.fromIterable([group]));
-
-    when(mockPaymentService.paymentsStream(
-      groupId: group.id,
-      userId1: currentUser.uid,
-      newFor: currentUser.uid,
-    )).thenAnswer((_) => Stream.fromIterable([
-          [
-            Payment(
-              groupId: group.id,
-              payerId: currentUser.uid,
-              receiverId: memberUser.uid,
-              value: 145,
-            )
-          ]
-        ]));
 
     Future<void> pumpOwingListItem(WidgetTester tester) async {
       await customPump(owingListItem, tester,
