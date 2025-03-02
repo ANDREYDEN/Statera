@@ -156,8 +156,8 @@ class Group {
   }
 
   bool canRedirect(String uid) {
-    final owers = getMembersThatOweToUser(uid);
-    final receivers = getMembersThatUserOwesTo(uid);
+    final owers = getMembersThatOweToMember(uid);
+    final receivers = getMembersThatMemberOwesTo(uid);
 
     return owers.isNotEmpty && receivers.isNotEmpty;
   }
@@ -197,8 +197,8 @@ class Group {
       throw Exception('User with id $uid cannot redirect debt');
     }
 
-    final owerUids = getMembersThatOweToUser(uid);
-    final receiverUids = getMembersThatUserOwesTo(uid);
+    final owerUids = getMembersThatOweToMember(uid);
+    final receiverUids = getMembersThatMemberOwesTo(uid);
 
     final bestOwerUid = owerUids.reduce((best, current) {
       if (this.balance[current]![uid]! > this.balance[best]![uid]!) {
@@ -219,7 +219,7 @@ class Group {
     return (bestOwerUid, bestReceiverUid);
   }
 
-  List<String> getMembersThatOweToUser(String uid) {
+  List<String> getMembersThatOweToMember(String uid) {
     return this
         .balance
         .keys
@@ -227,12 +227,17 @@ class Group {
         .toList();
   }
 
-  List<String> getMembersThatUserOwesTo(String uid) {
+  List<String> getMembersThatMemberOwesTo(String uid) {
     return this
         .balance
         .keys
         .where((otherUid) => (this.balance[uid]![otherUid] ?? 0) > 0)
         .toList();
+  }
+
+  bool memberHasOutstandingBalance(String uid) {
+    return getMembersThatOweToMember(uid).isNotEmpty ||
+        getMembersThatOweToMember(uid).isNotEmpty;
   }
 
   Map<String, Map<String, double>> getFirestoreBalance() {

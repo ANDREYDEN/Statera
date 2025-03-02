@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/group.dart';
+import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 
@@ -16,7 +18,15 @@ class LeaveGroupSetting extends StatelessWidget {
     required this.groupName,
   }) : super(key: key);
 
-  void _handleLeave(BuildContext context) {
+  Text generateSubtitle(BuildContext context, Group group) {
+    final authBloc = context.read<AuthBloc>();
+    return group.memberHasOutstandingBalance(authBloc.uid)
+        ? Text('"Suck my ass" Oleksii Kvadrober')
+        : Text(
+            'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.');
+  }
+
+  void _handleLeave(BuildContext context, Group group) {
     final authBloc = context.read<AuthBloc>();
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
@@ -40,14 +50,17 @@ class LeaveGroupSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text('Leave the group'),
-      subtitle: Text(
-        'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.',
-      ),
-      trailing: DangerButton(
-        text: 'Leave group',
-        onPressed: isAdmin ? null : () => _handleLeave(context),
+    final uid = context.select((AuthBloc authBloc) => authBloc.uid);
+
+    return GroupBuilder(
+      builder: (context, group) => ListTile(
+        title: Text('Leave the group'),
+        subtitle: generateSubtitle(context, group),
+        trailing: DangerButton(
+            text: 'Leave group',
+            onPressed: isAdmin || group.memberHasOutstandingBalance(uid)
+                ? null
+                : () => _handleLeave(context, group)),
       ),
     );
   }
