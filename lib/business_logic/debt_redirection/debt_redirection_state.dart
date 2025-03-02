@@ -16,8 +16,8 @@ class DebtRedirectionLoaded extends DebtRedirectionState {
   });
 
   DebtRedirectionLoaded.initial({uid, required this.group}) {
-    owerUids = group.getMembersThatOweToUser(uid);
-    receiverUids = group.getMembersThatUserOwesTo(uid);
+    owerUids = group.getMembersThatOweToMember(uid);
+    receiverUids = group.getMembersThatMemberOwesTo(uid);
 
     final (bestOwerUid, bestReceiverUid) = group.getBestRedirect(uid);
 
