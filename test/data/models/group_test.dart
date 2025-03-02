@@ -99,7 +99,7 @@ void main() {
       group.balance[ower.uid]![member.uid] = 5;
       group.balance[member.uid]![ower.uid] = -5;
 
-      final owers = group.getMembersThatOweToUser(member.uid);
+      final owers = group.getMembersThatOweToMember(member.uid);
 
       expect(owers, hasLength(1));
       expect(owers, contains(ower.uid));
@@ -115,7 +115,7 @@ void main() {
       group.balance[ower.uid]![member.uid] = 5;
       group.balance[member.uid]![ower.uid] = -5;
 
-      final receivers = group.getMembersThatUserOwesTo(member.uid);
+      final receivers = group.getMembersThatMemberOwesTo(member.uid);
 
       expect(receivers, hasLength(1));
       expect(receivers, contains(receiver.uid));
