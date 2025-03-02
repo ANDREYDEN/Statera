@@ -60,7 +60,6 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       if (currentState.allLoaded) return;
 
       emit(ExpensesProcessing.fromLoaded(currentState));
-      print('loading more...');
       load(
         numberOfExpenses: currentState.expenses.length + expensesPerPage,
         expenseStages: currentState.stages,
@@ -82,6 +81,16 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       return await _expenseService.deleteExpense(expenseId);
     }
     return null;
+  }
+
+  void updateExpense(Expense updatedExpense) {
+    if (state case final ExpensesLoaded currentState) {
+      final newExpenses = currentState.expenses
+          .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
+          .toList();
+
+      emit(ExpensesLoaded(expenses: newExpenses, stages: currentState.stages));
+    }
   }
 
   void selectExpenseStages(List<ExpenseStage> expenseStages) {

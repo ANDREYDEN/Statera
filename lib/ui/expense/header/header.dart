@@ -66,7 +66,7 @@ class Header extends StatelessWidget {
                       Icon(Icons.schedule, size: 20, color: Colors.black),
                       TextButton(
                         onPressed: expenseCanBeUpdated
-                            ? () => _handleDateClick(context)
+                            ? () => _handleDateClick(context, expense)
                             : null,
                         child: Text(
                           toStringDate(expense.date) ?? 'Not set',
@@ -82,7 +82,7 @@ class Header extends StatelessWidget {
                         return UserAvatar(
                           author: group.getMember(expense.authorUid),
                           onTap: expenseCanBeUpdated
-                              ? () => _handleAuthorClick(context)
+                              ? () => _handleAuthorClick(context, expense)
                               : null,
                         );
                       }),
@@ -90,7 +90,7 @@ class Header extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: expenseCanBeUpdated
-                              ? () => _handleAssigneesClick(context)
+                              ? () => _handleAssigneesClick(context, expense)
                               : null,
                           child: AssigneeList(),
                         ),
@@ -106,77 +106,68 @@ class Header extends StatelessWidget {
     );
   }
 
-  _handleDateClick(BuildContext context) {
+  _handleDateClick(BuildContext context, Expense expense) async {
+    DateTime? newDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+      lastDate: DateTime.now().add(Duration(days: 30)),
+    );
+    if (newDate == null) return;
+
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
+    expense.date = newDate;
     expenseBloc.add(
-      UpdateRequested(
-        issuerUid: authBloc.uid,
-        update: (expense) async {
-          DateTime? newDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-            lastDate: DateTime.now().add(Duration(days: 30)),
-          );
-          if (newDate == null) return;
-
-          expense.date = newDate;
-        },
-      ),
+      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: expense),
     );
   }
 
-  _handleAuthorClick(BuildContext context) {
+  _handleAuthorClick(BuildContext context, Expense expense) async {
+    final newAuthorUid = await showDialog<String?>(
+      context: context,
+      builder: (_) => BlocProvider<GroupCubit>.value(
+        value: context.read<GroupCubit>(),
+        child: MemberSelectDialog(
+          title: 'Change author',
+          singleSelection: true,
+          excludeMe: true,
+        ),
+      ),
+    );
+
+    if (newAuthorUid == null) return;
+
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
+    expense.authorUid = newAuthorUid;
     expenseBloc.add(
-      UpdateRequested(
-        issuerUid: authBloc.uid,
-        update: (expense) async {
-          final newAuthorUid = await showDialog<String?>(
-            context: context,
-            builder: (_) => BlocProvider<GroupCubit>.value(
-              value: context.read<GroupCubit>(),
-              child: MemberSelectDialog(
-                title: 'Change author',
-                singleSelection: true,
-                excludeMe: true,
-              ),
-            ),
-          );
-          if (newAuthorUid == null) return;
-
-          expense.authorUid = newAuthorUid;
-        },
-      ),
+      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: expense),
     );
   }
 
-  _handleAssigneesClick(BuildContext context) {
+  _handleAssigneesClick(BuildContext context, Expense expense) async {
+    final newAssigneeIds = await showDialog<List<String>>(
+      context: context,
+      builder: (_) => BlocProvider<GroupCubit>.value(
+        value: context.read<GroupCubit>(),
+        child: MemberSelectDialog(
+          title: 'Change Assignees',
+          value: expense.assigneeUids,
+        ),
+      ),
+    );
+    if (newAssigneeIds == null) return;
+
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
     expenseBloc.add(
       UpdateRequested(
         issuerUid: authBloc.uid,
-        update: (expense) async {
-          final newAssigneeIds = await showDialog<List<String>>(
-            context: context,
-            builder: (_) => BlocProvider<GroupCubit>.value(
-              value: context.read<GroupCubit>(),
-              child: MemberSelectDialog(
-                title: 'Change Assignees',
-                value: expense.assigneeUids,
-              ),
-            ),
-          );
-          if (newAssigneeIds == null) return;
-
-          expense.updateAssignees(newAssigneeIds);
-        },
+        updatedExpense: expense..updateAssignees(newAssigneeIds),
       ),
     );
   }

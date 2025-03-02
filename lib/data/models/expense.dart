@@ -189,6 +189,20 @@ class Expense {
     };
   }
 
+  static Expense from(Expense other) {
+    return Expense(
+      name: other.name,
+      authorUid: other.authorUid,
+      groupId: other.groupId,
+      settings: ExpenseSettings.from(other.settings),
+    )
+      ..id = other.id
+      ..date = other.date
+      ..finalizedDate = other.finalizedDate
+      ..assigneeUids = [...other.assigneeUids]
+      ..items = other.items.map((item) => Item.from(item)).toList();
+  }
+
   static Expense fromFirestore(Map<String, dynamic> data, String id) {
     final authorUid = data['authorUid'];
     final settings = data['settings'] == null

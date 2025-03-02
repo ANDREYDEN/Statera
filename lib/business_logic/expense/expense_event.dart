@@ -13,9 +13,9 @@ class _UnloadRequested extends ExpenseEvent {}
 
 class UpdateRequested extends ExpenseEvent {
   final String issuerUid;
-  final FutureOr<void> Function(Expense) update;
+  final Expense updatedExpense;
 
-  const UpdateRequested({required this.issuerUid, required this.update})
+  const UpdateRequested({required this.issuerUid, required this.updatedExpense})
       : super();
 
   @override

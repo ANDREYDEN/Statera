@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/empty_expense_items_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
@@ -37,7 +38,7 @@ class ItemsList extends StatelessWidget {
                             key: Key(item.hashCode.toString()),
                             isDismissible: expense.canBeUpdatedBy(authBloc.uid),
                             onDismissed: (_) =>
-                                _handleItemDelete(context, index),
+                                _handleItemDelete(context, expense, index),
                             confirmation:
                                 'Are you sure you want to delete this item?',
                             child: ItemListItemFactory.create(
@@ -50,6 +51,7 @@ class ItemsList extends StatelessWidget {
                               onChangePartition: !expense.finalized
                                   ? (partition) => _handleItemPartitionChange(
                                         context,
+                                        expense,
                                         partition,
                                         index,
                                       )
@@ -67,27 +69,31 @@ class ItemsList extends StatelessWidget {
     );
   }
 
-  void _handleItemDelete(BuildContext context, int index) {
+  void _handleItemDelete(BuildContext context, Expense expense, int index) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
+
+    final updatedExpense = expense..items.removeAt(index);
+
     expenseBloc.add(
-      UpdateRequested(
-        issuerUid: authBloc.uid,
-        update: (expense) => expense.items.removeAt(index),
-      ),
+      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
   }
 
-  void _handleItemPartitionChange(BuildContext context, int parts, int index) {
+  void _handleItemPartitionChange(
+    BuildContext context,
+    Expense expense,
+    int parts,
+    int index,
+  ) {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
+
+    final updatedExpense = expense
+      ..items[index].setAssigneeDecision(authBloc.uid, parts);
+
     expenseBloc.add(
-      UpdateRequested(
-        issuerUid: authBloc.uid,
-        update: (expense) {
-          expense.items[index].setAssigneeDecision(authBloc.uid, parts);
-        },
-      ),
+      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
   }
 }

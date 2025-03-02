@@ -28,4 +28,13 @@ class GasItem extends Item {
       'consumption': consumption
     };
   }
+
+  static GasItem from(GasItem other) {
+    return GasItem(
+      name: other.name,
+      distance: other.distance,
+      gasPrice: other.gasPrice,
+      consumption: other.consumption,
+    );
+  }
 }

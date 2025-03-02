@@ -13,13 +13,14 @@ class ExpenseLoading extends ExpenseState {
 }
 
 class ExpenseLoaded extends ExpenseState {
-  Expense expense;
+  final Expense _expense;
+  Expense get expense => Expense.from(_expense);
 
-  ExpenseLoaded({required this.expense}) : super();
+  ExpenseLoaded(this._expense) : super();
 }
 
 class ExpenseUpdating extends ExpenseLoaded {
-  ExpenseUpdating({required Expense expense}) : super(expense: expense);
+  ExpenseUpdating({required Expense expense}) : super(expense);
 }
 
 class ExpenseError extends ExpenseState {
