@@ -47,11 +47,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     if (state is! ExpenseLoaded) return;
 
     final expense = (state as ExpenseLoaded).expense;
+
+    if (event.updatedExpense == expense) {
+      emit(ExpenseLoaded(expense: event.updatedExpense));
+      return;
+    }
+
     emit(ExpenseUpdating(expense: expense));
-
-    final wasCompleted = expense.completed;
-    await event.update(expense);
-
     updateTimer?.cancel();
     updateTimer = Timer(Duration(seconds: 2), () async {
       try {
