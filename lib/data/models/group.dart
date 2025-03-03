@@ -236,8 +236,8 @@ class Group {
   }
 
   bool memberHasOutstandingBalance(String uid) {
-    return getMembersThatOweToMember(uid).isNotEmpty ||
-        getMembersThatOweToMember(uid).isNotEmpty;
+    return getMembersThatOweToMember(uid).isEmpty ||
+        getMembersThatOweToMember(uid).isEmpty;
   }
 
   Map<String, Map<String, double>> getFirestoreBalance() {

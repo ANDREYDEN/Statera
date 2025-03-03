@@ -18,8 +18,9 @@ class LeaveGroupSetting extends StatelessWidget {
     required this.groupName,
   }) : super(key: key);
 
-  Text generateSubtitle(BuildContext context, Group group) {
+  Text _generateSubtitle(BuildContext context, Group group) {
     final authBloc = context.read<AuthBloc>();
+
     return group.memberHasOutstandingBalance(authBloc.uid)
         ? Text('"Suck my ass" Oleksii Kvadrober')
         : Text(
@@ -55,7 +56,7 @@ class LeaveGroupSetting extends StatelessWidget {
     return GroupBuilder(
       builder: (context, group) => ListTile(
         title: Text('Leave the group'),
-        subtitle: generateSubtitle(context, group),
+        subtitle: _generateSubtitle(context, group),
         trailing: DangerButton(
             text: 'Leave group',
             onPressed: isAdmin || group.memberHasOutstandingBalance(uid)
