@@ -26,18 +26,30 @@ class ExpensesLoaded extends ExpensesState {
         stages.any((stage) => !other.stages.contains(stage));
   }
 
+  ExpensesLoaded copyWith({
+    List<Expense>? expenses,
+    List<ExpenseStage>? stages,
+    bool? allLoaded,
+  }) {
+    return ExpensesLoaded(
+      expenses: expenses ?? this.expenses,
+      stages: stages ?? this.stages,
+      allLoaded: allLoaded ?? this.allLoaded,
+    );
+  }
+
   @override
   List<Object> get props => [expenses, allLoaded, stages];
 }
 
 /// After the expenses were loaded; whenever the list is changing (creates, updates)
-class ExpensesProcessing extends ExpensesLoaded {
-  ExpensesProcessing({
+class ExpensesLoadingMore extends ExpensesLoaded {
+  ExpensesLoadingMore({
     required List<Expense> expenses,
     required List<ExpenseStage> stages,
   }) : super(expenses: expenses, stages: stages);
 
-  ExpensesProcessing.fromLoaded(ExpensesLoaded loaded)
+  ExpensesLoadingMore.fromLoaded(ExpensesLoaded loaded)
       : super(expenses: loaded.expenses, stages: loaded.stages);
 
   ExpensesLoaded toLoaded() {

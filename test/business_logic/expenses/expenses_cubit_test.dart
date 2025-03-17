@@ -7,12 +7,14 @@ import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
+import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 
 void main() {
   final expenseService = MockExpenseService();
   final groupService = MockGroupRepository();
   final userExpenseRepository = MockUserExpenseRepository();
+  final paymentService = MockPaymentService();
   final groupId = 'testGroupId';
   final uid = 'testUserId';
   ExpensesCubit expensesCubit = ExpensesCubit(
@@ -21,6 +23,7 @@ void main() {
     userExpenseRepository,
     expenseService,
     groupService,
+    paymentService,
   );
   final expenses = List.generate(
     25,
@@ -34,7 +37,13 @@ void main() {
   group('ExpensesCubit', () {
     setUp(() async {
       expensesCubit = ExpensesCubit(
-          groupId, uid, userExpenseRepository, expenseService, groupService);
+        groupId,
+        uid,
+        userExpenseRepository,
+        expenseService,
+        groupService,
+        paymentService,
+      );
     });
 
     test(
@@ -96,7 +105,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: firstExpenses,
             stages: ExpenseStage.values,
@@ -159,7 +168,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: firstExpenses,
             stages: ExpenseStage.values,
@@ -171,7 +180,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: secondExpenses,
             stages: ExpenseStage.values,
@@ -236,7 +245,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: firstExpenses,
             stages: ExpenseStage.values,
@@ -300,7 +309,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: firstExpenses,
             stages: ExpenseStage.values,
@@ -312,7 +321,7 @@ void main() {
           stages: selectedStages,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
+        ExpensesLoadingMore.fromLoaded(
           ExpensesLoaded(
             expenses: withoutFirstFive,
             stages: selectedStages,

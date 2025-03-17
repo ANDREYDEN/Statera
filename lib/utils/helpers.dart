@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -76,7 +77,7 @@ String? toStringDateTime(DateTime? date) {
 
 Future<bool> snackbarCatch(
   BuildContext context,
-  dynamic Function() operation, {
+  FutureOr<dynamic> Function() operation, {
   String? successMessage,
   String? errorMessage,
 }) async {

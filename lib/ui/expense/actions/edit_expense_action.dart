@@ -14,7 +14,6 @@ class EditExpenseAction extends EntityAction {
   @override
   @protected
   FutureOr<void> handle(BuildContext context) async {
-    final expenseService = context.read<ExpenseService>();
     final expensesCubit = context.read<ExpensesCubit>();
 
     await showDialog(
@@ -30,15 +29,11 @@ class EditExpenseAction extends EntityAction {
           )
         ],
         onSubmit: (values) async {
-          expensesCubit.process();
-          final success = await snackbarCatch(
+          expense.name = values['expense_name']!;
+          await snackbarCatch(
             context,
-            () => expenseService.updateExpenseById(expense.id, (expense) {
-              expense.name = values['expense_name']!;
-            }),
+            () => expensesCubit.updateExpense(expense, persist: true),
           );
-
-          if (!success) expensesCubit.stopProcessing();
         },
       ),
     );

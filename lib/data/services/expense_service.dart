@@ -19,15 +19,6 @@ class ExpenseService extends Firestore {
     return expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
-  Future<void> updateExpenseById(
-    String expenseId,
-    Function(Expense) updater,
-  ) async {
-    var expense = await getExpense(expenseId);
-    updater(expense);
-    await expensesCollection.doc(expense.id).set(expense.toFirestore());
-  }
-
   Stream<Expense?> expenseStream(String? expenseId) {
     return expensesCollection
         .doc(expenseId)

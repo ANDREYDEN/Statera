@@ -66,7 +66,7 @@ class ExpensesListBody extends StatelessWidget {
               },
               child: ExpenseListItem(
                 expense: expense,
-                processing: expensesState is ExpensesProcessing,
+                processing: expensesState is ExpensesLoadingMore,
               ),
             );
           },

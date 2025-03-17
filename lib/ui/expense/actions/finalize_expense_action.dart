@@ -1,37 +1,36 @@
 part of 'expense_action.dart';
 
-class FinalizeExpenseAction {
-  final String expenseId;
+class FinalizeExpenseAction extends ExpenseAction {
+  FinalizeExpenseAction(super.expense);
 
-  FinalizeExpenseAction(this.expenseId);
+  @override
+  IconData get icon => Icons.check;
+
+  @override
+  String get name => 'Finalize';
 
   Future handle(BuildContext context) {
     return snackbarCatch(
       context,
       () async {
-        final groupCubit = context.read<GroupCubit>();
-        final expenseService = context.read<ExpenseService>();
-        final expensesCubit = context.read<ExpensesCubit>();
-
-        // TODO: use transaction
-        final expense = await expenseService.getExpense(expenseId);
-        final valid = await verifyAllItemsValid(context, expense);
+        final valid = await _verifyAllItemsValid(context, expense);
         if (!valid) return;
 
-        var group = groupCubit.loadedState.group;
+        final groupCubit = context.read<GroupCubit>();
+        final expensesCubit = context.read<ExpensesCubit>();
 
-        await expenseService.finalizeExpense(expenseId);
-        expensesCubit.process();
-        final payments = await createPayments(context, expense, group);
-        updateGroup(groupCubit, payments);
+        var group = groupCubit.loadedState.group;
+        await expensesCubit.finalizeExpense(expense, group);
       },
       successMessage:
           "The expense is now finalized. Participants' balances updated.",
     );
   }
 
-  Future<bool> verifyAllItemsValid(
-      BuildContext context, Expense expense) async {
+  Future<bool> _verifyAllItemsValid(
+    BuildContext context,
+    Expense expense,
+  ) async {
     bool accepted = true;
     if (expense.hasItemsDeniedByAll) {
       accepted = await showDialog<bool>(
@@ -46,33 +45,5 @@ class FinalizeExpenseAction {
     }
 
     return accepted;
-  }
-
-  /// Add expense payments from author to all assignees
-  Future<List<Payment>> createPayments(
-      BuildContext context, Expense expense, Group group) async {
-    final paymentService = context.read<PaymentService>();
-
-    final payments = expense.assigneeUids
-        .where((assigneeUid) => assigneeUid != expense.authorUid)
-        .map(
-      (assigneeUid) {
-        return Payment.fromFinalizedExpense(
-          expense: expense,
-          receiverId: assigneeUid,
-          oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
-        );
-      },
-    );
-    await Future.wait(payments.map(paymentService.addPayment));
-    return payments.toList();
-  }
-
-  void updateGroup(GroupCubit groupCubit, List<Payment> payments) {
-    groupCubit.update((group) {
-      for (var payment in payments) {
-        group.payOffBalance(payment: payment);
-      }
-    });
   }
 }
