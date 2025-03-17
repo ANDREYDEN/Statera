@@ -59,31 +59,37 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   void loadMore() async {
-    if (state case final ExpensesLoaded currentState) {
-      if (currentState.allLoaded) return;
+    if (state case final ExpensesLoaded loadedState) {
+      if (loadedState.allLoaded) return;
 
-      emit(ExpensesLoadingMore.fromLoaded(currentState));
+      emit(loadedState.copyWith(loadingMore: true));
       load(
-        numberOfExpenses: currentState.expenses.length + expensesPerPage,
-        expenseStages: currentState.stages,
+        numberOfExpenses: loadedState.expenses.length + expensesPerPage,
+        expenseStages: loadedState.stages,
       );
     }
   }
 
   Future<String?> addExpense(Expense expense, String? groupId) async {
-    if (state case final ExpensesLoaded currentState) {
-      final newExpenses = [...currentState.expenses, expense];
-      emit(currentState.copyWith(expenses: newExpenses));
+    if (state case ExpensesLoaded loadedState) {
+      final updatedExpenses = [expense, ...loadedState.expenses];
+      emit(loadedState.copyWith(
+          expenses: updatedExpenses,
+          processingExpenseIds: [
+            ...loadedState.processingExpenseIds,
+            expense.id
+          ]));
       return await _groupService.addExpense(groupId, expense);
     }
+
     return null;
   }
 
   Future<void> deleteExpense(String expenseId) async {
-    if (state case final ExpensesLoaded currentState) {
+    if (state case final ExpensesLoaded loadedState) {
       final newExpenses =
-          currentState.expenses.where((e) => e.id != expenseId).toList();
-      emit(currentState.copyWith(expenses: newExpenses));
+          loadedState.expenses.where((e) => e.id != expenseId).toList();
+      emit(loadedState.copyWith(expenses: newExpenses));
       return await _expenseService.deleteExpense(expenseId);
     }
     return null;
@@ -93,25 +99,15 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     Expense updatedExpense, {
     bool persist = false,
   }) async {
-    if (state case final ExpensesLoaded currentState) {
-      final newExpenses = currentState.expenses
+    if (state case final ExpensesLoaded loadedState) {
+      final newExpenses = loadedState.expenses
           .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
           .toList();
 
-      emit(ExpensesLoaded(expenses: newExpenses, stages: currentState.stages));
+      emit(ExpensesLoaded(expenses: newExpenses, stages: loadedState.stages));
       if (persist) {
         await _expenseService.updateExpense(updatedExpense);
       }
-    }
-  }
-
-  void saveExpense(Expense updatedExpense) {
-    if (state case final ExpensesLoaded currentState) {
-      final newExpenses = currentState.expenses
-          .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
-          .toList();
-
-      emit(ExpensesLoaded(expenses: newExpenses, stages: currentState.stages));
     }
   }
 

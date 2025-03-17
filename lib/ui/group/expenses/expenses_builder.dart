@@ -8,7 +8,6 @@ class ExpensesBuilder extends StatelessWidget {
   final Widget Function(BuildContext, ExpensesError)? errorBuilder;
   final Widget? loadingWidget;
   final void Function(BuildContext, ExpensesState)? onStagesChanged;
-  final bool renderExpensesProcessing;
 
   const ExpensesBuilder({
     Key? key,
@@ -16,7 +15,6 @@ class ExpensesBuilder extends StatelessWidget {
     this.errorBuilder,
     this.loadingWidget,
     this.onStagesChanged,
-    this.renderExpensesProcessing = true,
   }) : super(key: key);
 
   @override
@@ -38,20 +36,7 @@ class ExpensesBuilder extends StatelessWidget {
         }
 
         if (state is ExpensesLoaded) {
-          if (!renderExpensesProcessing) {
-            return builder(groupContext, state);
-          }
-
-          return Column(
-            children: [
-              if (state is ExpensesLoadingMore)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: LinearProgressIndicator(),
-                ),
-              Expanded(child: builder(groupContext, state))
-            ],
-          );
+          return builder(groupContext, state);
         }
 
         return Container();

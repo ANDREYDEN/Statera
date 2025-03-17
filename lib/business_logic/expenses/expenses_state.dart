@@ -14,11 +14,15 @@ class ExpensesLoaded extends ExpensesState {
   final List<Expense> expenses;
   final List<ExpenseStage> stages;
   final bool allLoaded;
+  final bool loadingMore;
+  final List<String> processingExpenseIds;
 
   ExpensesLoaded({
     required expenses,
     required List<ExpenseStage> this.stages,
     this.allLoaded = false,
+    this.loadingMore = false,
+    this.processingExpenseIds = const [],
   }) : expenses = expenses;
 
   bool stagesAreDifferentFrom(ExpensesLoaded other) {
@@ -30,35 +34,26 @@ class ExpensesLoaded extends ExpensesState {
     List<Expense>? expenses,
     List<ExpenseStage>? stages,
     bool? allLoaded,
+    bool? loadingMore,
+    List<String>? processingExpenseIds,
   }) {
     return ExpensesLoaded(
       expenses: expenses ?? this.expenses,
       stages: stages ?? this.stages,
       allLoaded: allLoaded ?? this.allLoaded,
+      loadingMore: loadingMore ?? this.loadingMore,
+      processingExpenseIds: processingExpenseIds ?? this.processingExpenseIds,
     );
   }
 
   @override
-  List<Object> get props => [expenses, allLoaded, stages];
-}
-
-/// After the expenses were loaded; whenever the list is changing (creates, updates)
-class ExpensesLoadingMore extends ExpensesLoaded {
-  ExpensesLoadingMore({
-    required List<Expense> expenses,
-    required List<ExpenseStage> stages,
-  }) : super(expenses: expenses, stages: stages);
-
-  ExpensesLoadingMore.fromLoaded(ExpensesLoaded loaded)
-      : super(expenses: loaded.expenses, stages: loaded.stages);
-
-  ExpensesLoaded toLoaded() {
-    return ExpensesLoaded(
-      expenses: expenses,
-      stages: stages,
-      allLoaded: allLoaded,
-    );
-  }
+  List<Object> get props => [
+        expenses,
+        stages,
+        allLoaded,
+        loadingMore,
+        processingExpenseIds,
+      ];
 }
 
 class ExpensesError extends ExpensesState {

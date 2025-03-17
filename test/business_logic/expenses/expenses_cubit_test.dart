@@ -105,12 +105,10 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: expenses.take(ExpensesCubit.expensesPerPage + 3).toList(),
@@ -168,24 +166,20 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: secondExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
@@ -245,12 +239,10 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
@@ -309,24 +301,20 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: withoutFirstFive,
           stages: selectedStages,
           allLoaded: false,
         ),
-        ExpensesLoadingMore.fromLoaded(
-          ExpensesLoaded(
-            expenses: withoutFirstFive,
-            stages: selectedStages,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
         ),
         ExpensesLoaded(
           expenses: thirdExpenses,
