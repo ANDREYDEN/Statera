@@ -131,7 +131,7 @@ class ExpenseListItem extends StatelessWidget {
                 ),
                 if (expense.canBeFinalizedBy(uid) && !processing) ...[
                   SizedBox(height: 5),
-                  FinalizeButton(expenseId: expense.id)
+                  FinalizeButton(expense: expense)
                 ]
               ],
             ),

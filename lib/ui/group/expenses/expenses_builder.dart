@@ -44,7 +44,7 @@ class ExpensesBuilder extends StatelessWidget {
 
           return Column(
             children: [
-              if (state is ExpensesProcessing)
+              if (state is ExpensesLoadingMore)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: LinearProgressIndicator(),

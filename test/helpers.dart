@@ -47,6 +47,7 @@ Future<void> customPump(
   ExpenseService? expenseService,
   UserExpenseRepository? userExpenseRepository,
   GroupRepository? groupService,
+  PaymentService? paymentService,
   UserRepository? userRepository,
   AuthService? authService,
   FeatureService? featureService,
@@ -95,6 +96,7 @@ Future<void> customPump(
             userExpenseRepository ?? defaultUserExpensesRepository,
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
+            paymentService ?? defaultPaymentService,
           )..load(),
         ),
         BlocProvider(

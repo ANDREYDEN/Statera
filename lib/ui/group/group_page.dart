@@ -49,6 +49,7 @@ class GroupPage extends StatefulWidget {
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
             context.read<GroupRepository>(),
+            context.read<PaymentService>(),
           )..load(),
         ),
         BlocProvider(
