@@ -71,10 +71,18 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   Future<String?> addExpense(Expense expense, String? groupId) async {
-    if (state is! ExpensesLoaded) return null;
+    if (state case ExpensesLoaded loadedState) {
+      final updatedExpenses = [expense, ...loadedState.expenses];
+      emit(loadedState.copyWith(
+          expenses: updatedExpenses,
+          processingExpenseIds: [
+            ...loadedState.processingExpenseIds,
+            expense.id
+          ]));
+      return await _groupService.addExpense(groupId, expense);
+    }
 
-    emit(ExpensesLoading());
-    return await _groupService.addExpense(groupId, expense);
+    return null;
   }
 
   Future<void> deleteExpense(String expenseId) async {
@@ -100,16 +108,6 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       if (persist) {
         await _expenseService.updateExpense(updatedExpense);
       }
-    }
-  }
-
-  void saveExpense(Expense updatedExpense) {
-    if (state case final ExpensesLoaded loadedState) {
-      final newExpenses = loadedState.expenses
-          .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
-          .toList();
-
-      emit(ExpensesLoaded(expenses: newExpenses, stages: loadedState.stages));
     }
   }
 

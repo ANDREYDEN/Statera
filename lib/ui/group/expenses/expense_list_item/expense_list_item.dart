@@ -143,7 +143,6 @@ class ExpenseListItem extends StatelessWidget {
     if (processing) {
       return card
           .animate(onPlay: (controller) => controller.repeat(reverse: true))
-          .then(delay: 0.2.seconds)
           .fade(duration: 1.seconds, begin: 1, end: 0.5);
     }
 
