@@ -21,8 +21,11 @@ class ExpensePage extends StatelessWidget {
       key: Key(expenseId ?? 'unknown'),
       providers: [
         BlocProvider<ExpenseBloc>(
-          create: (context) =>
-              ExpenseBloc(context.read<ExpenseService>())..load(expenseId),
+          create: (context) => ExpenseBloc(
+            context.read<ExpenseService>(),
+            context.read<GroupRepository>(),
+            context.read<PaymentService>(),
+          )..load(expenseId),
         ),
         BlocProvider<GroupCubit>(
           create: (context) => GroupCubit(

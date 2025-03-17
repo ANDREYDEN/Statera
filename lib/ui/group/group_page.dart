@@ -134,6 +134,8 @@ class _GroupPageState extends State<GroupPage> {
           BlocProvider(
             create: (context) => ExpenseBloc(
               context.read<ExpenseService>(),
+              context.read<GroupRepository>(),
+              context.read<PaymentService>(),
               onExpenseUpdated: (expense) {
                 _expensesCubit.updateExpense(expense);
               },

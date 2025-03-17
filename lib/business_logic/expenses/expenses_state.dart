@@ -17,17 +17,22 @@ class ExpensesLoaded extends ExpensesState {
   final bool loadingMore;
   final List<String> processingExpenseIds;
 
-  ExpensesLoaded({
-    required expenses,
-    required List<ExpenseStage> this.stages,
-    this.allLoaded = false,
-    this.loadingMore = false,
-    this.processingExpenseIds = const [],
-  }) : expenses = expenses;
+  ExpensesLoaded(
+      {required expenses,
+      required List<ExpenseStage> this.stages,
+      this.allLoaded = false,
+      this.loadingMore = false})
+      : expenses = expenses,
+        processingExpenseIds = [];
 
   bool stagesAreDifferentFrom(ExpensesLoaded other) {
     return stages.length != other.stages.length ||
         stages.any((stage) => !other.stages.contains(stage));
+  }
+
+  void addProcessingExpenseId(String expenseId) {
+    if (processingExpenseIds.contains(expenseId)) return;
+    processingExpenseIds.add(expenseId);
   }
 
   ExpensesLoaded copyWith({
@@ -42,7 +47,6 @@ class ExpensesLoaded extends ExpensesState {
       stages: stages ?? this.stages,
       allLoaded: allLoaded ?? this.allLoaded,
       loadingMore: loadingMore ?? this.loadingMore,
-      processingExpenseIds: processingExpenseIds ?? this.processingExpenseIds,
     );
   }
 

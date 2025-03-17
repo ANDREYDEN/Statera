@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/data/services/error_service.mocks.dart';
 import 'package:statera/ui/platform_context.dart';
+import 'package:statera/utils/utils.dart';
 
 import 'data/services/services.dart';
 
@@ -36,7 +38,9 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => UserExpenseRepository(firestore)),
         RepositoryProvider(create: (_) => FeatureService()),
         RepositoryProvider(create: (_) => Callables()),
-        RepositoryProvider(create: (_) => PlatformContext())
+        RepositoryProvider(create: (_) => PlatformContext()),
+        RepositoryProvider(
+            create: (_) => kIsModeDebug ? MockErrorService() : ErrorService()),
       ],
       child: child,
     );

@@ -4,12 +4,13 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
 
 configureEmulators() async {
@@ -17,11 +18,7 @@ configureEmulators() async {
     'Talking to Firebase using ${kIsModeDebug ? 'EMULATOR' : 'PRODUCTION'} data',
   );
   if (!kIsModeDebug) {
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
+    ErrorService.registerGlobalErrorListeners();
     return;
   }
 
@@ -92,11 +89,8 @@ Future<bool> snackbarCatch(
 
   if (errorOccured) {
     print(exception);
-    await FirebaseCrashlytics.instance.recordError(
-      exception,
-      null,
-      reason: 'Something went wrong',
-    );
+    final errorService = context.read<ErrorService>();
+    await errorService.recordError(exception, reason: 'Something went wrong');
     showErrorSnackBar(
       context,
       errorMessage ?? stringifyException(exception),

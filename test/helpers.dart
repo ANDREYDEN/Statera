@@ -81,14 +81,18 @@ Future<void> customPump(
         Provider(create: (_) => featureService ?? featureServiceMock),
         Provider(create: (_) => expenseService ?? defaultExpenseService),
         BlocProvider(
-            create: (context) =>
-                ExpenseBloc(expenseService ?? defaultExpenseService)),
+          create: (context) => ExpenseBloc(
+              expenseService ?? defaultExpenseService,
+              groupService ?? defaultGroupService,
+              paymentService ?? defaultPaymentService),
+        ),
         BlocProvider(
-            create: (context) => GroupCubit(
-                  groupService ?? defaultGroupService,
-                  expenseService ?? defaultExpenseService,
-                  userRepository ?? defaultUserRepository,
-                )..load((group ?? defaultGroup).id)),
+          create: (context) => GroupCubit(
+            groupService ?? defaultGroupService,
+            expenseService ?? defaultExpenseService,
+            userRepository ?? defaultUserRepository,
+          )..load((group ?? defaultGroup).id),
+        ),
         BlocProvider(
           create: (context) => ExpensesCubit(
             group?.id ?? defaultGroup.id,

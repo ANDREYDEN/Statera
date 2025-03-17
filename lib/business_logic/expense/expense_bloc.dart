@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
@@ -12,10 +11,13 @@ part 'expense_state.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpenseService _expenseService;
+  final GroupRepository _groupRepository;
+  final PaymentService _paymentService;
   Timer? _updateTimer;
   final void Function(Expense)? onExpenseUpdated;
 
-  ExpenseBloc(this._expenseService, {this.onExpenseUpdated})
+  ExpenseBloc(this._expenseService, this._groupRepository, this._paymentService,
+      {this.onExpenseUpdated})
       : super(ExpenseNotSelected()) {
     on<_LoadRequested>((_, emit) => emit(ExpenseLoading()));
     on<_UnloadRequested>((_, emit) => emit(ExpenseNotSelected()));
@@ -69,6 +71,28 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       add(_FinishedUpdating(newExpense));
     });
+  }
+
+  Future<void> revertExpense(Expense expense, Group group) async {
+    if (state is! ExpenseLoaded) return;
+    // TODO: use transaction
+    await _expenseService.revertExpense(expense);
+    // add expense payments from all assignees to author
+    final payments = expense.assigneeUids
+        .where((assigneeUid) => assigneeUid != expense.authorUid)
+        .map(
+          (assigneeUid) => Payment.fromRevertedExpense(
+            expense: expense,
+            payerId: assigneeUid,
+            oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
+          ),
+        );
+    await Future.wait(payments.map(_paymentService.addPayment));
+
+    for (var payment in payments) {
+      group.payOffBalance(payment: payment);
+    }
+    await _groupRepository.saveGroup(group);
   }
 
   void _handleExpenseUpdatedFromDB(
