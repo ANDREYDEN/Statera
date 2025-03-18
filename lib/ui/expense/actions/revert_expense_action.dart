@@ -29,10 +29,15 @@ class RevertExpenseAction extends ExpenseAction {
     if (confirmed == false) return;
 
     final groupCubit = context.read<GroupCubit>();
-    final expensesCubit = context.read<ExpensesCubit>();
-
     final group = groupCubit.loadedState.group;
+    final isWide = context.read<LayoutState>().isWide;
 
-    await expensesCubit.revertExpense(expense, group);
+    if (isWide) {
+      final expensesCubit = context.read<ExpensesCubit>();
+      await expensesCubit.revertExpense(expense, group);
+    } else {
+      final expenseBloc = context.read<ExpenseBloc>();
+      await expenseBloc.revertExpense(expense, group);
+    }
   }
 }

@@ -14,7 +14,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final String _userId;
   late final UserExpenseRepository _userExpenseRepository;
   late final ExpenseService _expenseService;
-  late final GroupRepository _groupService;
+  late final GroupRepository _groupRepository;
   late final PaymentService _paymentService;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
@@ -24,12 +24,12 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     String userId,
     UserExpenseRepository userExpenseRepository,
     ExpenseService expenseService,
-    GroupRepository groupService,
+    GroupRepository groupRepository,
     PaymentService paymentService,
   ) : super(ExpensesLoading()) {
     _userExpenseRepository = userExpenseRepository;
     _expenseService = expenseService;
-    _groupService = groupService;
+    _groupRepository = groupRepository;
     _paymentService = paymentService;
     _groupId = groupId;
     _userId = userId;
@@ -73,13 +73,9 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   Future<String?> addExpense(Expense expense, String? groupId) async {
     if (state case ExpensesLoaded loadedState) {
       final updatedExpenses = [expense, ...loadedState.expenses];
-      emit(loadedState.copyWith(
-          expenses: updatedExpenses,
-          processingExpenseIds: [
-            ...loadedState.processingExpenseIds,
-            expense.id
-          ]));
-      return await _groupService.addExpense(groupId, expense);
+      emit(loadedState.copyWith(expenses: updatedExpenses)
+        ..addProcessingExpenseId(expense.id));
+      return await _groupRepository.addExpense(groupId, expense);
     }
 
     return null;
@@ -112,55 +108,55 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   Future<void> finalizeExpense(Expense expense, Group group) async {
-    if (state is! ExpensesLoaded) return;
+    if (state case ExpensesLoaded loadedState) {
+      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
 
-    emit(ExpensesLoading());
+      // TODO: use transaction
+      await _expenseService.finalizeExpense(expense.id);
+      // Add expense payments from author to all assignees
+      final payments = expense.assigneeUids
+          .where((assigneeUid) => assigneeUid != expense.authorUid)
+          .map(
+        (assigneeUid) {
+          return Payment.fromFinalizedExpense(
+            expense: expense,
+            receiverId: assigneeUid,
+            oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
+          );
+        },
+      );
+      await Future.wait(payments.map(_paymentService.addPayment));
 
-    // TODO: use transaction
-    await _expenseService.finalizeExpense(expense.id);
-    // Add expense payments from author to all assignees
-    final payments = expense.assigneeUids
-        .where((assigneeUid) => assigneeUid != expense.authorUid)
-        .map(
-      (assigneeUid) {
-        return Payment.fromFinalizedExpense(
-          expense: expense,
-          receiverId: assigneeUid,
-          oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
-        );
-      },
-    );
-    await Future.wait(payments.map(_paymentService.addPayment));
-
-    for (var payment in payments) {
-      group.payOffBalance(payment: payment);
+      for (var payment in payments) {
+        group.payOffBalance(payment: payment);
+      }
+      await _groupRepository.saveGroup(group);
     }
-    await _groupService.saveGroup(group);
   }
 
   Future<void> revertExpense(Expense expense, Group group) async {
-    if (state is! ExpensesLoaded) return;
+    if (state case ExpensesLoaded loadedState) {
+      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
 
-    emit(ExpensesLoading());
+      // TODO: use transaction
+      await _expenseService.revertExpense(expense);
+      // add expense payments from all assignees to author
+      final payments = expense.assigneeUids
+          .where((assigneeUid) => assigneeUid != expense.authorUid)
+          .map(
+            (assigneeUid) => Payment.fromRevertedExpense(
+              expense: expense,
+              payerId: assigneeUid,
+              oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
+            ),
+          );
+      await Future.wait(payments.map(_paymentService.addPayment));
 
-    // TODO: use transaction
-    await _expenseService.revertExpense(expense);
-    // add expense payments from all assignees to author
-    final payments = expense.assigneeUids
-        .where((assigneeUid) => assigneeUid != expense.authorUid)
-        .map(
-          (assigneeUid) => Payment.fromRevertedExpense(
-            expense: expense,
-            payerId: assigneeUid,
-            oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
-          ),
-        );
-    await Future.wait(payments.map(_paymentService.addPayment));
-
-    for (var payment in payments) {
-      group.payOffBalance(payment: payment);
+      for (var payment in payments) {
+        group.payOffBalance(payment: payment);
+      }
+      await _groupRepository.saveGroup(group);
     }
-    await _groupService.saveGroup(group);
   }
 
   void selectExpenseStages(List<ExpenseStage> expenseStages) {
