@@ -5,16 +5,16 @@ import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/coordination_repository.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
-import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
 
 void main() {
   final expenseService = MockExpenseService();
   final groupService = MockGroupRepository();
   final userExpenseRepository = MockUserExpenseRepository();
-  final paymentService = MockPaymentService();
+  final coordinationRepository = MockCoordinationRepository();
   final groupId = 'testGroupId';
   final uid = 'testUserId';
   ExpensesCubit expensesCubit = ExpensesCubit(
@@ -23,7 +23,7 @@ void main() {
     userExpenseRepository,
     expenseService,
     groupService,
-    paymentService,
+    coordinationRepository,
   );
   final expenses = List.generate(
     25,
@@ -42,7 +42,7 @@ void main() {
         userExpenseRepository,
         expenseService,
         groupService,
-        paymentService,
+        coordinationRepository,
       );
     });
 
