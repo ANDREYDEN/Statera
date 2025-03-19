@@ -39,3 +39,5 @@ const kMobileMargin = EdgeInsets.symmetric(horizontal: 10.0);
 const kWideMargin = EdgeInsets.symmetric(horizontal: 50.0);
 
 const kRedirectDebtIcon = Icons.bolt;
+
+const kExpenseUpdateDelay = Duration(milliseconds: 1500);

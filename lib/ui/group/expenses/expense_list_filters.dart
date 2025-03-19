@@ -13,7 +13,6 @@ class ExpenseListFilters extends StatelessWidget {
     var expensesCubit = context.read<ExpensesCubit>();
 
     return ExpensesBuilder(
-      renderExpensesProcessing: false,
       builder: (context, expensesState) {
         return Row(
           children: ExpenseStage.values

@@ -14,39 +14,50 @@ class ExpensesLoaded extends ExpensesState {
   final List<Expense> expenses;
   final List<ExpenseStage> stages;
   final bool allLoaded;
+  final bool loadingMore;
+  final List<String> processingExpenseIds;
 
-  ExpensesLoaded({
-    required expenses,
-    required List<ExpenseStage> this.stages,
-    this.allLoaded = false,
-  }) : expenses = expenses;
+  ExpensesLoaded(
+      {required expenses,
+      required List<ExpenseStage> this.stages,
+      this.allLoaded = false,
+      this.loadingMore = false})
+      : expenses = expenses,
+        processingExpenseIds = [];
 
   bool stagesAreDifferentFrom(ExpensesLoaded other) {
     return stages.length != other.stages.length ||
         stages.any((stage) => !other.stages.contains(stage));
   }
 
-  @override
-  List<Object> get props => [expenses, allLoaded, stages];
-}
+  void addProcessingExpenseId(String expenseId) {
+    if (processingExpenseIds.contains(expenseId)) return;
+    processingExpenseIds.add(expenseId);
+  }
 
-/// After the expenses were loaded; whenever the list is changing (creates, updates)
-class ExpensesProcessing extends ExpensesLoaded {
-  ExpensesProcessing({
-    required List<Expense> expenses,
-    required List<ExpenseStage> stages,
-  }) : super(expenses: expenses, stages: stages);
-
-  ExpensesProcessing.fromLoaded(ExpensesLoaded loaded)
-      : super(expenses: loaded.expenses, stages: loaded.stages);
-
-  ExpensesLoaded toLoaded() {
+  ExpensesLoaded copyWith({
+    List<Expense>? expenses,
+    List<ExpenseStage>? stages,
+    bool? allLoaded,
+    bool? loadingMore,
+    List<String>? processingExpenseIds,
+  }) {
     return ExpensesLoaded(
-      expenses: expenses,
-      stages: stages,
-      allLoaded: allLoaded,
+      expenses: expenses ?? this.expenses,
+      stages: stages ?? this.stages,
+      allLoaded: allLoaded ?? this.allLoaded,
+      loadingMore: loadingMore ?? this.loadingMore,
     );
   }
+
+  @override
+  List<Object> get props => [
+        expenses,
+        stages,
+        allLoaded,
+        loadingMore,
+        processingExpenseIds,
+      ];
 }
 
 class ExpensesError extends ExpensesState {

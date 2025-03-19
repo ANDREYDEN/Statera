@@ -4,20 +4,27 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/utils/utils.dart';
 
 part 'expense_event.dart';
 part 'expense_state.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpenseService _expenseService;
-  Timer? updateTimer;
+  final CoordinationRepository _coordinationRepository;
+  Timer? _updateTimer;
+  final void Function(Expense)? onExpenseUpdated;
 
-  ExpenseBloc(this._expenseService) : super(ExpenseNotSelected()) {
+  ExpenseBloc(
+    this._expenseService,
+    this._coordinationRepository, {
+    this.onExpenseUpdated,
+  }) : super(ExpenseNotSelected()) {
     on<_LoadRequested>((_, emit) => emit(ExpenseLoading()));
     on<_UnloadRequested>((_, emit) => emit(ExpenseNotSelected()));
     on<UpdateRequested>(_handleUpdate);
     on<_FinishedUpdating>(
-      (event, emit) => emit(ExpenseLoaded(expense: event.expense)),
+      (event, emit) => emit(ExpenseLoaded(event.expense)),
     );
     on<_UpdateErrorOccurred>(
       (event, emit) => emit(ExpenseError(error: event.error)),
@@ -46,24 +53,31 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   ) async {
     if (state is! ExpenseLoaded) return;
 
-    final expense = (state as ExpenseLoaded).expense;
-    emit(ExpenseUpdating(expense: expense));
+    final oldExpense = (state as ExpenseLoaded).expense;
+    final newExpense = event.updatedExpense;
 
-    final wasCompleted = expense.completed;
-    await event.update(expense);
+    if (newExpense == oldExpense) return;
 
-    updateTimer?.cancel();
-    updateTimer = Timer(Duration(seconds: 2), () async {
+    onExpenseUpdated?.call(newExpense);
+    emit(ExpenseUpdating(expense: newExpense));
+    _updateTimer?.cancel();
+    _updateTimer = Timer(kExpenseUpdateDelay, () async {
       try {
-        await _expenseService.updateExpense(expense);
+        await _expenseService.updateExpense(newExpense);
       } catch (e) {
         print(e);
         add(_UpdateErrorOccurred(e));
         throw e;
       } finally {}
 
-      add(_FinishedUpdating(expense));
+      add(_FinishedUpdating(newExpense));
     });
+  }
+
+  Future<void> revertExpense(Expense expense) async {
+    if (state is! ExpenseLoaded) return;
+    
+    await _coordinationRepository.revertExpense(expense.id);
   }
 
   void _handleExpenseUpdatedFromDB(
@@ -72,7 +86,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   ) {
     emit(event.expense == null
         ? ExpenseError(error: Exception('expense does not exist'))
-        : ExpenseLoaded(expense: event.expense!));
+        : ExpenseLoaded(event.expense!));
   }
 
   @override

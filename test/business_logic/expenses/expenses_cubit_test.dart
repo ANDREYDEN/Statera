@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/coordination_repository.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/user_expense_repository.mocks.dart';
@@ -13,6 +14,7 @@ void main() {
   final expenseService = MockExpenseService();
   final groupService = MockGroupRepository();
   final userExpenseRepository = MockUserExpenseRepository();
+  final coordinationRepository = MockCoordinationRepository();
   final groupId = 'testGroupId';
   final uid = 'testUserId';
   ExpensesCubit expensesCubit = ExpensesCubit(
@@ -21,6 +23,7 @@ void main() {
     userExpenseRepository,
     expenseService,
     groupService,
+    coordinationRepository,
   );
   final expenses = List.generate(
     25,
@@ -34,7 +37,13 @@ void main() {
   group('ExpensesCubit', () {
     setUp(() async {
       expensesCubit = ExpensesCubit(
-          groupId, uid, userExpenseRepository, expenseService, groupService);
+        groupId,
+        uid,
+        userExpenseRepository,
+        expenseService,
+        groupService,
+        coordinationRepository,
+      );
     });
 
     test(
@@ -96,12 +105,11 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
+          loadingMore: true,
         ),
         ExpensesLoaded(
           expenses: expenses.take(ExpensesCubit.expensesPerPage + 3).toList(),
@@ -159,24 +167,22 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
+          loadingMore: true,
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: secondExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: secondExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
+          loadingMore: true,
         ),
         ExpensesLoaded(
           expenses: secondExpenses,
@@ -236,13 +242,7 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
-        ),
+        ExpensesLoading(),
         ExpensesLoaded(
           expenses: secondExpenses,
           stages: selectedStages,
@@ -300,24 +300,17 @@ void main() {
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: firstExpenses,
-            stages: ExpenseStage.values,
-            allLoaded: false,
-          ),
-        ),
+        ExpensesLoading(),
         ExpensesLoaded(
           expenses: withoutFirstFive,
           stages: selectedStages,
           allLoaded: false,
         ),
-        ExpensesProcessing.fromLoaded(
-          ExpensesLoaded(
-            expenses: withoutFirstFive,
-            stages: selectedStages,
-            allLoaded: false,
-          ),
+        ExpensesLoaded(
+          expenses: withoutFirstFive,
+          stages: selectedStages,
+          allLoaded: false,
+          loadingMore: true,
         ),
         ExpensesLoaded(
           expenses: thirdExpenses,
