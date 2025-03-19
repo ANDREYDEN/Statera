@@ -16,11 +16,9 @@ class FinalizeExpenseAction extends ExpenseAction {
         final valid = await _verifyAllItemsValid(context, expense);
         if (!valid) return;
 
-        final groupCubit = context.read<GroupCubit>();
         final expensesCubit = context.read<ExpensesCubit>();
 
-        var group = groupCubit.loadedState.group;
-        await expensesCubit.finalizeExpense(expense, group);
+        await expensesCubit.finalizeExpense(expense);
       },
       successMessage:
           "The expense is now finalized. Participants' balances updated.",

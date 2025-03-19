@@ -66,17 +66,6 @@ class ExpenseService extends Firestore {
     await Future.wait(outstandingExpenses.map(updateExpense));
   }
 
-  Future<void> finalizeExpense(String expenseId) async {
-    final expense = await getExpense(expenseId);
-    expense.finalizedDate = Timestamp.now().toDate();
-    await updateExpense(expense);
-  }
-
-  Future<void> revertExpense(Expense expense) async {
-    expense.finalizedDate = null;
-    await updateExpense(expense);
-  }
-
   Future<void> deleteExpense(String expenseId) {
     return expensesCollection.doc(expenseId).delete();
   }

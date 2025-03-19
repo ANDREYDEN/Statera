@@ -49,7 +49,7 @@ class GroupPage extends StatefulWidget {
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
             context.read<GroupRepository>(),
-            context.read<PaymentService>(),
+            context.read<CoordinationRepository>(),
           )..load(),
         ),
         BlocProvider(
@@ -134,8 +134,7 @@ class _GroupPageState extends State<GroupPage> {
           BlocProvider(
             create: (context) => ExpenseBloc(
               context.read<ExpenseService>(),
-              context.read<GroupRepository>(),
-              context.read<PaymentService>(),
+              context.read<CoordinationRepository>(),
               onExpenseUpdated: (expense) {
                 _expensesCubit.updateExpense(expense);
               },

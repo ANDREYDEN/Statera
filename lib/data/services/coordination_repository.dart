@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 
+@GenerateNiceMocks([MockSpec<CoordinationRepository>()])
 class CoordinationRepository extends Firestore {
   CoordinationRepository(FirebaseFirestore firestoreInstance)
       : super(firestoreInstance);
 
-  Future<void> finalizeExpense(String groupId, String expenseId) async {
+  Future<void> finalizeExpense(String expenseId) async {
     await firestore.runTransaction((transaction) async {
       final (expense, expenseDocRef) =
           await _getExpense(transaction, expenseId);
-      final (group, groupDocRef) = await _getGroup(transaction, groupId);
+      final (group, groupDocRef) = await _getGroup(transaction, expense.groupId);
 
       expense.finalizedDate = Timestamp.now().toDate();
       await transaction.set(expenseDocRef, expense.toFirestore());
@@ -36,11 +38,11 @@ class CoordinationRepository extends Firestore {
     });
   }
 
-  Future<void> revertExpense(String groupId, String expenseId) async {
+  Future<void> revertExpense(String expenseId) async {
     await firestore.runTransaction((transaction) async {
       final (expense, expenseDocRef) =
           await _getExpense(transaction, expenseId);
-      final (group, groupDocRef) = await _getGroup(transaction, groupId);
+      final (group, groupDocRef) = await _getGroup(transaction, expense.groupId);
 
       expense.finalizedDate = null;
       await transaction.set(expenseDocRef, expense.toFirestore());
@@ -80,7 +82,7 @@ class CoordinationRepository extends Firestore {
 
   Future<(Group, DocumentReference)> _getGroup(
     Transaction transaction,
-    String groupId,
+    String? groupId,
   ) async {
     final groupDocRef = groupsCollection.doc(groupId);
     final groupDoc = await transaction.get(groupDocRef);
