@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
@@ -76,7 +77,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
   Future<void> revertExpense(Expense expense) async {
     if (state is! ExpenseLoaded) return;
-    
+
     await _coordinationRepository.revertExpense(expense.id);
   }
 
@@ -85,8 +86,9 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     Emitter<ExpenseState> emit,
   ) {
     emit(event.expense == null
-        ? ExpenseError(error: Exception('expense does not exist'))
+        ? ExpenseError(error: EntityNotFoundException<Expense>(null))
         : ExpenseLoaded(event.expense!));
+    
   }
 
   @override

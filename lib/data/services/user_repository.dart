@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mockito/annotations.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 import 'package:statera/utils/utils.dart';
@@ -40,7 +41,7 @@ class UserRepository extends Firestore {
   Future<CustomUser> getUser(String uid) async {
     final userDoc = await usersCollection.doc(uid).get();
 
-    if (!userDoc.exists) throw Exception('User data for $uid was not found');
+    if (!userDoc.exists) throw EntityNotFoundException(uid, name: 'User');
 
     return CustomUser.fromUserDoc(userDoc);
   }

@@ -5,7 +5,7 @@ import 'package:statera/data/services/services.dart';
 
 main() {
   group('ExpenseService', () {
-    group('when adding a new assignee', () {
+    group('addAssigneeToOutstandingExpenses', () {
       test('only adds them to non-finalized expenses', () async {
         // arrange
         final firestore = FakeFirebaseFirestore();

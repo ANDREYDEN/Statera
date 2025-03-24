@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/utils/mapping_utils.dart';
 import 'package:statera/data/value_objects/redirect.dart';
@@ -271,7 +272,12 @@ class Group {
     };
   }
 
-  factory Group.fromFirestore(Map<String, dynamic> map, {required String? id}) {
+  static Group fromSnapshot(DocumentSnapshot snap) {
+    final data = snap.data() as Map<String, dynamic>;
+    return fromFirestore(data, id: snap.id);
+  }
+
+  static Group fromFirestore(Map<String, dynamic> map, {required String? id}) {
     var members = List<CustomUser>.from(
       (map['members'] ?? []).map((x) => CustomUser.fromFirestore(x)),
     );

@@ -19,6 +19,7 @@ class Expense {
     required this.authorUid,
     this.groupId,
     ExpenseSettings? settings,
+    this.id = '',
   }) {
     this.assigneeUids = [authorUid];
     this.date = DateTime.now();

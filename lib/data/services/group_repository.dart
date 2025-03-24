@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mockito/annotations.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/data/models/group.dart';
@@ -20,32 +21,25 @@ class GroupRepository extends Firestore {
     if (groupSnap.docs.isEmpty)
       throw new Exception('There was no group with code $groupCode');
     var groupDoc = groupSnap.docs.first;
-    return Group.fromFirestore(
-      groupDoc.data() as Map<String, dynamic>,
-      id: groupDoc.id,
-    );
+    return groupDoc.data();
   }
 
   Future<Group> getGroupById(String? groupId) async {
     var groupDoc = await groupsCollection.doc(groupId).get();
-    if (!groupDoc.exists)
+    final group = groupDoc.data();
+
+    if (!groupDoc.exists || group == null) {
       throw new Exception('There was no group with id $groupId');
-    return Group.fromFirestore(
-      groupDoc.data() as Map<String, dynamic>,
-      id: groupDoc.id,
-    );
+    }
+
+    return group;
   }
 
   Stream<Group?> groupStream(String? groupId) {
     return groupsCollection
         .doc(groupId)
         .snapshots()
-        .map((groupSnap) => !groupSnap.exists
-            ? null
-            : Group.fromFirestore(
-                groupSnap.data() as Map<String, dynamic>,
-                id: groupSnap.id,
-              ));
+        .map((groupSnap) => groupSnap.data());
   }
 
   Future<void> deleteGroup(String? groupId) async {
@@ -53,14 +47,15 @@ class GroupRepository extends Firestore {
     await groupsCollection.doc(groupId).delete();
   }
 
-  Stream<CustomUser> getGroupMemberStream(
-      {String? groupId, required String memberId}) {
-    return groupsCollection.doc(groupId).snapshots().map((groupSnap) {
-      if (!groupSnap.exists) throw new Exception('No group with id $groupId');
+  Stream<CustomUser> getGroupMemberStream({
+    String? groupId,
+    required String memberId,
+  }) {
+    return groupStream(groupId).map((group) {
+      if (group == null) {
+        throw EntityNotFoundException<Group>(groupId);
+      }
 
-      Group group = Group.fromFirestore(
-          groupSnap.data() as Map<String, dynamic>,
-          id: groupSnap.id);
       return group.getMember(memberId);
     });
   }
@@ -69,7 +64,7 @@ class GroupRepository extends Firestore {
   Future<String> createGroup(Group newGroup, CustomUser user) async {
     newGroup.addMember(user);
 
-    final groupReference = await groupsCollection.add(newGroup.toFirestore());
+    final groupReference = await groupsCollection.add(newGroup);
     return groupReference.id;
   }
 
@@ -85,8 +80,8 @@ class GroupRepository extends Firestore {
     return group;
   }
 
-  Future<void> saveGroup(Group group) async {
-    return groupsCollection.doc(group.id).set(group.toFirestore());
+  Future<void> saveGroup(Group group) {
+    return groupsCollection.doc(group.id).set(group);
   }
 
   Future<String> addExpense(String? groupId, Expense expense) async {
