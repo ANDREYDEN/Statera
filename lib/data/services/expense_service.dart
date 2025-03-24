@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mockito/annotations.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 
@@ -10,8 +11,7 @@ class ExpenseService extends Firestore {
 
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
-    if (!expenseDoc.exists)
-      throw new Exception('Expense with id $expenseId does not exist.');
+    if (!expenseDoc.exists) throw EntityNotFoundException<Expense>(expenseId);
     return Expense.fromSnapshot(expenseDoc);
   }
 
