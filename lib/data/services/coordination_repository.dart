@@ -36,7 +36,7 @@ class CoordinationRepository extends Firestore {
       for (final payment in payments) {
         group.payOffBalance(payment: payment);
       }
-      await transaction.set(groupDocRef, group.toFirestore());
+      await transaction.set(groupDocRef, group);
     });
   }
 
@@ -68,7 +68,7 @@ class CoordinationRepository extends Firestore {
       for (final payment in payments) {
         group.payOffBalance(payment: payment);
       }
-      await transaction.set(groupDocRef, group.toFirestore());
+      await transaction.set(groupDocRef, group);
     });
   }
 
@@ -85,15 +85,17 @@ class CoordinationRepository extends Firestore {
     return (expense, expenseDocRef);
   }
 
-  Future<(Group, DocumentReference)> _getGroup(
+  Future<(Group, DocumentReference<Group>)> _getGroup(
     Transaction transaction,
     String? groupId,
   ) async {
     final groupDocRef = groupsCollection.doc(groupId);
     final groupDoc = await transaction.get(groupDocRef);
-    if (!groupDoc.exists) throw EntityNotFoundException<Group>(groupId);
+    final group = groupDoc.data();
 
-    final group = Group.fromSnapshot(groupDoc);
+    if (!groupDoc.exists || group == null) {
+      throw EntityNotFoundException<Group>(groupId);
+    }
 
     return (group, groupDocRef);
   }
