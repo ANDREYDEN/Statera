@@ -22,7 +22,8 @@ class LeaveGroupSetting extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
 
     return group.memberHasOutstandingBalance(authBloc.uid)
-        ? Text('"Suck my ass" Oleksii Kvadrober')
+        ? Text(
+            'You cannot leave the group while you have outstanding balances. Please settle all debts and payments first.')
         : Text(
             'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.');
   }
