@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 15
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -49,7 +49,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-      
+
       - name: Upload test failure screenshots
         if: failure()
         uses: actions/upload-artifact@v4
@@ -71,7 +71,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 15
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -169,7 +169,7 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -183,9 +183,6 @@ jobs:
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
-
-      - name: Get dependencies
-        run: flutter pub get
 
       - name: Copy google-services.json
         env:
@@ -209,6 +206,55 @@ jobs:
       - name: Build App bundle
         run: flutter build appbundle
 
+  build_ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
+
+      - name: Copy .env
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
+
+      - name: Copy GoogleService-Info.plist
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
+        run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
+
+      # - name: Install Cocoapods
+      #   run: gem install cocoapods -v 1.16.2
+
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     pod install
+
+      - name: Install Ruby Gems
+        run: |
+          cd ios
+          bundle install
+
+      - name: Install Certificates and Provisioning Profiles
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: |
+          cd ios
+          bundle exec fastlane match appstore --readonly
+
+      - name: Build iOS app
+        run: flutter build ios --no-codesign
+
   build_web:
     name: Build Web App
     runs-on: ubuntu-latest
@@ -221,7 +267,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 15
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -235,14 +281,6 @@ jobs:
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
-
-      - name: Copy google-services.json
-        env:
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-        run: echo $FIREBASE_CONFIG > android/app/google-services.json
-
-      - name: Get dependencies
-        run: flutter pub get
 
       - name: Build Web app
         run: flutter build web

@@ -21,7 +21,7 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -60,7 +60,7 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'gradle'
+          cache: "gradle"
 
       - name: Download Flutter
         uses: subosito/flutter-action@v2
@@ -105,6 +105,37 @@ jobs:
         with:
           name: android-out
           path: build/app/outputs/bundle/release/app-release.aab
+
+  ios-build-artifact:
+    name: Build iOS Artifact
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Copy .env
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+        run: echo $DOT_ENV > .env
+
+      - name: Install Cocoapods
+        run: sudo gem install cocoapods -v 1.16.2
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+
+      - name: Install Ruby Gems
+        run: |
+          cd ios
+          bundle install
+
+      - name: Build ipa
+        run: |
+          cd ios 
+          bundle exec fastlane ci_build_ipa \
+            export_method: appstore
 
   create-release:
     name: Create Release
