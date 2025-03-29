@@ -88,6 +88,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     emit(event.expense == null
         ? ExpenseError(error: EntityNotFoundException<Expense>(null))
         : ExpenseLoaded(event.expense!));
+    
   }
 
   @override
