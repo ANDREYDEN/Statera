@@ -31,7 +31,7 @@ jobs:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
 
       - name: Copy .env
         env:
@@ -79,7 +79,7 @@ jobs:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
 
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
@@ -177,7 +177,7 @@ jobs:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
 
       - name: Copy .env
         env:
@@ -275,7 +275,7 @@ jobs:
           channel: "stable"
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
 
       - name: Copy .env
         env:
