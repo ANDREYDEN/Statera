@@ -29,4 +29,25 @@ platform :ios do
     export_method = options[:export_method] || "development"
     match(type: export_method)
   end
+
+  lane :upload_to_testflight do |options|
+    path = options[:path] 
+    if !File.exist?("../#{path}")
+        throw "File not found at path: #{path}"
+    end
+
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_API_KEY_ISSUER_ID"],
+      key_content: ENV["APP_STORE_API_KEY_BASE_64"],
+      is_key_content_base64: true
+    )
+
+    upload_to_testflight(
+      apple_id: ENV["APP_STORE_CONNECT_APPLE_ID"],
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      ipa: path
+    )
+  end
 end

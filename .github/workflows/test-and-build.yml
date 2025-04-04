@@ -231,27 +231,6 @@ jobs:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
         run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
 
-      # - name: Install Cocoapods
-      #   run: gem install cocoapods -v 1.16.2
-
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod install
-
-      - name: Install Ruby Gems
-        run: |
-          cd ios
-          bundle install
-
-      - name: Install Certificates and Provisioning Profiles
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-        run: |
-          cd ios
-          bundle exec fastlane match appstore --readonly
-
       - name: Build iOS app
         run: flutter build ios --no-codesign
 

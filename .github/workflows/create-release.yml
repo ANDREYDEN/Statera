@@ -113,29 +113,43 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Download Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-v1"
+
       - name: Copy .env
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
 
-      - name: Install Cocoapods
-        run: sudo gem install cocoapods -v 1.16.2
-
-      - name: Install Pods
-        run: |
-          cd ios
-          pod install
+      - name: Copy GoogleService-Info.plist
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
+        run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
 
       - name: Install Ruby Gems
-        run: |
-          cd ios
-          bundle install
+        working-directory: ios
+        run: bundle install
+
+      - name: Install Certificates and Provisioning Profiles
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        working-directory: ios
+        run: bundle exec fastlane match appstore --readonly
 
       - name: Build ipa
-        run: |
-          cd ios 
-          bundle exec fastlane ci_build_ipa \
-            export_method: appstore
+        run: flutter build ipa --export-options-plist ./ios/Runner/Export.plist
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-out
+          path: build/ios/ipa/statera.ipa
 
   create-release:
     name: Create Release
@@ -161,8 +175,8 @@ jobs:
       - name: Rename Android Artifact
         run: mv android-out/app-release.aab ./android.aab
 
-      # - name: Rename iOS Artifact
-      #   run: mv ios-out/Runner.ipa ./ios.ipa
+      - name: Rename iOS Artifact
+        run: mv ios-out/Runner.ipa ./ios.ipa
 
       - name: Read Version
         id: read-version
@@ -188,3 +202,4 @@ jobs:
           files: |
             web.zip
             android.aab
+            ios.ipa
