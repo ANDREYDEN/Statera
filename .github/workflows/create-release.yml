@@ -176,7 +176,7 @@ jobs:
         run: mv android-out/app-release.aab ./android.aab
 
       - name: Rename iOS Artifact
-        run: mv ios-out/Runner.ipa ./ios.ipa
+        run: mv ios-out/statera.ipa ./ios.ipa
 
       - name: Read Version
         id: read-version

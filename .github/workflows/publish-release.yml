@@ -125,7 +125,47 @@ jobs:
         run: sudo fastlane run firebase_app_distribution \
           app:${{ secrets.FIREBASE_ANDROID_APP_ID }} \
           android_artifact_type:AAB \
-          android_artifact_path:../android.aab \
+          android_artifact_path:/home/runner/work/Statera/Statera/android.aab \
+          groups:friends \
+          debug:true
+        working-directory: android
+
+  app-distribution-ios-publish:
+    name: Publish iOS Release to Firebase App Distribution
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Get Artifact from Release
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          version: ${{ github.event.release.id }}
+          file: ios.ipa
+
+      - name: Create fastlane-service-account.json
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: echo $PLAY_STORE_CONFIG_JSON > fastlane-service-account.json
+        working-directory: ios
+
+      - name: Copy GoogleService-Info.plist
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
+        run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
+
+      - name: Setup Fastlane
+        uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
+        with:
+          ruby-version: "3.0.2"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Create App Distribution Release
+        run: bundle exec fastlane run firebase_app_distribution \
+          app:${{ secrets.FIREBASE_IOS_APP_ID }} \
+          ipa_path:/home/runner/work/Statera/Statera/ios.ipa \
           groups:friends \
           debug:true
         working-directory: android
