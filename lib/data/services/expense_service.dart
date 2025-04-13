@@ -89,4 +89,11 @@ class ExpenseService extends Firestore {
   Future<void> deleteExpense(String expenseId) {
     return expensesCollection.doc(expenseId).delete();
   }
+
+  Future<List<Expense>> getExpensesForUser(String groupId, String uuid)async{
+      final expensesSnap = await expensesQuery(groupId: groupId, authorId: uuid).get();
+      final expenses = expensesSnap.docs.map(Expense.fromSnapshot).toList();
+
+      return expenses;
+  }
 }

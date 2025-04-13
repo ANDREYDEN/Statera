@@ -89,6 +89,15 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
+  Future<List<Expense>> getExpensesForMember(String userUid) async {
+    if (userUid.isEmpty) {
+      emit(GroupError(error: 'Can not get expenses for the user'));
+    }
+
+    final groupId = loadedState.group.id;
+    return await this._expenseService.getExpensesForUser(groupId!, userUid);
+  }
+
   Future<void> generateInviteLink() async {
     final group = loadedState.group;
     emit(GroupLoading());
