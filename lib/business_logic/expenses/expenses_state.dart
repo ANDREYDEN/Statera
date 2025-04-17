@@ -30,7 +30,7 @@ class ExpensesLoaded extends ExpensesState {
         stages.any((stage) => !other.stages.contains(stage));
   }
 
-  void addProcessingExpenseId(String expenseId) {
+  void startProcessing(String expenseId) {
     if (processingExpenseIds.contains(expenseId)) return;
     processingExpenseIds.add(expenseId);
   }

@@ -74,7 +74,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     if (state case ExpensesLoaded loadedState) {
       final updatedExpenses = [expense, ...loadedState.expenses];
       emit(loadedState.copyWith(expenses: updatedExpenses)
-        ..addProcessingExpenseId(expense.id));
+        ..startProcessing(expense.id));
       return await _groupRepository.addExpense(groupId, expense);
     }
 
@@ -86,7 +86,12 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       final newExpenses =
           loadedState.expenses.where((e) => e.id != expenseId).toList();
       emit(loadedState.copyWith(expenses: newExpenses));
-      return await _expenseService.deleteExpense(expenseId);
+      try {
+        await _expenseService.deleteExpense(expenseId);
+      } catch (e) {
+        emit(loadedState);
+        rethrow;
+      }
     }
     return null;
   }
@@ -102,14 +107,19 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
       emit(ExpensesLoaded(expenses: newExpenses, stages: loadedState.stages));
       if (persist) {
-        await _expenseService.updateExpense(updatedExpense);
+        try {
+          await _expenseService.updateExpense(updatedExpense);
+        } catch (e) {
+          emit(loadedState);
+          rethrow;
+        }
       }
     }
   }
 
   Future<void> finalizeExpense(Expense expense) async {
     if (state case ExpensesLoaded loadedState) {
-      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
+      emit(loadedState.copyWith()..startProcessing(expense.id));
 
       await _coordinationRepository.finalizeExpense(expense.id);
     }
@@ -117,7 +127,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
   Future<void> revertExpense(Expense expense) async {
     if (state case ExpensesLoaded loadedState) {
-      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
+      emit(loadedState.copyWith()..startProcessing(expense.id));
 
       await _coordinationRepository.revertExpense(expense.id);
     }
