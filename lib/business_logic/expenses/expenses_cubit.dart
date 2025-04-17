@@ -74,7 +74,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     if (state case ExpensesLoaded loadedState) {
       final updatedExpenses = [expense, ...loadedState.expenses];
       emit(loadedState.copyWith(expenses: updatedExpenses)
-        ..addProcessingExpenseId(expense.id));
+        ..startProcessing(expense.id));
       return await _groupRepository.addExpense(groupId, expense);
     }
 
@@ -82,34 +82,43 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   Future<void> deleteExpense(String expenseId) async {
-    if (state case final ExpensesLoaded loadedState) {
-      final newExpenses =
-          loadedState.expenses.where((e) => e.id != expenseId).toList();
-      emit(loadedState.copyWith(expenses: newExpenses));
-      return await _expenseService.deleteExpense(expenseId);
+    final loadedState = state;
+    if (loadedState is! ExpensesLoaded) return;
+
+    final newExpenses =
+        loadedState.expenses.where((e) => e.id != expenseId).toList();
+    emit(loadedState.copyWith(expenses: newExpenses));
+    try {
+      await _expenseService.deleteExpense(expenseId);
+    } catch (e) {
+      emit(loadedState.copyWith(error: e, errorActionName: 'deleting'));
     }
-    return null;
   }
 
   Future<void> updateExpense(
     Expense updatedExpense, {
     bool persist = false,
   }) async {
-    if (state case final ExpensesLoaded loadedState) {
-      final newExpenses = loadedState.expenses
-          .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
-          .toList();
+    final loadedState = state;
+    if (loadedState is! ExpensesLoaded) return;
 
-      emit(ExpensesLoaded(expenses: newExpenses, stages: loadedState.stages));
-      if (persist) {
+    final newExpenses = loadedState.expenses
+        .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
+        .toList();
+
+    emit(loadedState.copyWith(expenses: newExpenses));
+    if (persist) {
+      try {
         await _expenseService.updateExpense(updatedExpense);
+      } catch (e) {
+        emit(loadedState.copyWith(error: e, errorActionName: 'updating'));
       }
     }
   }
 
   Future<void> finalizeExpense(Expense expense) async {
     if (state case ExpensesLoaded loadedState) {
-      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
+      emit(loadedState.copyWith()..startProcessing(expense.id));
 
       await _coordinationRepository.finalizeExpense(expense.id);
     }
@@ -117,7 +126,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
 
   Future<void> revertExpense(Expense expense) async {
     if (state case ExpensesLoaded loadedState) {
-      emit(loadedState.copyWith()..addProcessingExpenseId(expense.id));
+      emit(loadedState.copyWith()..startProcessing(expense.id));
 
       await _coordinationRepository.revertExpense(expense.id);
     }

@@ -369,38 +369,69 @@ void main() {
           ],
           stages: ExpenseStage.values,
           allLoaded: false,
-        )..addProcessingExpenseId('newExpenseId'),
+        )..startProcessing('newExpenseId'),
       ],
       verify: (_) {
         verify(groupService.addExpense(groupId, any)).called(1);
       },
     );
 
-    blocTest<ExpensesCubit, ExpensesState>(
-      'deleteExpense removes expense from the list and calls expenseService',
-      setUp: () {
-        when(expenseService.deleteExpense(any)).thenAnswer((_) async => {});
-      },
-      build: () => expensesCubit,
-      seed: () => ExpensesLoaded(
-        expenses: firstExpenses,
-        stages: ExpenseStage.values,
-        allLoaded: false,
-      ),
-      act: (ExpensesCubit cubit) async {
-        await cubit.deleteExpense(firstExpenses.first.id);
-      },
-      expect: () => [
-        ExpensesLoaded(
-          expenses: firstExpenses.sublist(1),
+    group('deleteExpense', () {
+      blocTest<ExpensesCubit, ExpensesState>(
+        'deleteExpense removes expense from the list and calls expenseService',
+        setUp: () {
+          when(expenseService.deleteExpense(any)).thenAnswer((_) async => {});
+        },
+        build: () => expensesCubit,
+        seed: () => ExpensesLoaded(
+          expenses: firstExpenses,
           stages: ExpenseStage.values,
           allLoaded: false,
         ),
-      ],
-      verify: (_) {
-        verify(expenseService.deleteExpense(firstExpenses.first.id)).called(1);
-      },
-    );
+        act: (ExpensesCubit cubit) async {
+          await cubit.deleteExpense(firstExpenses.first.id);
+        },
+        expect: () => [
+          ExpensesLoaded(
+            expenses: firstExpenses.sublist(1),
+            stages: ExpenseStage.values,
+            allLoaded: false,
+          ),
+        ],
+        verify: (_) {
+          verify(expenseService.deleteExpense(firstExpenses.first.id))
+              .called(1);
+        },
+      );
+
+      blocTest<ExpensesCubit, ExpensesState>(
+        'deleteExpense rolls back expenses state if delete fails',
+        build: () => expensesCubit,
+        seed: () => ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
+        ),
+        act: (ExpensesCubit cubit) async {
+          when(expenseService.deleteExpense(any))
+              .thenThrow(Exception('Delete failed'));
+          try {
+            await cubit.deleteExpense(firstExpenses.first.id);
+          } catch (_) {}
+        },
+        expect: () => [
+          ExpensesLoaded(
+            expenses: firstExpenses.sublist(1),
+            stages: ExpenseStage.values,
+          ),
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: ExpenseStage.values,
+            errorActionName: 'deleting',
+          ),
+        ],
+      );
+    });
 
     group('updateExpense', () {
       final updatedExpense = Expense.from(firstExpenses.first);
@@ -459,6 +490,37 @@ void main() {
           verifyNever(expenseService.updateExpense(any));
         },
       );
+
+      blocTest<ExpensesCubit, ExpensesState>(
+        'updateExpense rolls back expenses state if update fails',
+        build: () => expensesCubit,
+        seed: () => ExpensesLoaded(
+          expenses: firstExpenses,
+          stages: ExpenseStage.values,
+          allLoaded: false,
+        ),
+        act: (ExpensesCubit cubit) async {
+          when(expenseService.updateExpense(any))
+              .thenThrow(Exception('Update failed'));
+          try {
+            await cubit.updateExpense(updatedExpense, persist: true);
+          } catch (_) {}
+        },
+        expect: () => [
+          ExpensesLoaded(
+            expenses: [
+              updatedExpense,
+              ...firstExpenses.sublist(1),
+            ],
+            stages: ExpenseStage.values,
+          ),
+          ExpensesLoaded(
+            expenses: firstExpenses,
+            stages: ExpenseStage.values,
+            errorActionName: 'updating',
+          ),
+        ],
+      );
     });
 
     blocTest<ExpensesCubit, ExpensesState>(
@@ -481,7 +543,7 @@ void main() {
           expenses: firstExpenses,
           stages: ExpenseStage.values,
           allLoaded: false,
-        )..addProcessingExpenseId(firstExpenses.first.id),
+        )..startProcessing(firstExpenses.first.id),
       ],
       verify: (_) {
         verify(coordinationRepository.finalizeExpense(firstExpenses.first.id))
@@ -509,7 +571,7 @@ void main() {
           expenses: firstExpenses,
           stages: ExpenseStage.values,
           allLoaded: false,
-        )..addProcessingExpenseId(firstExpenses.first.id),
+        )..startProcessing(firstExpenses.first.id),
       ],
       verify: (_) {
         verify(coordinationRepository.revertExpense(firstExpenses.first.id))

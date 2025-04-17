@@ -25,11 +25,12 @@ class DeleteExpenseAction extends ExpenseAction {
             'Are you sure you want to delete this expense and all of its items?',
       ),
     );
+    if (confirmed != true) return;
 
     final expenseBloc = context.read<ExpenseBloc>();
-    expenseBloc.unload();
-
     final expensesCubit = context.read<ExpensesCubit>();
-    if (confirmed == true) await expensesCubit.deleteExpense(expense.id);
+
+    expenseBloc.unload();
+    await expensesCubit.deleteExpense(expense.id);
   }
 }

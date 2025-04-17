@@ -22,14 +22,12 @@ class UpdateRequested extends ExpenseEvent {
   List<Object> get props => [issuerUid];
 }
 
-class _FinishedUpdating extends ExpenseEvent {
+class _ExpenseUpdated extends ExpenseEvent {
   final Expense expense;
-  const _FinishedUpdating(this.expense) : super();
-}
+  const _ExpenseUpdated(this.expense) : super();
 
-class _UpdateErrorOccurred extends ExpenseEvent {
-  final Object error;
-  _UpdateErrorOccurred(this.error) : super();
+  @override
+  List<Object?> get props => [expense];
 }
 
 class _ExpenseUpdatedFromDB extends ExpenseEvent {

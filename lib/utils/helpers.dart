@@ -77,6 +77,7 @@ Future<bool> snackbarCatch(
   FutureOr<dynamic> Function() operation, {
   String? successMessage,
   String? errorMessage,
+  String? errorReason,
 }) async {
   dynamic exception;
   try {
@@ -89,11 +90,14 @@ Future<bool> snackbarCatch(
 
   if (errorOccured) {
     print(exception);
-    final errorService = context.read<ErrorService>();
-    await errorService.recordError(exception, reason: 'Something went wrong');
     showErrorSnackBar(
       context,
-      errorMessage ?? stringifyException(exception),
+      errorMessage ?? _stringifyException(exception, errorReason: errorReason),
+    );
+    final errorService = context.read<ErrorService>();
+    await errorService.recordError(
+      exception,
+      reason: errorReason ?? errorMessage ?? 'Something went wrong',
     );
   } else if (successMessage != null && successMessage.isNotEmpty) {
     showSnackBar(
@@ -106,12 +110,13 @@ Future<bool> snackbarCatch(
   return !errorOccured;
 }
 
-String stringifyException(dynamic exception) {
+String _stringifyException(dynamic exception, {String? errorReason}) {
+  final prefix = errorReason != null ? '$errorReason: ' : '';
   if (exception.toString().contains('code=permission-denied')) {
-    return 'Insufficient permissions';
+    return '${prefix}Insufficient permissions';
   }
 
-  return exception.toString();
+  return '${prefix}${exception.toString()}';
 }
 
 void showSnackBar(

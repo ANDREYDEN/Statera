@@ -28,12 +28,10 @@ class EditExpenseAction extends EntityAction {
             initialData: expense.name,
           )
         ],
-        onSubmit: (values) async {
-          expense.name = values['expense_name']!;
-          await snackbarCatch(
-            context,
-            () => expensesCubit.updateExpense(expense, persist: true),
-          );
+        onSubmit: (values) {
+          final updatedExpense = Expense.from(expense);
+          updatedExpense.name = values['expense_name']!;
+          expensesCubit.updateExpense(updatedExpense, persist: true);
         },
       ),
     );
