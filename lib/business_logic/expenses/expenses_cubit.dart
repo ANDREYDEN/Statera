@@ -89,11 +89,9 @@ class ExpensesCubit extends Cubit<ExpensesState> {
       try {
         await _expenseService.deleteExpense(expenseId);
       } catch (e) {
-        emit(loadedState);
-        rethrow;
+        emit(loadedState.copyWith(error: e, errorActionName: 'deleting'));
       }
     }
-    return null;
   }
 
   Future<void> updateExpense(
@@ -105,7 +103,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
           .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
           .toList();
 
-      emit(ExpensesLoaded(expenses: newExpenses, stages: loadedState.stages));
+      emit(loadedState.copyWith(expenses: newExpenses));
       if (persist) {
         try {
           await _expenseService.updateExpense(updatedExpense);

@@ -7,23 +7,17 @@ class ExpensesBuilder extends StatelessWidget {
   final Widget Function(BuildContext, ExpensesLoaded) builder;
   final Widget Function(BuildContext, ExpensesError)? errorBuilder;
   final Widget? loadingWidget;
-  final void Function(BuildContext, ExpensesState)? onStagesChanged;
 
   const ExpensesBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.loadingWidget,
-    this.onStagesChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ExpensesCubit, ExpensesState>(
-      listenWhen: (previous, current) =>
-          (previous is ExpensesLoaded && current is ExpensesLoaded) &&
-          previous.stagesAreDifferentFrom(current),
-      listener: onStagesChanged ?? (_, __) {},
+    return BlocBuilder<ExpensesCubit, ExpensesState>(
       builder: (groupContext, state) {
         if (state is ExpensesLoading) {
           return loadingWidget ?? Center(child: Loader());

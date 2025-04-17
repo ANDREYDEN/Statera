@@ -89,12 +89,12 @@ Future<bool> snackbarCatch(
 
   if (errorOccured) {
     print(exception);
-    final errorService = context.read<ErrorService>();
-    await errorService.recordError(exception, reason: 'Something went wrong');
     showErrorSnackBar(
       context,
       errorMessage ?? stringifyException(exception),
     );
+    final errorService = context.read<ErrorService>();
+    await errorService.recordError(exception, reason: 'Something went wrong');
   } else if (successMessage != null && successMessage.isNotEmpty) {
     showSnackBar(
       context,
