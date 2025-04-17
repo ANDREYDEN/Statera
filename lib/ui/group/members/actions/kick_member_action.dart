@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
-import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/group.dart';
+import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/members/actions/member_action.dart';
-import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 
 class KickMemberAction extends MemberAction {
   final Group group;
@@ -25,43 +25,58 @@ class KickMemberAction extends MemberAction {
 
   @override
   Future<void> handle(BuildContext context) async {
-    // final groupCubit = context.read<GroupCubit>();
+    String title = 'You are about to KICK member "${user.name}"';
+    late String warningMessage;
+
+    final groupService = context.read<ExpenseService>();
+    final groupCubit = context.read<GroupCubit>();
+
+    final hasOutstandingBalance =
+        this.group.memberHasOutstandingBalance(user.uid);
+
+    final membersThatMemberOwesTo =
+        this.group.getMembersThatMemberOwesTo(user.uid);
+    final memberNames = membersThatMemberOwesTo
+        .map((memberId) => this.group.getMember(memberId).name)
+        .join(', ');
+
+    final pendingMemberExpenses = await groupService
+        .getExpensesForMemberWhereAssignee(group.id!, user.uid, false);
+    final pendingExpenseNames =
+        pendingMemberExpenses.map((expense) => expense.name).join(', ');
+
+    final expensesAuthor =
+        await groupService.getAuthoredExpenses(group.id!, user.uid, false);
+    final expensesAuthorNames = expensesAuthor.map((expense) => expense.name);
+
+    if (hasOutstandingBalance || membersThatMemberOwesTo.isNotEmpty) {
+      warningMessage = '''
+      Warning! You are about to kick ${user.name} who is involved in outstanding expenses!
+      This person has outstanding balance with ${memberNames}
+      Pending expenses where user is involved: ${pendingExpenseNames}
+      User is the author of unresolved expenses: ${expensesAuthorNames}
+      ''';
+    }
+
+    await _showDangerDialog(warningMessage + title, context, groupCubit);
+  }
+
+  Future<void> _showDangerDialog(
+      String title, BuildContext context, GroupCubit groupCubit) async {
     await showDialog(
       context: context,
       builder: (context) => DangerDialog(
-        title: 'You are about to KICK member "${user.name}"',
+        title: title,
         valueName: 'member name',
         value: user.name,
         onConfirm: () async {
-          // await groupCubit.removeMember(user.uid);
-          await _handleKickMember(context);
+          await groupCubit.removeMember(user.uid);
         },
       ),
     );
   }
 
-  Future<void> _handleKickMember(BuildContext context) async {
-    final authBloc = context.read<AuthBloc>();
-    final layoutState = context.read<LayoutState>();
-    final groupCubit = context.read<GroupCubit>();
-
-    // check if member is assignee in any outstanding expenses
-
-    final hasOutstandingBalance =
-        this.group.memberHasOutstandingBalance(user.uid);
-    if (hasOutstandingBalance) {
-      /// check if he is the author of the expense
-      /// if yes -> allow leave
-      ///
-      /// if not -> do not allow kicking
-      ///
-      final expenses = await groupCubit.getExpensesForMember(user.uid);
-      if (expenses.isNotEmpty) {
-        /// display error
-        /// or somehow notify the user
-      }
-    }
-
-    await groupCubit.removeMember(user.uid);
+  String _createMessage(){
+    return '';
   }
 }
