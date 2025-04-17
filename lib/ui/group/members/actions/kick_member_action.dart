@@ -50,12 +50,12 @@ class KickMemberAction extends MemberAction {
     final expensesAuthorNames = expensesAuthor.map((expense) => expense.name);
 
     if (hasOutstandingBalance || membersThatMemberOwesTo.isNotEmpty) {
-      warningMessage = '''
-      Warning! You are about to kick ${user.name} who is involved in outstanding expenses!
-      This person has outstanding balance with ${memberNames}
-      Pending expenses where user is involved: ${pendingExpenseNames}
-      User is the author of unresolved expenses: ${expensesAuthorNames}
-      ''';
+      warningMessage = _createMessage(
+        hasOutstandingBalance: hasOutstandingBalance,
+        memberNames: memberNames,
+        pendingExpenseNames: pendingExpenseNames,
+        expensesAuthorNames: expensesAuthorNames,
+      );
     }
 
     await _showDangerDialog(warningMessage + title, context, groupCubit);
@@ -76,7 +76,38 @@ class KickMemberAction extends MemberAction {
     );
   }
 
-  String _createMessage(){
-    return '';
+  String _createMessage({
+    required bool hasOutstandingBalance,
+    required String memberNames,
+    required String pendingExpenseNames,
+    required Iterable<String> expensesAuthorNames,
+  }) {
+    final List<String> messageParts = [];
+
+    if (hasOutstandingBalance) {
+      messageParts.add('This person has an outstanding balance.');
+    }
+
+    if (memberNames.isNotEmpty) {
+      messageParts
+          .add('This person has outstanding balance with $memberNames.');
+    }
+
+    if (pendingExpenseNames.isNotEmpty) {
+      messageParts.add(
+          'Pending expenses where user is involved: $pendingExpenseNames.');
+    }
+
+    if (expensesAuthorNames.isNotEmpty) {
+      messageParts.add(
+          'User is the author of unresolved expenses: ${expensesAuthorNames.join(', ')}.');
+    }
+
+    if (messageParts.isEmpty) {
+      return '';
+    }
+
+    return 'Warning! You are about to kick ${user.name} who is involved in outstanding expenses!\n\n' +
+        messageParts.join('\n');
   }
 }
