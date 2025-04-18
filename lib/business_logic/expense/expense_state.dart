@@ -1,15 +1,21 @@
 part of 'expense_bloc.dart';
 
-abstract class ExpenseState {
+abstract class ExpenseState extends Equatable {
   ExpenseState();
 }
 
 class ExpenseNotSelected extends ExpenseState {
   ExpenseNotSelected() : super();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class ExpenseLoading extends ExpenseState {
   ExpenseLoading() : super();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class ExpenseLoaded extends ExpenseState {
@@ -17,6 +23,9 @@ class ExpenseLoaded extends ExpenseState {
   Expense get expense => Expense.from(_expense);
 
   ExpenseLoaded(this._expense) : super();
+
+  @override
+  List<Object?> get props => [_expense];
 }
 
 class ExpenseUpdating extends ExpenseLoaded {
@@ -24,6 +33,9 @@ class ExpenseUpdating extends ExpenseLoaded {
 }
 
 class ExpenseError extends ExpenseState {
-  Object? error;
+  final Object? error;
   ExpenseError({required this.error}) : super();
+
+  @override
+  List<Object?> get props => [error.toString()];
 }
