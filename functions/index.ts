@@ -92,7 +92,7 @@ export const handleExpenseUpdate = functions.firestore
 
     const oldExpenseSnap = change.before
     const newExpenseSnap = change.after
-    if (!newExpenseSnap || !oldExpenseSnap) return
+    if (!newExpenseSnap.exists || !oldExpenseSnap.exists) return
 
     await notifyWhenExpenseUpdated(oldExpenseSnap, newExpenseSnap )
   })

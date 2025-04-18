@@ -11,7 +11,11 @@ class Firestore {
   CollectionReference get expensesCollection =>
       firestore.collection('expenses');
 
-  CollectionReference get groupsCollection => firestore.collection('groups');
+  CollectionReference<Group> get groupsCollection =>
+      firestore.collection('groups').withConverter<Group>(
+            fromFirestore: (snapshot, _) => Group.fromSnapshot(snapshot),
+            toFirestore: (group, _) => group.toFirestore(),
+          );
 
   CollectionReference get paymentsCollection =>
       firestore.collection('payments');
