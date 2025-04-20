@@ -28,8 +28,10 @@ class _FinishedUpdating extends ExpenseEvent {
 }
 
 class _UpdateErrorOccurred extends ExpenseEvent {
+  final Expense originalExpense;
   final Object error;
-  _UpdateErrorOccurred(this.error) : super();
+  _UpdateErrorOccurred({required this.originalExpense, required this.error})
+      : super();
 }
 
 class _ExpenseUpdatedFromDB extends ExpenseEvent {

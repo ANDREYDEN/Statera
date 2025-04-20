@@ -20,16 +20,35 @@ class ExpenseLoading extends ExpenseState {
 
 class ExpenseLoaded extends ExpenseState {
   final Expense _expense;
+  final Expense lastPersistedExpense;
+  final Object? error;
+  final bool loading;
+
+  // TODO: copying expenses everytime is costly, expenses ahould be immutable
   Expense get expense => Expense.from(_expense);
 
-  ExpenseLoaded(this._expense) : super();
+  ExpenseLoaded(Expense expense,
+      {Expense? lastPersistedExpense, this.error, this.loading = false})
+      : _expense = expense,
+        lastPersistedExpense = lastPersistedExpense ?? expense,
+        super();
+
+  ExpenseLoaded copyWith({
+    Expense? expense,
+    Object? error,
+    bool loading = false,
+  }) {
+    return ExpenseLoaded(
+      expense ?? _expense,
+      error: error,
+      loading: loading,
+      lastPersistedExpense: lastPersistedExpense,
+    );
+  }
 
   @override
-  List<Object?> get props => [_expense];
-}
-
-class ExpenseUpdating extends ExpenseLoaded {
-  ExpenseUpdating({required Expense expense}) : super(expense);
+  List<Object?> get props =>
+      [_expense, error.toString(), loading, lastPersistedExpense];
 }
 
 class ExpenseError extends ExpenseState {

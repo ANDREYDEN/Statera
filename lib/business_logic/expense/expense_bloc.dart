@@ -25,10 +25,17 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<_UnloadRequested>((_, emit) => emit(ExpenseNotSelected()));
     on<UpdateRequested>(_handleUpdate);
     on<_FinishedUpdating>(
-      (event, emit) => emit(ExpenseLoaded(event.expense)),
+      (event, emit) => emit(ExpenseLoaded(
+        event.expense,
+        lastPersistedExpense: event.expense,
+      )),
     );
     on<_UpdateErrorOccurred>(
-      (event, emit) => emit(ExpenseError(error: event.error)),
+      (event, emit) => emit(ExpenseLoaded(
+        event.originalExpense,
+        lastPersistedExpense: event.originalExpense,
+        error: event.error,
+      )),
     );
     on<_ExpenseUpdatedFromDB>(_handleExpenseUpdatedFromDB);
   }
@@ -52,26 +59,31 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     UpdateRequested event,
     Emitter<ExpenseState> emit,
   ) async {
-    if (state is! ExpenseLoaded) return;
+    final loadedState = state;
+    if (loadedState is! ExpenseLoaded) return;
 
-    final oldExpense = (state as ExpenseLoaded).expense;
+    final oldExpense = loadedState.expense;
     final newExpense = event.updatedExpense;
 
     if (newExpense == oldExpense) return;
 
+    emit(loadedState.copyWith(expense: newExpense, loading: true));
     onExpenseUpdated?.call(newExpense);
-    emit(ExpenseUpdating(expense: newExpense));
+
+    // TODO: refactor into a throttle
     _updateTimer?.cancel();
     _updateTimer = Timer(kExpenseUpdateDelay, () async {
       try {
         await _expenseService.updateExpense(newExpense);
+        add(_FinishedUpdating(newExpense));
       } catch (e) {
-        print(e);
-        add(_UpdateErrorOccurred(e));
-        throw e;
-      } finally {}
-
-      add(_FinishedUpdating(newExpense));
+        add(_UpdateErrorOccurred(
+          error: e,
+          originalExpense: loadedState.lastPersistedExpense,
+        ));
+        onExpenseUpdated?.call(loadedState.lastPersistedExpense);
+        // rethrow;
+      }
     });
   }
 
@@ -87,8 +99,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   ) {
     emit(event.expense == null
         ? ExpenseError(error: EntityNotFoundException<Expense>(null))
-        : ExpenseLoaded(event.expense!));
-    
+        : ExpenseLoaded(event.expense!, lastPersistedExpense: event.expense!));
   }
 
   @override

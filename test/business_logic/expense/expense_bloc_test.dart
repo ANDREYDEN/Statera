@@ -86,15 +86,19 @@ void main() {
         },
         build: () => expenseBloc,
         seed: () => ExpenseLoaded(expense),
-        act: (bloc) async {
+        act: (bloc) {
           bloc.add(UpdateRequested(
             issuerUid: expense.authorUid,
             updatedExpense: updatedExpense,
           ));
-          await Future.delayed(kExpenseUpdateDelay);
         },
+        wait: kExpenseUpdateDelay,
         expect: () => [
-          ExpenseUpdating(expense: updatedExpense),
+          ExpenseLoaded(
+            updatedExpense,
+            loading: true,
+            lastPersistedExpense: expense,
+          ),
           ExpenseLoaded(updatedExpense),
         ],
         verify: (_) {
@@ -121,11 +125,17 @@ void main() {
         },
         wait: kExpenseUpdateDelay,
         expect: () => [
-          ExpenseUpdating(expense: updatedExpense),
-          ExpenseError(error: Exception('Update failed')),
-          ExpenseLoaded(updatedExpense),
+          ExpenseLoaded(
+            updatedExpense,
+            loading: true,
+            lastPersistedExpense: expense,
+          ),
+          ExpenseLoaded(
+            expense,
+            error: Exception('Update failed'),
+            lastPersistedExpense: expense,
+          ),
         ],
-        // errors: () => [any],
       );
 
       blocTest<ExpenseBloc, ExpenseState>(

@@ -57,7 +57,6 @@ class Header extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
                       ExpensePrice()
                     ],
                   ),
@@ -77,23 +76,40 @@ class Header extends StatelessWidget {
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      GroupBuilder(builder: (context, group) {
-                        return UserAvatar(
-                          author: group.getMember(expense.authorUid),
-                          onTap: expenseCanBeUpdated
-                              ? () => _handleAuthorClick(context, expense)
-                              : null,
-                        );
-                      }),
-                      Icon(Icons.arrow_forward, color: Colors.black),
                       Expanded(
-                        child: GestureDetector(
-                          onTap: expenseCanBeUpdated
-                              ? () => _handleAssigneesClick(context, expense)
-                              : null,
-                          child: AssigneeList(),
+                        child: Row(
+                          children: [
+                            GroupBuilder(builder: (context, group) {
+                              return UserAvatar(
+                                author: group.getMember(expense.authorUid),
+                                onTap: expenseCanBeUpdated
+                                    ? () => _handleAuthorClick(context, expense)
+                                    : null,
+                              );
+                            }),
+                            Icon(Icons.arrow_forward, color: Colors.black),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: expenseCanBeUpdated
+                                    ? () =>
+                                        _handleAssigneesClick(context, expense)
+                                    : null,
+                                child: AssigneeList(),
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                      BlocBuilder<ExpenseBloc, ExpenseState>(
+                        builder: (context, state) =>
+                            state is ExpenseLoaded && state.loading
+                                ? SizedBox.square(
+                                    dimension: 15,
+                                    child: Loader(width: 2),
+                                  )
+                                : SizedBox.shrink(),
                       ),
                     ],
                   ),
