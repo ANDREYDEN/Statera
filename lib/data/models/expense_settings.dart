@@ -21,7 +21,8 @@ class ExpenseSettings {
   ExpenseSettings.fromFirestore(Map<String, dynamic> data)
       : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
         this.showItemDecisions = data['showItemDecisions'] ?? true,
-        this.itemsAreTaxableByDefault = data['itemsAreTaxableByDefault'] ?? false,
+        this.itemsAreTaxableByDefault =
+            data['itemsAreTaxableByDefault'] ?? false,
         this.tax = data['tax'];
 
   Map<String, dynamic> toFirestore() {
@@ -31,6 +32,15 @@ class ExpenseSettings {
       'itemsAreTaxableByDefault': itemsAreTaxableByDefault,
       'tax': tax
     };
+  }
+
+  static ExpenseSettings from(ExpenseSettings other) {
+    return ExpenseSettings(
+      acceptNewMembers: other.acceptNewMembers,
+      showItemDecisions: other.showItemDecisions,
+      itemsAreTaxableByDefault: other.itemsAreTaxableByDefault,
+      tax: other.tax,
+    );
   }
 
   @override

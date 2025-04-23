@@ -11,13 +11,15 @@ class ExpensePrice extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ExpenseBloc, ExpenseState>(builder: (context, state) {
       Widget content = switch (state) {
-        ExpenseLoading() => Text('Loading...'),
-        ExpenseUpdating() => Text('Updating...'),
         ExpenseLoaded(expense: final expense) => PriceText(
             value: expense.total,
             textStyle: TextStyle(color: Colors.white),
           ),
-        _ => Text('Loading...')
+        ExpenseLoading() => Text(
+            '\$12.45',
+            style: TextStyle(color: Colors.transparent),
+          ),
+        _ => Text('N/A')
       };
 
       final card = Card(
@@ -28,7 +30,7 @@ class ExpensePrice extends StatelessWidget {
         ),
       );
 
-      if (state is ExpenseUpdating || state is ExpenseLoading) {
+      if (state is ExpenseLoading) {
         return card
             .animate(onPlay: (controller) => controller.repeat())
             .shimmer(delay: 0.5.seconds, duration: 0.5.seconds);
