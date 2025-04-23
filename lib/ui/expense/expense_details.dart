@@ -33,7 +33,8 @@ class ExpenseDetails extends StatelessWidget {
 
     return ExpenseBuilder(
       onUpdateError: (context, error) {
-        final simplifiedError = 'Error occurred when updating expense';
+        final simplifiedError =
+            'Unexpected error occurred when updating the expense. Please try again.';
         print(error);
         showErrorSnackBar(context, simplifiedError);
         final errorService = context.read<ErrorService>();
