@@ -33,6 +33,7 @@ class EditExpenseAction extends EntityAction {
           await snackbarCatch(
             context,
             () => expensesCubit.updateExpense(expense, persist: true),
+            errorReason: 'Failed to update expense',
           );
         },
       ),
