@@ -124,6 +124,7 @@ void main() {
           ));
         },
         wait: kExpenseUpdateDelay,
+        errors: () => [isA<Exception>()],
         expect: () => [
           ExpenseLoaded(
             updatedExpense,

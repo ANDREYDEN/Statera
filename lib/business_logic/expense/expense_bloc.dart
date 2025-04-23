@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_event_transformers/bloc_event_transformers.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/exceptions/exceptions.dart';
@@ -13,7 +14,6 @@ part 'expense_state.dart';
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpenseService _expenseService;
   final CoordinationRepository _coordinationRepository;
-  Timer? _updateTimer;
   final void Function(Expense)? onExpenseUpdated;
 
   ExpenseBloc(
@@ -23,19 +23,10 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   }) : super(ExpenseNotSelected()) {
     on<_LoadRequested>((_, emit) => emit(ExpenseLoading()));
     on<_UnloadRequested>((_, emit) => emit(ExpenseNotSelected()));
-    on<UpdateRequested>(_handleUpdate);
-    on<_FinishedUpdating>(
-      (event, emit) => emit(ExpenseLoaded(
-        event.expense,
-        lastPersistedExpense: event.expense,
-      )),
-    );
-    on<_UpdateErrorOccurred>(
-      (event, emit) => emit(ExpenseLoaded(
-        event.originalExpense,
-        lastPersistedExpense: event.originalExpense,
-        error: event.error,
-      )),
+    on<UpdateRequested>(_updateExpense);
+    on<_ExpenseUpdated>(
+      _persistExpense,
+      transformer: debounce(kExpenseUpdateDelay),
     );
     on<_ExpenseUpdatedFromDB>(_handleExpenseUpdatedFromDB);
   }
@@ -55,7 +46,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     _expenseSubscription?.cancel();
   }
 
-  Future<void> _handleUpdate(
+  Future<void> _updateExpense(
     UpdateRequested event,
     Emitter<ExpenseState> emit,
   ) async {
@@ -68,23 +59,34 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     if (newExpense == oldExpense) return;
 
     emit(loadedState.copyWith(expense: newExpense, loading: true));
+    add(_ExpenseUpdated(newExpense));
     onExpenseUpdated?.call(newExpense);
+  }
 
-    // TODO: refactor into a throttle
-    _updateTimer?.cancel();
-    _updateTimer = Timer(kExpenseUpdateDelay, () async {
-      try {
-        await _expenseService.updateExpense(newExpense);
-        add(_FinishedUpdating(newExpense));
-      } catch (e) {
-        add(_UpdateErrorOccurred(
-          error: e,
-          originalExpense: loadedState.lastPersistedExpense,
-        ));
-        onExpenseUpdated?.call(loadedState.lastPersistedExpense);
-        // rethrow;
-      }
-    });
+  Future<void> _persistExpense(
+    _ExpenseUpdated event,
+    Emitter<ExpenseState> emit,
+  ) async {
+    final loadedState = state;
+    if (loadedState is! ExpenseLoaded) return;
+
+    final newExpense = event.expense;
+
+    try {
+      await _expenseService.updateExpense(newExpense);
+      emit(ExpenseLoaded(
+        newExpense,
+        lastPersistedExpense: newExpense,
+      ));
+    } catch (e) {
+      emit(ExpenseLoaded(
+        loadedState.lastPersistedExpense,
+        lastPersistedExpense: loadedState.lastPersistedExpense,
+        error: e,
+      ));
+      onExpenseUpdated?.call(loadedState.lastPersistedExpense);
+      rethrow;
+    }
   }
 
   Future<void> revertExpense(Expense expense) async {
