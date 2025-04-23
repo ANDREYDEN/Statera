@@ -47,7 +47,7 @@ class ExpensesListBody extends StatelessWidget {
         if (error == null) return;
 
         final simplifiedError =
-            'Error occurred when ${expensesState.errorActionName} expense';
+            'Unexpected error occurred when ${expensesState.errorActionName} the expense. Please try again.';
         print(error);
         showErrorSnackBar(context, simplifiedError);
         final errorService = context.read<ErrorService>();
