@@ -57,12 +57,22 @@ abstract class Item {
     required String uid,
     double? tax,
     bool taxOnly = false,
+    double? tip,
+    bool tipOnly = false,
+    bool subtotalOnly = false,
   }) {
-    final baseValue = total * (taxOnly ? 0 : 1);
     final taxValue = total * (isTaxable && tax != null ? tax : 0);
-    final totalValue = baseValue + taxValue;
-    final confirmedPartition = isPartitioned ? partition : confirmedParts;
+    final tipValue = total * (tip ?? 0);
+    var totalValue = total + taxValue + tipValue;
+    if (tipOnly) {
+      totalValue = tipValue;
+    } else if (taxOnly) {
+      totalValue = taxValue;
+    } else if (subtotalOnly) {
+      totalValue = total;
+    }
 
+    final confirmedPartition = isPartitioned ? partition : confirmedParts;
     if (confirmedPartition == 0) return 0;
 
     return totalValue * getAssigneeParts(uid) / confirmedPartition;

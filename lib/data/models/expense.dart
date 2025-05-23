@@ -41,6 +41,8 @@ class Expense {
 
   bool get hasTax => settings.tax != null;
 
+  bool get hasTip => settings.tip != null;
+
   double get total => items.fold<double>(
       0,
       (previousValue, item) =>
@@ -119,25 +121,32 @@ class Expense {
   }
 
   double getConfirmedSubTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, tax: 0);
-  }
-
-  double getConfirmedTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax);
+    return _getConfirmedValueFor(uid: uid, subtotalOnly: true);
   }
 
   double getConfirmedTaxForUser(String uid) {
     return _getConfirmedValueFor(
       uid: uid,
-      tax: this.settings.tax,
       taxOnly: true,
     );
   }
 
+  double getConfirmedTipForUser(String uid) {
+    return _getConfirmedValueFor(
+      uid: uid,
+      tipOnly: true,
+    );
+  }
+
+  double getConfirmedTotalForUser(String uid) {
+    return _getConfirmedValueFor(uid: uid);
+  }
+
   double _getConfirmedValueFor({
     required String uid,
-    double? tax,
     bool taxOnly = false,
+    bool tipOnly = false,
+    bool subtotalOnly = false,
   }) {
     if (!this.hasAssignee(uid)) return 0;
 
@@ -145,7 +154,14 @@ class Expense {
       0,
       (previousValue, item) =>
           previousValue +
-          item.getConfirmedValueFor(uid: uid, tax: tax, taxOnly: taxOnly),
+          item.getConfirmedValueFor(
+            uid: uid,
+            tax: settings.tax,
+            taxOnly: taxOnly,
+            tip: settings.tip,
+            tipOnly: tipOnly,
+            subtotalOnly: subtotalOnly,
+          ),
     );
   }
 

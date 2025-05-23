@@ -49,6 +49,19 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
           initialData: widget.expense.settings.itemsAreTaxableByDefault,
           isVisible: (fields) => fields['is_taxable'] as bool,
         ),
+        FieldData(
+          id: 'has_tip',
+          label: 'Add tip to expense',
+          initialData: widget.expense.settings.tip != null,
+        ),
+        FieldData(
+          id: 'tip',
+          label: 'Tip percentage to apply',
+          initialData: widget.expense.settings.tip ?? 0.15,
+          formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
+          validators: [FieldData.constrainedDoubleValidator(0, 1)],
+          isVisible: (fields) => fields['has_tip'] as bool,
+        ),
       ],
       onSubmit: (values) async {
         widget.expense.settings.acceptNewMembers =
@@ -60,6 +73,11 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
               values['itemsAreTaxableByDefault']!;
         } else {
           widget.expense.settings.tax = null;
+        }
+        if (values['has_tip']) {
+          widget.expense.settings.tip = values['tip']!;
+        } else {
+          widget.expense.settings.tip = null;
         }
       },
     );

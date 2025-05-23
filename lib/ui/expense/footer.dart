@@ -12,19 +12,28 @@ class Footer extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Divider(thickness: 3),
-            if (expense.hasTax) ...[
+            if (expense.hasTax || expense.hasTip) ...[
+              Divider(thickness: 3),
               FooterEntry(
                 label: 'Subtotal',
                 value: expense.getConfirmedSubTotalForUser(authBloc.uid),
-              ),
+              )
+            ],
+            if (expense.hasTax) ...[
               Divider(),
               FooterEntry(
-                label: 'Tax',
+                label: 'Tax (${(expense.settings.tax ?? 0) * 100}%)',
                 value: expense.getConfirmedTaxForUser(authBloc.uid),
               ),
-              Divider(thickness: 3),
             ],
+            if (expense.hasTip) ...[
+              Divider(),
+              FooterEntry(
+                label: 'Tip (${(expense.settings.tip ?? 0) * 100}%)',
+                value: expense.getConfirmedTipForUser(authBloc.uid),
+              ),
+            ],
+            Divider(thickness: 3),
             FooterEntry(
               label: 'Total',
               value: expense.getConfirmedTotalForUser(authBloc.uid),
