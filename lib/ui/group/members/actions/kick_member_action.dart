@@ -8,6 +8,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/members/actions/member_action.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/user_avatar.dart';
 
 class KickMemberAction extends MemberAction {
   final Group group;
@@ -36,6 +37,9 @@ class KickMemberAction extends MemberAction {
 
     final membersThatMemberOwesTo =
         this.group.getMembersThatMemberOwesTo(user.uid);
+    final members = membersThatMemberOwesTo
+        .map((memberId) => this.group.getMember(memberId))
+        .toList();
     final memberNames = membersThatMemberOwesTo
         .map((memberId) => this.group.getMember(memberId).name)
         .join(', ');
@@ -45,11 +49,14 @@ class KickMemberAction extends MemberAction {
     final pendingExpenseNames =
         pendingMemberExpenses.map((expense) => expense.name).join(', ');
 
-    final expensesAuthor = await expenseService.getPendingAuthoredExpenses(
-        group.id!, user.uid);
+    final expensesAuthor =
+        await expenseService.getPendingAuthoredExpenses(group.id!, user.uid);
     final expensesAuthorNames = expensesAuthor.map((expense) => expense.name);
 
-    if (hasOutstandingBalance || membersThatMemberOwesTo.isNotEmpty || pendingMemberExpenses.isNotEmpty || expensesAuthor.isNotEmpty) {
+    if (hasOutstandingBalance ||
+        membersThatMemberOwesTo.isNotEmpty ||
+        pendingMemberExpenses.isNotEmpty ||
+        expensesAuthor.isNotEmpty) {
       warningMessage = _createMessage(
         hasOutstandingBalance: hasOutstandingBalance,
         memberNames: memberNames,
@@ -58,15 +65,94 @@ class KickMemberAction extends MemberAction {
       );
     }
 
-    await _showDangerDialog(warningMessage + title, context, groupCubit);
+    await _showDangerDialog(title, members, pendingMemberExpenses,
+        expensesAuthor, context, groupCubit);
   }
 
   Future<void> _showDangerDialog(
-      String title, BuildContext context, GroupCubit groupCubit) async {
+      String title,
+      List<CustomUser> members,
+      List<Expense> pendingMemberExpenses,
+      List<Expense> pendingAuthoredMemberExpenses,
+      BuildContext context,
+      GroupCubit groupCubit) async {
     await showDialog(
       context: context,
       builder: (context) => DangerDialog(
         title: title,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This person has outstanding balance with',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Container(
+              height: 70,
+              child: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: members.map((member) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: UserAvatar(author: member, withName: true),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Pending expenses where user is involved',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Container(
+              height: 70,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: pendingMemberExpenses.map((expense) {
+                  return Card(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          expense.name,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Pending expenses where user is author',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Container(
+              height: 70,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: pendingAuthoredMemberExpenses.map((expense) {
+                  return Card(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          expense.name,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 32),
+          ],
+        ),
         valueName: 'member name',
         value: user.name,
         onConfirm: () async {
@@ -83,10 +169,6 @@ class KickMemberAction extends MemberAction {
     required Iterable<String> expensesAuthorNames,
   }) {
     final List<String> messageParts = [];
-
-    if (hasOutstandingBalance) {
-      messageParts.add('This person has an outstanding balance.');
-    }
 
     if (memberNames.isNotEmpty) {
       messageParts
@@ -107,7 +189,6 @@ class KickMemberAction extends MemberAction {
       return '';
     }
 
-    return 'Warning! You are about to kick ${user.name} who is involved in outstanding expenses!\n\n' +
-        messageParts.join('\n');
+    return '\n\n' + messageParts.join('\n');
   }
 }
