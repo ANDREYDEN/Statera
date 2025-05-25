@@ -43,10 +43,15 @@ class Expense {
 
   bool get hasTip => settings.tip != null;
 
-  double get total => items.fold<double>(
-      0,
-      (previousValue, item) =>
-          previousValue + item.getValueWithTax(this.settings.tax));
+  double get total {
+    final subtotal = items.fold(0.0, (prev, item) => prev + item.total);
+    final taxValue = items.fold(
+      0.0,
+      (prev, item) => prev + item.getTaxValue(this.settings.tax),
+    );
+    final tipValue = subtotal * (this.settings.tip ?? 0);
+    return subtotal + taxValue + tipValue;
+  }
 
   bool get finalized => finalizedDate != null;
 
@@ -120,48 +125,39 @@ class Expense {
     });
   }
 
-  double getConfirmedSubTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, subtotalOnly: true);
-  }
-
-  double getConfirmedTaxForUser(String uid) {
-    return _getConfirmedValueFor(
-      uid: uid,
-      taxOnly: true,
-    );
-  }
-
   double getConfirmedTipForUser(String uid) {
-    return _getConfirmedValueFor(
-      uid: uid,
-      tipOnly: true,
-    );
+    final subtotal = getConfirmedSubtotalForUser(uid);
+    return subtotal * (settings.tip ?? 0);
   }
 
   double getConfirmedTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid);
+    final subtotal = getConfirmedSubtotalForUser(uid);
+    final tax = getConfirmedTaxForUser(uid);
+    final tip = getConfirmedTipForUser(uid);
+
+    return subtotal + tax + tip;
   }
 
-  double _getConfirmedValueFor({
-    required String uid,
-    bool taxOnly = false,
-    bool tipOnly = false,
-    bool subtotalOnly = false,
-  }) {
+  double getConfirmedTaxForUser(String uid) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
       0,
-      (previousValue, item) =>
-          previousValue +
-          item.getConfirmedValueFor(
-            uid: uid,
+      (prev, item) =>
+          prev +
+          item.getConfirmedTaxFor(
+            uid,
             tax: settings.tax,
-            taxOnly: taxOnly,
-            tip: settings.tip,
-            tipOnly: tipOnly,
-            subtotalOnly: subtotalOnly,
           ),
+    );
+  }
+
+  double getConfirmedSubtotalForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+
+    return items.fold<double>(
+      0,
+      (prev, item) => prev + item.getConfirmedSubtotalForUser(uid),
     );
   }
 

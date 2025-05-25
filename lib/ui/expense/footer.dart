@@ -16,7 +16,7 @@ class Footer extends StatelessWidget {
               Divider(thickness: 3),
               FooterEntry(
                 label: 'Subtotal',
-                value: expense.getConfirmedSubTotalForUser(authBloc.uid),
+                value: expense.getConfirmedSubtotalForUser(authBloc.uid),
               )
             ],
             if (expense.hasTax) ...[

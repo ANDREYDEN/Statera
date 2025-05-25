@@ -64,15 +64,15 @@ void main() {
     });
 
     test('can calculate totals and assignee split', () {
-      expect(expense.getConfirmedSubTotalForUser('1'), closeTo(2.6, 0.01));
+      expect(expense.getConfirmedSubtotalForUser('1'), closeTo(2.6, 0.01));
       expect(expense.getConfirmedTaxForUser('1'), closeTo(0.03, 0.01));
       expect(expense.getConfirmedTotalForUser('1'), closeTo(2.63, 0.01));
 
-      expect(expense.getConfirmedSubTotalForUser('2'), closeTo(7.91, 0.01));
+      expect(expense.getConfirmedSubtotalForUser('2'), closeTo(7.91, 0.01));
       expect(expense.getConfirmedTaxForUser('2'), closeTo(0.6, 0.01));
       expect(expense.getConfirmedTotalForUser('2'), closeTo(8.51, 0.01));
 
-      expect(expense.getConfirmedSubTotalForUser('3'), closeTo(15.09, 0.01));
+      expect(expense.getConfirmedSubtotalForUser('3'), closeTo(15.09, 0.01));
       expect(expense.getConfirmedTaxForUser('3'), closeTo(1.27, 0.01));
       expect(expense.getConfirmedTotalForUser('3'), closeTo(16.36, 0.01));
     });
