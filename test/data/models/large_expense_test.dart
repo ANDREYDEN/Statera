@@ -6,7 +6,7 @@ void main() {
     var expense = Expense(
       name: 'Big',
       authorUid: 'foo',
-      settings: ExpenseSettings(tax: 0.13),
+      settings: ExpenseSettings(tax: 0.13, tip: 0.15),
     );
 
     var assigneeUids = ['1', '2', '3'];
@@ -60,21 +60,28 @@ void main() {
     // no decision for assignee 3
 
     test('can calculate its total', () {
-      expect(expense.total, closeTo(31.48, 0.01));
+      final expectedSubtotal = 29.57;
+      final expectedTip = 4.4355;
+      final expectedTax = 1.9097;
+      expect(expense.total,
+          closeTo(expectedSubtotal + expectedTip + expectedTax, 0.01));
     });
 
     test('can calculate totals and assignee split', () {
       expect(expense.getConfirmedSubtotalForUser('1'), closeTo(2.6, 0.01));
       expect(expense.getConfirmedTaxForUser('1'), closeTo(0.03, 0.01));
-      expect(expense.getConfirmedTotalForUser('1'), closeTo(2.63, 0.01));
+      expect(expense.getConfirmedTipForUser('1'), closeTo(0.39, 0.01));
+      expect(expense.getConfirmedTotalForUser('1'), closeTo(3.02, 0.01));
 
       expect(expense.getConfirmedSubtotalForUser('2'), closeTo(7.91, 0.01));
       expect(expense.getConfirmedTaxForUser('2'), closeTo(0.6, 0.01));
-      expect(expense.getConfirmedTotalForUser('2'), closeTo(8.51, 0.01));
+      expect(expense.getConfirmedTipForUser('2'), closeTo(1.1865, 0.01));
+      expect(expense.getConfirmedTotalForUser('2'), closeTo(9.6965, 0.01));
 
       expect(expense.getConfirmedSubtotalForUser('3'), closeTo(15.09, 0.01));
       expect(expense.getConfirmedTaxForUser('3'), closeTo(1.27, 0.01));
-      expect(expense.getConfirmedTotalForUser('3'), closeTo(16.36, 0.01));
+      expect(expense.getConfirmedTipForUser('3'), closeTo(2.2635, 0.01));
+      expect(expense.getConfirmedTotalForUser('3'), closeTo(18.6235, 0.01));
     });
   });
 }
