@@ -41,7 +41,7 @@ class Group {
     this.id,
     List<CustomUser>? members,
     String? adminId,
-    balance,
+    Map<String, Map<String, double>>? balance,
     String? currencySign,
     this.inviteLink,
     double? debtThreshold,

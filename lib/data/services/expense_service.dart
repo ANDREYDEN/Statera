@@ -90,8 +90,8 @@ class ExpenseService extends Firestore {
     return expensesCollection.doc(expenseId).delete();
   }
 
-  Future<List<Expense>> getExpensesForMemberWhereAssignee(
-      String groupId, String assigneeId, bool finalazed) async {
+  Future<List<Expense>> getPendingExpenses(
+      String groupId, String assigneeId) async {
     final expensesSnap = await expensesQuery(
       groupId: groupId,
       assigneeId: assigneeId,
@@ -102,8 +102,8 @@ class ExpenseService extends Firestore {
     return expenses;
   }
 
-  Future<List<Expense>> getAuthoredExpenses(
-      String groupId, String authorId, bool finalazed) async {
+  Future<List<Expense>> getPendingAuthoredExpenses(
+      String groupId, String authorId) async {
     final expensesSnap = await expensesQuery(
       groupId: groupId,
       authorId: authorId,
