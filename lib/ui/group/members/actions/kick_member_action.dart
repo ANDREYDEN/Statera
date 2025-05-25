@@ -28,7 +28,7 @@ class KickMemberAction extends MemberAction {
     String title = 'You are about to KICK member "${user.name}"';
     late String warningMessage;
 
-    final groupService = context.read<ExpenseService>();
+    final expenseService = context.read<ExpenseService>();
     final groupCubit = context.read<GroupCubit>();
 
     final hasOutstandingBalance =
@@ -40,16 +40,16 @@ class KickMemberAction extends MemberAction {
         .map((memberId) => this.group.getMember(memberId).name)
         .join(', ');
 
-    final pendingMemberExpenses = await groupService
-        .getExpensesForMemberWhereAssignee(group.id!, user.uid, false);
+    final pendingMemberExpenses =
+        await expenseService.getPendingExpenses(group.id!, user.uid);
     final pendingExpenseNames =
         pendingMemberExpenses.map((expense) => expense.name).join(', ');
 
-    final expensesAuthor =
-        await groupService.getAuthoredExpenses(group.id!, user.uid, false);
+    final expensesAuthor = await expenseService.getPendingAuthoredExpenses(
+        group.id!, user.uid);
     final expensesAuthorNames = expensesAuthor.map((expense) => expense.name);
 
-    if (hasOutstandingBalance || membersThatMemberOwesTo.isNotEmpty) {
+    if (hasOutstandingBalance || membersThatMemberOwesTo.isNotEmpty || pendingMemberExpenses.isNotEmpty || expensesAuthor.isNotEmpty) {
       warningMessage = _createMessage(
         hasOutstandingBalance: hasOutstandingBalance,
         memberNames: memberNames,
