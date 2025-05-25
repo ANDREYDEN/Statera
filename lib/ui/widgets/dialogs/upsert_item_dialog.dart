@@ -116,6 +116,21 @@ class UpsertItemDialog extends StatelessWidget {
           ],
         ),
       ),
+      buildWarning: (fields) {
+        final itemName = (fields['item_name'] ?? '') as String;
+
+        final possibleTipNames = ['tip', 'tips'];
+        if (possibleTipNames.contains(itemName.trim().toLowerCase())) {
+          return 'Tips can be added in expense settings';
+        }
+
+        final possibleTaxNames = ['tax', 'taxes'];
+        if (possibleTaxNames.contains(itemName.trim().toLowerCase())) {
+          return 'Taxes can be added in expense settings';
+        }
+
+        return null;
+      },
       onSubmit: (values) {
         Item item = initialItem ?? Item.fake();
 

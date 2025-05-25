@@ -22,6 +22,7 @@ class CRUDDialog extends StatefulWidget {
   late final bool segmentSelectionEnabled;
   final String? initialSelection;
   final bool hasAutoFocus;
+  final String? Function(Map<String, dynamic>)? buildWarning;
 
   CRUDDialog({
     Key? key,
@@ -32,6 +33,7 @@ class CRUDDialog extends StatefulWidget {
     this.allowAddAnother = false,
     this.initialSelection,
     this.hasAutoFocus = true,
+    this.buildWarning,
   }) : super(key: key) {
     this.fieldsMap = {'default': fields};
     this.segments = [];
@@ -49,6 +51,7 @@ class CRUDDialog extends StatefulWidget {
     this.segmentSelectionEnabled = true,
     this.initialSelection,
     this.hasAutoFocus = true,
+    this.buildWarning,
   }) : super(key: key);
 
   @override
@@ -75,6 +78,13 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final warning = widget.buildWarning?.call(
+      _fields.fold<Map<String, dynamic>>(
+        {},
+        (acc, cur) => {...acc, cur.id: cur.data},
+      ),
+    );
+
     return AlertDialog(
       title: Text(widget.title),
       content: DialogWidth(
@@ -108,6 +118,29 @@ class _CRUDDialogState extends State<CRUDDialog> {
                 ],
               ),
             ),
+            if (warning != null)
+              Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        warning,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -168,55 +201,57 @@ class _CRUDDialogState extends State<CRUDDialog> {
       var isFirstField = i == 0;
       final isDisabled = field.isDisabled?.call(fieldValueMap) ?? false;
       if (field.initialData is String || field.initialData is num) {
-        yield TextFormField(
-          controller: field.controller,
-          autofocus: widget.hasAutoFocus && isFirstField,
-          focusNode: field.focusNode,
-          enabled: !isDisabled,
-          keyboardType: field.initialData is String
-              ? TextInputType.text
-              : field.initialData is double
-                  ? TextInputType.numberWithOptions(decimal: true)
-                  : TextInputType.number,
-          inputFormatters: field.formatters,
-          decoration: InputDecoration(
-            labelText: field.label,
-            errorText: this._dirty && field.getError().isNotEmpty
-                ? field.getError()
-                : null,
-            suffixIcon: Icon(
-              field.suffixIcon,
-              size: 20,
-              // color: Theme.of(context).colorScheme.onSurface,
+        yield Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: TextFormField(
+            controller: field.controller,
+            autofocus: widget.hasAutoFocus && isFirstField,
+            focusNode: field.focusNode,
+            enabled: !isDisabled,
+            keyboardType: field.initialData is String
+                ? TextInputType.text
+                : field.initialData is double
+                    ? TextInputType.numberWithOptions(decimal: true)
+                    : TextInputType.number,
+            inputFormatters: field.formatters,
+            decoration: InputDecoration(
+              labelText: field.label,
+              errorText: this._dirty && field.getError().isNotEmpty
+                  ? field.getError()
+                  : null,
+              suffixIcon: Icon(field.suffixIcon, size: 20),
             ),
+            onChanged: (text) {
+              setState(() {
+                this._dirty = true;
+                field.changeData(text);
+              });
+            },
+            onFieldSubmitted: (_) {
+              if (isLastField) {
+                submit(closeAfterSubmit: widget.closeAfterSubmit);
+              } else {
+                selectedFields[i + 1].focusNode.requestFocus();
+              }
+            },
           ),
-          onChanged: (text) {
-            setState(() {
-              this._dirty = true;
-              field.changeData(text);
-            });
-          },
-          onFieldSubmitted: (_) {
-            if (isLastField) {
-              submit(closeAfterSubmit: widget.closeAfterSubmit);
-            } else {
-              selectedFields[i + 1].focusNode.requestFocus();
-            }
-          },
         );
       } else if (field.initialData is bool) {
-        yield SwitchListTile(
-          contentPadding: EdgeInsets.all(0),
-          title: Text(field.label),
-          value: field.data,
-          autofocus: widget.hasAutoFocus && isFirstField,
-          focusNode: field.focusNode,
-          onChanged: isDisabled
-              ? null
-              : (newValue) => setState(() {
-                    this._dirty = true;
-                    field.changeData(newValue);
-                  }),
+        yield Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: SwitchListTile(
+            contentPadding: EdgeInsets.all(0),
+            title: Text(field.label),
+            value: field.data,
+            autofocus: widget.hasAutoFocus && isFirstField,
+            focusNode: field.focusNode,
+            onChanged: isDisabled
+                ? null
+                : (newValue) => setState(() {
+                      this._dirty = true;
+                      field.changeData(newValue);
+                    }),
+          ),
         );
       }
     }
