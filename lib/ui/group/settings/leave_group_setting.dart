@@ -18,14 +18,22 @@ class LeaveGroupSetting extends StatelessWidget {
     required this.groupName,
   }) : super(key: key);
 
-  Text _generateSubtitle(BuildContext context, Group group) {
+  Text? _generateSubtitle(BuildContext context, Group group) {
     final authBloc = context.read<AuthBloc>();
 
-    return group.memberHasOutstandingBalance(authBloc.uid)
-        ? Text(
-            'You cannot leave the group while you have outstanding balances. Please settle all debts and payments first.')
-        : Text(
-            'You can only leave the group if your balance is resolved and you are not part of any outstanding expenses. If you are a group admin, you need to transfer ownership before leaving.');
+    if (isAdmin) {
+      return Text(
+        'You can\'t leave the group while you are an admin. Transfer ownership to another member first.',
+      );
+    }
+
+    if (group.memberHasOutstandingBalance(authBloc.uid)) {
+      return Text(
+        'You can\'t leave the group while you have outstanding balance. Settle all pending debts first.',
+      );
+    }
+
+    return null;
   }
 
   void _handleLeave(BuildContext context, Group group) {
@@ -59,10 +67,11 @@ class LeaveGroupSetting extends StatelessWidget {
         title: Text('Leave the group'),
         subtitle: _generateSubtitle(context, group),
         trailing: DangerButton(
-            text: 'Leave group',
-            onPressed: isAdmin || group.memberHasOutstandingBalance(uid)
-                ? null
-                : () => _handleLeave(context, group)),
+          text: 'Leave group',
+          onPressed: isAdmin || group.memberHasOutstandingBalance(uid)
+              ? null
+              : () => _handleLeave(context, group),
+        ),
       ),
     );
   }
