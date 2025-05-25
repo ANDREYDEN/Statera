@@ -21,6 +21,7 @@ class CRUDDialog extends StatefulWidget {
   final bool allowAddAnother;
   late final bool segmentSelectionEnabled;
   final String? initialSelection;
+  final bool hasAutoFocus;
 
   CRUDDialog({
     Key? key,
@@ -30,6 +31,7 @@ class CRUDDialog extends StatefulWidget {
     this.closeAfterSubmit = true,
     this.allowAddAnother = false,
     this.initialSelection,
+    this.hasAutoFocus = true,
   }) : super(key: key) {
     this.fieldsMap = {'default': fields};
     this.segments = [];
@@ -46,6 +48,7 @@ class CRUDDialog extends StatefulWidget {
     this.allowAddAnother = false,
     this.segmentSelectionEnabled = true,
     this.initialSelection,
+    this.hasAutoFocus = true,
   }) : super(key: key);
 
   @override
@@ -160,13 +163,16 @@ class _CRUDDialogState extends State<CRUDDialog> {
     for (var i = 0; i < selectedFields.length; i++) {
       var field = selectedFields[i];
       if (field.isVisible != null && !field.isVisible!(fieldValueMap)) continue;
+
       var isLastField = i == selectedFields.length - 1;
       var isFirstField = i == 0;
+      final isDisabled = field.isDisabled?.call(fieldValueMap) ?? false;
       if (field.initialData is String || field.initialData is num) {
         yield TextFormField(
           controller: field.controller,
-          autofocus: isFirstField,
+          autofocus: widget.hasAutoFocus && isFirstField,
           focusNode: field.focusNode,
+          enabled: !isDisabled,
           keyboardType: field.initialData is String
               ? TextInputType.text
               : field.initialData is double
@@ -178,6 +184,11 @@ class _CRUDDialogState extends State<CRUDDialog> {
             errorText: this._dirty && field.getError().isNotEmpty
                 ? field.getError()
                 : null,
+            suffixIcon: Icon(
+              field.suffixIcon,
+              size: 20,
+              // color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           onChanged: (text) {
             setState(() {
@@ -195,14 +206,17 @@ class _CRUDDialogState extends State<CRUDDialog> {
         );
       } else if (field.initialData is bool) {
         yield SwitchListTile(
+          contentPadding: EdgeInsets.all(0),
           title: Text(field.label),
           value: field.data,
-          autofocus: isFirstField,
+          autofocus: widget.hasAutoFocus && isFirstField,
           focusNode: field.focusNode,
-          onChanged: (newValue) => setState(() {
-            this._dirty = true;
-            field.changeData(newValue);
-          }),
+          onChanged: isDisabled
+              ? null
+              : (newValue) => setState(() {
+                    this._dirty = true;
+                    field.changeData(newValue);
+                  }),
         );
       }
     }

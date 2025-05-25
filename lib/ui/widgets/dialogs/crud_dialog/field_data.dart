@@ -11,6 +11,8 @@ class FieldData<T> {
   List<TextInputFormatter> formatters;
   bool isAdvanced;
   bool Function(Map<String, dynamic>)? isVisible;
+  bool? Function(Map<String, dynamic>)? isDisabled;
+  IconData? suffixIcon;
 
   T? _data;
   String? _fieldValue;
@@ -24,6 +26,8 @@ class FieldData<T> {
     this.formatters = const [],
     this.isAdvanced = false,
     this.isVisible,
+    this.isDisabled,
+    this.suffixIcon,
   }) {
     initialData = (initialData ?? '') as T;
     _data = initialData;

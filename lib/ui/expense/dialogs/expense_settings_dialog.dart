@@ -37,17 +37,18 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         ),
         FieldData(
           id: 'tax',
-          label: 'Amount of tax to apply',
-          initialData: widget.expense.settings.tax ?? 0.13,
+          label: 'Tax',
+          initialData: (widget.expense.settings.tax ?? .13) * 100,
           formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
-          validators: [FieldData.constrainedDoubleValidator(0, 1)],
-          isVisible: (fields) => fields['is_taxable'] as bool,
+          validators: [FieldData.constrainedDoubleValidator(0, 100)],
+          isDisabled: (fields) => fields['is_taxable'] == false,
+          suffixIcon: Icons.percent,
         ),
         FieldData(
           id: 'itemsAreTaxableByDefault',
           label: 'Items are taxable by default',
           initialData: widget.expense.settings.itemsAreTaxableByDefault,
-          isVisible: (fields) => fields['is_taxable'] as bool,
+          isDisabled: (fields) => fields['is_taxable'] == false,
         ),
         FieldData(
           id: 'has_tip',
@@ -56,11 +57,12 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         ),
         FieldData(
           id: 'tip',
-          label: 'Tip percentage to apply',
-          initialData: widget.expense.settings.tip ?? 0.15,
+          label: 'Tip',
+          initialData: (widget.expense.settings.tip ?? 0.15) * 100,
           formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
-          validators: [FieldData.constrainedDoubleValidator(0, 1)],
-          isVisible: (fields) => fields['has_tip'] as bool,
+          validators: [FieldData.constrainedDoubleValidator(0, 100)],
+          isDisabled: (fields) => fields['has_tip'] == false,
+          suffixIcon: Icons.percent,
         ),
       ],
       onSubmit: (values) async {
@@ -68,14 +70,14 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
             values['automaticallyAddNewMembers'];
         widget.expense.settings.showItemDecisions = values['showItemDecisions'];
         if (values['is_taxable']) {
-          widget.expense.settings.tax = values['tax']!;
+          widget.expense.settings.tax = values['tax']! / 100;
           widget.expense.settings.itemsAreTaxableByDefault =
               values['itemsAreTaxableByDefault']!;
         } else {
           widget.expense.settings.tax = null;
         }
         if (values['has_tip']) {
-          widget.expense.settings.tip = values['tip']!;
+          widget.expense.settings.tip = values['tip']! / 100;
         } else {
           widget.expense.settings.tip = null;
         }

@@ -35,7 +35,7 @@ class Footer extends StatelessWidget {
             ],
             Divider(thickness: 3),
             FooterEntry(
-              label: 'Total',
+              label: 'Your Total',
               value: expense.getConfirmedTotalForUser(authBloc.uid),
               bold: true,
             ),
