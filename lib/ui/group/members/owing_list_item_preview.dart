@@ -12,7 +12,7 @@ import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
-import 'package:statera/data/services/preferences_service.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
 import 'package:statera/utils/preview_helpers.dart';
@@ -33,15 +33,44 @@ class OwingListItemExamples extends StatelessWidget {
   Widget build(BuildContext context) {
     late CustomUser currentUser;
     late CustomUser memberUser;
+    late CustomUser memberUser2;
+    late CustomUser memberUser3;
 
     currentUser = CustomUser(uid: 'foo', name: 'Current User');
     memberUser = CustomUser.fake();
+    memberUser2 = CustomUser.fake();
+    memberUser3 = CustomUser.fake();
     final group = Group(
-      id: 'test_group',
-      name: 'Test Group',
-      members: [currentUser, memberUser],
-      adminId: 'foo',
-    );
+        id: 'test_group',
+        name: 'Test Group',
+        members: [currentUser, memberUser, memberUser2, memberUser3],
+        adminId: 'foo',
+        balance: {
+          '${currentUser.uid}': {
+            '${memberUser.uid}': -10,
+            '${memberUser2.uid}': -10,
+            '${memberUser3.uid}': -10
+          },
+          '${memberUser.uid}': {
+            '${currentUser.uid}': 10,
+            '${memberUser2.uid}': 10,
+            '${memberUser3.uid}': 10
+          },
+          '${memberUser2.uid}': {
+            '${currentUser.uid}': 10,
+            '${memberUser.uid}': -10,
+            '${memberUser3.uid}': -10
+          },
+          '${memberUser3.uid}': {
+            '${currentUser.uid}': 10,
+            '${memberUser.uid}': -10,
+            '${memberUser3.uid}': -10
+          }
+        });
+
+    final expense =
+        Expense(authorUid: 'foo', name: 'test expense', groupId: group.id);
+
     final owingListItem = OwingListItem(member: memberUser, owing: 10);
 
     final defaultAuthService = MockAuthService();
@@ -52,6 +81,13 @@ class OwingListItemExamples extends StatelessWidget {
     final defaultGroupService = MockGroupRepository();
     when(defaultGroupService.groupStream(any))
         .thenAnswer((_) => Stream.fromIterable([group]));
+
+    final mockExpenseService = MockExpenseService();
+    when(mockExpenseService.getPendingExpenses(group.id, memberUser.uid))
+        .thenAnswer((_) => Future.value([expense]));
+    when(mockExpenseService.getPendingAuthoredExpenses(
+            group.id, memberUser.uid))
+        .thenAnswer((_) => Future.value([expense]));
 
     final defaultPaymentService = MockPaymentService();
     when(defaultPaymentService.paymentsStream(
@@ -70,6 +106,7 @@ class OwingListItemExamples extends StatelessWidget {
         ]));
     return Preview(
       providers: [
+        Provider<ExpenseService>.value(value: mockExpenseService),
         Provider.value(value: PreferencesService()),
         Provider<OwingCubit>(
           create: (context) => OwingCubit(),
@@ -81,7 +118,7 @@ class OwingListItemExamples extends StatelessWidget {
         BlocProvider(
           create: (context) => GroupCubit(
             defaultGroupService,
-            MockExpenseService(),
+            mockExpenseService,
             MockUserRepository(),
           )..load((group).id),
         ),
