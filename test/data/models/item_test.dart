@@ -61,7 +61,8 @@ void main() {
 
           for (var i = 0; i < partsList.length; i++) {
             final subTotal = item.getConfirmedSubtotalForUser(i.toString());
-            final taxValue = item.getConfirmedTaxFor(i.toString(), tax: tax);
+            final taxValue =
+                item.getConfirmedTaxForUser(i.toString(), tax: tax);
             expect(
               subTotal + taxValue,
               closeTo(expectedValues[i], 0.01),

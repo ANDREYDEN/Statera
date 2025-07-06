@@ -53,7 +53,7 @@ abstract class Item {
     return total * (tax ?? 0);
   }
 
-  double getConfirmedTaxFor(String uid, {double? tax}) {
+  double getConfirmedTaxForUser(String uid, {double? tax}) {
     if (!isTaxable) return 0;
 
     final taxValue = total * (tax ?? 0);

@@ -125,17 +125,17 @@ class Expense {
     });
   }
 
-  double getConfirmedTipForUser(String uid) {
-    final subtotal = getConfirmedSubtotalForUser(uid);
-    return subtotal * (settings.tip ?? 0);
-  }
-
   double getConfirmedTotalForUser(String uid) {
     final subtotal = getConfirmedSubtotalForUser(uid);
     final tax = getConfirmedTaxForUser(uid);
     final tip = getConfirmedTipForUser(uid);
 
     return subtotal + tax + tip;
+  }
+
+  double getConfirmedTipForUser(String uid) {
+    final subtotal = getConfirmedSubtotalForUser(uid);
+    return subtotal * (settings.tip ?? 0);
   }
 
   double getConfirmedTaxForUser(String uid) {
@@ -145,7 +145,7 @@ class Expense {
       0,
       (prev, item) =>
           prev +
-          item.getConfirmedTaxFor(
+          item.getConfirmedTaxForUser(
             uid,
             tax: settings.tax,
           ),
