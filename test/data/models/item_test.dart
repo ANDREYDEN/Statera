@@ -49,7 +49,6 @@ void main() {
         required List<int?> partsList,
         required List<double> expectedValues,
         double? tax,
-        bool taxOnly = false,
       }) {
         test('when $condition', () {
           item.assignees = [];
@@ -61,13 +60,12 @@ void main() {
           }
 
           for (var i = 0; i < partsList.length; i++) {
+            final subTotal = item.getConfirmedSubtotalForUser(i.toString());
+            final taxValue =
+                item.getConfirmedTaxForUser(i.toString(), tax: tax);
             expect(
-              item.getConfirmedValueFor(
-                uid: i.toString(),
-                tax: tax,
-                taxOnly: taxOnly,
-              ),
-              expectedValues[i],
+              subTotal + taxValue,
+              closeTo(expectedValues[i], 0.01),
             );
           }
         });
@@ -120,15 +118,6 @@ void main() {
             0.0
           ],
         );
-
-        createSharedValueTest(
-          itemWithTax,
-          condition: 'item has tax and calculating only tax',
-          tax: 0.1,
-          taxOnly: true,
-          partsList: [1, 1, 0],
-          expectedValues: [item.total * 0.1 / 2, item.total * 0.1 / 2, 0.0],
-        );
       });
 
       group('when partitioned', () {
@@ -178,19 +167,6 @@ void main() {
           expectedValues: [
             item.total * (1 + 0.1) / item.partition,
             item.total * (1 + 0.1) * 2 / item.partition,
-            0.0
-          ],
-        );
-
-        createSharedValueTest(
-          partitionedItemWithTax,
-          condition: 'item has tax and calculating only tax',
-          tax: 0.1,
-          taxOnly: true,
-          partsList: [1, 2, 0],
-          expectedValues: [
-            item.total * 0.1 / item.partition,
-            item.total * 0.1 * 2 / item.partition,
             0.0
           ],
         );

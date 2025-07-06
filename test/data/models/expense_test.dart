@@ -203,19 +203,33 @@ void main() {
           expense.addItem(item1);
           expense.addItem(item2);
 
-          expect(expense.total, (item1.total + item2.total) * (1 + tax));
+          expect(expense.total, closeTo(182.6, 0.01));
+        });
+
+        test('when some items have tax and expense has a tip', () {
+          var tax = 0.1;
+          expense.settings.tax = tax;
+          expense.settings.tip = 0.2;
+          var item1 = SimpleItem(name: 'big', value: 124, isTaxable: true);
+          var item2 = SimpleItem(name: 'small', value: 42, isTaxable: false);
+          expense.addItem(item1);
+          expense.addItem(item2);
+
+          expect(expense.total, closeTo(211.6, 0.01));
         });
       });
 
       group('gets confirmed totals for assignees', () {
         var firstAssigneeUid = 'first';
         var secondAssigneeUid = 'second';
-        var item1 = SimpleItem(name: 'big', value: 124);
-        var item2 = SimpleItem(name: 'small', value: 42, partition: 3);
+        late SimpleItem item1;
+        late SimpleItem item2;
 
         setUp(() {
           expense.assigneeUids = [firstAssigneeUid, secondAssigneeUid];
 
+          item1 = SimpleItem(name: 'big', value: 124);
+          item2 = SimpleItem(name: 'small', value: 42, partition: 3);
           expense.addItem(item1);
           expense.addItem(item2);
         });
@@ -285,10 +299,10 @@ void main() {
           item2.setAssigneeDecision(secondAssigneeUid, 2);
 
           expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 14);
-          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedSubtotalForUser(firstAssigneeUid), 14);
           expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 0);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 28);
-          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 28);
+          expect(expense.getConfirmedSubtotalForUser(secondAssigneeUid), 28);
           expect(expense.getConfirmedTaxForUser(secondAssigneeUid), 0);
         });
 
@@ -303,10 +317,10 @@ void main() {
           item1.setAssigneeDecision(secondAssigneeUid, 1);
 
           expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 14);
-          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedSubtotalForUser(firstAssigneeUid), 14);
           expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 0);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 136.4);
-          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 124);
+          expect(expense.getConfirmedSubtotalForUser(secondAssigneeUid), 124);
           expect(expense.getConfirmedTaxForUser(secondAssigneeUid), 12.4);
         });
 
@@ -322,12 +336,42 @@ void main() {
           item2.setAssigneeDecision(secondAssigneeUid, 2);
 
           expect(expense.getConfirmedTotalForUser(firstAssigneeUid), 151.8);
-          expect(expense.getConfirmedSubTotalForUser(firstAssigneeUid), 138);
+          expect(expense.getConfirmedSubtotalForUser(firstAssigneeUid), 138);
           expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 13.8);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 30.8);
-          expect(expense.getConfirmedSubTotalForUser(secondAssigneeUid), 28);
+          expect(expense.getConfirmedSubtotalForUser(secondAssigneeUid), 28);
           expect(expense.getConfirmedTaxForUser(secondAssigneeUid),
               closeTo(2.8, 0.01));
+        });
+
+        test('when expense has tax & tip and some items are taxable', () {
+          expense.settings.tax = 0.1;
+          expense.settings.tip = 0.2;
+          item1.isTaxable = true;
+
+          item1.setAssigneeDecision(firstAssigneeUid, 0);
+          item2.setAssigneeDecision(firstAssigneeUid, 1);
+
+          item1.setAssigneeDecision(secondAssigneeUid, 1);
+
+          expect(expense.getConfirmedSubtotalForUser(firstAssigneeUid), 14);
+          expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 0);
+          expect(
+            expense.getConfirmedTipForUser(firstAssigneeUid),
+            closeTo(2.8, 0.01),
+          );
+          expect(
+            expense.getConfirmedTotalForUser(firstAssigneeUid),
+            closeTo(16.8, 0.01),
+          );
+
+          expect(expense.getConfirmedSubtotalForUser(secondAssigneeUid), 124);
+          expect(expense.getConfirmedTaxForUser(secondAssigneeUid), 12.4);
+          expect(expense.getConfirmedTipForUser(secondAssigneeUid), 24.8);
+          expect(
+            expense.getConfirmedTotalForUser(secondAssigneeUid),
+            closeTo(161.2, 0.01),
+          );
         });
       });
     });

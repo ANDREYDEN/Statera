@@ -47,25 +47,28 @@ abstract class Item {
 
   bool get isPartitioned => partition > 1;
 
-  double getValueWithTax(double? tax) {
-    if (tax == null || !isTaxable) return total;
+  double getTaxValue(double? tax) {
+    if (!isTaxable) return 0;
 
-    return total * (1 + tax);
+    return total * (tax ?? 0);
   }
 
-  double getConfirmedValueFor({
-    required String uid,
-    double? tax,
-    bool taxOnly = false,
-  }) {
-    final baseValue = total * (taxOnly ? 0 : 1);
-    final taxValue = total * (isTaxable && tax != null ? tax : 0);
-    final totalValue = baseValue + taxValue;
-    final confirmedPartition = isPartitioned ? partition : confirmedParts;
+  double getConfirmedTaxForUser(String uid, {double? tax}) {
+    if (!isTaxable) return 0;
 
+    final taxValue = total * (tax ?? 0);
+
+    final confirmedPartition = isPartitioned ? partition : confirmedParts;
     if (confirmedPartition == 0) return 0;
 
-    return totalValue * getAssigneeParts(uid) / confirmedPartition;
+    return taxValue * getAssigneeParts(uid) / confirmedPartition;
+  }
+
+  double getConfirmedSubtotalForUser(String uid) {
+    final confirmedPartition = isPartitioned ? partition : confirmedParts;
+    if (confirmedPartition == 0) return 0;
+
+    return total * getAssigneeParts(uid) / confirmedPartition;
   }
 
   bool get completed =>

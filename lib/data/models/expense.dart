@@ -41,10 +41,17 @@ class Expense {
 
   bool get hasTax => settings.tax != null;
 
-  double get total => items.fold<double>(
-      0,
-      (previousValue, item) =>
-          previousValue + item.getValueWithTax(this.settings.tax));
+  bool get hasTip => settings.tip != null;
+
+  double get total {
+    final subtotal = items.fold(0.0, (prev, item) => prev + item.total);
+    final taxValue = items.fold(
+      0.0,
+      (prev, item) => prev + item.getTaxValue(this.settings.tax),
+    );
+    final tipValue = subtotal * (this.settings.tip ?? 0);
+    return subtotal + taxValue + tipValue;
+  }
 
   bool get finalized => finalizedDate != null;
 
@@ -118,34 +125,39 @@ class Expense {
     });
   }
 
-  double getConfirmedSubTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, tax: 0);
+  double getConfirmedTotalForUser(String uid) {
+    final subtotal = getConfirmedSubtotalForUser(uid);
+    final tax = getConfirmedTaxForUser(uid);
+    final tip = getConfirmedTipForUser(uid);
+
+    return subtotal + tax + tip;
   }
 
-  double getConfirmedTotalForUser(String uid) {
-    return _getConfirmedValueFor(uid: uid, tax: this.settings.tax);
+  double getConfirmedTipForUser(String uid) {
+    final subtotal = getConfirmedSubtotalForUser(uid);
+    return subtotal * (settings.tip ?? 0);
   }
 
   double getConfirmedTaxForUser(String uid) {
-    return _getConfirmedValueFor(
-      uid: uid,
-      tax: this.settings.tax,
-      taxOnly: true,
-    );
-  }
-
-  double _getConfirmedValueFor({
-    required String uid,
-    double? tax,
-    bool taxOnly = false,
-  }) {
     if (!this.hasAssignee(uid)) return 0;
 
     return items.fold<double>(
       0,
-      (previousValue, item) =>
-          previousValue +
-          item.getConfirmedValueFor(uid: uid, tax: tax, taxOnly: taxOnly),
+      (prev, item) =>
+          prev +
+          item.getConfirmedTaxForUser(
+            uid,
+            tax: settings.tax,
+          ),
+    );
+  }
+
+  double getConfirmedSubtotalForUser(String uid) {
+    if (!this.hasAssignee(uid)) return 0;
+
+    return items.fold<double>(
+      0,
+      (prev, item) => prev + item.getConfirmedSubtotalForUser(uid),
     );
   }
 
