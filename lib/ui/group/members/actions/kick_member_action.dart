@@ -27,7 +27,7 @@ class KickMemberAction extends MemberAction {
 
     final membersThatMemberOwesTo =
         this.group.getMembersThatMemberOwesTo(user.uid);
-    final members = membersThatMemberOwesTo
+    final outstandingBalanceMembers = membersThatMemberOwesTo
         .map((memberId) => this.group.getMember(memberId))
         .toList();
 
@@ -40,7 +40,7 @@ class KickMemberAction extends MemberAction {
     await KickMemberDialog.show(
       context,
       member: user,
-      members: members,
+      outstandingBalanceMembers: outstandingBalanceMembers,
       pendingExpenses: pendingExpenses,
       pendingAuthoredExpenses: pendingAuthoredExpenses,
     );

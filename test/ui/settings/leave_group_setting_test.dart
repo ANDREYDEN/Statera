@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -67,36 +66,25 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('shows the leave group title and button', (tester) async {
-      await pumpLeaveGroupSetting(tester);
+    group('disables leave button', () {
+      testWidgets('when user is admin', (tester) async {
+        await pumpLeaveGroupSetting(tester, isAdmin: true);
 
-      expect(find.text('Leave the group'), findsOneWidget);
-      expect(find.text('Leave group'), findsOneWidget);
-    });
+        final subtitle =
+            find.textContaining('Transfer ownership to another member first');
+        expect(subtitle, findsOneWidget);
+        final button = find.widgetWithText(DangerButton, 'Leave group');
+        expect(tester.widget<DangerButton>(button).onPressed, isNull);
+      });
 
-    testWidgets('disables leave button when user is admin', (tester) async {
-      await pumpLeaveGroupSetting(tester, isAdmin: true);
+      testWidgets('when user has outstanding balance', (tester) async {
+        await pumpLeaveGroupSetting(tester, hasOutstandingBalance: true);
 
-      final button = find.widgetWithText(DangerButton, 'Leave group');
-      expect(tester.widget<DangerButton>(button).onPressed, isNull);
-    });
-
-    testWidgets('disables leave button when user has outstanding balance',
-        (tester) async {
-      await pumpLeaveGroupSetting(tester, hasOutstandingBalance: true);
-
-      final button = find.widgetWithText(DangerButton, 'Leave group');
-      expect(tester.widget<DangerButton>(button).onPressed, isNull);
-    });
-
-    testWidgets('shows correct subtitle when user has outstanding balance',
-        (tester) async {
-      await pumpLeaveGroupSetting(tester, hasOutstandingBalance: true);
-
-      expect(
-        find.text('"Suck my ass" Oleksii Kvadrober'),
-        findsOneWidget,
-      );
+        final subtitle = find.textContaining('Settle all pending debts first');
+        expect(subtitle, findsOneWidget);
+        final button = find.widgetWithText(DangerButton, 'Leave group');
+        expect(tester.widget<DangerButton>(button).onPressed, isNull);
+      });
     });
 
     testWidgets('enables leave button when user can leave', (tester) async {

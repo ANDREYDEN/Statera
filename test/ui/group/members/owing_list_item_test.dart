@@ -9,6 +9,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
+import 'package:statera/ui/group/members/kick_member/kick_member_info_section.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
 
 import '../../../helpers.dart';
@@ -25,7 +26,8 @@ void main() {
     late CustomUser memberUser;
     late Group testGroup;
     late OwingListItem owingListItem;
-    late Expense expense;
+    late Expense pendingExpense;
+    late Expense pendingAuthoredExpense;
 
     setUp(() {
       currentUser = CustomUser(uid: defaultCurrentUserId, name: 'Current User');
@@ -34,17 +36,33 @@ void main() {
         id: 'test_group',
         name: 'Test Group',
         members: [currentUser, memberUser],
+        balance: {
+          currentUser.uid: {memberUser.uid: -10.0},
+          memberUser.uid: {currentUser.uid: 10.0},
+        },
         adminId: defaultCurrentUserId,
       );
 
       owingListItem = OwingListItem(member: memberUser, owing: 10);
-      expense = Expense(
-          authorUid: defaultCurrentUserId,
-          name: 'test expense',
-          groupId: testGroup.id);
+      pendingExpense = Expense(
+        authorUid: defaultCurrentUserId,
+        name: 'test expense',
+        groupId: testGroup.id,
+      )..addAssignee(memberUser.uid);
+      pendingAuthoredExpense = Expense(
+        authorUid: memberUser.uid,
+        name: 'test authored expense',
+        groupId: testGroup.id,
+      );
 
       when(mockGroupService.groupStream(any))
           .thenAnswer((_) => Stream.fromIterable([testGroup]));
+
+      when(mockExpenseService.getPendingExpenses(testGroup.id!, memberUser.uid))
+          .thenAnswer((_) => Future.value([pendingExpense]));
+      when(mockExpenseService.getPendingAuthoredExpenses(
+              testGroup.id!, memberUser.uid))
+          .thenAnswer((_) => Future.value([pendingAuthoredExpense]));
 
       when(mockPaymentService.paymentsStream(
         groupId: testGroup.id,
@@ -82,9 +100,9 @@ void main() {
       await tester.pump();
     }
 
-    group('shows kick member confirmation dialog', () {
-      testWidgets('member has outstanding balance',
-          (WidgetTester tester) async {
+    group('when kicking member', () {
+      testWidgets('can kick member', (WidgetTester tester) async {
+        await tester.binding.setSurfaceSize(Size(700, 1000));
         testGroup.balance = {
           '${currentUser.uid}': {'${memberUser.uid}': -10},
           '${memberUser.uid}': {'${currentUser.uid}': 10}
@@ -92,10 +110,7 @@ void main() {
 
         await pumpOwingListItem(tester);
 
-        final icon = find.byIcon(Icons.more_vert);
-        await tester.tap(icon);
-        await tester.pumpAndSettle();
-
+        await openOptionsMenu(tester);
         await tester.tap(find.text('Kick Member'));
         await tester.pumpAndSettle();
 
@@ -109,95 +124,108 @@ void main() {
         await tester.pumpAndSettle();
 
         final confirmButton = find.ancestor(
-            of: find.text('Confirm'), matching: find.byType(FilledButton));
+          of: find.text('Confirm'),
+          matching: find.byType(FilledButton),
+        );
         expect(tester.widget<FilledButton>(confirmButton).enabled, isTrue);
         await tester.tap(confirmButton);
 
         verify(mockGroupService.saveGroup(any)).called(1);
       });
 
-      testWidgets('member is author of outstanding expenses',
-          (WidgetTester tester) async {
+      testWidgets('shows outstanding balance', (WidgetTester tester) async {
+        await tester.binding.setSurfaceSize(Size(700, 1000));
         await pumpOwingListItem(tester);
 
-        when(mockExpenseService.getPendingAuthoredExpenses(
-                testGroup.id!, memberUser.uid))
-            .thenAnswer((_) => Future.value([expense]));
-
-        final icon = find.byIcon(Icons.more_vert);
-        await tester.tap(icon);
-        await tester.pumpAndSettle();
-
+        await openOptionsMenu(tester);
         await tester.tap(find.text('Kick Member'));
         await tester.pumpAndSettle();
 
-        expect(
-          find.textContaining(
-              'User is the author of unresolved expenses: ${expense.name}'),
-          findsOneWidget,
+        final sectionTitle = find.text('Outstanding Balance');
+        final section = find.ancestor(
+          of: sectionTitle,
+          matching: find.byType(KickMemberInfoSection),
         );
+        final memberWithPendingBalanceName =
+            find.descendant(of: section, matching: find.text(currentUser.name));
+        expect(memberWithPendingBalanceName, findsOneWidget);
       });
 
-      testWidgets('member is an assignee in any outstanding expenses',
-          (WidgetTester tester) async {
+      testWidgets('shows outstanding expenses', (WidgetTester tester) async {
+        await tester.binding.setSurfaceSize(Size(700, 1000));
         await pumpOwingListItem(tester);
 
-        when(mockExpenseService.getPendingExpenses(
-                testGroup.id!, memberUser.uid))
-            .thenAnswer((_) => Future.value([expense]));
-
-        final icon = find.byIcon(Icons.more_vert);
-        await tester.tap(icon);
-        await tester.pumpAndSettle();
-
+        await openOptionsMenu(tester);
         await tester.tap(find.text('Kick Member'));
         await tester.pumpAndSettle();
 
-        expect(
-          find.textContaining(
-              'Pending expenses where user is involved: ${expense.name}'),
-          findsOneWidget,
+        final sectionTitle = find.text('Pending Expenses');
+        final section = find.ancestor(
+          of: sectionTitle,
+          matching: find.byType(KickMemberInfoSection),
         );
+        final pendingExpenseName = find.descendant(
+          of: section,
+          matching: find.text(pendingExpense.name),
+        );
+        expect(pendingExpenseName, findsOneWidget);
+      });
+
+      testWidgets('shows outstanding authored expenses',
+          (WidgetTester tester) async {
+        await pumpOwingListItem(tester);
+
+        await openOptionsMenu(tester);
+        await tester.tap(find.text('Kick Member'));
+        await tester.pumpAndSettle();
+
+        final sectionTitle = find.text('Pending Authored Expenses');
+        final section = find.ancestor(
+          of: sectionTitle,
+          matching: find.byType(KickMemberInfoSection),
+        );
+        final pendingAuthoredExpenseName = find.descendant(
+          of: section,
+          matching: find.text(pendingAuthoredExpense.name),
+        );
+        expect(pendingAuthoredExpenseName, findsOneWidget);
       });
     });
 
-    group('shows transfer ownership confirmation dialog', () {
-      testWidgets('able to transefer ownership', (WidgetTester tester) async {
-        await pumpOwingListItem(tester);
+    testWidgets('can transfer ownership', (WidgetTester tester) async {
+      await pumpOwingListItem(tester);
 
-        await tester.tap(find.byIcon(Icons.more_vert));
-        await tester.pumpAndSettle();
+      await openOptionsMenu(tester);
 
-        await tester.tap(find.text('Transfer Ownership'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('Transfer Ownership'));
+      await tester.pumpAndSettle();
 
-        expect(
-          find.text(
-              'You are about to Transfer Ownership to "${memberUser.name}"'),
-          findsOneWidget,
-        );
+      expect(
+        find.text(
+            'You are about to Transfer Ownership to "${memberUser.name}"'),
+        findsOneWidget,
+      );
 
-        final test = find.byType(TextField);
-        expect(test, findsOneWidget);
-        await tester.enterText(find.byType(TextField), memberUser.name);
-        await tester.pumpAndSettle();
+      final test = find.byType(TextField);
+      expect(test, findsOneWidget);
+      await tester.enterText(find.byType(TextField), memberUser.name);
+      await tester.pumpAndSettle();
 
-        final confirmButton = find.ancestor(
-            of: find.text('Confirm'), matching: find.byType(FilledButton));
-        expect(tester.widget<FilledButton>(confirmButton).enabled, isTrue);
-        await tester.tap(confirmButton);
+      final confirmButton = find.ancestor(
+        of: find.text('Confirm'),
+        matching: find.byType(FilledButton),
+      );
+      expect(tester.widget<FilledButton>(confirmButton).enabled, isTrue);
+      await tester.tap(confirmButton);
 
-        verify(mockGroupService.saveGroup(any)).called(1);
-      });
+      verify(mockGroupService.saveGroup(any)).called(1);
     });
 
     testWidgets('shows kick member and transfer ownership option in menu',
         (WidgetTester tester) async {
       await pumpOwingListItem(tester);
 
-      final icon = find.byIcon(Icons.more_vert);
-      await tester.tap(icon);
-      await tester.pump();
+      await openOptionsMenu(tester);
 
       expect(find.text('Kick Member'), findsOneWidget);
       expect(find.text('Transfer Ownership'), findsOneWidget);
@@ -208,7 +236,7 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
-    testWidgets('doesnt show options to non admins',
+    testWidgets('does not show options to non admins',
         (WidgetTester tester) async {
       testGroup = Group(
         id: 'test_group',
@@ -222,4 +250,10 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsNothing);
     });
   });
+}
+
+Future<void> openOptionsMenu(WidgetTester tester) async {
+  final icon = find.byIcon(Icons.more_vert);
+  await tester.tap(icon);
+  await tester.pumpAndSettle();
 }

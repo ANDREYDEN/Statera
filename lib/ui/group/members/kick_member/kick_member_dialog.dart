@@ -24,7 +24,7 @@ class KickMemberDialog extends StatelessWidget {
   static Future<void> show(
     BuildContext context, {
     required CustomUser member,
-    required List<CustomUser> members,
+    required List<CustomUser> outstandingBalanceMembers,
     required List<Expense> pendingExpenses,
     required List<Expense> pendingAuthoredExpenses,
   }) {
@@ -32,7 +32,7 @@ class KickMemberDialog extends StatelessWidget {
       context: context,
       builder: (context) => KickMemberDialog(
         member: member,
-        outstandingBalanceMembers: members,
+        outstandingBalanceMembers: outstandingBalanceMembers,
         pendingExpenses: pendingExpenses,
         pendingAuthoredExpenses: pendingAuthoredExpenses,
       ),
