@@ -102,7 +102,6 @@ void main() {
 
     group('when kicking member', () {
       testWidgets('can kick member', (WidgetTester tester) async {
-        await tester.binding.setSurfaceSize(Size(700, 1000));
         testGroup.balance = {
           '${currentUser.uid}': {'${memberUser.uid}': -10},
           '${memberUser.uid}': {'${currentUser.uid}': 10}
@@ -134,7 +133,6 @@ void main() {
       });
 
       testWidgets('shows outstanding balance', (WidgetTester tester) async {
-        await tester.binding.setSurfaceSize(Size(700, 1000));
         await pumpOwingListItem(tester);
 
         await openOptionsMenu(tester);
@@ -152,7 +150,6 @@ void main() {
       });
 
       testWidgets('shows outstanding expenses', (WidgetTester tester) async {
-        await tester.binding.setSurfaceSize(Size(700, 1000));
         await pumpOwingListItem(tester);
 
         await openOptionsMenu(tester);

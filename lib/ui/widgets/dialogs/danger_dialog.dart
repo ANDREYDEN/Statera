@@ -50,7 +50,11 @@ class _DangerDialogState extends State<DangerDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if(widget.body != null) widget.body!, 
+            if (widget.body != null) ...[
+              Flexible(child: SingleChildScrollView(child: widget.body!)),
+              SizedBox(height: 5),
+              Divider()
+            ],
             Text('Please enter the ${widget.valueName} to confirm'),
             TextField(controller: _confirmController),
           ],

@@ -18,9 +18,11 @@ class KickMemberInfoSection extends StatelessWidget {
       return Row(children: [
         Icon(Icons.check_circle_rounded, color: Colors.green),
         SizedBox(width: 5),
-        Text(
-          'No ${title.toLowerCase()}',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Flexible(
+          child: Text(
+            'No ${title.toLowerCase()}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
       ]);
     }
@@ -32,9 +34,11 @@ class KickMemberInfoSection extends StatelessWidget {
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.amber),
             SizedBox(width: 5),
-            Text(
-              title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Flexible(
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

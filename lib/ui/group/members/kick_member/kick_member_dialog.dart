@@ -103,7 +103,6 @@ class KickMemberDialog extends StatelessWidget {
               );
             }).toList(),
           ),
-          SizedBox(height: 32),
         ],
       ),
       valueName: 'member name',
