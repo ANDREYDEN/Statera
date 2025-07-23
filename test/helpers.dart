@@ -78,6 +78,7 @@ Future<void> customPump(
         Provider(create: (_) => platformContext ?? PlatformContext()),
         Provider(create: (_) => LayoutState.narrow()),
         Provider(create: (_) => featureService ?? featureServiceMock),
+        Provider(create: (_) => expenseService ?? defaultExpenseService),
         BlocProvider(
             create: (context) =>
                 ExpenseBloc(expenseService ?? defaultExpenseService)),
