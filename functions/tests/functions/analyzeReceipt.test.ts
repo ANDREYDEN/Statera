@@ -1,4 +1,7 @@
-import { analyzeReceipt, IAnnotateResponse } from '../../src/functions/analyzeReceipt'
+import {
+  analyzeReceipt,
+  IAnnotateResponse,
+} from '../../src/functions/analyzeReceipt'
 import lcboReceiptShortData from '../__stubs__/receipt_data/lcbo/short/data.json'
 import walmartReceiptLongData from '../__stubs__/receipt_data/walmart/long/data.json'
 import walmartReceiptMediumData from '../__stubs__/receipt_data/walmart/medium/data.json'
@@ -16,6 +19,12 @@ jest.mock('@google-cloud/vision', () => ({
   }),
 }))
 
+jest.mock('node-fetch', () => () =>
+  Promise.resolve({
+    buffer: jest.fn(),
+  })
+)
+
 describe('analyzeReceipt', () => {
   it('can analyze a medium Walmart receipt', async () => {
     documentTextDetection.mockResolvedValue([walmartReceiptMediumData])
@@ -24,13 +33,41 @@ describe('analyzeReceipt', () => {
     expect(products).toEqual(walmartReceiptMediumExpected)
   })
 
-  it.each<{ title: string, visionResponse: IAnnotateResponse, store: StoreName }>([
-    { title: 'long Walmart', visionResponse: walmartReceiptLongData as IAnnotateResponse, store: 'walmart' },
-    { title: 'short LCBO', visionResponse: lcboReceiptShortData as IAnnotateResponse, store: 'lcbo' },
-    { title: 'short Metro', visionResponse: metroReceiptShortData as IAnnotateResponse, store: 'metro' },
-    { title: 'medium Metro', visionResponse: metroReceiptMediumData as IAnnotateResponse, store: 'metro' },
-    { title: 'tilted to left', visionResponse: tiltedReceiptLeftData as IAnnotateResponse, store: 'metro' },
-    { title: 'tilted to right', visionResponse: tiltedReceiptRightData as IAnnotateResponse, store: 'metro' },
+  it.each<{
+    title: string
+    visionResponse: IAnnotateResponse
+    store: StoreName
+  }>([
+    {
+      title: 'long Walmart',
+      visionResponse: walmartReceiptLongData as IAnnotateResponse,
+      store: 'walmart',
+    },
+    {
+      title: 'short LCBO',
+      visionResponse: lcboReceiptShortData as IAnnotateResponse,
+      store: 'lcbo',
+    },
+    {
+      title: 'short Metro',
+      visionResponse: metroReceiptShortData as IAnnotateResponse,
+      store: 'metro',
+    },
+    {
+      title: 'medium Metro',
+      visionResponse: metroReceiptMediumData as IAnnotateResponse,
+      store: 'metro',
+    },
+    {
+      title: 'tilted to left',
+      visionResponse: tiltedReceiptLeftData as IAnnotateResponse,
+      store: 'metro',
+    },
+    {
+      title: 'tilted to right',
+      visionResponse: tiltedReceiptRightData as IAnnotateResponse,
+      store: 'metro',
+    },
   ])('can analyze $title receipt', async ({ visionResponse, store }) => {
     documentTextDetection.mockResolvedValue([visionResponse])
     const products = await analyzeReceipt('https://example.com', store)
