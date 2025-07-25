@@ -12,9 +12,9 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 part 'field_data.dart';
 
-class CRUDDialog extends StatefulWidget {
+class CRUDDialog<T> extends StatefulWidget {
   final String title;
-  final FutureOr<void> Function(Map<String, dynamic>) onSubmit;
+  final FutureOr<T> Function(Map<String, dynamic>) onSubmit;
   late final List<ButtonSegment<String>> segments;
   late final Map<String, List<FieldData>> fieldsMap;
   final bool closeAfterSubmit;
@@ -265,14 +265,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
       return;
     }
 
-    await widget.onSubmit(
+    final result = await widget.onSubmit(
       Map.fromEntries(_fields.map(
         (field) => MapEntry(field.id, field.data),
       )),
     );
 
     if (closeAfterSubmit) {
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(result);
     } else {
       _focusOnFirstField();
     }

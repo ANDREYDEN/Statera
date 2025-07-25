@@ -14,7 +14,8 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   late final String _userId;
   late final UserExpenseRepository _userExpenseRepository;
   late final ExpenseService _expenseService;
-  late final GroupRepository _groupService;
+  late final GroupRepository _groupRepository;
+  late final CoordinationRepository _coordinationRepository;
   StreamSubscription? _expensesSubscription;
   static const int expensesPerPage = 10;
 
@@ -23,11 +24,13 @@ class ExpensesCubit extends Cubit<ExpensesState> {
     String userId,
     UserExpenseRepository userExpenseRepository,
     ExpenseService expenseService,
-    GroupRepository groupService,
+    GroupRepository groupRepository,
+    CoordinationRepository coordinationRepository,
   ) : super(ExpensesLoading()) {
     _userExpenseRepository = userExpenseRepository;
     _expenseService = expenseService;
-    _groupService = groupService;
+    _groupRepository = groupRepository;
+    _coordinationRepository = coordinationRepository;
     _groupId = groupId;
     _userId = userId;
   }
@@ -56,51 +59,84 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   }
 
   void loadMore() async {
-    if (state case final ExpensesLoaded currentState) {
-      if (currentState.allLoaded) return;
+    if (state case final ExpensesLoaded loadedState) {
+      if (loadedState.allLoaded) return;
 
-      emit(ExpensesProcessing.fromLoaded(currentState));
-      print('loading more...');
+      emit(loadedState.copyWith(loadingMore: true));
       load(
-        numberOfExpenses: currentState.expenses.length + expensesPerPage,
-        expenseStages: currentState.stages,
+        numberOfExpenses: loadedState.expenses.length + expensesPerPage,
+        expenseStages: loadedState.stages,
       );
     }
   }
 
   Future<String?> addExpense(Expense expense, String? groupId) async {
-    if (state case final ExpensesLoaded currentState) {
-      emit(ExpensesProcessing.fromLoaded(currentState));
-      return await _groupService.addExpense(groupId, expense);
+    if (state case ExpensesLoaded loadedState) {
+      final updatedExpenses = [expense, ...loadedState.expenses];
+      emit(loadedState.copyWith(expenses: updatedExpenses)
+        ..startProcessing(expense.id));
+      return await _groupRepository.addExpense(groupId, expense);
     }
+
     return null;
   }
 
   Future<void> deleteExpense(String expenseId) async {
-    if (state case final ExpensesLoaded currentState) {
-      emit(ExpensesProcessing.fromLoaded(currentState));
-      return await _expenseService.deleteExpense(expenseId);
+    final loadedState = state;
+    if (loadedState is! ExpensesLoaded) return;
+
+    final newExpenses =
+        loadedState.expenses.where((e) => e.id != expenseId).toList();
+    emit(loadedState.copyWith(expenses: newExpenses));
+    try {
+      await _expenseService.deleteExpense(expenseId);
+    } catch (e) {
+      emit(loadedState.copyWith(error: e, errorActionName: 'deleting'));
     }
-    return null;
+  }
+
+  Future<void> updateExpense(
+    Expense updatedExpense, {
+    bool persist = false,
+  }) async {
+    final loadedState = state;
+    if (loadedState is! ExpensesLoaded) return;
+
+    final newExpenses = loadedState.expenses
+        .map((e) => e.id == updatedExpense.id ? updatedExpense : e)
+        .toList();
+
+    emit(loadedState.copyWith(expenses: newExpenses));
+    if (persist) {
+      try {
+        await _expenseService.updateExpense(updatedExpense);
+      } catch (e) {
+        emit(loadedState.copyWith(error: e, errorActionName: 'updating'));
+      }
+    }
+  }
+
+  Future<void> finalizeExpense(Expense expense) async {
+    if (state case ExpensesLoaded loadedState) {
+      emit(loadedState.copyWith()..startProcessing(expense.id));
+
+      await _coordinationRepository.finalizeExpense(expense.id);
+    }
+  }
+
+  Future<void> revertExpense(Expense expense) async {
+    if (state case ExpensesLoaded loadedState) {
+      emit(loadedState.copyWith()..startProcessing(expense.id));
+
+      await _coordinationRepository.revertExpense(expense.id);
+    }
   }
 
   void selectExpenseStages(List<ExpenseStage> expenseStages) {
-    if (state case final ExpensesLoaded currentState) {
-      emit(ExpensesProcessing.fromLoaded(currentState));
-      load(expenseStages: expenseStages);
-    }
-  }
+    if (state is! ExpensesLoaded) return;
 
-  void process() {
-    if (state is ExpensesLoaded) {
-      emit(ExpensesProcessing.fromLoaded(state as ExpensesLoaded));
-    }
-  }
-
-  void stopProcessing() {
-    if (state is ExpensesProcessing) {
-      emit((state as ExpensesProcessing).toLoaded());
-    }
+    emit(ExpensesLoading());
+    load(expenseStages: expenseStages);
   }
 
   @override

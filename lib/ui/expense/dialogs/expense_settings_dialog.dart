@@ -15,6 +15,14 @@ class ExpenseSettingsDialog extends StatefulWidget {
 }
 
 class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
+  late Expense updatedExpense;
+
+  @override
+  void initState() {
+    updatedExpense = widget.expense;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CRUDDialog(
@@ -66,15 +74,15 @@ class _ExpenseSettingsDialogState extends State<ExpenseSettingsDialog> {
         ),
       ],
       onSubmit: (values) async {
-        widget.expense.settings.acceptNewMembers =
+        updatedExpense.settings.acceptNewMembers =
             values['automaticallyAddNewMembers'];
-        widget.expense.settings.showItemDecisions = values['showItemDecisions'];
+        updatedExpense.settings.showItemDecisions = values['showItemDecisions'];
         if (values['is_taxable']) {
           widget.expense.settings.tax = values['tax']! / 100;
           widget.expense.settings.itemsAreTaxableByDefault =
               values['itemsAreTaxableByDefault']!;
         } else {
-          widget.expense.settings.tax = null;
+          updatedExpense.settings.tax = null;
         }
         if (values['has_tip']) {
           widget.expense.settings.tip = values['tip']! / 100;

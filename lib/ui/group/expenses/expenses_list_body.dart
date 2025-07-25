@@ -6,11 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/expense_list_item.dart';
 import 'package:statera/ui/group/expenses/expenses_builder.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 import 'package:statera/utils/stream_extensions.dart';
+import 'package:statera/utils/utils.dart';
 
 class ExpensesListBody extends StatelessWidget {
   const ExpensesListBody({Key? key}) : super(key: key);
@@ -34,45 +36,69 @@ class ExpensesListBody extends StatelessWidget {
       }
     });
 
-    return ExpensesBuilder(
-      onStagesChanged: (_, __) {
-        scrollController.jumpTo(0);
-      },
-      builder: (context, expensesState) {
-        final expenses = expensesState.expenses;
-        if (expenses.isEmpty) {
-          return ListEmpty(text: 'Start by adding an expense');
-        }
+    return BlocListener<ExpensesCubit, ExpensesState>(
+      listenWhen: (previous, current) =>
+          (previous is ExpensesLoaded && current is ExpensesLoaded) &&
+          current.error != null,
+      listener: (context, expensesState) {
+        if (expensesState is! ExpensesLoaded) return;
 
-        return ListView.separated(
-          itemCount: expenses.length + 1,
-          controller: scrollController,
-          itemBuilder: (context, index) {
-            if (index == expenses.length) {
-              if (expensesState.allLoaded) return SizedBox.shrink();
-              return Center(child: CircularProgressIndicator());
+        final error = expensesState.error;
+        if (error == null) return;
+
+        final simplifiedError =
+            'Unexpected error occurred when ${expensesState.errorActionName} the expense. Please try again.';
+        print(error);
+        showErrorSnackBar(context, simplifiedError);
+        final errorService = context.read<ErrorService>();
+        errorService.recordError(error, reason: simplifiedError);
+      },
+      child: BlocListener<ExpensesCubit, ExpensesState>(
+        listenWhen: (previous, current) =>
+            (previous is ExpensesLoaded && current is ExpensesLoaded) &&
+            previous.stagesAreDifferentFrom(current),
+        listener: (_, __) {
+          scrollController.jumpTo(0);
+        },
+        child: ExpensesBuilder(
+          builder: (context, expensesState) {
+            final expenses = expensesState.expenses;
+            if (expenses.isEmpty) {
+              return ListEmpty(text: 'Start by adding an expense');
             }
 
-            var expense = expenses[index];
+            return ListView.separated(
+              itemCount: expenses.length + 1,
+              controller: scrollController,
+              itemBuilder: (context, index) {
+                if (index == expenses.length) {
+                  if (expensesState.allLoaded) return SizedBox.shrink();
+                  return Center(child: CircularProgressIndicator());
+                }
 
-            return OptionallyDismissible(
-              key: Key(expense.id),
-              isDismissible: !isWide && expense.canBeUpdatedBy(authBloc.uid),
-              confirmation:
-                  'Are you sure you want to delete this expense and all of its items?',
-              onDismissed: (_) {
-                expenses.remove(expense);
-                context.read<ExpensesCubit>().deleteExpense(expense.id);
+                var expense = expenses[index];
+
+                return OptionallyDismissible(
+                  key: Key(expense.id),
+                  isDismissible:
+                      !isWide && expense.canBeUpdatedBy(authBloc.uid),
+                  confirmation:
+                      'Are you sure you want to delete this expense and all of its items?',
+                  onDismissed: (_) {
+                    context.read<ExpensesCubit>().deleteExpense(expense.id);
+                  },
+                  child: ExpenseListItem(
+                    expense: expense,
+                    processing:
+                        expensesState.processingExpenseIds.contains(expense.id),
+                  ),
+                );
               },
-              child: ExpenseListItem(
-                expense: expense,
-                processing: expensesState is ExpensesProcessing,
-              ),
+              separatorBuilder: (context, index) => SizedBox(height: 10),
             );
           },
-          separatorBuilder: (context, index) => SizedBox(height: 10),
-        );
-      },
+        ),
+      ),
     );
   }
 }

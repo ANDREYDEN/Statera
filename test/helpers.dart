@@ -11,6 +11,7 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/coordination_repository.mocks.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
@@ -31,6 +32,7 @@ final defaultUserExpensesRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
 final defaultAuthService = MockAuthService();
 final defaultPaymentService = MockPaymentService();
+final defaultCoordinationRepository = MockCoordinationRepository();
 final defaultCurrentUser = MockUser();
 final defaultCurrentUserId = 'foo';
 final defaultGroup = Group(
@@ -47,6 +49,8 @@ Future<void> customPump(
   ExpenseService? expenseService,
   UserExpenseRepository? userExpenseRepository,
   GroupRepository? groupService,
+  PaymentService? paymentService,
+  CoordinationRepository? coordinationRepository,
   UserRepository? userRepository,
   AuthService? authService,
   FeatureService? featureService,
@@ -80,14 +84,18 @@ Future<void> customPump(
         Provider(create: (_) => featureService ?? featureServiceMock),
         Provider(create: (_) => expenseService ?? defaultExpenseService),
         BlocProvider(
-            create: (context) =>
-                ExpenseBloc(expenseService ?? defaultExpenseService)),
+          create: (context) => ExpenseBloc(
+            expenseService ?? defaultExpenseService,
+            coordinationRepository ?? defaultCoordinationRepository,
+          ),
+        ),
         BlocProvider(
-            create: (context) => GroupCubit(
-                  groupService ?? defaultGroupService,
-                  expenseService ?? defaultExpenseService,
-                  userRepository ?? defaultUserRepository,
-                )..load((group ?? defaultGroup).id)),
+          create: (context) => GroupCubit(
+            groupService ?? defaultGroupService,
+            expenseService ?? defaultExpenseService,
+            userRepository ?? defaultUserRepository,
+          )..load((group ?? defaultGroup).id),
+        ),
         BlocProvider(
           create: (context) => ExpensesCubit(
             group?.id ?? defaultGroup.id,
@@ -95,6 +103,7 @@ Future<void> customPump(
             userExpenseRepository ?? defaultUserExpensesRepository,
             expenseService ?? defaultExpenseService,
             groupService ?? defaultGroupService,
+            coordinationRepository ?? defaultCoordinationRepository,
           )..load(),
         ),
         BlocProvider(

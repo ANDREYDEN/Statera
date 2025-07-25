@@ -40,6 +40,15 @@ class ExpenseSettings {
     };
   }
 
+  static ExpenseSettings from(ExpenseSettings other) {
+    return ExpenseSettings(
+      acceptNewMembers: other.acceptNewMembers,
+      showItemDecisions: other.showItemDecisions,
+      itemsAreTaxableByDefault: other.itemsAreTaxableByDefault,
+      tax: other.tax,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

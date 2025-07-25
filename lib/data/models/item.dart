@@ -133,6 +133,20 @@ abstract class Item {
     };
   }
 
+  static Item from(Item other) {
+    var item = other.type == ItemType.simple
+        ? SimpleItem.from(other as SimpleItem)
+        : GasItem.from(other as GasItem);
+    item.id = other.id;
+    item.name = other.name;
+    item.partition = other.partition;
+    item.isTaxable = other.isTaxable;
+    item.assignees = other.assignees
+        .map<AssigneeDecision>((assignee) => AssigneeDecision.from(assignee))
+        .toList();
+    return item;
+  }
+
   static Item fromFirestore(Map<String, dynamic> data) {
     var uuid = Uuid();
     var type = ItemType.fromFirestore(data['type']) ?? ItemType.simple;
