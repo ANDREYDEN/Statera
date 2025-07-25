@@ -16,7 +16,10 @@ class Loader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(this.margin ?? 0),
-      child: CircularProgressIndicator(color: this.color, strokeWidth: width),
+      child: CircularProgressIndicator(
+        color: this.color,
+        strokeWidth: width ?? 4.0,
+      ),
     );
   }
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:statera/custom_theme_builder.dart';
-import 'package:statera/data/services/error_service.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/ui/custom_layout_builder.dart';
 
 import '../data/services/services.dart';
@@ -17,13 +16,10 @@ class Preview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorServiceMock = MockErrorService();
-    when(errorServiceMock.recordError(any)).thenAnswer((_) => Future.value());
-
     return MultiBlocProvider(
       providers: [
         ...providers,
-        Provider<ErrorService>.value(value: errorServiceMock)
+        Provider<ErrorService>.value(value: ErrorServiceMock())
       ],
       child: CustomLayoutBuilder(
         child: CustomThemeBuilder(
