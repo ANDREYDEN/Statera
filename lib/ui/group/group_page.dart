@@ -49,6 +49,7 @@ class GroupPage extends StatefulWidget {
             context.read<UserExpenseRepository>(),
             context.read<ExpenseService>(),
             context.read<GroupRepository>(),
+            context.read<CoordinationRepository>(),
           )..load(),
         ),
         BlocProvider(
@@ -70,6 +71,8 @@ class GroupPage extends StatefulWidget {
 class _GroupPageState extends State<GroupPage> {
   int _selectedNavBarItemIndex = 0;
   PageController _pageController = PageController();
+
+  ExpensesCubit get _expensesCubit => context.read<ExpensesCubit>();
 
   Widget build(BuildContext context) {
     final isWide = context.select((LayoutState state) => state.isWide);
@@ -129,7 +132,14 @@ class _GroupPageState extends State<GroupPage> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) => ExpenseBloc(context.read<ExpenseService>())),
+            create: (context) => ExpenseBloc(
+              context.read<ExpenseService>(),
+              context.read<CoordinationRepository>(),
+              onExpenseUpdated: (expense) {
+                _expensesCubit.updateExpense(expense);
+              },
+            ),
+          ),
           BlocProvider(create: (context) => OwingCubit()),
         ],
         child: isWide

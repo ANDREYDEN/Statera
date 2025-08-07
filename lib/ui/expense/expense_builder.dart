@@ -8,25 +8,25 @@ import 'package:statera/ui/widgets/loader.dart';
 class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
   final Widget Function(BuildContext, ExpenseError)? errorBuilder;
-  final void Function(BuildContext, ExpenseError)? onError;
+  final void Function(BuildContext, Object error)? onUpdateError;
 
   const ExpenseBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
-    this.onError,
+    this.onUpdateError,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ExpenseBloc, ExpenseState>(
       listener: (context, state) {
-        if (state is ExpenseError) {
-          onError?.call(context, state);
+        if (state is ExpenseLoaded && state.error != null) {
+          onUpdateError?.call(context, state.error!);
         }
       },
       listenWhen: (previous, current) {
-        return current is ExpenseError;
+        return current is ExpenseLoaded && current.error != null;
       },
       builder: (expenseContext, state) {
         if (state is ExpenseNotSelected) {
@@ -39,7 +39,7 @@ class ExpenseBuilder extends StatelessWidget {
 
         if (state is ExpenseError) {
           return errorBuilder == null
-              ? Center(child: Text(state.error.toString()))
+              ? Center(child: SelectableText(state.error.toString()))
               : errorBuilder!(expenseContext, state);
         }
 

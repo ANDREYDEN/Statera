@@ -21,4 +21,11 @@ class SimpleItem extends Item {
 
     return {...base, 'value': value};
   }
+
+  static SimpleItem from(SimpleItem other) {
+    return SimpleItem(
+      name: other.name,
+      value: other.value,
+    );
+  }
 }

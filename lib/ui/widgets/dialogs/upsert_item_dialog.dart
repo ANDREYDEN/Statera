@@ -30,14 +30,18 @@ class UpsertItemDialog extends StatelessWidget {
 
     AuthBloc authBloc = context.read<AuthBloc>();
 
-    final itemTaxableByDefault = expenseBloc.state is ExpenseLoaded &&
-        (expenseBloc.state as ExpenseLoaded)
-            .expense
-            .settings
-            .itemsAreTaxableByDefault;
+    Expense? getExpense() {
+      if (expenseBloc.state case final ExpenseLoaded state) {
+        return state.expense;
+      }
 
-    final itemHasTax = expenseBloc.state is ExpenseLoaded &&
-        (expenseBloc.state as ExpenseLoaded).expense.hasTax;
+      return null;
+    }
+
+    final bool itemTaxableByDefault =
+        getExpense()?.settings.itemsAreTaxableByDefault ?? false;
+
+    final bool itemHasTax = getExpense()?.hasTax ?? false;
 
     final simpleItemFields = [
       FieldData<double>(
@@ -168,16 +172,22 @@ class UpsertItemDialog extends StatelessWidget {
           item.partition = newPartition;
         }
 
+        final expense = getExpense();
+        if (expense == null) {
+          return;
+        }
+
+        late final updatedExpense;
+        if (addingItem) {
+          updatedExpense = expense..addItem(item);
+        } else {
+          updatedExpense = expense..updateItem(item);
+        }
+
         expenseBloc.add(
           UpdateRequested(
             issuerUid: authBloc.uid,
-            update: (expense) {
-              if (addingItem) {
-                expense.addItem(item);
-              } else {
-                expense.updateItem(item);
-              }
-            },
+            updatedExpense: updatedExpense,
           ),
         );
       },

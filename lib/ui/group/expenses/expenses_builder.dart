@@ -7,25 +7,17 @@ class ExpensesBuilder extends StatelessWidget {
   final Widget Function(BuildContext, ExpensesLoaded) builder;
   final Widget Function(BuildContext, ExpensesError)? errorBuilder;
   final Widget? loadingWidget;
-  final void Function(BuildContext, ExpensesState)? onStagesChanged;
-  final bool renderExpensesProcessing;
 
   const ExpensesBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.loadingWidget,
-    this.onStagesChanged,
-    this.renderExpensesProcessing = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ExpensesCubit, ExpensesState>(
-      listenWhen: (previous, current) =>
-          (previous is ExpensesLoaded && current is ExpensesLoaded) &&
-          previous.stagesAreDifferentFrom(current),
-      listener: onStagesChanged ?? (_, __) {},
+    return BlocBuilder<ExpensesCubit, ExpensesState>(
       builder: (groupContext, state) {
         if (state is ExpensesLoading) {
           return loadingWidget ?? Center(child: Loader());
@@ -38,20 +30,7 @@ class ExpensesBuilder extends StatelessWidget {
         }
 
         if (state is ExpensesLoaded) {
-          if (!renderExpensesProcessing) {
-            return builder(groupContext, state);
-          }
-
-          return Column(
-            children: [
-              if (state is ExpensesProcessing)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: LinearProgressIndicator(),
-                ),
-              Expanded(child: builder(groupContext, state))
-            ],
-          );
+          return builder(groupContext, state);
         }
 
         return Container();

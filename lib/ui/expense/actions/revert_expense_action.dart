@@ -28,32 +28,14 @@ class RevertExpenseAction extends ExpenseAction {
 
     if (confirmed == false) return;
 
-    final groupCubit = context.read<GroupCubit>();
-    final expensesCubit = context.readOrDefault<ExpensesCubit>();
-    final expenseService = context.read<ExpenseService>();
-    final paymentService = context.read<PaymentService>();
+    final isWide = context.read<LayoutState>().isWide;
 
-    // TODO: use transaction
-    final group = groupCubit.loadedState.group;
-
-    expensesCubit?.process();
-    await expenseService.revertExpense(expense);
-    // add expense payments from all assignees to author
-    final payments = expense.assigneeUids
-        .where((assigneeUid) => assigneeUid != expense.authorUid)
-        .map(
-          (assigneeUid) => Payment.fromRevertedExpense(
-            expense: expense,
-            payerId: assigneeUid,
-            oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
-          ),
-        );
-    await Future.wait(payments.map(paymentService.addPayment));
-
-    groupCubit.update((group) {
-      for (var payment in payments) {
-        group.payOffBalance(payment: payment);
-      }
-    });
+    if (isWide) {
+      final expensesCubit = context.read<ExpensesCubit>();
+      await expensesCubit.revertExpense(expense);
+    } else {
+      final expenseBloc = context.read<ExpenseBloc>();
+      await expenseBloc.revertExpense(expense);
+    }
   }
 }

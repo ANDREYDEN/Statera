@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mockito/annotations.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
 
@@ -10,22 +11,12 @@ class ExpenseService extends Firestore {
 
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
-    if (!expenseDoc.exists)
-      throw new Exception('Expense with id $expenseId does not exist.');
+    if (!expenseDoc.exists) throw EntityNotFoundException<Expense>(expenseId);
     return Expense.fromSnapshot(expenseDoc);
   }
 
   Future<void> updateExpense(Expense expense) {
     return expensesCollection.doc(expense.id).set(expense.toFirestore());
-  }
-
-  Future<void> updateExpenseById(
-    String expenseId,
-    Function(Expense) updater,
-  ) async {
-    var expense = await getExpense(expenseId);
-    updater(expense);
-    await expensesCollection.doc(expense.id).set(expense.toFirestore());
   }
 
   Stream<Expense?> expenseStream(String? expenseId) {
@@ -73,17 +64,6 @@ class ExpenseService extends Firestore {
     }
 
     await Future.wait(outstandingExpenses.map(updateExpense));
-  }
-
-  Future<void> finalizeExpense(String expenseId) async {
-    final expense = await getExpense(expenseId);
-    expense.finalizedDate = Timestamp.now().toDate();
-    await updateExpense(expense);
-  }
-
-  Future<void> revertExpense(Expense expense) async {
-    expense.finalizedDate = null;
-    await updateExpense(expense);
   }
 
   Future<void> deleteExpense(String expenseId) {

@@ -19,6 +19,7 @@ class Expense {
     required this.authorUid,
     this.groupId,
     ExpenseSettings? settings,
+    this.id = '',
   }) {
     this.assigneeUids = [authorUid];
     this.date = DateTime.now();
@@ -187,6 +188,20 @@ class Expense {
       'finalizedDate': finalizedDate,
       'settings': settings.toFirestore(),
     };
+  }
+
+  static Expense from(Expense other) {
+    return Expense(
+      name: other.name,
+      authorUid: other.authorUid,
+      groupId: other.groupId,
+      settings: ExpenseSettings.from(other.settings),
+    )
+      ..id = other.id
+      ..date = other.date
+      ..finalizedDate = other.finalizedDate
+      ..assigneeUids = [...other.assigneeUids]
+      ..items = other.items.map((item) => Item.from(item)).toList();
   }
 
   static Expense fromFirestore(Map<String, dynamic> data, String id) {
