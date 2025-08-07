@@ -13,7 +13,7 @@ class CollapsiblePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Preview(
+    return CustomPreview(
       providers: [
         Provider.value(value: PreferencesService()),
       ],
