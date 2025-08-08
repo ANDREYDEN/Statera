@@ -102,7 +102,7 @@ class OwingListItemExamples extends StatelessWidget {
             )
           ]
         ]));
-    return Preview(
+    return CustomPreview(
       providers: [
         Provider<ExpenseService>.value(value: mockExpenseService),
         Provider.value(value: PreferencesService()),

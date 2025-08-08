@@ -90,7 +90,7 @@ class ItemListItemPreview extends StatelessWidget {
       gasItemWithTenUsers.setAssigneeDecision(user.uid, 1);
     }
 
-    return Preview(
+    return CustomPreview(
       providers: [
         BlocProvider(
           create: (_) => GroupCubit(

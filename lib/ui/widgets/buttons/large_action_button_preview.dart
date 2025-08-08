@@ -5,7 +5,7 @@ import 'package:statera/ui/widgets/buttons/large_action_button.dart';
 import 'package:statera/utils/preview_helpers.dart';
 
 void main() {
-  runApp(Preview(
+  runApp(CustomPreview(
     providers: [Provider.value(value: PreferencesService())],
     body: Padding(
       padding: const EdgeInsets.all(8.0),

@@ -40,7 +40,7 @@ class ListCover extends StatelessWidget {
     when(user.uid).thenReturn('a');
     when(authService.currentUser).thenReturn(user);
 
-    return Preview(
+    return CustomPreview(
       providers: [
         BlocProvider(
           create: (_) => GroupCubit(
