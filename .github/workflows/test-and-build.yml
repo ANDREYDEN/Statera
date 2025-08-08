@@ -203,7 +203,7 @@ jobs:
 
   build_ios:
     name: Build iOS App
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
