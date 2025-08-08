@@ -108,7 +108,7 @@ jobs:
 
   ios-build-artifact:
     name: Build iOS Artifact
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
