@@ -8,7 +8,7 @@ import 'crud_dialog.dart';
 
 main() {
   runApp(
-    Preview(
+    CustomPreview(
       providers: [Provider.value(value: PreferencesService())],
       body: Builder(
         builder: (context) {
