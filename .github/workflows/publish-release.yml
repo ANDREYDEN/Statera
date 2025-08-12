@@ -27,7 +27,7 @@ jobs:
         working-directory: android
 
       - name: Setup Fastlane
-        uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0.2"
           bundler-cache: true
@@ -43,7 +43,7 @@ jobs:
     name: Publish TestFlight Release
     if: github.event.release.prerelease == true
     environment: ios-production
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -115,7 +115,7 @@ jobs:
         working-directory: android
 
       - name: Setup Fastlane
-        uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0.2"
           bundler-cache: true
@@ -156,7 +156,7 @@ jobs:
         run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
 
       - name: Setup Fastlane
-        uses: ruby/setup-ruby@eae47962baca661befdfd24e4d6c34ade04858f7
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0.2"
           bundler-cache: true

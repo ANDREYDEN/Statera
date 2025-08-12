@@ -49,7 +49,7 @@ class ReceiptScanDialogPreview extends StatelessWidget {
       await Future.delayed(1.seconds);
     });
 
-    return Preview(
+    return CustomPreview(
       providers: [
         Provider<FileStorageService>.value(value: mockFileStorageService),
         Provider<Callables>.value(value: mockCallables),
