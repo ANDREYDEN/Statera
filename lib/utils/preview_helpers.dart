@@ -8,11 +8,11 @@ import 'package:statera/ui/custom_layout_builder.dart';
 
 import '../data/services/services.dart';
 
-class Preview extends StatelessWidget {
+class CustomPreview extends StatelessWidget {
   final List<SingleChildWidget> providers;
   final Widget body;
 
-  const Preview({super.key, required this.providers, required this.body});
+  const CustomPreview({super.key, required this.providers, required this.body});
 
   @override
   Widget build(BuildContext context) {

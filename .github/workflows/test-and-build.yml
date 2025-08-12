@@ -7,7 +7,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_VERSION: 18
-  FLUTTER_VERSION: 3.24.5
+  FLUTTER_VERSION: 3.32.8
   JAVA_VERSION: 20
 
 jobs:
@@ -198,12 +198,15 @@ jobs:
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
         working-directory: android
 
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
       - name: Build App bundle
         run: flutter build appbundle
 
   build_ios:
     name: Build iOS App
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
