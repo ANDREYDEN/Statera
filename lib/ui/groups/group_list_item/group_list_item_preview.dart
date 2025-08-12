@@ -67,7 +67,7 @@ class GroupListItemPreview extends StatelessWidget {
     final _userRepository = MockUserRepository();
     final _userGroupRepository = MockUserGroupRepository();
 
-    return Preview(
+    return CustomPreview(
       providers: [
         Provider.value(
             value: GroupsCubit(

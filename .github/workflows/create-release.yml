@@ -5,7 +5,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  FLUTTER_VERSION: 3.24.5
+  FLUTTER_VERSION: 3.32.8
   JAVA_VERSION: 20
 
 jobs:
@@ -108,7 +108,9 @@ jobs:
 
   ios-build-artifact:
     name: Build iOS Artifact
-    runs-on: macos-latest
+    runs-on: macos-15
+    # Disabling this because mac runners are expensive and this job hangs on pod install
+    if: false 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -157,6 +159,7 @@ jobs:
     needs:
       - web-build-artifact
       - android-build-artifact
+      # - ios-build-artifact
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -175,8 +178,8 @@ jobs:
       - name: Rename Android Artifact
         run: mv android-out/app-release.aab ./android.aab
 
-      - name: Rename iOS Artifact
-        run: mv ios-out/statera.ipa ./ios.ipa
+      # - name: Rename iOS Artifact
+      #   run: mv ios-out/statera.ipa ./ios.ipa
 
       - name: Read Version
         id: read-version
@@ -202,4 +205,3 @@ jobs:
           files: |
             web.zip
             android.aab
-            ios.ipa

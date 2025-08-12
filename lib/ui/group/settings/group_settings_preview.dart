@@ -33,7 +33,7 @@ class GroupSettingsPreview extends StatelessWidget {
     when(() => groupCubit.stream).thenAnswer((_) => Stream.fromIterable([]));
     when(() => groupCubit.state).thenReturn(GroupLoaded(group: Group.empty()));
 
-    return Preview(
+    return CustomPreview(
       providers: [
         BlocProvider<AuthBloc>.value(value: authBloc),
         BlocProvider<GroupCubit>.value(value: groupCubit),
