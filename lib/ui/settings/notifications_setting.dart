@@ -2,7 +2,6 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/notifications/notifications_cubit.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
@@ -22,7 +21,6 @@ class _NotificationsSettingState extends State<NotificationsSetting>
 
   NotificationsCubit get _notificationsCubit =>
       context.read<NotificationsCubit>();
-  AuthBloc get _authBloc => context.read<AuthBloc>();
 
   @override
   void initState() {
@@ -38,7 +36,7 @@ class _NotificationsSettingState extends State<NotificationsSetting>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _notificationsCubit.requestPermission(uid: _authBloc.uid);
+    _notificationsCubit.requestPermission();
   }
 
 // TODO: use this

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/authentication/sign_in.dart';
+import 'package:statera/ui/authentication/sign_in_page.dart';
 
 import '../../../integration_test/test_helpers.dart';
 
@@ -40,7 +40,7 @@ void main() {
     });
 
     Future<void> buildSignIn(WidgetTester tester) {
-      return pumpPage(SignIn(), tester, signInCubit: signInCubit);
+      return pumpPage(SignInPage(), tester, signInCubit: signInCubit);
     }
 
     testWidgets(

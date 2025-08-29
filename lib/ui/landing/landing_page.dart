@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:statera/custom_theme_builder.dart';
-import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/groups/group_list_page.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,7 +51,7 @@ class _LandingPageState extends State<LandingPage>
       title: 'Statera',
       actions: [
         TextButton.icon(
-          onPressed: () => context.goNamed(GroupList.name),
+          onPressed: () => context.goNamed(GroupListPage.name),
           icon: Icon(Icons.login),
           label: Text('Log in'),
           style: TextButton.styleFrom(
@@ -119,7 +119,7 @@ class _LandingPageState extends State<LandingPage>
                         ? null
                         : () {
                             if (_selectedOption.platform == null) {
-                              context.goNamed(GroupList.name);
+                              context.goNamed(GroupListPage.name);
                               return;
                             }
 

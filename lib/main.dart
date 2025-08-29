@@ -57,14 +57,16 @@ class Statera extends StatelessWidget {
         child: CustomThemeBuilder(
           builder: (lightTheme, darkTheme) {
             return CustomLayoutBuilder(
-              child: MaterialApp.router(
-                title: kAppName,
-                theme: lightTheme,
-                darkTheme: darkTheme,
-                themeMode: ThemeMode.system,
-                routerConfig: router,
-                debugShowCheckedModeBanner: false,
-              ),
+              child: Builder(builder: (context) {
+                return MaterialApp.router(
+                  title: kAppName,
+                  theme: lightTheme,
+                  darkTheme: darkTheme,
+                  themeMode: ThemeMode.system,
+                  routerConfig: CustomRouterConfig.create(context),
+                  debugShowCheckedModeBanner: false,
+                );
+              }),
             );
           },
         ),
