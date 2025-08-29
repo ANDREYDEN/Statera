@@ -25,7 +25,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     _listenForNotifications(context);
   }
 
-  Future<void> requestPermission({required String uid}) async {
+  Future<void> requestPermission() async {
     try {
       final success = await _notificationService.requestPermission();
       emit(NotificationsState(success));

@@ -36,7 +36,7 @@ class NotificationsInitializer extends StatelessWidget {
       );
     }
 
-    notificationsCubit.requestPermission(uid: uid);
+    notificationsCubit.requestPermission();
 
     if (isHomePage) {
       notificationsCubit.updateToken(uid: uid);
