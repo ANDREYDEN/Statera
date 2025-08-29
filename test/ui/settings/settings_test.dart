@@ -13,7 +13,7 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/color/seed_color_cubit.dart';
 import 'package:statera/ui/color/seed_color_cubit.mocks.dart';
 import 'package:statera/ui/settings/profile_completion/profile_completion.dart';
-import 'package:statera/ui/settings/settings.dart';
+import 'package:statera/ui/settings/settings_page.dart';
 
 import '../../helpers.dart';
 import 'settings_test.mocks.dart';
@@ -74,7 +74,7 @@ Future<void> pumpSettings(WidgetTester tester, {CustomUser? user}) async {
         BlocProvider<NotificationsCubit>.value(value: notificationsCubit),
         BlocProvider<SeedColorCubit>.value(value: seedColorCubit),
       ],
-      child: Settings(),
+      child: SettingsPage(),
     ),
     tester,
   );

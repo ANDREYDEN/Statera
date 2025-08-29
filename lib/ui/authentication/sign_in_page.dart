@@ -1,23 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
+import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/groups/group_list_page.dart';
 import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({Key? key}) : super(key: key);
+class SignInPage extends StatefulWidget {
+  static const String name = 'SignIn';
+  const SignInPage({Key? key}) : super(key: key);
+
+  static Widget init() {
+    return BlocProvider(
+      create: (context) => SignInCubit(context.read<AuthService>()),
+      child: SignInPage(),
+    );
+  }
 
   @override
-  State<SignIn> createState() => _SignInState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInState extends State<SignIn> {
+class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _passwordConfirmController = TextEditingController();
   bool _isSignIn = true;
+
+  Future<void> _handleSubmit() async {
+    final signInCubit = context.read<SignInCubit>();
+    if (_isSignIn) {
+      await signInCubit.signIn(
+        _emailController.text,
+        _passwordController.text,
+      );
+    } else {
+      await signInCubit.signUp(
+        _emailController.text,
+        _passwordController.text,
+        _passwordConfirmController.text,
+      );
+    }
+
+    context.goNamed(GroupListPage.name);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +100,8 @@ class _SignInState extends State<SignIn> {
                       ),
                     SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : _isSignIn
-                              ? () => signInCubit.signIn(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  )
-                              : () => signInCubit.signUp(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                    _passwordConfirmController.text,
-                                  ),
+                      onPressed:
+                          signInState is SignInLoading ? null : _handleSubmit,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 9.0),
                         child: Center(

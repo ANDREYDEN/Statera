@@ -27,7 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AccountDeletionRequested>(_onAccountDeletionRequested);
   }
 
-  String get uid => state.user!.uid;
+  String get uid => state.user?.uid ?? '';
 
   void _onUserChanged(UserChanged event, Emitter<AuthState> emit) {
     emit(event.user != null

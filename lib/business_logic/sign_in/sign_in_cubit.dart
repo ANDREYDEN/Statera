@@ -14,7 +14,7 @@ class SignInCubit extends Cubit<SignInState> {
     _authRepository = authRepository;
   }
 
-  signIn(String email, String password) async {
+  Future<void> signIn(String email, String password) async {
     try {
       emit(SignInLoading());
       await _authRepository.signIn(email, password);
@@ -30,7 +30,11 @@ class SignInCubit extends Cubit<SignInState> {
     }
   }
 
-  signUp(String email, String password, String confirmPassword) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
     try {
       emit(SignInLoading());
       await _authRepository.signUp(email, password, confirmPassword);

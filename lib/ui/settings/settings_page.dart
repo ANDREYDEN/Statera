@@ -8,7 +8,6 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
-import 'package:statera/ui/settings/notifications_setting.dart';
 import 'package:statera/ui/settings/primary_color_picker.dart';
 import 'package:statera/ui/settings/profile_completion/profile_completion.dart';
 import 'package:statera/ui/widgets/buttons/danger_button.dart';
@@ -18,10 +17,10 @@ import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
-class Settings extends StatefulWidget {
+class SettingsPage extends StatefulWidget {
   static const String name = 'Settings';
 
-  const Settings({Key? key}) : super(key: key);
+  const SettingsPage({Key? key}) : super(key: key);
 
   static Widget init() {
     return MultiBlocProvider(
@@ -31,15 +30,16 @@ class Settings extends StatefulWidget {
             ..load(context.read<AuthBloc>().uid),
         )
       ],
-      child: Settings(),
+      child: SettingsPage(),
     );
   }
 
   @override
-  State<Settings> createState() => _SettingsState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsState extends State<Settings> with WidgetsBindingObserver {
+class _SettingsPageState extends State<SettingsPage>
+    with WidgetsBindingObserver {
   AuthBloc get _authBloc => context.read<AuthBloc>();
   FileStorageService get _fileStorageService =>
       context.read<FileStorageService>();
@@ -143,7 +143,6 @@ class _SettingsState extends State<Settings> with WidgetsBindingObserver {
                     text: 'Log Out',
                     onPressed: () {
                       _authBloc.add(LogoutRequested());
-                      Navigator.pop(context);
                     },
                   ),
                 ),

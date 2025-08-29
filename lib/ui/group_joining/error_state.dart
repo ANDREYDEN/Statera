@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:statera/ui/groups/group_list.dart';
+import 'package:statera/ui/groups/group_list_page.dart';
 
 class GroupJoiningErrorState extends StatelessWidget {
   final String error;
@@ -15,7 +15,7 @@ class GroupJoiningErrorState extends StatelessWidget {
         Text(error),
         SizedBox(height: 30),
         ElevatedButton(
-          onPressed: () => context.goNamed(GroupList.name),
+          onPressed: () => context.goNamed(GroupListPage.name),
           child: Text('Back'),
         )
       ],
