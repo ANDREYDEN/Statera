@@ -31,7 +31,9 @@ class CustomRouterConfig {
         GoRoute(
           name: SignInPage.name,
           path: '/sign-in',
-          builder: (_, __) => SignInPage.init(),
+          builder: (_, state) => SignInPage.init(
+            destinationPath: state.uri.queryParameters['destinationPath'],
+          ),
         ),
         GoRoute(
           name: SupportPage.name,
@@ -44,13 +46,9 @@ class CustomRouterConfig {
           builder: (_) => GroupListPage.init(),
           isHomePage: true,
           redirect: (context, routeState) {
-            if (routeState.topRoute is AuthenticatedGoRoute) {
-              return null;
-            }
-
             final authBloc = context.read<AuthBloc>();
             if (authBloc.state.status == AuthStatus.unauthenticated) {
-              return '/sign-in';
+              return '/sign-in?destinationPath=${routeState.uri}';
             }
 
             return null;
@@ -84,6 +82,7 @@ class CustomRouterConfig {
                 AuthenticatedGoRoute(
                   name: GroupJoining.name,
                   path: 'join/:code',
+                  redirect: (context, state) => null,
                   builder: (state) => GroupJoining.init(
                     state.pathParameters['groupId'],
                     state.pathParameters['code'],

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/ui/groups/group_list_page.dart';
 import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -11,12 +10,14 @@ import 'package:statera/utils/utils.dart';
 
 class SignInPage extends StatefulWidget {
   static const String name = 'SignIn';
-  const SignInPage({Key? key}) : super(key: key);
 
-  static Widget init() {
+  final String? destinationPath;
+  const SignInPage({Key? key, this.destinationPath}) : super(key: key);
+
+  static Widget init({required String? destinationPath}) {
     return BlocProvider(
       create: (context) => SignInCubit(context.read<AuthService>()),
-      child: SignInPage(),
+      child: SignInPage(destinationPath: destinationPath),
     );
   }
 
@@ -45,7 +46,7 @@ class _SignInPageState extends State<SignInPage> {
       );
     }
 
-    context.goNamed(GroupListPage.name);
+    context.replace(widget.destinationPath ?? '/groups');
   }
 
   @override
