@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/platform_context.dart';
+import 'package:statera/ui/widgets/buttons/google_sign_in_button.dart';
+import 'package:statera/ui/widgets/buttons/apple_sign_in_button.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
@@ -136,41 +138,24 @@ class _SignInPageState extends State<SignInPage> {
                         ],
                       ),
                     ),
-                    // TODO: Add Google icon
                     if (platformContext.isWeb ||
                         platformContext.isMobile ||
                         platformContext.isWindows)
-                      ElevatedButton(
+                      GoogleSignInButton(
                         onPressed: signInState is SignInLoading
                             ? null
                             : () => signInCubit.signInWithGoogle(),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 9.0),
-                          child: Center(
-                            child: signInState is SignInLoading
-                                ? Loader()
-                                : Text(_isSignIn
-                                    ? 'Sign in with Google'
-                                    : 'Sign up with Google'),
-                          ),
-                        ),
+                        isLoading: signInState is SignInLoading,
+                        isSignUp: !_isSignIn,
                       ),
                     SizedBox(height: 8),
                     if (platformContext.isApple)
-                      ElevatedButton(
+                      AppleSignInButton(
                         onPressed: signInState is SignInLoading
                             ? null
                             : () => signInCubit.signInWithApple(),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 9.0),
-                          child: Center(
-                            child: signInState is SignInLoading
-                                ? Loader()
-                                : Text(_isSignIn
-                                    ? 'Sign in with Apple'
-                                    : 'Sign up with Apple'),
-                          ),
-                        ),
+                        isLoading: signInState is SignInLoading,
+                        isSignUp: !_isSignIn,
                       ),
                     SizedBox(height: 20),
                     TextButton(

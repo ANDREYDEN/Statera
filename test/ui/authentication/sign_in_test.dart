@@ -37,6 +37,8 @@ void main() {
           .thenAnswer((_) async => userCredential);
       when(() => signInCubit.signInWithGoogle())
           .thenAnswer((_) async => userCredential);
+      when(() => signInCubit.signInWithApple())
+          .thenAnswer((_) async => userCredential);
     });
 
     Future<void> buildSignIn(WidgetTester tester) {
@@ -96,6 +98,18 @@ void main() {
         await tester.tap(signUpButton);
 
         verify(() => signInCubit.signUp(any(), any(), any())).called(1);
+      },
+    );
+
+    testWidgets(
+      'clicking Google sign in button calls the signInWithGoogle method',
+      (WidgetTester tester) async {
+        await buildSignIn(tester);
+
+        var googleSignInButton = find.text('Sign in with Google');
+        await tester.tap(googleSignInButton);
+
+        verify(() => signInCubit.signInWithGoogle()).called(1);
       },
     );
   });
