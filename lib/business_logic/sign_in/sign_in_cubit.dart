@@ -61,7 +61,6 @@ class SignInCubit extends Cubit<SignInState> {
       await Future.any([timeout, signInTask]);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
-      print(firebaseError);
       final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
           ? kSignInWithGoogleMessages[firebaseError.code]!
           : 'Error while authenticating: ${firebaseError.message}';
