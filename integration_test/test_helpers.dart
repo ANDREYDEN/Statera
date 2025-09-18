@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
@@ -16,7 +17,20 @@ Future<void> pumpPage(
     firestore: FakeFirebaseFirestore(),
     child: Provider<LayoutState>.value(
       value: LayoutState(BoxConstraints(maxWidth: 600)),
-      child: MaterialApp(home: page),
+      child: Builder(builder: (context) {
+        return MaterialApp.router(
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                name: 'Test',
+                path: '/',
+                builder: (_, __) => page,
+              ),
+            ],
+          ),
+        );
+      }),
     ),
   );
 

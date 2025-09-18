@@ -14,7 +14,7 @@ class SignInCubit extends Cubit<SignInState> {
     _authRepository = authRepository;
   }
 
-  signIn(String email, String password) async {
+  Future<void> signIn(String email, String password) async {
     try {
       emit(SignInLoading());
       await _authRepository.signIn(email, password);
@@ -30,7 +30,11 @@ class SignInCubit extends Cubit<SignInState> {
     }
   }
 
-  signUp(String email, String password, String confirmPassword) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
     try {
       emit(SignInLoading());
       await _authRepository.signUp(email, password, confirmPassword);
@@ -57,7 +61,6 @@ class SignInCubit extends Cubit<SignInState> {
       await Future.any([timeout, signInTask]);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
-      print(firebaseError);
       final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
           ? kSignInWithGoogleMessages[firebaseError.code]!
           : 'Error while authenticating: ${firebaseError.message}';

@@ -13,17 +13,17 @@ import 'package:statera/ui/groups/notifications_reminder.dart';
 import 'package:statera/ui/groups/settings_badge.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/platform_context.dart';
-import 'package:statera/ui/settings/settings.dart';
+import 'package:statera/ui/settings/settings_page.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
 
-class GroupList extends StatelessWidget {
+class GroupListPage extends StatelessWidget {
   static const String name = 'GroupList';
 
-  const GroupList({Key? key}) : super(key: key);
+  const GroupListPage({Key? key}) : super(key: key);
 
   static Widget init() {
     return MultiBlocProvider(
@@ -40,7 +40,7 @@ class GroupList extends StatelessWidget {
             ..load(context.read<AuthBloc>().uid),
         )
       ],
-      child: GroupList(),
+      child: GroupListPage(),
     );
   }
 
@@ -58,7 +58,7 @@ class GroupList extends StatelessWidget {
               icon: Icon(Icons.info_outline_rounded),
             ),
             IconButton(
-              onPressed: () => context.goNamed(Settings.name),
+              onPressed: () => context.goNamed(SettingsPage.name),
               icon: SettingsBadge(child: Icon(Icons.settings_outlined)),
             ),
           ],
