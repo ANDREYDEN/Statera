@@ -35,10 +35,7 @@ class _SignInPageState extends State<SignInPage> {
   Future<void> _handleSubmit() async {
     final signInCubit = context.read<SignInCubit>();
     if (_isSignIn) {
-      await signInCubit.signIn(
-        _emailController.text,
-        _passwordController.text,
-      );
+      await signInCubit.signIn(_emailController.text, _passwordController.text);
     } else {
       await signInCubit.signUp(
         _emailController.text,
@@ -101,8 +98,9 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed:
-                        signInState is SignInLoading ? null : _handleSubmit,
+                    onPressed: signInState is SignInLoading
+                        ? null
+                        : _handleSubmit,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 9.0),
                       child: Center(
@@ -131,7 +129,7 @@ class _SignInPageState extends State<SignInPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text('or'),
                         ),
-                        Expanded(child: Divider())
+                        Expanded(child: Divider()),
                       ],
                     ),
                   ),
@@ -154,7 +152,7 @@ class _SignInPageState extends State<SignInPage> {
                         SocialSignInButton.apple(
                           onPressed: signInCubit.signInWithApple,
                           isLoading: signInState is SignInLoading,
-                        )
+                        ),
                     ],
                   ),
                   SizedBox(height: 20),
@@ -166,10 +164,12 @@ class _SignInPageState extends State<SignInPage> {
                               _isSignIn = !_isSignIn;
                             });
                           },
-                    child: Text(_isSignIn
-                        ? 'Create an account'
-                        : 'Already have an account?'),
-                  )
+                    child: Text(
+                      _isSignIn
+                          ? 'Create an account'
+                          : 'Already have an account?',
+                    ),
+                  ),
                 ],
               ),
             ),
