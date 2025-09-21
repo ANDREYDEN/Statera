@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:statera/ui/widgets/buttons/google_sign_in_button.dart';
+import 'package:statera/ui/widgets/buttons/social_sign_in_button.dart';
 import 'package:statera/ui/widgets/buttons/apple_sign_in_button.dart';
 
 void main() {
   group('Sign-in Button Tests', () {
-    testWidgets('GoogleSignInButton displays correctly', (WidgetTester tester) async {
+    testWidgets('GoogleSignInButton displays correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GoogleSignInButton(
+            body: SocialSignInButton(
               onPressed: () {},
               isSignUp: false,
             ),
@@ -21,11 +22,12 @@ void main() {
       expect(find.text('G'), findsOneWidget);
     });
 
-    testWidgets('GoogleSignInButton shows loading state', (WidgetTester tester) async {
+    testWidgets('GoogleSignInButton shows loading state',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GoogleSignInButton(
+            body: SocialSignInButton(
               onPressed: () {},
               isLoading: true,
             ),
@@ -36,7 +38,8 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('AppleSignInButton displays correctly', (WidgetTester tester) async {
+    testWidgets('AppleSignInButton displays correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -52,7 +55,8 @@ void main() {
       expect(find.byIcon(Icons.apple), findsOneWidget);
     });
 
-    testWidgets('AppleSignInButton shows loading state', (WidgetTester tester) async {
+    testWidgets('AppleSignInButton shows loading state',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -67,11 +71,12 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('GoogleSignInButton shows sign up text when isSignUp is true', (WidgetTester tester) async {
+    testWidgets('GoogleSignInButton shows sign up text when isSignUp is true',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GoogleSignInButton(
+            body: SocialSignInButton(
               onPressed: () {},
               isSignUp: true,
             ),
@@ -82,7 +87,8 @@ void main() {
       expect(find.text('Sign up with Google'), findsOneWidget);
     });
 
-    testWidgets('AppleSignInButton shows sign up text when isSignUp is true', (WidgetTester tester) async {
+    testWidgets('AppleSignInButton shows sign up text when isSignUp is true',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

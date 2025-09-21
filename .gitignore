@@ -47,10 +47,6 @@ serviceAccount.json
 *.cache
 receipts
 
-# Screenshots and demo files
-*.png
-/tmp/
-
 # fastlane specific
 **/fastlane/report.xml
 
