@@ -163,6 +163,7 @@ class _SignInPageState extends State<SignInPage> {
                         : () {
                             setState(() {
                               _isSignIn = !_isSignIn;
+                              signInCubit.clearError();
                             });
                           },
                     child: Text(

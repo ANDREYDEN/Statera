@@ -25,8 +25,9 @@ class SignInCubit extends Cubit<SignInState> {
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
     } catch (genericError) {
-      emit(SignInError(
-          error: 'Something went wrong: ${genericError.toString()}'));
+      emit(
+        SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+      );
     }
   }
 
@@ -45,20 +46,17 @@ class SignInCubit extends Cubit<SignInState> {
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
     } catch (genericError) {
-      emit(SignInError(
-          error: 'Something went wrong: ${genericError.toString()}'));
+      emit(
+        SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+      );
     }
   }
 
   signInWithGoogle() async {
     try {
       emit(SignInLoading());
-      final signInTask = _authRepository.signInWithGoogle();
-      final timeout = Future.delayed(
-        Duration(seconds: 20),
-        () => throw Exception('Timeout'),
-      );
-      await Future.any([timeout, signInTask]);
+      final cred = await _authRepository.signInWithGoogle();
+      print(cred);
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
       final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
@@ -71,7 +69,6 @@ class SignInCubit extends Cubit<SignInState> {
         null,
         reason: 'Sign In with Google Failed',
       );
-      print(genericError);
       emit(
         SignInError(error: 'Something went wrong: ${genericError.toString()}'),
       );
@@ -93,5 +90,9 @@ class SignInCubit extends Cubit<SignInState> {
         SignInError(error: 'Something went wrong: ${genericError.toString()}'),
       );
     }
+  }
+
+  clearError() {
+    if (state is SignInError) emit(SignInLoaded());
   }
 }

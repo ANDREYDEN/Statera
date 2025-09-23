@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SocialSignInButton extends StatelessWidget {
   final void Function()? onPressed;
@@ -25,10 +26,10 @@ class SocialSignInButton extends StatelessWidget {
     final assetName =
         '${type}_icon_button_${isDarkMode ? 'light' : 'dark'}.png';
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
+    final result = MouseRegion(
+      cursor: isLoading ? MouseCursor.defer : SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: onPressed,
+        onTap: isLoading ? null : onPressed,
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -36,5 +37,13 @@ class SocialSignInButton extends StatelessWidget {
         ),
       ),
     );
+
+    if (isLoading) {
+      return result
+          .animate(onPlay: (controller) => controller.repeat(reverse: true))
+          .fade(duration: 1.seconds, begin: 1, end: 0.25);
+    }
+
+    return result;
   }
 }
