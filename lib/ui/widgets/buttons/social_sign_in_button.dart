@@ -33,7 +33,7 @@ class SocialSignInButton extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Image.asset('images/$assetName'),
+          child: Image.asset('images/$assetName', semanticLabel: '$type icon'),
         ),
       ),
     );
