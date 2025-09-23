@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/platform_context.dart';
+import 'package:statera/ui/widgets/buttons/social_sign_in_button.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
@@ -34,10 +35,7 @@ class _SignInPageState extends State<SignInPage> {
   Future<void> _handleSubmit() async {
     final signInCubit = context.read<SignInCubit>();
     if (_isSignIn) {
-      await signInCubit.signIn(
-        _emailController.text,
-        _passwordController.text,
-      );
+      await signInCubit.signIn(_emailController.text, _passwordController.text);
     } else {
       await signInCubit.signUp(
         _emailController.text,
@@ -61,132 +59,120 @@ class _SignInPageState extends State<SignInPage> {
           child: Center(
             child: Container(
               width: 500,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                child: ListView(
-                  children: [
-                    SizedBox(height: 50),
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                      ),
-                      enabled: signInState is! SignInLoading,
+              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+              child: ListView(
+                children: [
+                  Image.asset('images/logo.png', height: 150),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
                     ),
-                    SizedBox(height: 8),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                      ),
-                      obscureText: true,
-                      enabled: signInState is! SignInLoading,
+                    enabled: signInState is! SignInLoading,
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
                     ),
-                    if (!_isSignIn)
-                      Column(
-                        children: [
-                          SizedBox(height: 8),
-                          TextField(
-                            controller: _passwordConfirmController,
-                            decoration: InputDecoration(
-                              labelText: 'Confirm Password',
-                              border: OutlineInputBorder(),
-                            ),
-                            obscureText: true,
-                            enabled: signInState is! SignInLoading,
+                    obscureText: true,
+                    enabled: signInState is! SignInLoading,
+                  ),
+                  if (!_isSignIn)
+                    Column(
+                      children: [
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: _passwordConfirmController,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            border: OutlineInputBorder(),
                           ),
-                        ],
-                      ),
-                    SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed:
-                          signInState is SignInLoading ? null : _handleSubmit,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Center(
-                          child: signInState is SignInLoading
-                              ? Loader()
-                              : Text(_isSignIn ? 'Sign In' : 'Sign Up'),
+                          obscureText: true,
+                          enabled: signInState is! SignInLoading,
                         ),
+                      ],
+                    ),
+                  SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: signInState is SignInLoading
+                        ? null
+                        : _handleSubmit,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 9.0),
+                      child: Center(
+                        child: signInState is SignInLoading
+                            ? Loader()
+                            : Text(_isSignIn ? 'Sign In' : 'Sign Up'),
                       ),
                     ),
-                    if (signInState is SignInError)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Center(
-                          child: Text(
-                            signInState.error,
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
+                  ),
+                  if (signInState is SignInError)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Row(
-                        children: [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('or'),
-                          ),
-                          Expanded(child: Divider())
-                        ],
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Center(
+                        child: Text(
+                          signInState.error,
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ),
                     ),
-                    // TODO: Add Google icon
-                    if (platformContext.isWeb ||
-                        platformContext.isMobile ||
-                        platformContext.isWindows)
-                      ElevatedButton(
-                        onPressed: signInState is SignInLoading
-                            ? null
-                            : () => signInCubit.signInWithGoogle(),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 9.0),
-                          child: Center(
-                            child: signInState is SignInLoading
-                                ? Loader()
-                                : Text(_isSignIn
-                                    ? 'Sign in with Google'
-                                    : 'Sign up with Google'),
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('or'),
                         ),
-                      ),
-                    SizedBox(height: 8),
-                    if (platformContext.isApple)
-                      ElevatedButton(
-                        onPressed: signInState is SignInLoading
-                            ? null
-                            : () => signInCubit.signInWithApple(),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 9.0),
-                          child: Center(
-                            child: signInState is SignInLoading
-                                ? Loader()
-                                : Text(_isSignIn
-                                    ? 'Sign in with Apple'
-                                    : 'Sign up with Apple'),
-                          ),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    _isSignIn ? 'Sign in with:' : 'Sign up with:',
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (platformContext.isWeb ||
+                          platformContext.isMobile ||
+                          platformContext.isWindows)
+                        SocialSignInButton.google(
+                          onPressed: signInCubit.signInWithGoogle,
+                          isLoading: signInState is SignInLoading,
                         ),
-                      ),
-                    SizedBox(height: 20),
-                    TextButton(
-                      onPressed: signInState is SignInLoading
-                          ? null
-                          : () {
-                              setState(() {
-                                _isSignIn = !_isSignIn;
-                              });
-                            },
-                      child: Text(_isSignIn
+                      if (platformContext.isApple)
+                        SocialSignInButton.apple(
+                          onPressed: signInCubit.signInWithApple,
+                          isLoading: signInState is SignInLoading,
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: signInState is SignInLoading
+                        ? null
+                        : () {
+                            setState(() {
+                              _isSignIn = !_isSignIn;
+                              signInCubit.clearError();
+                            });
+                          },
+                    child: Text(
+                      _isSignIn
                           ? 'Create an account'
-                          : 'Already have an account?'),
-                    )
-                  ],
-                ),
+                          : 'Already have an account?',
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
