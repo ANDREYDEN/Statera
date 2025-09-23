@@ -45,10 +45,10 @@ class _ItemDecisionsState extends State<ItemDecisions> {
         builder: (_, group) => ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
             colors: [
-              Colors.white.withOpacity(_showStartBlur ? 0.05 : 1),
+              Colors.white.withAlpha(_showStartBlur ? 13 : 255),
               Colors.white,
               Colors.white,
-              Colors.white.withOpacity(_showEndBlur ? 0.05 : 1),
+              Colors.white.withAlpha(_showEndBlur ? 13 : 255),
             ],
             stops: [0, 0.2, 0.8, 1],
             tileMode: TileMode.mirror,
@@ -60,31 +60,32 @@ class _ItemDecisionsState extends State<ItemDecisions> {
             children: [...widget.item.assignees]
                 .where((assigneeDecision) => (assigneeDecision.parts ?? 0) > 0)
                 .map((assigneeDecision) {
-              if (!group.memberExists(assigneeDecision.uid))
-                return Icon(Icons.error);
+                  if (!group.memberExists(assigneeDecision.uid))
+                    return Icon(Icons.error);
 
-              var member = group.getMember(assigneeDecision.uid);
+                  var member = group.getMember(assigneeDecision.uid);
 
-              if (!widget.item.isPartitioned)
-                return UserAvatar(author: member, dimension: 30);
+                  if (!widget.item.isPartitioned)
+                    return UserAvatar(author: member, dimension: 30);
 
-              return Padding(
-                padding: const EdgeInsets.only(right: 2.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    color: Theme.of(context).colorScheme.surface,
-                    child: Row(
-                      children: [
-                        SizedBox(width: 4),
-                        Text(assigneeDecision.parts.toString()),
-                        UserAvatar(author: member, dimension: 30),
-                      ],
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 2.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 4),
+                            Text(assigneeDecision.parts.toString()),
+                            UserAvatar(author: member, dimension: 30),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                })
+                .toList(),
           ),
         ),
       ),

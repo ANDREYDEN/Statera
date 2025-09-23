@@ -48,7 +48,7 @@ class PreferencesService {
 
   Future<void> setPrimaryColor(Color color) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('primary_color', color.value);
+    await prefs.setInt('primary_color', color.toARGB32());
   }
 
   Future<void> clear() async {
