@@ -62,7 +62,8 @@ class _SignInPageState extends State<SignInPage> {
               padding: const EdgeInsets.symmetric(horizontal: 50.0),
               child: ListView(
                 children: [
-                  SizedBox(height: 50),
+                  Image.asset('images/logo.png', height: 150),
+                  SizedBox(height: 20),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
