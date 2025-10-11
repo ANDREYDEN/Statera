@@ -41,13 +41,18 @@ class OwingsList extends StatelessWidget {
                     return Center(child: Loader());
                   }
 
-                  final mostRecentPaymentMap = newPaymentsState.mostRecentPaymentMap;
+                  final mostRecentPaymentMap =
+                      newPaymentsState.mostRecentPaymentMap;
                   final paymentCount = newPaymentsState.paymentCount;
                   final userOwings = owings.entries.toList();
                   userOwings.sort((a, b) {
                     final aDate = mostRecentPaymentMap[a.key.uid];
                     final bDate = mostRecentPaymentMap[b.key.uid];
-                    if (aDate == null && bDate == null) return 0;
+                    if (aDate == null && bDate == null) {
+                      return a.key.name.toLowerCase().compareTo(
+                        b.key.name.toLowerCase(),
+                      );
+                    }
                     if (aDate == null && bDate != null) return 1;
                     if (aDate != null && bDate == null) return -1;
 
