@@ -53,11 +53,10 @@ class GroupPage extends StatefulWidget {
           )..load(),
         ),
         BlocProvider(
-          create: (context) => NewPaymentsCubit(context.read<PaymentService>())
-            ..load(
-              groupId: groupId,
-              uid: context.read<AuthBloc>().uid,
-            ),
+          create: (context) => NewPaymentsCubit(
+            context.read<PaymentService>(),
+            context.read<ErrorService>(),
+          )..load(groupId: groupId, uid: context.read<AuthBloc>().uid),
         ),
       ],
       child: GroupPage(groupId: groupId),
@@ -94,7 +93,7 @@ class _GroupPageState extends State<GroupPage> {
         label: 'Settings',
         icon: Icons.settings_outlined,
         activeIcon: Icons.settings_rounded,
-      )
+      ),
     ];
 
     return PageScaffold(
@@ -105,17 +104,17 @@ class _GroupPageState extends State<GroupPage> {
       onFabPressed: isWide || _selectedNavBarItemIndex != 1
           ? null
           : () => NewExpenseDialog.show(
-                context,
-                afterAddition: (expenseId) {
-                  context.goNamed(
-                    ExpensePage.name,
-                    pathParameters: {
-                      'expenseId': expenseId!,
-                      'groupId': widget.groupId!
-                    },
-                  );
-                },
-              ),
+              context,
+              afterAddition: (expenseId) {
+                context.goNamed(
+                  ExpensePage.name,
+                  pathParameters: {
+                    'expenseId': expenseId!,
+                    'groupId': widget.groupId!,
+                  },
+                );
+              },
+            ),
       bottomNavBar: isWide
           ? null
           : GroupBottomNavBar(

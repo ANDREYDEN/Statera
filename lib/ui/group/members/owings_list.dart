@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/services/services.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
-import 'package:statera/ui/group/members/owing_list_item.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_button.dart';
+import 'package:statera/ui/group/members/owing_list_item.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -17,7 +16,6 @@ class OwingsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authBloc = context.watch<AuthBloc>();
-    final paymentService = context.watch<PaymentService>();
 
     return Column(
       children: [
@@ -37,46 +35,39 @@ class OwingsList extends StatelessWidget {
                 );
               }
 
-              return FutureBuilder<Map<String, DateTime>>(
-                  future: paymentService.getMostRecentPaymentDateForMembers(
-                      group, authBloc.uid),
-                  builder: (context, snap) {
-                    if (snap.connectionState != ConnectionState.done) {
-                      return Center(child: Loader());
-                    }
+              return BlocBuilder<NewPaymentsCubit, NewPaymentsState>(
+                builder: (context, newPaymentsState) {
+                  if (newPaymentsState.isLoading) {
+                    return Center(child: Loader());
+                  }
 
-                    if (snap.hasError) {
-                      debugPrint(snap.error.toString());
-                      debugPrintStack(stackTrace: snap.stackTrace);
-                    }
+                  final mostRecentPaymentMap = newPaymentsState.mostRecentPaymentMap;
+                  final paymentCount = newPaymentsState.paymentCount;
+                  final userOwings = owings.entries.toList();
+                  userOwings.sort((a, b) {
+                    final aDate = mostRecentPaymentMap[a.key.uid];
+                    final bDate = mostRecentPaymentMap[b.key.uid];
+                    if (aDate == null && bDate == null) return 0;
+                    if (aDate == null && bDate != null) return 1;
+                    if (aDate != null && bDate == null) return -1;
 
-                    final order = snap.data;
-
-                    final userOwings = owings.entries.toList();
-                    if (order != null) {
-                      userOwings.sort((a, b) {
-                        final aDate = order[a.key.uid];
-                        final bDate = order[b.key.uid];
-                        if (aDate == null && bDate == null) return 0;
-                        if (aDate == null && bDate != null) return 1;
-                        if (aDate != null && bDate == null) return -1;
-
-                        return bDate!.compareTo(aDate!);
-                      });
-                    }
-
-                    return ListView.separated(
-                      itemCount: userOwings.length,
-                      itemBuilder: ((context, index) {
-                        var userOwing = userOwings[index];
-                        return OwingListItem(
-                          member: userOwing.key,
-                          owing: userOwing.value,
-                        );
-                      }),
-                      separatorBuilder: (context, index) => Divider(height: 10),
-                    );
+                    return bDate!.compareTo(aDate!);
                   });
+
+                  return ListView.separated(
+                    itemCount: userOwings.length,
+                    itemBuilder: ((context, index) {
+                      var userOwing = userOwings[index];
+                      return OwingListItem(
+                        member: userOwing.key,
+                        owing: userOwing.value,
+                        newPaymentsCount: paymentCount[userOwing.key.uid] ?? 0,
+                      );
+                    }),
+                    separatorBuilder: (context, index) => Divider(height: 10),
+                  );
+                },
+              );
             },
           ),
         ),

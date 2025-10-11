@@ -9,6 +9,7 @@ import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
@@ -23,6 +24,7 @@ void main() {
 
 class MockUser extends Mock implements User {
   String get uid =>
+      // ignore: invalid_use_of_visible_for_testing_member
       super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
 }
 
@@ -41,35 +43,39 @@ class OwingListItemExamples extends StatelessWidget {
     memberUser2 = CustomUser.fake(name: 'John Doe');
     memberUser3 = CustomUser.fake(name: 'Jane Doe');
     final group = Group(
-        id: 'test_group',
-        name: 'Test Group',
-        members: [currentUser, memberUser, memberUser2, memberUser3],
-        adminId: currentUser.uid,
-        balance: {
-          '${currentUser.uid}': {
-            '${memberUser.uid}': -10,
-            '${memberUser2.uid}': -10,
-            '${memberUser3.uid}': -10
-          },
-          '${memberUser.uid}': {
-            '${currentUser.uid}': 10,
-            '${memberUser2.uid}': 10,
-            '${memberUser3.uid}': 10
-          },
-          '${memberUser2.uid}': {
-            '${currentUser.uid}': 10,
-            '${memberUser.uid}': -10,
-            '${memberUser3.uid}': -10
-          },
-          '${memberUser3.uid}': {
-            '${currentUser.uid}': 10,
-            '${memberUser.uid}': -10,
-            '${memberUser3.uid}': -10
-          }
-        });
+      id: 'test_group',
+      name: 'Test Group',
+      members: [currentUser, memberUser, memberUser2, memberUser3],
+      adminId: currentUser.uid,
+      balance: {
+        '${currentUser.uid}': {
+          '${memberUser.uid}': -10,
+          '${memberUser2.uid}': -10,
+          '${memberUser3.uid}': -10,
+        },
+        '${memberUser.uid}': {
+          '${currentUser.uid}': 10,
+          '${memberUser2.uid}': 10,
+          '${memberUser3.uid}': 10,
+        },
+        '${memberUser2.uid}': {
+          '${currentUser.uid}': 10,
+          '${memberUser.uid}': -10,
+          '${memberUser3.uid}': -10,
+        },
+        '${memberUser3.uid}': {
+          '${currentUser.uid}': 10,
+          '${memberUser.uid}': -10,
+          '${memberUser3.uid}': -10,
+        },
+      },
+    );
 
     final expense = Expense(
-        authorUid: currentUser.uid, name: 'test expense', groupId: group.id);
+      authorUid: currentUser.uid,
+      name: 'test expense',
+      groupId: group.id,
+    );
 
     final defaultAuthService = MockAuthService();
     final authCurrentUser = MockUser();
@@ -77,41 +83,47 @@ class OwingListItemExamples extends StatelessWidget {
     when(defaultAuthService.currentUser).thenAnswer((_) => authCurrentUser);
 
     final defaultGroupService = MockGroupRepository();
-    when(defaultGroupService.groupStream(any))
-        .thenAnswer((_) => Stream.fromIterable([group]));
+    when(
+      defaultGroupService.groupStream(any),
+    ).thenAnswer((_) => Stream.fromIterable([group]));
 
     final mockExpenseService = MockExpenseService();
-    when(mockExpenseService.getPendingExpenses(group.id, memberUser.uid))
-        .thenAnswer((_) => Future.value([expense]));
-    when(mockExpenseService.getPendingAuthoredExpenses(
-            group.id, memberUser.uid))
-        .thenAnswer((_) => Future.value([expense]));
+    when(
+      mockExpenseService.getPendingExpenses(group.id, memberUser.uid),
+    ).thenAnswer((_) => Future.value([expense]));
+    when(
+      mockExpenseService.getPendingAuthoredExpenses(group.id, memberUser.uid),
+    ).thenAnswer((_) => Future.value([expense]));
 
     final defaultPaymentService = MockPaymentService();
-    when(defaultPaymentService.paymentsStream(
-      groupId: group.id,
-      userId1: currentUser.uid,
-      newFor: currentUser.uid,
-    )).thenAnswer((_) => Stream.fromIterable([
-          [
-            Payment(
-              groupId: group.id,
-              payerId: currentUser.uid,
-              receiverId: memberUser.uid,
-              value: 145,
-            )
-          ]
-        ]));
+    when(
+      defaultPaymentService.paymentsStream(
+        groupId: group.id,
+        userId1: currentUser.uid,
+        newFor: currentUser.uid,
+      ),
+    ).thenAnswer(
+      (_) => Stream.fromIterable([
+        [
+          Payment(
+            groupId: group.id,
+            payerId: currentUser.uid,
+            receiverId: memberUser.uid,
+            value: 145,
+          ),
+        ],
+      ]),
+    );
     return CustomPreview(
       providers: [
         Provider<ExpenseService>.value(value: mockExpenseService),
         Provider.value(value: PreferencesService()),
-        Provider<OwingCubit>(
-          create: (context) => OwingCubit(),
-        ),
+        Provider<OwingCubit>(create: (context) => OwingCubit()),
         Provider<NewPaymentsCubit>(
-            create: (context) => NewPaymentsCubit(defaultPaymentService)
-              ..load(groupId: group.id, uid: currentUser.uid)),
+          create: (context) =>
+              NewPaymentsCubit(defaultPaymentService, MockErrorService())
+                ..load(groupId: group.id, uid: currentUser.uid),
+        ),
         BlocProvider(create: (context) => AuthBloc(defaultAuthService)),
         BlocProvider(
           create: (context) => GroupCubit(

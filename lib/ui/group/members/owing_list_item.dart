@@ -8,7 +8,6 @@ import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/actions/kick_member_action.dart';
 import 'package:statera/ui/group/members/actions/transfer_ownership_action.dart';
-import 'package:statera/ui/group/members/new_payments_badge.dart';
 import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
@@ -17,11 +16,13 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 class OwingListItem extends StatelessWidget {
   final CustomUser member;
   final double owing;
+  final int newPaymentsCount;
 
   const OwingListItem({
     Key? key,
     required this.member,
     required this.owing,
+    this.newPaymentsCount = 0,
   }) : super(key: key);
 
   @override
@@ -53,12 +54,13 @@ class OwingListItem extends StatelessWidget {
                     PaymentListPage.name,
                     pathParameters: {
                       'groupId': group.id!,
-                      'memberId': member.uid
+                      'memberId': member.uid,
                     },
                   ),
             selected: selectedMemberUid == member.uid,
-            selectedTileColor:
-                Theme.of(context).colorScheme.primary.withAlpha(50),
+            selectedTileColor: Theme.of(
+              context,
+            ).colorScheme.primary.withAlpha(50),
             title: Row(
               children: [
                 Expanded(
@@ -68,12 +70,14 @@ class OwingListItem extends StatelessWidget {
                     withIcon: isCurrentMemberAdmin,
                     icon: isCurrentMemberAdmin ? Icons.star : null,
                     iconColor: isCurrentMemberAdmin ? Colors.yellow : null,
-                    iconBackgroudColor:
-                        isCurrentMemberAdmin ? Colors.black : null,
+                    iconBackgroudColor: isCurrentMemberAdmin
+                        ? Colors.black
+                        : null,
                   ),
                 ),
-                NewPaymentsBadge(
-                  memberId: member.uid,
+                Badge.count(
+                  count: newPaymentsCount,
+                  isLabelVisible: newPaymentsCount > 0,
                   child: PriceText(
                     value: this.owing,
                     textStyle: TextStyle(fontSize: 18, color: owingColor),
@@ -86,7 +90,7 @@ class OwingListItem extends StatelessWidget {
                     tooltip: 'Admin Actions',
                     actions: [
                       KickMemberAction(group, this.member),
-                      TransferOwnershipAction(this.member)
+                      TransferOwnershipAction(this.member),
                     ],
                   )
                 : null,
