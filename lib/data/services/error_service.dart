@@ -13,8 +13,8 @@ class ErrorService {
   Future<void> recordError(Object error, {String? reason}) {
     return FirebaseCrashlytics.instance.recordError(
       error,
-      null,
-      reason: 'Receipt upload failed',
+      StackTrace.current,
+      reason: reason ?? 'Unknown error',
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/payment_service.mocks.dart';
@@ -55,29 +56,38 @@ void main() {
         groupId: testGroup.id,
       );
 
-      when(mockGroupService.groupStream(any))
-          .thenAnswer((_) => Stream.fromIterable([testGroup]));
+      when(
+        mockGroupService.groupStream(any),
+      ).thenAnswer((_) => Stream.fromIterable([testGroup]));
 
-      when(mockExpenseService.getPendingExpenses(testGroup.id!, memberUser.uid))
-          .thenAnswer((_) => Future.value([pendingExpense]));
-      when(mockExpenseService.getPendingAuthoredExpenses(
-              testGroup.id!, memberUser.uid))
-          .thenAnswer((_) => Future.value([pendingAuthoredExpense]));
+      when(
+        mockExpenseService.getPendingExpenses(testGroup.id!, memberUser.uid),
+      ).thenAnswer((_) => Future.value([pendingExpense]));
+      when(
+        mockExpenseService.getPendingAuthoredExpenses(
+          testGroup.id!,
+          memberUser.uid,
+        ),
+      ).thenAnswer((_) => Future.value([pendingAuthoredExpense]));
 
-      when(mockPaymentService.paymentsStream(
-        groupId: testGroup.id,
-        userId1: currentUser.uid,
-        newFor: currentUser.uid,
-      )).thenAnswer((_) => Stream.fromIterable([
-            [
-              Payment(
-                groupId: testGroup.id,
-                payerId: currentUser.uid,
-                receiverId: memberUser.uid,
-                value: 145,
-              )
-            ]
-          ]));
+      when(
+        mockPaymentService.paymentsStream(
+          groupId: testGroup.id,
+          userId1: currentUser.uid,
+          newFor: currentUser.uid,
+        ),
+      ).thenAnswer(
+        (_) => Stream.fromIterable([
+          [
+            Payment(
+              groupId: testGroup.id,
+              payerId: currentUser.uid,
+              receiverId: memberUser.uid,
+              value: 145,
+            ),
+          ],
+        ]),
+      );
     });
 
     Future<void> pumpOwingListItem(WidgetTester tester) async {
@@ -87,12 +97,12 @@ void main() {
         currentUserId: defaultCurrentUserId,
         group: testGroup,
         extraProviders: [
-          Provider<OwingCubit>(
-            create: (context) => OwingCubit(),
-          ),
+          Provider<OwingCubit>(create: (context) => OwingCubit()),
           Provider<NewPaymentsCubit>(
-              create: (context) => NewPaymentsCubit(mockPaymentService)
-                ..load(groupId: testGroup.id, uid: currentUser.uid)),
+            create: (context) =>
+                NewPaymentsCubit(mockPaymentService, MockErrorService())
+                  ..load(groupId: testGroup.id, uid: currentUser.uid),
+          ),
         ],
         groupService: mockGroupService,
         expenseService: mockExpenseService,
@@ -104,7 +114,7 @@ void main() {
       testWidgets('can kick member', (WidgetTester tester) async {
         testGroup.balance = {
           '${currentUser.uid}': {'${memberUser.uid}': -10},
-          '${memberUser.uid}': {'${currentUser.uid}': 10}
+          '${memberUser.uid}': {'${currentUser.uid}': 10},
         };
 
         await pumpOwingListItem(tester);
@@ -115,7 +125,8 @@ void main() {
 
         expect(
           find.textContaining(
-              'You are about to KICK member "${memberUser.name}"'),
+            'You are about to KICK member "${memberUser.name}"',
+          ),
           findsOneWidget,
         );
 
@@ -144,8 +155,10 @@ void main() {
           of: sectionTitle,
           matching: find.byType(KickMemberInfoSection),
         );
-        final memberWithPendingBalanceName =
-            find.descendant(of: section, matching: find.text(currentUser.name));
+        final memberWithPendingBalanceName = find.descendant(
+          of: section,
+          matching: find.text(currentUser.name),
+        );
         expect(memberWithPendingBalanceName, findsOneWidget);
       });
 
@@ -168,8 +181,9 @@ void main() {
         expect(pendingExpenseName, findsOneWidget);
       });
 
-      testWidgets('shows outstanding authored expenses',
-          (WidgetTester tester) async {
+      testWidgets('shows outstanding authored expenses', (
+        WidgetTester tester,
+      ) async {
         await pumpOwingListItem(tester);
 
         await openOptionsMenu(tester);
@@ -199,7 +213,8 @@ void main() {
 
       expect(
         find.text(
-            'You are about to Transfer Ownership to "${memberUser.name}"'),
+          'You are about to Transfer Ownership to "${memberUser.name}"',
+        ),
         findsOneWidget,
       );
 
@@ -218,8 +233,9 @@ void main() {
       verify(mockGroupService.saveGroup(any)).called(1);
     });
 
-    testWidgets('shows kick member and transfer ownership option in menu',
-        (WidgetTester tester) async {
+    testWidgets('shows kick member and transfer ownership option in menu', (
+      WidgetTester tester,
+    ) async {
       await pumpOwingListItem(tester);
 
       await openOptionsMenu(tester);
@@ -233,8 +249,9 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
-    testWidgets('does not show options to non admins',
-        (WidgetTester tester) async {
+    testWidgets('does not show options to non admins', (
+      WidgetTester tester,
+    ) async {
       testGroup = Group(
         id: 'test_group',
         name: 'Test Group',

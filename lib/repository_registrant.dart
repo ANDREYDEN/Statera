@@ -33,7 +33,8 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => groupService),
         RepositoryProvider(create: (_) => UserGroupRepository(firestore)),
         RepositoryProvider(
-            create: (_) => PaymentService(groupService, firestore)),
+          create: (_) => PaymentService(groupService, firestore),
+        ),
         RepositoryProvider(create: (_) => ExpenseService(firestore)),
         RepositoryProvider(create: (_) => UserExpenseRepository(firestore)),
         RepositoryProvider(create: (_) => CoordinationRepository(firestore)),
@@ -41,7 +42,8 @@ class RepositoryRegistrant extends StatelessWidget {
         RepositoryProvider(create: (_) => Callables()),
         RepositoryProvider(create: (_) => PlatformContext()),
         RepositoryProvider(
-            create: (_) => kIsModeDebug ? ErrorServiceMock() : ErrorService()),
+          create: (_) => kIsModeDebug ? MockErrorService() : ErrorService(),
+        ),
       ],
       child: child,
     );

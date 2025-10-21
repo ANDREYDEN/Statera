@@ -1,33 +1,49 @@
 part of 'new_payments_cubit.dart';
 
-abstract class NewPaymentsState extends Equatable {
-  const NewPaymentsState();
-}
+class NewPaymentsState extends Equatable {
+  final List<Payment>? payments;
+  final String? error;
+  final bool isLoading;
 
-class NewPaymentsLoading extends NewPaymentsState {
-  List<Object?> get props => [];
-}
+  const NewPaymentsState({required this.payments})
+    : isLoading = false,
+      error = null;
+  const NewPaymentsState.error(this.error) : isLoading = false, payments = null;
+  const NewPaymentsState.loading()
+    : payments = null,
+      error = null,
+      isLoading = true;
 
-class NewPaymentsError extends NewPaymentsState {
-  final String error;
+  Map<String, DateTime> get mostRecentPaymentMap {
+    final result = Map<String, DateTime>();
+    for (var payment in payments ?? []) {
+      final paymentCreatedDate = payment.timeCreated;
+      if (paymentCreatedDate == null) continue;
 
-  const NewPaymentsError({required this.error});
+      if (!result.containsKey(payment.receiverId) ||
+          result[payment.receiverId]!.isBefore(paymentCreatedDate)) {
+        result[payment.receiverId] = paymentCreatedDate;
+      }
 
-  List<Object?> get props => [error];
-}
+      if (!result.containsKey(payment.payerId) ||
+          result[payment.payerId]!.isBefore(paymentCreatedDate)) {
+        result[payment.payerId] = paymentCreatedDate;
+      }
+    }
 
-class NewPaymentsLoaded extends NewPaymentsState {
-  final List<Payment> payments;
+    return result;
+  }
 
-  const NewPaymentsLoaded({required this.payments});
+  Map<String, int> get paymentCount {
+    final result = Map<String, int>();
+    for (var payment in payments ?? []) {
+      result[payment.payerId] = (result[payment.payerId] ?? 0) + 1;
+      result[payment.receiverId] = (result[payment.receiverId] ?? 0) + 1;
+    }
 
-  int countForMember(String memberId) {
-    return payments
-        .where((payment) =>
-            payment.receiverId == memberId || payment.payerId == memberId)
-        .length;
+    return result;
   }
 
   @override
-  List<Object?> get props => [payments];
+  List<Object?> get props => [payments, isLoading, error];
 }

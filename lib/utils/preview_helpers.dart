@@ -19,7 +19,7 @@ class CustomPreview extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         ...providers,
-        Provider<ErrorService>.value(value: ErrorServiceMock())
+        Provider<ErrorService>.value(value: MockErrorService()),
       ],
       child: CustomLayoutBuilder(
         child: CustomThemeBuilder(
