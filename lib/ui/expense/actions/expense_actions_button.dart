@@ -9,10 +9,8 @@ import 'package:statera/ui/widgets/buttons/actions_button.dart';
 class ExpenseActionsButton extends StatelessWidget {
   final Expense expense;
 
-  const ExpenseActionsButton({
-    Key? key,
-    required this.expense,
-  }) : super(key: key);
+  const ExpenseActionsButton({Key? key, required this.expense})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +24,13 @@ class ExpenseActionsButton extends StatelessWidget {
         if (isWide) DeleteExpenseAction(expense),
       ],
       if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
-        RevertExpenseAction(expense)
+        RevertExpenseAction(expense),
     ];
 
-    return ActionsButton(tooltip: 'Expense actions', actions: actions);
+    return ActionsButton(
+      tooltip: 'Expense actions',
+      actions: actions,
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+    );
   }
 }

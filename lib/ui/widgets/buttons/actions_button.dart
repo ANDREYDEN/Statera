@@ -4,13 +4,19 @@ import 'package:statera/ui/widgets/entity_action.dart';
 class ActionsButton extends StatelessWidget {
   final List<EntityAction> actions;
   final String? tooltip;
+  final EdgeInsetsGeometry? padding;
 
-  const ActionsButton({super.key, required this.actions, this.tooltip});
+  const ActionsButton({
+    super.key,
+    required this.actions,
+    this.tooltip,
+    this.padding,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
+      padding: padding ?? EdgeInsets.zero,
       child: PopupMenuButton<EntityAction>(
         tooltip: tooltip,
         child: Padding(

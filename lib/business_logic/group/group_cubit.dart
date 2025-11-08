@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'group_state.dart';
 
@@ -15,11 +15,8 @@ class GroupCubit extends Cubit<GroupState> {
   final ExpenseService _expenseService;
   final UserRepository _userRepository;
 
-  GroupCubit(
-    this._groupService,
-    this._expenseService,
-    this._userRepository,
-  ) : super(GroupLoading());
+  GroupCubit(this._groupService, this._expenseService, this._userRepository)
+    : super(GroupLoading());
 
   // TODO: error handling
   GroupLoaded get loadedState => state as GroupLoaded;
@@ -28,9 +25,11 @@ class GroupCubit extends Cubit<GroupState> {
     _groupSubscription?.cancel();
     _groupSubscription = _groupService
         .groupStream(groupId)
-        .map((group) => group == null
-            ? GroupError(error: 'Group does not exist')
-            : GroupLoaded(group: group))
+        .map(
+          (group) => group == null
+              ? GroupError(error: 'Group does not exist')
+              : GroupLoaded(group: group),
+        )
         .handleError(handleError)
         .listen(emit);
   }
@@ -67,9 +66,12 @@ class GroupCubit extends Cubit<GroupState> {
 
   Future<void> addMember(String? code, String uid) async {
     if (code != loadedState.group.code) {
-      emit(GroupError(
+      emit(
+        GroupError(
           error:
-              'Invalid invitation. Make sure you have copied the link correctly.'));
+              'Invalid invitation. Make sure you have copied the link correctly.',
+        ),
+      );
       return;
     }
 
@@ -114,8 +116,11 @@ class GroupCubit extends Cubit<GroupState> {
     } else {
       emit(GroupError(error: 'Something went wrong'));
     }
-    await FirebaseCrashlytics.instance
-        .recordError(error, null, reason: 'Group error');
+    await FirebaseCrashlytics.instance.recordError(
+      error,
+      null,
+      reason: 'Group error',
+    );
   }
 
   @override

@@ -9,10 +9,6 @@ class GroupListItemLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(child: SizedBox(height: height))
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(
-          duration: 1.seconds,
-          delay: 0.5.seconds,
-          color: Theme.of(context).colorScheme.secondary,
-        );
+        .shimmer(duration: 1.seconds, delay: 0.5.seconds);
   }
 }

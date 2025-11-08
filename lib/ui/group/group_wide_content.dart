@@ -37,7 +37,6 @@ class GroupWideContent extends StatelessWidget {
           Flexible(
             flex: 1,
             child: Card(
-              margin: EdgeInsets.symmetric(vertical: 10.0),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: leftPart,
