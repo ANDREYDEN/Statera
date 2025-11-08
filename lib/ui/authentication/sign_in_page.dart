@@ -81,6 +81,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     obscureText: true,
                     enabled: signInState is! SignInLoading,
+                    onSubmitted: _isSignIn ? (_) => _handleSubmit() : null,
                   ),
                   if (!_isSignIn)
                     Column(
@@ -94,6 +95,7 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                           obscureText: true,
                           enabled: signInState is! SignInLoading,
+                          onSubmitted: (_) => _handleSubmit(),
                         ),
                       ],
                     ),
