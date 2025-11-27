@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/constants.dart';
 
@@ -19,13 +20,16 @@ void main() {
 
     setUp(() {
       authRepository = MockAuthRepository();
-      signInCubit = SignInCubit(authRepository);
-      when(() => authRepository.signIn(any(), any()))
-          .thenAnswer((_) async => userCredential);
-      when(() => authRepository.signUp(any(), any(), any()))
-          .thenAnswer((_) async => userCredential);
-      when(() => authRepository.signInWithGoogle())
-          .thenAnswer((_) async => userCredential);
+      signInCubit = SignInCubit(authRepository, MockErrorService());
+      when(
+        () => authRepository.signIn(any(), any()),
+      ).thenAnswer((_) async => userCredential);
+      when(
+        () => authRepository.signUp(any(), any(), any()),
+      ).thenAnswer((_) async => userCredential);
+      when(
+        () => authRepository.signInWithGoogle(),
+      ).thenAnswer((_) async => userCredential);
     });
 
     test('initial state is SignInLoaded', () {
@@ -46,14 +50,15 @@ void main() {
       blocTest(
         'emits SignInError when signIn throws',
         setUp: () {
-          when(() => authRepository.signIn(any(), any()))
-              .thenThrow(FirebaseAuthException(code: 'invalid-email'));
+          when(
+            () => authRepository.signIn(any(), any()),
+          ).thenThrow(FirebaseAuthException(code: 'invalid-email'));
         },
         build: () => signInCubit,
         act: (SignInCubit cubit) => cubit.signIn('email', 'password'),
         expect: () => [
           SignInLoading(),
-          SignInError(error: kSignInMessages['invalid-email']!)
+          SignInError(error: kSignInMessages['invalid-email']!),
         ],
         verify: (_) {
           verify(() => authRepository.signIn(any(), any())).called(1);
@@ -76,15 +81,16 @@ void main() {
       blocTest(
         'emits [SignInLoading, SignInError] when signUp throws',
         setUp: () {
-          when(() => authRepository.signUp(any(), any(), any()))
-              .thenThrow(FirebaseAuthException(code: 'weak-password'));
+          when(
+            () => authRepository.signUp(any(), any(), any()),
+          ).thenThrow(FirebaseAuthException(code: 'weak-password'));
         },
         build: () => signInCubit,
         act: (SignInCubit cubit) =>
             cubit.signUp('email', 'password', 'password'),
         expect: () => [
           SignInLoading(),
-          SignInError(error: kSignUpMessages['weak-password']!)
+          SignInError(error: kSignUpMessages['weak-password']!),
         ],
         verify: (_) {
           verify(() => authRepository.signUp(any(), any(), any())).called(1);
@@ -106,14 +112,15 @@ void main() {
       blocTest(
         'emits SignInError when signInWithGoogle throws',
         setUp: () {
-          when(() => authRepository.signInWithGoogle())
-              .thenThrow(FirebaseAuthException(code: 'user-disabled'));
+          when(
+            () => authRepository.signInWithGoogle(),
+          ).thenThrow(FirebaseAuthException(code: 'user-disabled'));
         },
         build: () => signInCubit,
         act: (SignInCubit cubit) => cubit.signInWithGoogle(),
         expect: () => [
           SignInLoading(),
-          SignInError(error: kSignInWithGoogleMessages['user-disabled']!)
+          SignInError(error: kFirebaseAuthErrorMessages['user-disabled']!),
         ],
         verify: (_) {
           verify(() => authRepository.signInWithGoogle()).called(1);

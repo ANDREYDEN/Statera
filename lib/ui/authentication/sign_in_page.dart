@@ -17,7 +17,10 @@ class SignInPage extends StatefulWidget {
 
   static Widget init({required String? destinationPath}) {
     return BlocProvider(
-      create: (context) => SignInCubit(context.read<AuthService>()),
+      create: (context) => SignInCubit(
+        context.read<AuthService>(),
+        context.read<ErrorService>(),
+      ),
       child: SignInPage(destinationPath: destinationPath),
     );
   }

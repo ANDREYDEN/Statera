@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/utils/utils.dart';
@@ -9,9 +8,12 @@ part 'sign_in_state.dart';
 
 class SignInCubit extends Cubit<SignInState> {
   late final AuthService _authRepository;
+  late final ErrorService _errorService;
 
-  SignInCubit(AuthService authRepository) : super(SignInLoaded()) {
+  SignInCubit(AuthService authRepository, ErrorService errorService)
+    : super(SignInLoaded()) {
     _authRepository = authRepository;
+    _errorService = errorService;
   }
 
   Future<void> signIn(String email, String password) async {
@@ -55,22 +57,22 @@ class SignInCubit extends Cubit<SignInState> {
   signInWithGoogle() async {
     try {
       emit(SignInLoading());
-      final cred = await _authRepository.signInWithGoogle();
-      print(cred);
+      await _authRepository.signInWithGoogle();
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
-      final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
-          ? kSignInWithGoogleMessages[firebaseError.code]!
+      final message = kFirebaseAuthErrorMessages.containsKey(firebaseError.code)
+          ? kFirebaseAuthErrorMessages[firebaseError.code]!
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
     } on Exception catch (genericError) {
-      await FirebaseCrashlytics.instance.recordError(
-        genericError,
-        null,
-        reason: 'Sign In with Google Failed',
-      );
       emit(
-        SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+        SignInError(
+          error: 'Something went wrong while signing in with Google.',
+        ),
+      );
+      await _errorService.recordError(
+        genericError,
+        reason: 'Sign In with Google Failed',
       );
     }
   }
@@ -81,13 +83,17 @@ class SignInCubit extends Cubit<SignInState> {
       await _authRepository.signInWithApple();
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
-      final message = kSignInWithGoogleMessages.containsKey(firebaseError.code)
-          ? kSignInWithGoogleMessages[firebaseError.code]!
+      final message = kFirebaseAuthErrorMessages.containsKey(firebaseError.code)
+          ? kFirebaseAuthErrorMessages[firebaseError.code]!
           : 'Error while authenticating: ${firebaseError.message}';
       emit(SignInError(error: message));
     } catch (genericError) {
       emit(
-        SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+        SignInError(error: 'Something went wrong while signing in with Apple.'),
+      );
+      await _errorService.recordError(
+        genericError,
+        reason: 'Sign In with Apple Failed',
       );
     }
   }
