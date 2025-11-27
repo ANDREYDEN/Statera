@@ -38,7 +38,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.statera.statera</string>
-				<string>com.googleusercontent.apps.630064020417-kp591unonuf8jvctsjngk2r1d70p4b1p</string>
+				<string>com.googleusercontent.apps.630064020417-3r46lh80ajgs92ovhc52rh04emg40b75</string>
 			</array>
 		</dict>
 	</array>
@@ -46,6 +46,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
 	<false/>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -61,6 +63,8 @@
 	<string>Camera access</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Functionality of picking a saved receipt image</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -83,9 +87,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>FlutterDeepLinkingEnabled</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
 </dict>
 </plist>
