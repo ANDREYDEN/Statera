@@ -6,8 +6,8 @@ import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/group_qr_button.dart';
 import 'package:statera/ui/group/members/debt_redirect/redirect_debt_button.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
+import 'package:statera/ui/group/members/owing_list_loading.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
-import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 class OwingsList extends StatelessWidget {
@@ -26,8 +26,10 @@ class OwingsList extends StatelessWidget {
         RedirectDebtButton(),
         Flexible(
           child: GroupBuilder(
+            loadingWidget: OwingListLoading(),
             builder: (context, group) {
               final owings = group.getOwingsForUser(authBloc.uid);
+
               if (owings.isEmpty) {
                 return ListEmpty(
                   text: 'Start by inviting people to your group',
@@ -37,9 +39,7 @@ class OwingsList extends StatelessWidget {
 
               return BlocBuilder<NewPaymentsCubit, NewPaymentsState>(
                 builder: (context, newPaymentsState) {
-                  if (newPaymentsState.isLoading) {
-                    return Center(child: Loader());
-                  }
+                  if (newPaymentsState.isLoading) return OwingListLoading();
 
                   final mostRecentPaymentMap =
                       newPaymentsState.mostRecentPaymentMap;

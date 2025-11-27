@@ -42,8 +42,8 @@ class OwingListItem extends StatelessWidget {
         final owingColor = this.owing >= group.debtThreshold
             ? Theme.of(context).colorScheme.error
             : null;
-        final isCurrentMemberAdmin = group.admin.uid == this.member.uid;
-        final isGroupMember = group.isAdmin(uid);
+        final isMemberAdmin = group.admin.uid == this.member.uid;
+        final isCurrentUserAdmin = group.isAdmin(uid);
 
         return MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -67,12 +67,10 @@ class OwingListItem extends StatelessWidget {
                   child: UserAvatar(
                     author: this.member,
                     withName: true,
-                    withIcon: isCurrentMemberAdmin,
-                    icon: isCurrentMemberAdmin ? Icons.star : null,
-                    iconColor: isCurrentMemberAdmin ? Colors.yellow : null,
-                    iconBackgroudColor: isCurrentMemberAdmin
-                        ? Colors.black
-                        : null,
+                    withIcon: isMemberAdmin,
+                    icon: isMemberAdmin ? Icons.star : null,
+                    iconColor: isMemberAdmin ? Colors.yellow : null,
+                    iconBackgroudColor: isMemberAdmin ? Colors.black : null,
                   ),
                 ),
                 Badge.count(
@@ -85,7 +83,7 @@ class OwingListItem extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: isGroupMember
+            trailing: isCurrentUserAdmin
                 ? ActionsButton(
                     tooltip: 'Admin Actions',
                     actions: [

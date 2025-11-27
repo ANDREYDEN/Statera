@@ -18,44 +18,39 @@ class GroupsCubit extends Cubit<GroupsState> {
     this._groupRepository,
     this._userRepository,
     this._userGroupRepository,
-  ) : super(GroupsLoading());
+  ) : super(GroupsState.loading());
 
   void load(String userId) {
     _groupsSubscription?.cancel();
+
     _groupsSubscription = _userGroupRepository
         .userGroupsStream(userId)
-        .map((groups) => GroupsLoaded(groups: groups))
+        .map((groups) => GroupsState(groups: groups))
         .listen(
-      emit,
-      onError: (error) {
-        if (error is Exception) {
-          FirebaseCrashlytics.instance.recordError(
-            error,
-            null,
-            reason: 'Groups failed to load',
-          );
-        }
-        emit(GroupsError(error: error));
-      },
-    );
+          emit,
+          onError: (error) {
+            if (error is Exception) {
+              FirebaseCrashlytics.instance.recordError(
+                error,
+                null,
+                reason: 'Groups failed to load',
+              );
+            }
+            emit(GroupsState.error(error));
+          },
+        );
   }
 
   addGroup(Group group, String uid) async {
-    final groupState = state;
-    if (groupState is GroupsLoaded) {
-      emit(GroupsProcessing(groups: groupState.groups));
-      final user = await _userRepository.getUser(uid);
-      final groupId = await _groupRepository.createGroup(group, user);
-      await _groupRepository.generateInviteLink(group..id = groupId);
-    }
+    emit(GroupsState.processing(groups: state.groups));
+    final user = await _userRepository.getUser(uid);
+    final groupId = await _groupRepository.createGroup(group, user);
+    await _groupRepository.generateInviteLink(group..id = groupId);
   }
 
   Future<void> update(String uid, UserGroup targetGroup) async {
-    final groupState = state;
-    if (groupState is GroupsLoaded) {
-      emit(GroupsProcessing(groups: groupState.groups));
-      await _userGroupRepository.saveUserGroup(uid, targetGroup);
-    }
+    emit(GroupsState.processing(groups: state.groups));
+    await _userGroupRepository.saveUserGroup(uid, targetGroup);
   }
 
   @override

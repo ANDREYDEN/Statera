@@ -20,8 +20,12 @@ class UserAvatarExamples extends StatelessWidget {
         children: [
           UserAvatar(
             author: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
-            dimension: 40,
           ),
+          UserAvatar(
+            author: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
+            borderColor: Colors.green,
+          ),
+          UserAvatar(author: CustomUser.fake(), loading: true),
           Row(
             children: [20, 40, 60, 100, 200]
                 .map(
@@ -37,26 +41,31 @@ class UserAvatarExamples extends StatelessWidget {
               name: 'John Doe',
               photoURL: 'https://picsum.photos/300',
             ),
-            dimension: 40,
             withName: true,
           ),
-          UserAvatar(
-            author: CustomUser.fake(
-              name: 'Very long name',
-              photoURL: 'https://picsum.photos/300',
-            ),
-            dimension: 80,
-            withName: true,
-            namePosition: NamePosition.bottom,
-          ),
-          UserAvatar(
-            author: CustomUser.fake(
-              name: 'short',
-              photoURL: 'https://picsum.photos/300',
-            ),
-            dimension: 80,
-            withName: true,
-            namePosition: NamePosition.bottom,
+          UserAvatar(author: CustomUser.fake(), loading: true, withName: true),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UserAvatar(
+                author: CustomUser.fake(
+                  name: 'Very long name',
+                  photoURL: 'https://picsum.photos/300',
+                ),
+                dimension: 80,
+                withName: true,
+                namePosition: NamePosition.bottom,
+              ),
+              UserAvatar(
+                author: CustomUser.fake(
+                  name: 'short',
+                  photoURL: 'https://picsum.photos/300',
+                ),
+                dimension: 80,
+                withName: true,
+                namePosition: NamePosition.bottom,
+              ),
+            ],
           ),
         ],
       ),

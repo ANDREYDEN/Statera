@@ -6,11 +6,13 @@ class UserAvatarName extends StatelessWidget {
   final NamePosition namePosition;
   final double? dimension;
 
-  const UserAvatarName(String this.name,
-      {super.key,
-      required this.loading,
-      required this.namePosition,
-      this.dimension});
+  const UserAvatarName(
+    String this.name, {
+    super.key,
+    required this.loading,
+    required this.namePosition,
+    this.dimension,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,9 @@ class UserAvatarName extends StatelessWidget {
       return Container(
         width: 80,
         height: 16,
+        margin: namePosition == NamePosition.right
+            ? EdgeInsets.symmetric(horizontal: 10)
+            : null,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.grey,
@@ -32,8 +37,8 @@ class UserAvatarName extends StatelessWidget {
         width: dimension == null
             ? null
             : this.namePosition == NamePosition.bottom
-                ? dimension! + 10
-                : null,
+            ? dimension! + 10
+            : null,
         child: Text(
           name,
           textAlign: TextAlign.center,

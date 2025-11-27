@@ -7,9 +7,9 @@ class Header extends StatelessWidget {
     ClipboardData clipData = ClipboardData(text: name);
     await Clipboard.setData(clipData);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Expense name copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Expense name copied to clipboard')));
   }
 
   @override
@@ -49,20 +49,17 @@ class Header extends StatelessWidget {
                           child: Text(
                             expense.name,
                             softWrap: false,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 32,
-                            ),
+                            style: TextStyle(color: Colors.black, fontSize: 32),
                             overflow: TextOverflow.fade,
                           ),
                         ),
                       ),
-                      ExpensePrice()
+                      ExpensePrice(),
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(Icons.schedule, size: 20, color: Colors.black),
+                      Icon(Icons.calendar_month, size: 20, color: Colors.black),
                       TextButton(
                         onPressed: expenseCanBeUpdated
                             ? () => _handleDateClick(context, expense)
@@ -81,20 +78,25 @@ class Header extends StatelessWidget {
                       Expanded(
                         child: Row(
                           children: [
-                            GroupBuilder(builder: (context, group) {
-                              return UserAvatar(
-                                author: group.getMember(expense.authorUid),
-                                onTap: expenseCanBeUpdated
-                                    ? () => _handleAuthorClick(context, expense)
-                                    : null,
-                              );
-                            }),
+                            GroupBuilder(
+                              builder: (context, group) {
+                                return UserAvatar(
+                                  author: group.getMember(expense.authorUid),
+                                  onTap: expenseCanBeUpdated
+                                      ? () =>
+                                            _handleAuthorClick(context, expense)
+                                      : null,
+                                );
+                              },
+                            ),
                             Icon(Icons.arrow_forward, color: Colors.black),
                             Expanded(
                               child: GestureDetector(
                                 onTap: expenseCanBeUpdated
-                                    ? () =>
-                                        _handleAssigneesClick(context, expense)
+                                    ? () => _handleAssigneesClick(
+                                        context,
+                                        expense,
+                                      )
                                     : null,
                                 child: AssigneeList(),
                               ),
@@ -105,11 +107,11 @@ class Header extends StatelessWidget {
                       BlocBuilder<ExpenseBloc, ExpenseState>(
                         builder: (context, state) =>
                             state is ExpenseLoaded && state.loading
-                                ? SizedBox.square(
-                                    dimension: 15,
-                                    child: Loader(width: 2),
-                                  )
-                                : SizedBox.shrink(),
+                            ? SizedBox.square(
+                                dimension: 15,
+                                child: Loader(width: 2),
+                              )
+                            : SizedBox.shrink(),
                       ),
                     ],
                   ),

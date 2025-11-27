@@ -1,34 +1,32 @@
 part of 'groups_cubit.dart';
 
-abstract class GroupsState extends Equatable {
-  const GroupsState();
+class GroupsState extends Equatable {
+  final List<UserGroup>? groups;
+  final String? error;
+  final bool isLoading;
+  final bool isProcessing;
+
+  const GroupsState({required this.groups})
+    : isLoading = false,
+      isProcessing = false,
+      error = null;
+
+  const GroupsState.error(this.error)
+    : isLoading = false,
+      isProcessing = false,
+      groups = null;
+
+  const GroupsState.loading()
+    : groups = null,
+      error = null,
+      isProcessing = false,
+      isLoading = true;
+
+  const GroupsState.processing({required this.groups})
+    : error = null,
+      isProcessing = true,
+      isLoading = false;
 
   @override
-  List<Object> get props => [];
-}
-
-/// Before the groups were first loaded
-class GroupsLoading extends GroupsState {}
-
-class GroupsLoaded extends GroupsState {
-  final List<UserGroup> groups;
-
-  const GroupsLoaded({required this.groups});
-
-  @override
-  List<Object> get props => [groups];
-}
-
-/// After the groups were loaded; whenever the list is changing (creates, updates)
-class GroupsProcessing extends GroupsLoaded {
-  GroupsProcessing({required List<UserGroup> groups}) : super(groups: groups);
-}
-
-class GroupsError extends GroupsState {
-  final Object error;
-
-  GroupsError({required this.error});
-
-  @override
-  List<Object> get props => [error];
+  List<Object?> get props => [groups, error, isLoading, isProcessing];
 }

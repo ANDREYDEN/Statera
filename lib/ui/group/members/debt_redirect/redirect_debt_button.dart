@@ -18,6 +18,7 @@ class RedirectDebtButton extends StatelessWidget {
     var featureService = context.read<FeatureService>();
 
     return GroupBuilder(
+      loadingWidget: SizedBox.shrink(),
       builder: (context, group) {
         if (!group.supportsDebtRedirection) return SizedBox.shrink();
         if (!group.canRedirect(uid)) return SizedBox.shrink();
@@ -25,23 +26,24 @@ class RedirectDebtButton extends StatelessWidget {
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 10.0),
-          child: OutlinedButton.icon(
-            icon: Icon(kRedirectDebtIcon),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider<GroupCubit>.value(
-                    value: groupCubit,
-                    child: RedirectDebtView(group: group),
-                  ),
-                ),
-              );
-            },
-            label: Text('Redirect Debt'),
-          )
-              .animate(onPlay: (controller) => controller.repeat())
-              .shimmer(delay: 3.seconds, duration: 1.seconds),
+          child:
+              OutlinedButton.icon(
+                    icon: Icon(kRedirectDebtIcon),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider<GroupCubit>.value(
+                            value: groupCubit,
+                            child: RedirectDebtView(group: group),
+                          ),
+                        ),
+                      );
+                    },
+                    label: Text('Redirect Debt'),
+                  )
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .shimmer(delay: 3.seconds, duration: 1.seconds),
         );
       },
     );

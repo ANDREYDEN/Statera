@@ -11,14 +11,15 @@ class LoadingText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(
-        color: Colors.grey,
-        borderRadius: BorderRadius.circular(radius ?? 5),
-      ),
-    )
+          height: height,
+          width: width,
+          margin: EdgeInsets.symmetric(vertical: (height ?? 0) * 0.2),
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.circular(radius ?? 5),
+          ),
+        )
         .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1.seconds);
+        .shimmer(duration: 1.seconds, delay: 0.5.seconds);
   }
 }

@@ -10,6 +10,7 @@ import 'package:statera/data/services/error_service.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
+import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/header/expense_price.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/expense/buttons/new_item_button.dart';
@@ -40,6 +41,9 @@ class ExpenseDetails extends StatelessWidget {
         final errorService = context.read<ErrorService>();
         errorService.recordError(error, reason: simplifiedError);
       },
+      loadingWidget: Column(
+        children: [SizedBox(height: 34), ExpenseDetailsLoading()],
+      ),
       builder: (context, expense) {
         return Column(
           mainAxisSize: MainAxisSize.min,

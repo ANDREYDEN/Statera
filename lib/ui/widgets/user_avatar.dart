@@ -28,7 +28,7 @@ class UserAvatar extends StatelessWidget {
     this.icon = Icons.check,
     this.iconColor = Colors.white,
     this.iconBackgroudColor = Colors.green,
-    this.dimension,
+    this.dimension = 36,
     this.margin,
     this.namePosition = NamePosition.right,
     this.loading = false,
@@ -39,8 +39,9 @@ class UserAvatar extends StatelessWidget {
     final result = Padding(
       padding: this.margin ?? EdgeInsets.all(0),
       child: MouseRegion(
-        cursor:
-            this.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
+        cursor: this.onTap != null
+            ? SystemMouseCursors.click
+            : MouseCursor.defer,
         child: GestureDetector(
           onTap: this.onTap,
           child: Flex(
@@ -48,19 +49,14 @@ class UserAvatar extends StatelessWidget {
                 ? Axis.vertical
                 : Axis.horizontal,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Stack(
                 children: [
                   Container(
+                    margin: EdgeInsets.all(2),
                     width: this.dimension,
                     height: this.dimension,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 3,
-                        color: this.borderColor ?? Colors.transparent,
-                      ),
-                    ),
                     child: CircleAvatar(
                       backgroundImage: this.author.photoURL == null
                           ? null
@@ -91,6 +87,16 @@ class UserAvatar extends StatelessWidget {
                             ),
                     ),
                   ),
+                  if (borderColor != null)
+                    Container(
+                      margin: EdgeInsets.all(2),
+                      width: this.dimension,
+                      height: this.dimension,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 3, color: this.borderColor!),
+                      ),
+                    ),
                   if (this.withIcon)
                     Positioned(
                       bottom: 0,
@@ -103,7 +109,7 @@ class UserAvatar extends StatelessWidget {
                         padding: EdgeInsets.all(2),
                         child: Icon(this.icon, size: 20, color: this.iconColor),
                       ),
-                    )
+                    ),
                 ],
               ),
               if (this.withName)
@@ -112,7 +118,7 @@ class UserAvatar extends StatelessWidget {
                   loading: loading,
                   namePosition: namePosition,
                   dimension: dimension,
-                )
+                ),
             ],
           ),
         ),
@@ -122,7 +128,7 @@ class UserAvatar extends StatelessWidget {
     if (loading) {
       return result
           .animate(onPlay: (controller) => controller.repeat())
-          .shimmer(duration: 1.seconds);
+          .shimmer(duration: 1.seconds, delay: 0.5.seconds);
     }
 
     return result;
