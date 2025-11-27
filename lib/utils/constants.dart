@@ -5,8 +5,10 @@ const kAppName = 'Statera';
 const kEmulatorFlag = 'MODE';
 const kCheckNotificationsFlag = 'CHECK_NOTIFICATIONS';
 const kIsModeDebug = String.fromEnvironment(kEmulatorFlag) == 'debug';
-const kCheckNotifications =
-    bool.fromEnvironment(kCheckNotificationsFlag, defaultValue: true);
+const kCheckNotifications = bool.fromEnvironment(
+  kCheckNotificationsFlag,
+  defaultValue: true,
+);
 
 const kSignInMessages = {
   'user-not-found': 'There is no user associated with this email address',
@@ -20,10 +22,10 @@ const kSignUpMessages = {
   'invalid-email': 'The provided email is not valid',
   'operation-not-allowed': 'This user has been disabled',
   'weak-password': 'Your password is not strong enough',
-  'password-mismatch': 'Passwords should match'
+  'password-mismatch': 'Passwords should match',
 };
 
-const kSignInWithGoogleMessages = {
+const kFirebaseAuthErrorMessages = {
   'user-not-found': 'There is no user associated with this email address',
   'user-disabled': 'This user has been disabled',
 };
