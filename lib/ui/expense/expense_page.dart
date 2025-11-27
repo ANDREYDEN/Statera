@@ -7,8 +7,8 @@ import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/expense_details.dart';
+import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
-import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatelessWidget {
@@ -32,7 +32,7 @@ class ExpensePage extends StatelessWidget {
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
           )..loadFromExpense(expenseId),
-        )
+        ),
       ],
       child: ExpensePage(),
     );
@@ -46,7 +46,8 @@ class ExpensePage extends StatelessWidget {
       builder: (context, expenseState) {
         if (expenseState is ExpenseLoading) {
           return PageScaffold(
-            child: Center(child: Loader()),
+            title: 'Loading...',
+            child: ExpenseDetailsLoading(),
           );
         }
 

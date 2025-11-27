@@ -9,12 +9,14 @@ class ExpenseBuilder extends StatelessWidget {
   final Widget Function(BuildContext, Expense) builder;
   final Widget Function(BuildContext, ExpenseError)? errorBuilder;
   final void Function(BuildContext, Object error)? onUpdateError;
+  final Widget? loadingWidget;
 
   const ExpenseBuilder({
     Key? key,
     required this.builder,
     this.errorBuilder,
     this.onUpdateError,
+    this.loadingWidget,
   }) : super(key: key);
 
   @override
@@ -34,7 +36,7 @@ class ExpenseBuilder extends StatelessWidget {
         }
 
         if (state is ExpenseLoading) {
-          return Center(child: Loader());
+          return loadingWidget ?? Center(child: Loader());
         }
 
         if (state is ExpenseError) {
