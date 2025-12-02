@@ -7,12 +7,15 @@ class CustomFilterChipLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomFilterChip(
-          label: List.generate(20, (_) => ' ').join(),
-          onSelected: (_) {},
-          color: Colors.grey,
-        )
-        .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(duration: 1.seconds, delay: 0.5.seconds);
+    return Flexible(
+      child:
+          CustomFilterChip(
+                label: List.generate(20, (_) => ' ').join(),
+                onSelected: (_) {},
+                color: Colors.grey,
+              )
+              .animate(onPlay: (controller) => controller.repeat())
+              .shimmer(duration: 1.seconds, delay: 0.5.seconds),
+    );
   }
 }
