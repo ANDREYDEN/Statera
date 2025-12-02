@@ -16,6 +16,7 @@ import 'package:statera/data/services/payment_service.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/group/members/owing_list_item.dart';
+import 'package:statera/ui/group/members/owing_list_item_loading.dart';
 import 'package:statera/utils/preview_helpers.dart';
 
 void main() {
@@ -138,6 +139,7 @@ class OwingListItemExamples extends StatelessWidget {
           OwingListItem(member: memberUser, owing: 10),
           OwingListItem(member: memberUser2, owing: 12),
           OwingListItem(member: memberUser3, owing: 13),
+          OwingListItemLoading(),
         ],
       ),
     );

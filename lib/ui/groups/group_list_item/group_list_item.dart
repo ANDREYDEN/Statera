@@ -33,7 +33,7 @@ class GroupListItem extends StatelessWidget {
                   children: [
                     if (userGroup.pinned) ...[
                       Icon(Icons.push_pin),
-                      SizedBox(width: 5)
+                      SizedBox(width: 5),
                     ],
                     Flexible(
                       child: Column(
@@ -57,7 +57,7 @@ class GroupListItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -74,7 +74,8 @@ class GroupListItem extends StatelessWidget {
                   if (!userGroup.archived) TogglePinUserGroupAction(userGroup),
                   ToggleArchiveUserGroupAction(userGroup),
                 ],
-              )
+                padding: EdgeInsets.only(left: 10.0),
+              ),
             ],
           ),
         ),

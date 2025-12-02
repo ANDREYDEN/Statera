@@ -8,6 +8,7 @@ import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/expense_list_item.dart';
+import 'package:statera/ui/group/expenses/expense_list_item/expense_list_item_loading.dart';
 import 'package:statera/ui/group/expenses/expenses_builder.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
@@ -29,7 +30,8 @@ class ExpensesListBody extends StatelessWidget {
     });
     scrollUpdateStreamController.stream.throttle(1.seconds).listen((_) {
       const loadingThreshold = 20.0;
-      final distanceToBottom = scrollController.position.maxScrollExtent -
+      final distanceToBottom =
+          scrollController.position.maxScrollExtent -
           scrollController.position.pixels;
       if (distanceToBottom < loadingThreshold) {
         context.read<ExpensesCubit>().loadMore();
@@ -61,6 +63,11 @@ class ExpensesListBody extends StatelessWidget {
           scrollController.jumpTo(0);
         },
         child: ExpensesBuilder(
+          loadingWidget: ListView.separated(
+            itemCount: 5,
+            itemBuilder: (context, index) => ExpenseListItemLoading(),
+            separatorBuilder: (context, index) => SizedBox(height: 10),
+          ),
           builder: (context, expensesState) {
             final expenses = expensesState.expenses;
             if (expenses.isEmpty) {
@@ -89,8 +96,9 @@ class ExpensesListBody extends StatelessWidget {
                   },
                   child: ExpenseListItem(
                     expense: expense,
-                    processing:
-                        expensesState.processingExpenseIds.contains(expense.id),
+                    processing: expensesState.processingExpenseIds.contains(
+                      expense.id,
+                    ),
                   ),
                 );
               },
