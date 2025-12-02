@@ -55,12 +55,20 @@ class GroupCubit extends Cubit<GroupState> {
     if (!group.memberExists(uid)) return;
     emit(GroupLoading());
 
-    await _expenseService.removeAssigneeFromOutstandingExpenses(uid, group.id);
-    group.removeMember(uid);
-    if (group.members.isEmpty) {
-      await _groupService.deleteGroup(group.id);
-    } else {
-      await _groupService.saveGroup(group);
+    try {
+      await _expenseService.removeAssigneeFromOutstandingExpenses(
+        uid,
+        group.id,
+      );
+      group.removeMember(uid);
+      if (group.members.isEmpty) {
+        await _groupService.deleteGroup(group.id);
+      } else {
+        await _groupService.saveGroup(group);
+      }
+    } catch (e) {
+      emit(GroupLoaded(group: group));
+      rethrow;
     }
   }
 

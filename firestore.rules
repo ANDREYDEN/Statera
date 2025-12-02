@@ -35,12 +35,16 @@ service cloud.firestore {
       allow read, update: if request.auth != null; 
       
       allow create: if isMemberOfExpenseGroup(request.resource.data)
-      
-      allow delete: if isExpenseAuthor();
+
+      allow delete: if isExpenseAuthor() || isParentGroupAdmin(resource.data);
     }
 
     function isExpenseAuthor() {
       return request.auth.uid == resource.data.authorUid;
+    }
+
+    function isParentGroupAdmin(expense) {
+      return request.auth.uid == get(/databases/$(database)/documents/groups/$(expense.groupId)).data.adminId;
     }
 
     function isExpenseAssignee() {

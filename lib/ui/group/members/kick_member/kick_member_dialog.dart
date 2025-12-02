@@ -7,6 +7,7 @@ import 'package:statera/data/models/expense.dart';
 import 'package:statera/ui/group/members/kick_member/kick_member_info_section.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/utils.dart';
 
 class KickMemberDialog extends StatelessWidget {
   final CustomUser member;
@@ -45,7 +46,14 @@ class KickMemberDialog extends StatelessWidget {
 
   Future<void> _handleConfirm(BuildContext context) async {
     final groupCubit = context.read<GroupCubit>();
-    await groupCubit.removeMember(member.uid);
+
+    await snackbarCatch(
+      context,
+      () async {
+        await groupCubit.removeMember(member.uid);
+      },
+      successMessage: 'Member "${member.name}" has been successfully removed.',
+    );
   }
 
   @override
