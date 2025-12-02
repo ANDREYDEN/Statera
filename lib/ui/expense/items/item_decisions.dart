@@ -60,9 +60,6 @@ class _ItemDecisionsState extends State<ItemDecisions> {
             children: [...widget.item.assignees]
                 .where((assigneeDecision) => (assigneeDecision.parts ?? 0) > 0)
                 .map((assigneeDecision) {
-                  if (!group.memberExists(assigneeDecision.uid))
-                    return Icon(Icons.error);
-
                   var member = group.getMember(assigneeDecision.uid);
 
                   if (!widget.item.isPartitioned)

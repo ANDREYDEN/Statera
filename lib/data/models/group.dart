@@ -68,11 +68,11 @@ class Group {
     List<CustomUser>? members,
     String? adminId,
   }) : this(
-          name: name ?? 'Empty',
-          code: code,
-          members: members,
-          adminId: adminId,
-        );
+         name: name ?? 'Empty',
+         code: code,
+         members: members,
+         adminId: adminId,
+       );
 
   CustomUser get admin =>
       _adminId != null ? getMember(_adminId!) : members.first;
@@ -115,8 +115,10 @@ class Group {
   bool memberExists(String uid) =>
       this.members.any((member) => member.uid == uid);
 
-  CustomUser getMember(String uid) =>
-      this.members.firstWhere((member) => member.uid == uid);
+  CustomUser getMember(String uid) => this.members.firstWhere(
+    (member) => member.uid == uid,
+    orElse: () => CustomUser.inactive(),
+  );
 
   void addMember(CustomUser member) {
     this.members.add(member);
@@ -135,19 +137,21 @@ class Group {
   }
 
   Map<CustomUser, double> getOwingsForUser(String uid) {
-    return this
-        .balance[uid]!
-        .map((otherUid, balance) => MapEntry(getMember(otherUid), balance));
+    return this.balance[uid]!.map(
+      (otherUid, balance) => MapEntry(getMember(otherUid), balance),
+    );
   }
 
   void payOffBalance({required Payment payment}) {
     if (this.members.every((member) => member.uid != payment.payerId)) {
       throw new Exception(
-          'User with id ${payment.payerId} is not a member of group $name');
+        'User with id ${payment.payerId} is not a member of group $name',
+      );
     }
     if (this.members.every((member) => member.uid != payment.receiverId)) {
       throw new Exception(
-          'User with id ${payment.receiverId} is not a member of group $name');
+        'User with id ${payment.receiverId} is not a member of group $name',
+      );
     }
 
     this.balance[payment.payerId]![payment.receiverId] =
@@ -221,17 +225,13 @@ class Group {
   }
 
   List<String> getMembersThatOweToMember(String uid) {
-    return this
-        .balance
-        .keys
+    return this.balance.keys
         .where((otherUid) => (this.balance[otherUid]![uid] ?? 0) > 0)
         .toList();
   }
 
   List<String> getMembersThatMemberOwesTo(String uid) {
-    return this
-        .balance
-        .keys
+    return this.balance.keys
         .where((otherUid) => (this.balance[uid]![otherUid] ?? 0) > 0)
         .toList();
   }
@@ -244,15 +244,15 @@ class Group {
   Map<String, Map<String, double>> getFirestoreBalance() {
     return Map.fromEntries(
       this.balance.entries.map(
-            (memberEntry) => MapEntry(
-              memberEntry.key,
-              Map.fromEntries(
-                memberEntry.value.entries.map(
-                  (entry) => MapEntry(entry.key, round(entry.value, 2)),
-                ),
-              ),
+        (memberEntry) => MapEntry(
+          memberEntry.key,
+          Map.fromEntries(
+            memberEntry.value.entries.map(
+              (entry) => MapEntry(entry.key, round(entry.value, 2)),
             ),
           ),
+        ),
+      ),
     );
   }
 

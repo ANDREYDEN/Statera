@@ -26,6 +26,7 @@ class UserAvatarExamples extends StatelessWidget {
             borderColor: Colors.green,
           ),
           UserAvatar(author: CustomUser.fake(), loading: true),
+          UserAvatar(author: CustomUser.inactive()),
           Row(
             children: [20, 40, 60, 100, 200]
                 .map(

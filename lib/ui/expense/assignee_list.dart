@@ -18,8 +18,6 @@ class AssigneeList extends StatelessWidget {
                 builder: (_, group) => ListView(
                   scrollDirection: Axis.horizontal,
                   children: expense.assigneeUids.map((assigneeUid) {
-                    if (!group.memberExists(assigneeUid))
-                      return Icon(Icons.error);
                     var member = group.getMember(assigneeUid);
                     return UserAvatar(
                       margin: const EdgeInsets.only(right: 4),
