@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/expense.dart';
 import 'package:statera/ui/group/members/kick_member/kick_member_info_section.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/utils.dart';
 
 class KickMemberDialog extends StatelessWidget {
   final CustomUser member;
@@ -30,18 +32,28 @@ class KickMemberDialog extends StatelessWidget {
   }) {
     return showDialog(
       context: context,
-      builder: (context) => KickMemberDialog(
-        member: member,
-        outstandingBalanceMembers: outstandingBalanceMembers,
-        pendingExpenses: pendingExpenses,
-        pendingAuthoredExpenses: pendingAuthoredExpenses,
+      builder: (_) => Provider.value(
+        value: context.read<GroupCubit>(),
+        child: KickMemberDialog(
+          member: member,
+          outstandingBalanceMembers: outstandingBalanceMembers,
+          pendingExpenses: pendingExpenses,
+          pendingAuthoredExpenses: pendingAuthoredExpenses,
+        ),
       ),
     );
   }
 
   Future<void> _handleConfirm(BuildContext context) async {
     final groupCubit = context.read<GroupCubit>();
-    await groupCubit.removeMember(member.uid);
+
+    await snackbarCatch(
+      context,
+      () async {
+        await groupCubit.removeMember(member.uid);
+      },
+      successMessage: 'Member "${member.name}" has been successfully removed.',
+    );
   }
 
   @override
@@ -75,10 +87,7 @@ class KickMemberDialog extends StatelessWidget {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      expense.name,
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text(expense.name, textAlign: TextAlign.center),
                   ),
                 ),
               );
@@ -94,10 +103,7 @@ class KickMemberDialog extends StatelessWidget {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      expense.name,
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text(expense.name, textAlign: TextAlign.center),
                   ),
                 ),
               );

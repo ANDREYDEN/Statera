@@ -7,7 +7,7 @@ import 'package:statera/data/services/firestore.dart';
 @GenerateNiceMocks([MockSpec<ExpenseService>()])
 class ExpenseService extends Firestore {
   ExpenseService(FirebaseFirestore firestoreInstance)
-      : super(firestoreInstance);
+    : super(firestoreInstance);
 
   Future<Expense> getExpense(String? expenseId) async {
     var expenseDoc = await expensesCollection.doc(expenseId).get();
@@ -30,8 +30,10 @@ class ExpenseService extends Firestore {
     String uid,
     String? groupId,
   ) async {
-    var outstandingExpensesSnap =
-        await expensesQuery(groupId: groupId, finalized: false).get();
+    var outstandingExpensesSnap = await expensesQuery(
+      groupId: groupId,
+      finalized: false,
+    ).get();
     final outstandingExpenses = outstandingExpensesSnap.docs
         .map((doc) => Expense.fromSnapshot(doc))
         .toList();
@@ -52,18 +54,28 @@ class ExpenseService extends Firestore {
     String uid,
     String? groupId,
   ) async {
-    final outstandingExpensesSnap =
-        await expensesQuery(groupId: groupId, finalized: false).get();
-    final outstandingExpenses =
-        outstandingExpensesSnap.docs.map(Expense.fromSnapshot).toList();
+    final outstandingExpensesSnap = await expensesQuery(
+      groupId: groupId,
+      finalized: false,
+    ).get();
+    final outstandingExpenses = outstandingExpensesSnap.docs.map((doc) {
+      return Expense.fromSnapshot(doc);
+    }).toList();
 
-    for (final expense in outstandingExpenses) {
-      if (expense.assigneeUids.contains(uid)) {
-        expense.removeAssignee(uid);
-      }
+    final authoredExpenses = outstandingExpenses.where((expense) {
+      return expense.isAuthoredBy(uid);
+    }).toList();
+
+    final involvedExpenses = outstandingExpenses.where((expense) {
+      return expense.assigneeUids.contains(uid) && !expense.isAuthoredBy(uid);
+    }).toList();
+    for (var expense in involvedExpenses) {
+      expense.removeAssignee(uid);
     }
-
-    await Future.wait(outstandingExpenses.map(updateExpense));
+    await Future.wait([
+      ...authoredExpenses.map((expense) => deleteExpense(expense.id)),
+      ...involvedExpenses.map((expense) => updateExpense(expense)),
+    ]);
   }
 
   Future<void> deleteExpense(String expenseId) {
@@ -71,7 +83,9 @@ class ExpenseService extends Firestore {
   }
 
   Future<List<Expense>> getPendingExpenses(
-      String groupId, String assigneeId) async {
+    String groupId,
+    String assigneeId,
+  ) async {
     final expensesSnap = await expensesQuery(
       groupId: groupId,
       assigneeId: assigneeId,
@@ -83,7 +97,9 @@ class ExpenseService extends Firestore {
   }
 
   Future<List<Expense>> getPendingAuthoredExpenses(
-      String groupId, String authorId) async {
+    String groupId,
+    String authorId,
+  ) async {
     final expensesSnap = await expensesQuery(
       groupId: groupId,
       authorId: authorId,

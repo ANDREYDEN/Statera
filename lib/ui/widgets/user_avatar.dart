@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:statera/data/models/custom_user.dart';
+import 'package:statera/utils/utils.dart';
 
 part 'user_avatar_name.dart';
 
@@ -34,16 +35,34 @@ class UserAvatar extends StatelessWidget {
     this.loading = false,
   }) : super(key: key);
 
+  String get firstLetter {
+    if (!author.isActive || author.name.isEmpty) return '?';
+    return author.name[0];
+  }
+
+  void Function()? getTapHandler(BuildContext context) {
+    if (!author.isActive && onTap == null) {
+      return () {
+        showSnackBar(context, 'This user is no longer active');
+      };
+    }
+
+    return onTap;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final photoUrl = author.photoURL;
+    final tapHandler = getTapHandler(context);
+
     final result = Padding(
       padding: this.margin ?? EdgeInsets.all(0),
       child: MouseRegion(
-        cursor: this.onTap != null
+        cursor: tapHandler != null
             ? SystemMouseCursors.click
             : MouseCursor.defer,
         child: GestureDetector(
-          onTap: this.onTap,
+          onTap: tapHandler,
           child: Flex(
             direction: namePosition == NamePosition.bottom
                 ? Axis.vertical
@@ -58,10 +77,10 @@ class UserAvatar extends StatelessWidget {
                     width: this.dimension,
                     height: this.dimension,
                     child: CircleAvatar(
-                      backgroundImage: this.author.photoURL == null
+                      backgroundImage: photoUrl == null
                           ? null
-                          : NetworkImage(this.author.photoURL!),
-                      child: this.author.photoURL != null
+                          : NetworkImage(photoUrl),
+                      child: photoUrl != null
                           ? null
                           : Stack(
                               alignment: AlignmentDirectional.center,
@@ -74,9 +93,7 @@ class UserAvatar extends StatelessWidget {
                                 ),
                                 if (!loading)
                                   Text(
-                                    this.author.name.isEmpty
-                                        ? '?'
-                                        : this.author.name[0],
+                                    firstLetter,
                                     style: TextStyle(
                                       fontSize: dimension == null
                                           ? 24

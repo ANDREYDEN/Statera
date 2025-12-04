@@ -4,49 +4,62 @@ import 'package:statera/data/value_objects/profile_part.dart';
 import 'package:uuid/uuid.dart';
 
 class CustomUser {
-  late String uid;
-  late String name;
-  String? photoURL;
-  String? paymentInfo;
+  late final String uid;
+  late final String name;
+  late final String? photoURL;
+  final String? paymentInfo;
+  final bool isActive;
 
   CustomUser({
     required this.uid,
     required this.name,
     this.photoURL,
     this.paymentInfo,
-  });
+  }) : isActive = true;
 
-  CustomUser.fromUser(User user) {
+  CustomUser.fromUser(User user) : paymentInfo = null, isActive = true {
     this.uid = user.uid;
     this.name = user.displayName ?? 'anonymous';
     this.photoURL = user.photoURL;
   }
 
-  CustomUser.fake({String? name, String? uid, String? photoURL}) {
+  CustomUser.fake({
+    String? name,
+    String? uid,
+    this.photoURL,
+    this.paymentInfo,
+    this.isActive = true,
+  }) {
     this.uid = uid ?? Uuid().v1();
     this.name = name ?? 'bar';
-    this.photoURL = photoURL;
   }
 
+  CustomUser.inactive()
+    : uid = '',
+      name = '',
+      photoURL = null,
+      paymentInfo = null,
+      isActive = false;
+
   List<ProfilePart> get profileParts => [
-        ProfilePart(
-          name: 'Set a username',
-          incompleteMessage:
-              'Please provide a username, otherwise you would be visible to others as "anonymous"',
-          isCompleted: name != 'anonymous',
-        ),
-        ProfilePart(
-          name: 'Set a Profile Picture',
-          incompleteMessage: 'Make it easier for others to recognize you',
-          isCompleted: photoURL != null,
-        ),
-        ProfilePart(
-          name: 'Set Payment Information',
-          incompleteMessage:
-              'Please provide your payment information so that others know how to pay you',
-          isCompleted: paymentInfo != null,
-        ),
-      ];
+    ProfilePart(
+      name: 'Set a username',
+      incompleteMessage:
+          'Please provide a username, otherwise you would be visible to others as "anonymous"',
+      isCompleted: name != 'anonymous',
+    ),
+    ProfilePart(
+      name: 'Set a Profile Picture',
+      incompleteMessage: 'Make it easier for others to recognize you',
+      isCompleted: photoURL != null,
+    ),
+    ProfilePart(
+      name: 'Set Payment Information',
+      incompleteMessage:
+          'Please provide your payment information so that others know how to pay you',
+      isCompleted: paymentInfo != null,
+    ),
+  ];
 
   List<ProfilePart> get incompletedProfileParts =>
       profileParts.where((part) => !part.isCompleted).toList();
@@ -77,10 +90,6 @@ class CustomUser {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
-      'uid': uid,
-      'name': name,
-      'photoURL': photoURL,
-    };
+    return {'uid': uid, 'name': name, 'photoURL': photoURL};
   }
 }

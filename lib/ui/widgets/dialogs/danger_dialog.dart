@@ -12,14 +12,14 @@ class DangerDialog extends StatefulWidget {
   final String value;
   final FutureOr<void> Function() onConfirm;
 
-  const DangerDialog(
-      {Key? key,
-      required this.title,
-      required this.valueName,
-      required this.value,
-      required this.onConfirm,
-      this.body})
-      : super(key: key);
+  const DangerDialog({
+    Key? key,
+    required this.title,
+    required this.valueName,
+    required this.value,
+    required this.onConfirm,
+    this.body,
+  }) : super(key: key);
 
   @override
   State<DangerDialog> createState() => _DangerDialogState();
@@ -53,10 +53,13 @@ class _DangerDialogState extends State<DangerDialog> {
             if (widget.body != null) ...[
               Flexible(child: SingleChildScrollView(child: widget.body!)),
               SizedBox(height: 5),
-              Divider()
+              Divider(),
             ],
             Text('Please enter the ${widget.valueName} to confirm'),
-            TextField(controller: _confirmController),
+            TextField(
+              controller: _confirmController,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+            ),
           ],
         ),
       ),
