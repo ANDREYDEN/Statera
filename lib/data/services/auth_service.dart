@@ -28,12 +28,17 @@ class AuthService {
   }
 
   Future<UserCredential> signUp(
-      String email, String password, String confirmPassword) {
+    String email,
+    String password,
+    String confirmPassword,
+  ) {
     if (password != confirmPassword) {
       throw FirebaseAuthException(code: 'password-mismatch');
     }
     return _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
+      email: email,
+      password: password,
+    );
   }
 
   Future<UserCredential?> signInWithGoogle() async {
@@ -95,7 +100,7 @@ class AuthService {
   }
 
   Future<UserCredential?> signInWithAppleOnWeb() async {
-    final provider = OAuthProvider('apple.com')
+    final provider = AppleAuthProvider()
       ..addScope('email')
       ..addScope('name');
 
@@ -106,14 +111,26 @@ class AuthService {
     final rawNonce = _generateNonce();
     final nonce = _sha256ofString(rawNonce);
 
-    final appleCredential = await SignInWithApple.getAppleIDCredential(scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.fullName,
-    ], nonce: nonce);
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: nonce,
+    );
 
-    final oAuthCredential = OAuthProvider('apple.com').credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
+    final idToken = appleCredential.identityToken;
+    if (idToken == null) {
+      throw Exception('Failed to sign in with Apple: no identity token');
+    }
+
+    final oAuthCredential = AppleAuthProvider.credentialWithIDToken(
+      idToken,
+      rawNonce,
+      AppleFullPersonName(
+        familyName: appleCredential.familyName,
+        givenName: appleCredential.givenName,
+      ),
     );
     return _auth.signInWithCredential(oAuthCredential);
   }
@@ -122,8 +139,10 @@ class AuthService {
     const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   String _sha256ofString(String input) {
