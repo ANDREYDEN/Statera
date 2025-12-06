@@ -67,4 +67,9 @@ class NotificationService {
           FirebaseMessaging.instance.onTokenRefresh.listen(onUpdate);
     }
   }
+
+  void dispose() {
+    _tokenRefreshSubscription?.cancel();
+    _notificationSubscription?.cancel();
+  }
 }
