@@ -50,6 +50,18 @@ class _SignInPageState extends State<SignInPage> {
     context.replace(widget.destinationPath ?? '/groups');
   }
 
+  Future<void> _handleSignInWithGoogle() async {
+    final signInCubit = context.read<SignInCubit>();
+    await signInCubit.signInWithGoogle();
+    context.replace(widget.destinationPath ?? '/groups');
+  }
+
+  Future<void> _handleSignInWithApple() async {
+    final signInCubit = context.read<SignInCubit>();
+    await signInCubit.signInWithApple();
+    context.replace(widget.destinationPath ?? '/groups');
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignInCubit, SignInState>(
@@ -151,12 +163,12 @@ class _SignInPageState extends State<SignInPage> {
                           platformContext.isMobile ||
                           platformContext.isWindows)
                         SocialSignInButton.google(
-                          onPressed: signInCubit.signInWithGoogle,
+                          onPressed: _handleSignInWithGoogle,
                           isLoading: signInState is SignInLoading,
                         ),
                       if (platformContext.isApple)
                         SocialSignInButton.apple(
-                          onPressed: signInCubit.signInWithApple,
+                          onPressed: _handleSignInWithApple,
                           isLoading: signInState is SignInLoading,
                         ),
                     ],
