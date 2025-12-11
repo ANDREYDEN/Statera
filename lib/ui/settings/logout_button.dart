@@ -12,7 +12,7 @@ class LogoutButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       child: DangerButton(
         text: 'Log Out',
-        onPressed: () async {
+        onPressed: () {
           context.goNamed(SignOutPage.name);
         },
       ),

@@ -33,8 +33,11 @@ class CustomRouterConfig {
           (prefix) => routeState.matchedLocation.startsWith(prefix),
         );
         final isSignIn = routeState.matchedLocation.startsWith('/sign-in');
+        final isSignOut = routeState.matchedLocation.startsWith('/sign-out');
 
         if (!isAuthenticated && routePrivate) {
+          if (isSignOut) return '/sign-in';
+
           return '/sign-in?destinationPath=${routeState.uri}';
         }
 
