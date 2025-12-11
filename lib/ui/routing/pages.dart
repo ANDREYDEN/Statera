@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/authentication/sign_in_page.dart';
+import 'package:statera/ui/authentication/sign_out_page.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
@@ -19,9 +20,35 @@ class CustomRouterConfig {
   static GoRouter create(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
 
+    final authenticatedRoutePrefixes = ['/groups', '/sign-out'];
+
     return GoRouter(
       initialLocation: kIsWeb ? '/' : '/groups',
       refreshListenable: authBloc.stream.toChangeNotifier(),
+      redirect: (context, routeState) {
+        final authBloc = context.read<AuthBloc>();
+        final isAuthenticated =
+            authBloc.state.status == AuthStatus.authenticated;
+        final routePrivate = authenticatedRoutePrefixes.any(
+          (prefix) => routeState.matchedLocation.startsWith(prefix),
+        );
+        final isSignIn = routeState.matchedLocation.startsWith('/sign-in');
+        final isSignOut = routeState.matchedLocation.startsWith('/sign-out');
+
+        if (!isAuthenticated && routePrivate) {
+          if (isSignOut) return '/sign-in';
+
+          return '/sign-in?destinationPath=${routeState.uri}';
+        }
+
+        if (isAuthenticated && isSignIn) {
+          final destinationPath =
+              routeState.uri.queryParameters['destinationPath'];
+          return destinationPath ?? '/groups';
+        }
+
+        return null;
+      },
       routes: [
         GoRoute(
           name: LandingPage.name,
@@ -31,28 +58,23 @@ class CustomRouterConfig {
         GoRoute(
           name: SignInPage.name,
           path: '/sign-in',
-          builder: (_, state) => SignInPage.init(
-            destinationPath: state.uri.queryParameters['destinationPath'],
-          ),
+          builder: (_, state) => SignInPage.init(),
         ),
         GoRoute(
           name: SupportPage.name,
           path: '/support',
           builder: (_, __) => SupportPage(),
         ),
+        GoRoute(
+          name: SignOutPage.name,
+          path: '/sign-out',
+          builder: (_, state) => SignOutPage(),
+        ),
         AuthenticatedGoRoute(
           name: GroupListPage.name,
           path: '/groups',
           builder: (_) => GroupListPage.init(),
           isHomePage: true,
-          redirect: (context, routeState) {
-            final authBloc = context.read<AuthBloc>();
-            if (authBloc.state.status == AuthStatus.unauthenticated) {
-              return '/sign-in?destinationPath=${routeState.uri}';
-            }
-
-            return null;
-          },
           routes: [
             AuthenticatedGoRoute(
               name: SettingsPage.name,
@@ -87,7 +109,7 @@ class CustomRouterConfig {
                     state.pathParameters['groupId'],
                     state.pathParameters['code'],
                   ),
-                )
+                ),
               ],
             ),
           ],
@@ -106,9 +128,9 @@ class AuthenticatedGoRoute extends GoRoute {
     bool isHomePage = false,
     super.redirect,
   }) : super(
-          builder: (context, state) => NotificationsInitializer(
-            child: builder(state),
-            isHomePage: isHomePage,
-          ),
-        );
+         builder: (context, state) => NotificationsInitializer(
+           child: builder(state),
+           isHomePage: isHomePage,
+         ),
+       );
 }

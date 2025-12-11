@@ -37,4 +37,10 @@ class NewPaymentsCubit extends Cubit<NewPaymentsState> {
           },
         );
   }
+
+  @override
+  Future<void> close() {
+    _paymentsSubscription?.cancel();
+    return super.close();
+  }
 }

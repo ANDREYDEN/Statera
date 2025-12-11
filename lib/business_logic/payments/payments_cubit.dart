@@ -25,26 +25,33 @@ class PaymentsCubit extends Cubit<PaymentsState> {
     _paymentsSubscription = _paymentService
         .paymentsStream(groupId: groupId, userId1: uid, userId2: otherUid)
         .map((payments) {
-      payments.sort();
-      return PaymentsLoaded(payments: payments);
-    }).listen(
-      emit,
-      onError: (error) {
-        if (error is Exception) {
-          FirebaseCrashlytics.instance.recordError(
-            error,
-            null,
-            reason: 'Payments failed to load',
-          );
-        }
-        emit(PaymentsError(error: error));
-      },
-    );
+          payments.sort();
+          return PaymentsLoaded(payments: payments);
+        })
+        .listen(
+          emit,
+          onError: (error) {
+            if (error is Exception) {
+              FirebaseCrashlytics.instance.recordError(
+                error,
+                null,
+                reason: 'Payments failed to load',
+              );
+            }
+            emit(PaymentsError(error: error));
+          },
+        );
   }
 
   Future<void> view(String uid) {
     if (!(state is PaymentsLoaded)) return Future.value();
 
     return _paymentService.view((state as PaymentsLoaded).payments, uid);
+  }
+
+  @override
+  Future<void> close() {
+    _paymentsSubscription?.cancel();
+    return super.close();
   }
 }

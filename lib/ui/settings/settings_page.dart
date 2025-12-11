@@ -8,9 +8,9 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
+import 'package:statera/ui/settings/logout_button.dart';
 import 'package:statera/ui/settings/primary_color_picker.dart';
 import 'package:statera/ui/settings/profile_completion/profile_completion.dart';
-import 'package:statera/ui/widgets/buttons/danger_button.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
@@ -134,18 +134,7 @@ class _SettingsPageState extends State<SettingsPage>
             SizedBox(height: 40),
             DangerZone(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 15,
-                  ),
-                  child: DangerButton(
-                    text: 'Log Out',
-                    onPressed: () {
-                      _authBloc.add(LogoutRequested());
-                    },
-                  ),
-                ),
+                LogoutButton(),
                 ClearPreferencesButton(),
                 DeleteAccountButton(),
               ],

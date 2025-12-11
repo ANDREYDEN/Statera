@@ -34,14 +34,11 @@ class UserGroup {
 
   double getDebt(DebtDirection debtDirection, String uid) {
     final balanceRef = balance;
-    if (balanceRef == null) return 0;
-
-    if (!balanceRef.containsKey(uid)) {
-      throw Exception('User ($uid) is not part of group ($name)');
+    if (balanceRef == null || !balanceRef.containsKey(uid)) {
+      return 0;
     }
 
-    return balanceRef[uid]!
-        .values
+    return balanceRef[uid]!.values
         .where((v) => (v > 0) ^ (debtDirection == DebtDirection.inward))
         .sum
         .abs();

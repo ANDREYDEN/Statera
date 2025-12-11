@@ -51,4 +51,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
           AppLaunchHandler.handleNotificationMessage(message, context),
     );
   }
+
+  @override
+  Future<void> close() {
+    _notificationService.dispose();
+    return super.close();
+  }
 }
