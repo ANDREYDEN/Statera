@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/platform_context.dart';
@@ -12,16 +11,15 @@ import 'package:statera/utils/utils.dart';
 class SignInPage extends StatefulWidget {
   static const String name = 'SignIn';
 
-  final String? destinationPath;
-  const SignInPage({Key? key, this.destinationPath}) : super(key: key);
+  const SignInPage({Key? key}) : super(key: key);
 
-  static Widget init({required String? destinationPath}) {
+  static Widget init() {
     return BlocProvider(
       create: (context) => SignInCubit(
         context.read<AuthService>(),
         context.read<ErrorService>(),
       ),
-      child: SignInPage(destinationPath: destinationPath),
+      child: SignInPage(),
     );
   }
 
@@ -46,20 +44,16 @@ class _SignInPageState extends State<SignInPage> {
         _passwordConfirmController.text,
       );
     }
-
-    context.replace(widget.destinationPath ?? '/groups');
   }
 
   Future<void> _handleSignInWithGoogle() async {
     final signInCubit = context.read<SignInCubit>();
     await signInCubit.signInWithGoogle();
-    context.replace(widget.destinationPath ?? '/groups');
   }
 
   Future<void> _handleSignInWithApple() async {
     final signInCubit = context.read<SignInCubit>();
     await signInCubit.signInWithApple();
-    context.replace(widget.destinationPath ?? '/groups');
   }
 
   @override
