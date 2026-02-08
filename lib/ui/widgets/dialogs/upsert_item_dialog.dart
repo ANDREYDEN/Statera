@@ -174,7 +174,7 @@ class UpsertItemDialog extends StatelessWidget {
 
         final expense = getExpense();
         if (expense == null) {
-          return;
+          return item;
         }
 
         late final updatedExpense;
@@ -190,6 +190,7 @@ class UpsertItemDialog extends StatelessWidget {
             updatedExpense: updatedExpense,
           ),
         );
+        return item;
       },
       allowAddAnother: addingItem,
     );

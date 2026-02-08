@@ -26,12 +26,13 @@ class EditExpenseAction extends EntityAction {
             label: 'Expense name',
             validators: [FieldData.requiredValidator],
             initialData: expense.name,
-          )
+          ),
         ],
         onSubmit: (values) {
           final updatedExpense = Expense.from(expense);
           updatedExpense.name = values['expense_name']!;
           expensesCubit.updateExpense(updatedExpense, persist: true);
+          return updatedExpense;
         },
       ),
     );

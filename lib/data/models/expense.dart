@@ -27,11 +27,7 @@ class Expense {
   }
 
   Expense.empty({String? groupId})
-      : this(
-          name: 'Empty',
-          authorUid: '',
-          groupId: groupId,
-        );
+    : this(name: 'Empty', authorUid: '', groupId: groupId);
 
   bool wasEarlierThan(Expense other) {
     if (this.date == null) return true;
@@ -74,14 +70,13 @@ class Expense {
       !this.finalized && this.assigneeUids.contains(uid);
 
   int get definedAssignees => assigneeUids.fold(
-        0,
-        (previousValue, assigneeUid) =>
-            previousValue + (isMarkedBy(assigneeUid) ? 1 : 0),
-      );
+    0,
+    (previousValue, assigneeUid) =>
+        previousValue + (isMarkedBy(assigneeUid) ? 1 : 0),
+  );
 
   void addItem(Item newItem) {
-    newItem.assignees = this
-        .assigneeUids
+    newItem.assignees = this.assigneeUids
         .map((assigneeUid) => AssigneeDecision(uid: assigneeUid))
         .toList();
     this.items.add(newItem);
@@ -145,11 +140,7 @@ class Expense {
     return items.fold<double>(
       0,
       (prev, item) =>
-          prev +
-          item.getConfirmedTaxForUser(
-            uid,
-            tax: settings.tax,
-          ),
+          prev + item.getConfirmedTaxForUser(uid, tax: settings.tax),
     );
   }
 
@@ -190,13 +181,13 @@ class Expense {
     };
   }
 
-  static Expense from(Expense other) {
+  static Expense from(Expense other, {ExpenseSettings? settings}) {
     return Expense(
-      name: other.name,
-      authorUid: other.authorUid,
-      groupId: other.groupId,
-      settings: ExpenseSettings.from(other.settings),
-    )
+        name: other.name,
+        authorUid: other.authorUid,
+        groupId: other.groupId,
+        settings: settings ?? ExpenseSettings.from(other.settings),
+      )
       ..id = other.id
       ..date = other.date
       ..finalizedDate = other.finalizedDate
@@ -227,7 +218,8 @@ class Expense {
         .map((a) => a.toString())
         .toList();
     data['items'].forEach(
-        (itemData) => {expense.items.add(Item.fromFirestore(itemData))});
+      (itemData) => {expense.items.add(Item.fromFirestore(itemData))},
+    );
     return expense;
   }
 
