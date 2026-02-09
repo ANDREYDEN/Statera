@@ -16,7 +16,7 @@ class EditExpenseAction extends EntityAction {
   FutureOr<void> handle(BuildContext context) async {
     final expensesCubit = context.read<ExpensesCubit>();
 
-    await showDialog(
+    final updatedExpense = await showDialog(
       context: context,
       builder: (context) => CRUDDialog(
         title: 'Edit Expense',
@@ -29,12 +29,11 @@ class EditExpenseAction extends EntityAction {
           ),
         ],
         onSubmit: (values) {
-          final updatedExpense = Expense.from(expense);
-          updatedExpense.name = values['expense_name']!;
-          expensesCubit.updateExpense(updatedExpense, persist: true);
-          return updatedExpense;
+          return Expense.from(expense, name: values['expense_name']!);
         },
       ),
     );
+
+    await expensesCubit.updateExpense(updatedExpense, persist: true);
   }
 }

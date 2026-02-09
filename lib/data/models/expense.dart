@@ -181,9 +181,9 @@ class Expense {
     };
   }
 
-  static Expense from(Expense other, {ExpenseSettings? settings}) {
+  static Expense from(Expense other, {String? name, ExpenseSettings? settings}) {
     return Expense(
-        name: other.name,
+        name: name ?? other.name,
         authorUid: other.authorUid,
         groupId: other.groupId,
         settings: settings ?? ExpenseSettings.from(other.settings),

@@ -6,6 +6,7 @@ linter:
   rules:
     prefer_single_quotes: true
     unawaited_futures: true
+    avoid_void_async: true
 
 analyzer:
   errors:
