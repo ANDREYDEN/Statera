@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/upsert_item_dialog.dart';
@@ -22,15 +23,33 @@ class UpsertItemAction extends ItemAction {
 
   @override
   @protected
-  void handle(BuildContext context) {
+  Future<void> handle(BuildContext context) async {
     final expenseBloc = context.read<ExpenseBloc>();
+    final authBloc = context.read<AuthBloc>();
 
-    showDialog(
+    final expenseState = expenseBloc.state;
+    if (expenseState is! ExpenseLoaded) return;
+    final expense = expenseState.expense;
+
+    final updatedItem = await showDialog<Item>(
       context: context,
       builder: (context) => UpsertItemDialog(
-        initialItem: item,
-        expenseBloc: expenseBloc,
+        initialItem: item == null ? null : Item.from(item!),
+        expense: expense,
       ),
+    );
+
+    if (updatedItem == null) return;
+
+    final updatedExpense = Expense.from(expense);
+    if (item == null) {
+      updatedExpense.addItem(updatedItem);
+    } else {
+      updatedExpense.updateItem(updatedItem);
+    }
+
+    expenseBloc.add(
+      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
   }
 }

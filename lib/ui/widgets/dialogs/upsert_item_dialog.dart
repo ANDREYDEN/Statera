@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
 class UpsertItemDialog extends StatelessWidget {
   final Item? initialItem;
-  final ExpenseBloc expenseBloc;
+  final Expense expense;
 
-  UpsertItemDialog({Key? key, this.initialItem, required this.expenseBloc})
-      : super(key: key);
+  UpsertItemDialog({Key? key, this.initialItem, required this.expense})
+    : super(key: key);
 
   R initialItemProperty<T extends Item, R>(
     R? Function(T item) selector, {
@@ -28,20 +25,9 @@ class UpsertItemDialog extends StatelessWidget {
   build(BuildContext context) {
     bool addingItem = initialItem == null;
 
-    AuthBloc authBloc = context.read<AuthBloc>();
+    final bool itemTaxableByDefault = expense.settings.itemsAreTaxableByDefault;
 
-    Expense? getExpense() {
-      if (expenseBloc.state case final ExpenseLoaded state) {
-        return state.expense;
-      }
-
-      return null;
-    }
-
-    final bool itemTaxableByDefault =
-        getExpense()?.settings.itemsAreTaxableByDefault ?? false;
-
-    final bool itemHasTax = getExpense()?.hasTax ?? false;
+    final bool itemHasTax = expense.hasTax;
 
     final simpleItemFields = [
       FieldData<double>(
@@ -92,33 +78,30 @@ class UpsertItemDialog extends StatelessWidget {
         ),
       ],
       fieldsMap: itemFieldsMap.map(
-        (segmentValue, itemFields) => MapEntry(
-          segmentValue,
-          [
+        (segmentValue, itemFields) => MapEntry(segmentValue, [
+          FieldData(
+            id: 'item_name',
+            label: 'Item Name',
+            initialData: initialItem?.name ?? '',
+            validators: [FieldData.requiredValidator],
+          ),
+          ...itemFields,
+          FieldData(
+            id: 'item_partition',
+            label: 'Item Parts',
+            initialData: initialItem?.partition ?? 1,
+            validators: [FieldData.requiredValidator],
+            formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
+            isAdvanced: true,
+          ),
+          if (itemHasTax)
             FieldData(
-              id: 'item_name',
-              label: 'Item Name',
-              initialData: initialItem?.name ?? '',
-              validators: [FieldData.requiredValidator],
-            ),
-            ...itemFields,
-            FieldData(
-              id: 'item_partition',
-              label: 'Item Parts',
-              initialData: initialItem?.partition ?? 1,
-              validators: [FieldData.requiredValidator],
-              formatters: [FilteringTextInputFormatter.deny(RegExp('\.,-'))],
+              id: 'item_taxable',
+              label: 'Apply tax to item',
+              initialData: initialItem?.isTaxable ?? itemTaxableByDefault,
               isAdvanced: true,
             ),
-            if (itemHasTax)
-              FieldData(
-                id: 'item_taxable',
-                label: 'Apply tax to item',
-                initialData: initialItem?.isTaxable ?? itemTaxableByDefault,
-                isAdvanced: true,
-              ),
-          ],
-        ),
+        ]),
       ),
       buildWarning: (fields) {
         final itemName = (fields['item_name'] ?? '') as String;
@@ -140,7 +123,8 @@ class UpsertItemDialog extends StatelessWidget {
 
         final isSimpleItem = values['item_value'] != null;
         if (isSimpleItem) {
-          item = initialItem ??
+          item =
+              initialItem ??
               SimpleItem(
                 name: values['item_name'],
                 value: values['item_value'],
@@ -151,7 +135,8 @@ class UpsertItemDialog extends StatelessWidget {
 
         final isGasItem = values['item_distance'] != null;
         if (isGasItem) {
-          item = initialItem ??
+          item =
+              initialItem ??
               GasItem(
                 name: values['item_name'],
                 distance: values['item_distance'],
@@ -172,24 +157,6 @@ class UpsertItemDialog extends StatelessWidget {
           item.partition = newPartition;
         }
 
-        final expense = getExpense();
-        if (expense == null) {
-          return item;
-        }
-
-        late final updatedExpense;
-        if (addingItem) {
-          updatedExpense = expense..addItem(item);
-        } else {
-          updatedExpense = expense..updateItem(item);
-        }
-
-        expenseBloc.add(
-          UpdateRequested(
-            issuerUid: authBloc.uid,
-            updatedExpense: updatedExpense,
-          ),
-        );
         return item;
       },
       allowAddAnother: addingItem,
