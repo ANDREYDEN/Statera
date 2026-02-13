@@ -38,9 +38,7 @@ final defaultCurrentUserId = 'foo';
 final defaultGroup = Group(
   id: 'group_foo',
   name: 'Group Foo',
-  members: [
-    CustomUser(uid: defaultCurrentUserId, name: 'Foo'),
-  ],
+  members: [CustomUser(uid: defaultCurrentUserId, name: 'Foo')],
 );
 
 Future<void> customPump(
@@ -57,24 +55,37 @@ Future<void> customPump(
   String? currentUserId,
   Group? group,
   List<Expense>? expenses,
+  Expense? selectedExpense,
   PlatformContext? platformContext,
   List<Provider>? extraProviders,
 }) async {
-  when(defaultCurrentUser.uid)
-      .thenReturn(currentUserId ?? defaultCurrentUserId);
+  when(
+    defaultCurrentUser.uid,
+  ).thenReturn(currentUserId ?? defaultCurrentUserId);
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
-  when(defaultUserExpensesRepository.listenForRelatedExpenses(
-    any,
-    any,
-    quantity: anyNamed('quantity'),
-    stages: anyNamed('stages'),
-  )).thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
-  when(defaultGroupService.groupStream(any))
-      .thenAnswer((_) => Stream.fromIterable([group]));
+  when(
+    defaultUserExpensesRepository.listenForRelatedExpenses(
+      any,
+      any,
+      quantity: anyNamed('quantity'),
+      stages: anyNamed('stages'),
+    ),
+  ).thenAnswer((_) => Stream.fromIterable([expenses ?? []]));
+  when(
+    defaultGroupService.groupStream(any),
+  ).thenAnswer((_) => Stream.fromIterable([group]));
 
   final featureServiceMock = MockFeatureService();
   when(featureServiceMock.debtRedirectionEnabled).thenReturn(true);
+
+  final expenseBloc = ExpenseBloc(
+    expenseService ?? defaultExpenseService,
+    coordinationRepository ?? defaultCoordinationRepository,
+  );
+  if (selectedExpense != null) {
+    expenseBloc.load(selectedExpense.id);
+  }
 
   await tester.pumpWidget(
     MultiProvider(
@@ -83,12 +94,7 @@ Future<void> customPump(
         Provider(create: (_) => LayoutState.narrow()),
         Provider(create: (_) => featureService ?? featureServiceMock),
         Provider(create: (_) => expenseService ?? defaultExpenseService),
-        BlocProvider(
-          create: (context) => ExpenseBloc(
-            expenseService ?? defaultExpenseService,
-            coordinationRepository ?? defaultCoordinationRepository,
-          ),
-        ),
+        BlocProvider(create: (_) => expenseBloc),
         BlocProvider(
           create: (context) => GroupCubit(
             groupService ?? defaultGroupService,
@@ -107,8 +113,9 @@ Future<void> customPump(
           )..load(),
         ),
         BlocProvider(
-            create: (context) => AuthBloc(authService ?? defaultAuthService)),
-        ...extraProviders ?? []
+          create: (context) => AuthBloc(authService ?? defaultAuthService),
+        ),
+        ...extraProviders ?? [],
       ],
       child: MaterialApp(home: Scaffold(body: widget)),
     ),

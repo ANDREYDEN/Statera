@@ -1,1 +1,2 @@
-Don't include code comments in the output. Instead explain the generated code in detail.
+- Don't include code comments in the output. Instead explain the generated code in detail.
+- Don't add pre-assertions in tests
