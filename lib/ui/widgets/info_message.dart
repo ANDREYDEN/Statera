@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:statera/ui/styling/index.dart';
+import 'package:statera/ui/styling/border_rad.dart';
 
 class InfoMessage extends StatelessWidget {
   final String message;
@@ -9,11 +11,11 @@ class InfoMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.all(Spacing.xs_5),
       margin: margin,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRad.s_10,
       ),
       child: Row(
         children: [
@@ -21,7 +23,7 @@ class InfoMessage extends StatelessWidget {
             Icons.info_outline_rounded,
             color: Theme.of(context).colorScheme.onSurface,
           ),
-          SizedBox(width: 10),
+          SizedBox(width: Spacing.m_10),
           Expanded(
             child: Text(message, style: Theme.of(context).textTheme.bodyMedium),
           ),
