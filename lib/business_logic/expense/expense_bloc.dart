@@ -74,16 +74,15 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
     try {
       await _expenseService.updateExpense(newExpense);
-      emit(ExpenseLoaded(
-        newExpense,
-        lastPersistedExpense: newExpense,
-      ));
+      emit(ExpenseLoaded(newExpense, lastPersistedExpense: newExpense));
     } catch (e) {
-      emit(ExpenseLoaded(
-        loadedState.lastPersistedExpense,
-        lastPersistedExpense: loadedState.lastPersistedExpense,
-        error: e,
-      ));
+      emit(
+        ExpenseLoaded(
+          loadedState.lastPersistedExpense,
+          lastPersistedExpense: loadedState.lastPersistedExpense,
+          error: e,
+        ),
+      );
       onExpenseUpdated?.call(loadedState.lastPersistedExpense);
       rethrow;
     }
@@ -99,9 +98,11 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     _ExpenseUpdatedFromDB event,
     Emitter<ExpenseState> emit,
   ) {
-    emit(event.expense == null
-        ? ExpenseError(error: EntityNotFoundException<Expense>(null))
-        : ExpenseLoaded(event.expense!, lastPersistedExpense: event.expense!));
+    emit(
+      event.expense == null
+          ? ExpenseError(error: EntityNotFoundException<Expense>(null))
+          : ExpenseLoaded(event.expense!, lastPersistedExpense: event.expense!),
+    );
   }
 
   @override

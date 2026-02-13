@@ -23,12 +23,11 @@ class ExpenseSettings {
   });
 
   ExpenseSettings.fromFirestore(Map<String, dynamic> data)
-      : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
-        this.showItemDecisions = data['showItemDecisions'] ?? true,
-        this.itemsAreTaxableByDefault =
-            data['itemsAreTaxableByDefault'] ?? false,
-        this.tax = data['tax'],
-        this.tip = data['tip'];
+    : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
+      this.showItemDecisions = data['showItemDecisions'] ?? true,
+      this.itemsAreTaxableByDefault = data['itemsAreTaxableByDefault'] ?? false,
+      this.tax = data['tax'],
+      this.tip = data['tip'];
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -36,7 +35,7 @@ class ExpenseSettings {
       'showItemDecisions': showItemDecisions,
       'itemsAreTaxableByDefault': itemsAreTaxableByDefault,
       'tax': tax,
-      'tip': tip
+      'tip': tip,
     };
   }
 
@@ -46,6 +45,7 @@ class ExpenseSettings {
       showItemDecisions: other.showItemDecisions,
       itemsAreTaxableByDefault: other.itemsAreTaxableByDefault,
       tax: other.tax,
+      tip: other.tip,
     );
   }
 

@@ -12,7 +12,7 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 part 'field_data.dart';
 
-class CRUDDialog<T> extends StatefulWidget {
+class CRUDDialog<T extends Object> extends StatefulWidget {
   final String title;
   final FutureOr<T> Function(Map<String, dynamic>) onSubmit;
   late final List<ButtonSegment<String>> segments;
@@ -58,7 +58,7 @@ class CRUDDialog<T> extends StatefulWidget {
   _CRUDDialogState createState() => _CRUDDialogState();
 }
 
-class _CRUDDialogState extends State<CRUDDialog> {
+class _CRUDDialogState<T extends Object> extends State<CRUDDialog<T>> {
   bool _dirty = false;
   bool _addAnother = true;
   bool _showAdvancedFields = false;
@@ -69,7 +69,8 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   @override
   void initState() {
-    _selectedValue = widget.initialSelection ??
+    _selectedValue =
+        widget.initialSelection ??
         widget.segments.firstOrNull?.value ??
         'default';
 
@@ -153,13 +154,13 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
     if (isWide) {
       return [
-        CancelButton(),
+        CancelButton(returnsNull: true),
         ProtectedButton(
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
           child: Text('Save'),
         ),
         if (widget.allowAddAnother)
-          ProtectedButton(onPressed: submit, child: Text('Save & add another'))
+          ProtectedButton(onPressed: submit, child: Text('Save & add another')),
       ];
     }
 
@@ -170,10 +171,12 @@ class _CRUDDialogState extends State<CRUDDialog> {
           _addAnother = !_addAnother;
         }),
         onSave: () => submit(
-            closeAfterSubmit: (!widget.allowAddAnother || !_addAnother) &&
-                widget.closeAfterSubmit),
+          closeAfterSubmit:
+              (!widget.allowAddAnother || !_addAnother) &&
+              widget.closeAfterSubmit,
+        ),
         addAnother: _addAnother,
-      )
+      ),
     ];
   }
 
@@ -211,8 +214,8 @@ class _CRUDDialogState extends State<CRUDDialog> {
             keyboardType: field.initialData is String
                 ? TextInputType.text
                 : field.initialData is double
-                    ? TextInputType.numberWithOptions(decimal: true)
-                    : TextInputType.number,
+                ? TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.number,
             inputFormatters: field.formatters,
             decoration: InputDecoration(
               labelText: field.label,
@@ -248,9 +251,9 @@ class _CRUDDialogState extends State<CRUDDialog> {
             onChanged: isDisabled
                 ? null
                 : (newValue) => setState(() {
-                      this._dirty = true;
-                      field.changeData(newValue);
-                    }),
+                    this._dirty = true;
+                    field.changeData(newValue);
+                  }),
           ),
         );
       }
@@ -258,18 +261,18 @@ class _CRUDDialogState extends State<CRUDDialog> {
   }
 
   Future submit({bool closeAfterSubmit = false}) async {
-    if (_fields.any((field) => field.getError().isNotEmpty)) {
+    final hasErrors = _fields.any((field) => field.getError().isNotEmpty);
+    if (hasErrors) {
       setState(() {
         this._dirty = true;
       });
       return;
     }
 
-    final result = await widget.onSubmit(
-      Map.fromEntries(_fields.map(
-        (field) => MapEntry(field.id, field.data),
-      )),
+    final resultMap = Map.fromEntries(
+      _fields.map((field) => MapEntry(field.id, field.data)),
     );
+    final result = await widget.onSubmit(resultMap);
 
     if (closeAfterSubmit) {
       Navigator.of(context).pop(result);

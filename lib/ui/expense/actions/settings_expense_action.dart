@@ -14,10 +14,12 @@ class SettingsExpenseAction extends ExpenseAction {
   Future<void> handle(BuildContext context) async {
     final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
-    final updatedExpense = await showDialog(
+    final updatedExpense = await showDialog<Expense>(
       context: context,
       builder: (_) => ExpenseSettingsDialog(expense: expense),
     );
+
+    if (updatedExpense == null) return;
 
     expenseBloc.add(
       UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
