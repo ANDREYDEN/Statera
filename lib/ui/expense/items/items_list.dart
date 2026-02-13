@@ -61,6 +61,7 @@ class ItemsList extends StatelessWidget {
                             'Are you sure you want to delete this item?',
                         child: ItemListItemFactory.create(
                           item: item,
+                          disabled: !userIsAssignee,
                           showDecisions: expense.settings.showItemDecisions,
                           onLongPress: expense.canBeUpdatedBy(authBloc.uid)
                               ? () => UpsertItemAction(

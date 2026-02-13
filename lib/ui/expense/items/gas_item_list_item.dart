@@ -8,8 +8,9 @@ class GasItemListItem extends ItemListItem {
   GasItemListItem({
     super.key,
     required GasItem item,
-    super.showDecisions,
     required super.onChangePartition,
+    super.disabled,
+    super.showDecisions,
     super.onLongPress,
     super.expenseTax,
   }) : super(item: item) {
