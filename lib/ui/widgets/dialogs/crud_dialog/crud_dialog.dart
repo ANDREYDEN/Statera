@@ -9,6 +9,7 @@ import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/collapsible_header.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
+import 'package:statera/ui/widgets/info_message.dart';
 
 part 'field_data.dart';
 
@@ -119,29 +120,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
                 ],
               ),
             ),
-            if (warning != null)
-              Container(
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        warning,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (warning != null) InfoMessage(message: warning),
           ],
         ),
       ),
