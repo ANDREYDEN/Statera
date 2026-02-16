@@ -63,6 +63,7 @@ class UserAvatar extends StatelessWidget {
             : MouseCursor.defer,
         child: GestureDetector(
           onTap: tapHandler,
+          behavior: HitTestBehavior.translucent,
           child: Flex(
             direction: namePosition == NamePosition.bottom
                 ? Axis.vertical
