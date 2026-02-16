@@ -1,2 +1,2 @@
-export './spacing.dart';
+export 'spacing.dart';
 export 'border_rad.dart';

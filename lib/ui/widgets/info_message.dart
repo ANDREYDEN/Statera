@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:statera/ui/styling/index.dart';
-import 'package:statera/ui/styling/border_rad.dart';
 
 class InfoMessage extends StatelessWidget {
   final String message;

@@ -40,7 +40,7 @@ class ItemsList extends StatelessWidget {
                     isWide ? 0 : Spacing.l_20,
                     0,
                     isWide ? 0 : Spacing.l_20,
-                    10,
+                    Spacing.m_10,
                   ),
                   message:
                       'You can\'t mark items in this expense because you are not an assignee.',

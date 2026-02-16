@@ -99,26 +99,26 @@ class ItemListItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 renderPrice(context),
-                SizedBox(width: 10),
+                SizedBox(width: Spacing.m_10),
                 IconButton(
                   onPressed: disabled
                       ? null
                       : () => this.onChangePartition(
                           item.getAssigneeParts(uid) - 1,
                         ),
-                  style: ElevatedButton.styleFrom(
+                  style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
                     backgroundColor: denyButtonBgColor,
-                    iconColor: denyButtonColor,
+                    foregroundColor: denyButtonColor,
                     disabledBackgroundColor: Colors.grey[300],
-                    disabledIconColor: Colors.grey[400],
+                    disabledForegroundColor: Colors.grey[400],
                     padding: EdgeInsets.all(0),
                     visualDensity: VisualDensity.compact,
                   ),
                   icon: Icon(denyButtonIcon),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: Spacing.xs_5),
                   child: Visibility(
                     visible: item.partition > 1,
                     child: Text(
@@ -132,12 +132,12 @@ class ItemListItem extends StatelessWidget {
                       : () => this.onChangePartition(
                           item.getAssigneeParts(uid) + 1,
                         ),
-                  style: ElevatedButton.styleFrom(
+                  style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
                     backgroundColor: acceptButtonBgColor,
-                    iconColor: acceptButtonColor,
+                    foregroundColor: acceptButtonColor,
                     disabledBackgroundColor: Colors.grey[300],
-                    disabledIconColor: Colors.grey[400],
+                    disabledForegroundColor: Colors.grey[400],
                     padding: EdgeInsets.all(0),
                     visualDensity: VisualDensity.compact,
                   ),
