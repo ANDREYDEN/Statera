@@ -16,7 +16,7 @@ class UpdateRequested extends ExpenseEvent {
   final Expense updatedExpense;
 
   const UpdateRequested({required this.issuerUid, required this.updatedExpense})
-      : super();
+    : super();
 
   @override
   List<Object> get props => [issuerUid];

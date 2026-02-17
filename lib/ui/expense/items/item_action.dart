@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
@@ -24,32 +24,35 @@ class UpsertItemAction extends ItemAction {
   @override
   @protected
   Future<void> handle(BuildContext context) async {
-    final expenseBloc = context.read<ExpenseBloc>();
-    final authBloc = context.read<AuthBloc>();
-
-    final expenseState = expenseBloc.state;
-    if (expenseState is! ExpenseLoaded) return;
-    final expense = expenseState.expense;
-
-    final updatedItem = await showDialog<Item>(
+    await showDialog<Item>(
       context: context,
-      builder: (context) => UpsertItemDialog(
-        initialItem: item == null ? null : Item.from(item!),
-        expense: expense,
+      builder: (_) => Provider.value(
+        value: context.read<ExpenseBloc>(),
+        child: UpsertItemDialog(
+          initialItem: item == null ? null : Item.from(item!),
+          onSubmit: (newItem) {
+            final expenseBloc = context.read<ExpenseBloc>();
+            final authBloc = context.read<AuthBloc>();
+
+            final expenseState = expenseBloc.state;
+            if (expenseState is! ExpenseLoaded) return;
+            final expense = expenseState.expense;
+            final updatedExpense = Expense.from(expense);
+            if (item == null) {
+              updatedExpense.addItem(newItem);
+            } else {
+              updatedExpense.updateItem(newItem);
+            }
+
+            expenseBloc.add(
+              UpdateRequested(
+                issuerUid: authBloc.uid,
+                updatedExpense: updatedExpense,
+              ),
+            );
+          },
+        ),
       ),
-    );
-
-    if (updatedItem == null) return;
-
-    final updatedExpense = Expense.from(expense);
-    if (item == null) {
-      updatedExpense.addItem(updatedItem);
-    } else {
-      updatedExpense.updateItem(updatedItem);
-    }
-
-    expenseBloc.add(
-      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
     );
   }
 }
