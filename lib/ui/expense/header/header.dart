@@ -3,7 +3,7 @@ part of '../expense_details.dart';
 class Header extends StatelessWidget {
   const Header({Key? key}) : super(key: key);
 
-  void _copyExpenseName(BuildContext context, String name) async {
+  Future<void> _copyExpenseName(BuildContext context, String name) async {
     ClipboardData clipData = ClipboardData(text: name);
     await Clipboard.setData(clipData);
 
@@ -133,13 +133,10 @@ class Header extends StatelessWidget {
     );
     if (newDate == null) return;
 
-    final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
     expense.date = newDate;
-    expenseBloc.add(
-      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: expense),
-    );
+    expenseBloc.add(UpdateRequested(updatedExpense: expense));
   }
 
   _handleAuthorClick(BuildContext context, Expense expense) async {
@@ -157,13 +154,10 @@ class Header extends StatelessWidget {
 
     if (newAuthorUid == null) return;
 
-    final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
     expense.authorUid = newAuthorUid;
-    expenseBloc.add(
-      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: expense),
-    );
+    expenseBloc.add(UpdateRequested(updatedExpense: expense));
   }
 
   _handleAssigneesClick(BuildContext context, Expense expense) async {
@@ -179,14 +173,10 @@ class Header extends StatelessWidget {
     );
     if (newAssigneeIds == null) return;
 
-    final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
     expenseBloc.add(
-      UpdateRequested(
-        issuerUid: authBloc.uid,
-        updatedExpense: expense..updateAssignees(newAssigneeIds),
-      ),
+      UpdateRequested(updatedExpense: expense..updateAssignees(newAssigneeIds)),
     );
   }
 }

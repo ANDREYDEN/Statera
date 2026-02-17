@@ -21,10 +21,7 @@ void main() {
 
   group('ExpenseBloc', () {
     setUp(() {
-      expenseBloc = ExpenseBloc(
-        expenseService,
-        coordinationRepository,
-      );
+      expenseBloc = ExpenseBloc(expenseService, coordinationRepository);
       reset(expenseService);
       reset(coordinationRepository);
     });
@@ -38,15 +35,13 @@ void main() {
       blocTest<ExpenseBloc, ExpenseState>(
         'can load expense',
         setUp: () {
-          when(expenseService.expenseStream(any))
-              .thenAnswer((_) => Stream.value(expense));
+          when(
+            expenseService.expenseStream(any),
+          ).thenAnswer((_) => Stream.value(expense));
         },
         build: () => expenseBloc,
         act: (bloc) => bloc.load(expense.id),
-        expect: () => [
-          ExpenseLoading(),
-          ExpenseLoaded(expense),
-        ],
+        expect: () => [ExpenseLoading(), ExpenseLoaded(expense)],
         verify: (_) {
           verify(expenseService.expenseStream(expense.id)).called(1);
         },
@@ -55,8 +50,9 @@ void main() {
       blocTest<ExpenseBloc, ExpenseState>(
         'handles expense loading error',
         setUp: () {
-          when(expenseService.expenseStream(any))
-              .thenAnswer((_) => Stream.value(null));
+          when(
+            expenseService.expenseStream(any),
+          ).thenAnswer((_) => Stream.value(null));
         },
         build: () => expenseBloc,
         act: (bloc) => bloc.load(expense.id),
@@ -87,10 +83,7 @@ void main() {
         build: () => expenseBloc,
         seed: () => ExpenseLoaded(expense),
         act: (bloc) {
-          bloc.add(UpdateRequested(
-            issuerUid: expense.authorUid,
-            updatedExpense: updatedExpense,
-          ));
+          bloc.add(UpdateRequested(updatedExpense: updatedExpense));
         },
         wait: kExpenseUpdateDelay,
         expect: () => [
@@ -109,19 +102,14 @@ void main() {
       blocTest<ExpenseBloc, ExpenseState>(
         'handles update error',
         setUp: () {
-          when(expenseService.updateExpense(any))
-              .thenThrow(Exception('Update failed'));
+          when(
+            expenseService.updateExpense(any),
+          ).thenThrow(Exception('Update failed'));
         },
-        build: () => ExpenseBloc(
-          expenseService,
-          coordinationRepository,
-        ),
+        build: () => ExpenseBloc(expenseService, coordinationRepository),
         seed: () => ExpenseLoaded(expense),
         act: (bloc) {
-          bloc.add(UpdateRequested(
-            issuerUid: expense.authorUid,
-            updatedExpense: updatedExpense,
-          ));
+          bloc.add(UpdateRequested(updatedExpense: updatedExpense));
         },
         wait: kExpenseUpdateDelay,
         errors: () => [isA<Exception>()],
@@ -143,10 +131,7 @@ void main() {
         'does not emit new state when updated expense equals current expense',
         build: () => expenseBloc,
         seed: () => ExpenseLoaded(expense),
-        act: (bloc) => bloc.add(UpdateRequested(
-          issuerUid: expense.authorUid,
-          updatedExpense: expense,
-        )),
+        act: (bloc) => bloc.add(UpdateRequested(updatedExpense: expense)),
         expect: () => [],
         verify: (_) {
           verifyNever(expenseService.updateExpense(any));
@@ -157,8 +142,9 @@ void main() {
     blocTest<ExpenseBloc, ExpenseState>(
       'can revert expense',
       setUp: () {
-        when(coordinationRepository.revertExpense(any))
-            .thenAnswer((_) async => {});
+        when(
+          coordinationRepository.revertExpense(any),
+        ).thenAnswer((_) async => {});
       },
       build: () => expenseBloc,
       seed: () => ExpenseLoaded(expense),

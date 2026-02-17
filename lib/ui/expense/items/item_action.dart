@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/upsert_item_dialog.dart';
@@ -32,7 +31,6 @@ class UpsertItemAction extends ItemAction {
           initialItem: item == null ? null : Item.from(item!),
           onSubmit: (newItem) {
             final expenseBloc = context.read<ExpenseBloc>();
-            final authBloc = context.read<AuthBloc>();
 
             final expenseState = expenseBloc.state;
             if (expenseState is! ExpenseLoaded) return;
@@ -44,12 +42,7 @@ class UpsertItemAction extends ItemAction {
               updatedExpense.updateItem(newItem);
             }
 
-            expenseBloc.add(
-              UpdateRequested(
-                issuerUid: authBloc.uid,
-                updatedExpense: updatedExpense,
-              ),
-            );
+            expenseBloc.add(UpdateRequested(updatedExpense: updatedExpense));
           },
         ),
       ),
