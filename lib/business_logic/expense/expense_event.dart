@@ -12,14 +12,12 @@ class _LoadRequested extends ExpenseEvent {}
 class _UnloadRequested extends ExpenseEvent {}
 
 class UpdateRequested extends ExpenseEvent {
-  final String issuerUid;
   final Expense updatedExpense;
 
-  const UpdateRequested({required this.issuerUid, required this.updatedExpense})
-      : super();
+  const UpdateRequested({required this.updatedExpense}) : super();
 
   @override
-  List<Object> get props => [issuerUid];
+  List<Object> get props => [updatedExpense];
 }
 
 class _ExpenseUpdated extends ExpenseEvent {

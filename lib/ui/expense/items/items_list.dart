@@ -45,16 +45,17 @@ class ItemsList extends StatelessWidget {
                               item: item,
                               showDecisions: expense.settings.showItemDecisions,
                               onLongPress: expense.canBeUpdatedBy(authBloc.uid)
-                                  ? () => UpsertItemAction(item: item)
-                                      .safeHandle(context)
+                                  ? () => UpsertItemAction(
+                                      item: item,
+                                    ).safeHandle(context)
                                   : null,
                               onChangePartition: !expense.finalized
                                   ? (partition) => _handleItemPartitionChange(
-                                        context,
-                                        expense,
-                                        partition,
-                                        index,
-                                      )
+                                      context,
+                                      expense,
+                                      partition,
+                                      index,
+                                    )
                                   : (p) {},
                               expenseTax: expense.settings.tax,
                             ),
@@ -70,14 +71,11 @@ class ItemsList extends StatelessWidget {
   }
 
   void _handleItemDelete(BuildContext context, Expense expense, int index) {
-    final authBloc = context.read<AuthBloc>();
     final expenseBloc = context.read<ExpenseBloc>();
 
     final updatedExpense = expense..items.removeAt(index);
 
-    expenseBloc.add(
-      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
-    );
+    expenseBloc.add(UpdateRequested(updatedExpense: updatedExpense));
   }
 
   void _handleItemPartitionChange(
@@ -92,8 +90,6 @@ class ItemsList extends StatelessWidget {
     final updatedExpense = expense
       ..items[index].setAssigneeDecision(authBloc.uid, parts);
 
-    expenseBloc.add(
-      UpdateRequested(issuerUid: authBloc.uid, updatedExpense: updatedExpense),
-    );
+    expenseBloc.add(UpdateRequested(updatedExpense: updatedExpense));
   }
 }

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
 class UpsertItemDialog extends StatelessWidget {
   final Item? initialItem;
-  final Expense expense;
+  final Function(Item) onSubmit;
 
-  UpsertItemDialog({Key? key, this.initialItem, required this.expense})
+  UpsertItemDialog({Key? key, this.initialItem, required this.onSubmit})
     : super(key: key);
 
   R initialItemProperty<T extends Item, R>(
@@ -21,13 +23,22 @@ class UpsertItemDialog extends StatelessWidget {
     return selector(tempItem) ?? or;
   }
 
+  Expense? getExpense(BuildContext context) {
+    final expenseBloc = context.read<ExpenseBloc>();
+    if (expenseBloc.state case final ExpenseLoaded state) {
+      return state.expense;
+    }
+
+    return null;
+  }
+
   @override
   build(BuildContext context) {
     bool addingItem = initialItem == null;
 
-    final bool itemTaxableByDefault = expense.settings.itemsAreTaxableByDefault;
-
-    final bool itemHasTax = expense.hasTax;
+    final expense = getExpense(context);
+    final bool itemTaxableByDefault = expense?.settings.itemsAreTaxableByDefault ?? false;
+    final bool itemHasTax = expense?.hasTax ?? false;
 
     final simpleItemFields = [
       FieldData<double>(
@@ -157,7 +168,7 @@ class UpsertItemDialog extends StatelessWidget {
           item.partition = newPartition;
         }
 
-        return item;
+        onSubmit(item);
       },
       allowAddAnother: addingItem,
     );

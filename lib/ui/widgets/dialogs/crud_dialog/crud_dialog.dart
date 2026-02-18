@@ -12,9 +12,9 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 
 part 'field_data.dart';
 
-class CRUDDialog<T extends Object> extends StatefulWidget {
+class CRUDDialog extends StatefulWidget {
   final String title;
-  final FutureOr<T> Function(Map<String, dynamic>) onSubmit;
+  final FutureOr Function(Map<String, dynamic>) onSubmit;
   late final List<ButtonSegment<String>> segments;
   late final Map<String, List<FieldData>> fieldsMap;
   final bool closeAfterSubmit;
@@ -58,7 +58,7 @@ class CRUDDialog<T extends Object> extends StatefulWidget {
   _CRUDDialogState createState() => _CRUDDialogState();
 }
 
-class _CRUDDialogState<T extends Object> extends State<CRUDDialog<T>> {
+class _CRUDDialogState extends State<CRUDDialog> {
   bool _dirty = false;
   bool _addAnother = true;
   bool _showAdvancedFields = false;
