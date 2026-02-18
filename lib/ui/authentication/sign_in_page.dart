@@ -18,6 +18,7 @@ class SignInPage extends StatefulWidget {
       create: (context) => SignInCubit(
         context.read<AuthService>(),
         context.read<ErrorService>(),
+        context.read<UserRepository>(),
       ),
       child: SignInPage(),
     );
@@ -42,6 +43,7 @@ class _SignInPageState extends State<SignInPage> {
         _emailController.text,
         _passwordController.text,
         _passwordConfirmController.text,
+        'anonymous',
       );
     }
   }

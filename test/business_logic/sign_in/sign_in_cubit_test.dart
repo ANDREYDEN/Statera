@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
 import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/utils/constants.dart';
 
 class MockAuthRepository extends Mock implements AuthService {}
@@ -20,7 +21,11 @@ void main() {
 
     setUp(() {
       authRepository = MockAuthRepository();
-      signInCubit = SignInCubit(authRepository, MockErrorService());
+      signInCubit = SignInCubit(
+        authRepository,
+        MockErrorService(),
+        MockUserRepository(),
+      );
       when(
         () => authRepository.signIn(any(), any()),
       ).thenAnswer((_) async => userCredential);
@@ -71,7 +76,7 @@ void main() {
         'emits [SignInLoading, SignInLoaded] when signUp is called',
         build: () => signInCubit,
         act: (SignInCubit cubit) =>
-            cubit.signUp('email', 'password', 'password'),
+            cubit.signUp('email', 'password', 'password', 'John Doe'),
         expect: () => [SignInLoading(), SignInLoaded()],
         verify: (_) {
           verify(() => authRepository.signUp(any(), any(), any())).called(1);
@@ -87,7 +92,7 @@ void main() {
         },
         build: () => signInCubit,
         act: (SignInCubit cubit) =>
-            cubit.signUp('email', 'password', 'password'),
+            cubit.signUp('email', 'password', 'password', 'John Doe'),
         expect: () => [
           SignInLoading(),
           SignInError(error: kSignUpMessages['weak-password']!),

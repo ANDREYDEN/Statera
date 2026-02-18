@@ -35,7 +35,7 @@ void main() {
         () => signInCubit.signIn(any(), any()),
       ).thenAnswer((_) async => userCredential);
       when(
-        () => signInCubit.signUp(any(), any(), any()),
+        () => signInCubit.signUp(any(), any(), any(), any()),
       ).thenAnswer((_) async => userCredential);
       when(
         () => signInCubit.signInWithGoogle(),
@@ -94,7 +94,7 @@ void main() {
 
       await tester.tap(signUpButton);
 
-      verify(() => signInCubit.signUp(any(), any(), any())).called(1);
+      verify(() => signInCubit.signUp(any(), any(), any(), any())).called(1);
     });
 
     testWidgets(

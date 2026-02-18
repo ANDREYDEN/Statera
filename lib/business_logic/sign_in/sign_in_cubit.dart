@@ -9,11 +9,16 @@ part 'sign_in_state.dart';
 class SignInCubit extends Cubit<SignInState> {
   late final AuthService _authRepository;
   late final ErrorService _errorService;
+  late final UserRepository _userRepository;
 
-  SignInCubit(AuthService authRepository, ErrorService errorService)
-    : super(SignInLoaded()) {
+  SignInCubit(
+    AuthService authRepository,
+    ErrorService errorService,
+    UserRepository userRepository,
+  ) : super(SignInLoaded()) {
     _authRepository = authRepository;
     _errorService = errorService;
+    _userRepository = userRepository;
   }
 
   Future<void> signIn(String email, String password) async {
@@ -34,13 +39,23 @@ class SignInCubit extends Cubit<SignInState> {
   }
 
   Future<void> signUp(
+    String name,
     String email,
     String password,
     String confirmPassword,
   ) async {
     try {
       emit(SignInLoading());
-      await _authRepository.signUp(email, password, confirmPassword);
+      final userCredential = await _authRepository.signUp(
+        email,
+        password,
+        confirmPassword,
+      );
+      await _userRepository.tryCreateUser(
+        uid: userCredential.user!.uid,
+        name: name,
+      );
+
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
       final message = kSignUpMessages.containsKey(firebaseError.code)
@@ -57,7 +72,15 @@ class SignInCubit extends Cubit<SignInState> {
   signInWithGoogle() async {
     try {
       emit(SignInLoading());
-      await _authRepository.signInWithGoogle();
+      final userCredential = await _authRepository.signInWithGoogle();
+      final user = userCredential?.user;
+      if (user != null) {
+        await _userRepository.tryCreateUser(
+          uid: user.uid,
+          name: user.displayName ?? 'anonymous',
+          photoURL: user.photoURL,
+        );
+      }
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
       final message = kFirebaseAuthErrorMessages.containsKey(firebaseError.code)
@@ -80,7 +103,15 @@ class SignInCubit extends Cubit<SignInState> {
   signInWithApple() async {
     try {
       emit(SignInLoading());
-      await _authRepository.signInWithApple();
+      final userCredential = await _authRepository.signInWithApple();
+      final user = userCredential.user;
+      if (user != null) {
+        await _userRepository.tryCreateUser(
+          uid: user.uid,
+          name: user.displayName ?? 'anonymous',
+          photoURL: user.photoURL,
+        );
+      }
       emit(SignInLoaded());
     } on FirebaseAuthException catch (firebaseError) {
       final message = kFirebaseAuthErrorMessages.containsKey(firebaseError.code)
