@@ -5,21 +5,24 @@ import 'package:statera/data/models/gas_item.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/expense/items/gas_item_list_item.dart';
 import 'package:statera/ui/expense/items/item_decisions.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/warning_icon.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
-  final bool showDecisions;
   final void Function(int) onChangePartition;
+  final bool disabled;
+  final bool showDecisions;
   final void Function()? onLongPress;
   final double? expenseTax;
 
   const ItemListItem({
     Key? key,
     required this.item,
-    this.showDecisions = false,
     required this.onChangePartition,
+    this.disabled = false,
+    this.showDecisions = false,
     this.onLongPress,
     this.expenseTax,
   }) : super(key: key);
@@ -47,6 +50,42 @@ class ItemListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.select((AuthBloc authBloc) => authBloc.uid);
 
+    final denyButtonBgColor = (() {
+      if (!item.isMarkedBy(uid)) return Colors.grey[300];
+      if (item.getAssigneeParts(uid) == 0) return Colors.red[400];
+      return Colors.grey[500];
+    })();
+
+    final denyButtonColor = denyButtonBgColor == Colors.grey[300]
+        ? Colors.grey[700]
+        : Colors.white;
+
+    final denyButtonIcon = (() {
+      if (item.isPartitioned && item.getAssigneeParts(uid) > 0) {
+        return Icons.remove_rounded;
+      }
+      return Icons.close_rounded;
+    })();
+
+    final acceptButtonBgColor = (() {
+      if (!item.isMarkedBy(uid)) return Colors.grey[300];
+      if (item.getAssigneeParts(uid) > 0) return Colors.green[400];
+      return Colors.grey[500];
+    })();
+
+    final acceptButtonColor = acceptButtonBgColor == Colors.grey[300]
+        ? Colors.grey[700]
+        : Colors.white;
+
+    final acceptButtonIcon = (() {
+      if (item.isPartitioned &&
+          item.undefinedParts > 0 &&
+          item.getAssigneeParts(uid) > 0) {
+        return Icons.add_rounded;
+      }
+      return Icons.check_rounded;
+    })();
+
     return Column(
       children: [
         ListTile(
@@ -60,32 +99,26 @@ class ItemListItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 renderPrice(context),
-                SizedBox(width: 10),
+                SizedBox(width: Spacing.m_10),
                 IconButton(
-                  onPressed: () =>
-                      this.onChangePartition(item.getAssigneeParts(uid) - 1),
+                  onPressed: disabled
+                      ? null
+                      : () => this.onChangePartition(
+                          item.getAssigneeParts(uid) - 1,
+                        ),
                   style: IconButton.styleFrom(
-                    backgroundColor: !item.isMarkedBy(uid)
-                        ? Colors.grey[300]
-                        : item.isMarkedBy(uid) &&
-                                item.getAssigneeParts(uid) == 0
-                            ? Colors.red[400]
-                            : Colors.grey[500],
+                    shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
+                    backgroundColor: denyButtonBgColor,
+                    foregroundColor: denyButtonColor,
+                    disabledBackgroundColor: Colors.grey[300],
+                    disabledForegroundColor: Colors.grey[400],
                     padding: EdgeInsets.all(0),
                     visualDensity: VisualDensity.compact,
                   ),
-                  icon: Icon(
-                    !item.isMarkedBy(uid) || !item.isPartitioned
-                        ? Icons.close_rounded
-                        : item.isMarkedBy(uid) &&
-                                item.getAssigneeParts(uid) == 0
-                            ? Icons.close_rounded
-                            : Icons.remove_rounded,
-                    color: Colors.white,
-                  ),
+                  icon: Icon(denyButtonIcon),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: Spacing.xs_5),
                   child: Visibility(
                     visible: item.partition > 1,
                     child: Text(
@@ -94,30 +127,21 @@ class ItemListItem extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () =>
-                      this.onChangePartition(item.getAssigneeParts(uid) + 1),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    backgroundColor: !item.isMarkedBy(uid)
-                        ? Colors.grey[300]
-                        : item.undefinedParts == 0 &&
-                                item.isMarkedBy(uid) &&
-                                item.getAssigneeParts(uid) > 0
-                            ? Colors.green[400]
-                            : Colors.grey[500],
+                  onPressed: disabled
+                      ? null
+                      : () => this.onChangePartition(
+                          item.getAssigneeParts(uid) + 1,
+                        ),
+                  style: IconButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
+                    backgroundColor: acceptButtonBgColor,
+                    foregroundColor: acceptButtonColor,
+                    disabledBackgroundColor: Colors.grey[300],
+                    disabledForegroundColor: Colors.grey[400],
                     padding: EdgeInsets.all(0),
                     visualDensity: VisualDensity.compact,
                   ),
-                  icon: Icon(
-                    !item.isMarkedBy(uid) || !item.isPartitioned
-                        ? Icons.check_rounded
-                        : item.undefinedParts == 0 &&
-                                item.isMarkedBy(uid) &&
-                                item.getAssigneeParts(uid) > 0
-                            ? Icons.check_rounded
-                            : Icons.add_rounded,
-                    color: Colors.white,
-                  ),
+                  icon: Icon(acceptButtonIcon),
                 ),
               ],
             ),
@@ -133,24 +157,27 @@ class ItemListItemFactory {
   static ItemListItem create({
     Key? key,
     required Item item,
-    bool showDecisions = false,
     required void Function(int) onChangePartition,
+    bool disabled = false,
+    bool showDecisions = false,
     void Function()? onLongPress,
     double? expenseTax,
   }) {
     if (item is GasItem) {
       return GasItemListItem(
         item: item,
-        showDecisions: showDecisions,
         onChangePartition: onChangePartition,
+        disabled: disabled,
+        showDecisions: showDecisions,
         onLongPress: onLongPress,
         expenseTax: expenseTax,
       );
     }
     return ItemListItem(
       item: item,
-      showDecisions: showDecisions,
       onChangePartition: onChangePartition,
+      disabled: disabled,
+      showDecisions: showDecisions,
       onLongPress: onLongPress,
       expenseTax: expenseTax,
     );

@@ -8,6 +8,8 @@ import 'package:statera/ui/expense/empty_expense_items_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
+import 'package:statera/ui/styling/spacing.dart';
+import 'package:statera/ui/widgets/info_message.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
 
 class ItemsList extends StatelessWidget {
@@ -20,49 +22,66 @@ class ItemsList extends StatelessWidget {
 
     return ExpenseBuilder(
       builder: (context, expense) {
+        final userIsAssignee = expense.assigneeUids.contains(authBloc.uid);
+
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: isWide ? 20 : 0),
+          padding: EdgeInsets.symmetric(
+            horizontal: isWide ? Spacing.l_20 : 0.0,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: expense.hasNoItems
-                    ? EmptyExpenseItemsList(expense: expense)
-                    : ListView.builder(
-                        itemCount: expense.items.length,
-                        itemBuilder: (context, index) {
-                          var item = expense.items[index];
+              if (expense.hasNoItems)
+                Expanded(child: EmptyExpenseItemsList(expense: expense)),
+              if (expense.hasItems && !userIsAssignee)
+                InfoMessage(
+                  margin: EdgeInsets.fromLTRB(
+                    isWide ? 0 : Spacing.l_20,
+                    0,
+                    isWide ? 0 : Spacing.l_20,
+                    Spacing.m_10,
+                  ),
+                  message:
+                      'You can\'t mark items in this expense because you are not an assignee.',
+                ),
+              if (expense.hasItems)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: expense.items.length,
+                    itemBuilder: (context, index) {
+                      var item = expense.items[index];
 
-                          return OptionallyDismissible(
-                            key: Key(item.hashCode.toString()),
-                            isDismissible: expense.canBeUpdatedBy(authBloc.uid),
-                            onDismissed: (_) =>
-                                _handleItemDelete(context, expense, index),
-                            confirmation:
-                                'Are you sure you want to delete this item?',
-                            child: ItemListItemFactory.create(
-                              item: item,
-                              showDecisions: expense.settings.showItemDecisions,
-                              onLongPress: expense.canBeUpdatedBy(authBloc.uid)
-                                  ? () => UpsertItemAction(
-                                      item: item,
-                                    ).safeHandle(context)
-                                  : null,
-                              onChangePartition: !expense.finalized
-                                  ? (partition) => _handleItemPartitionChange(
-                                      context,
-                                      expense,
-                                      partition,
-                                      index,
-                                    )
-                                  : (p) {},
-                              expenseTax: expense.settings.tax,
-                            ),
-                          );
-                        },
-                      ),
-              ),
+                      return OptionallyDismissible(
+                        key: Key(item.hashCode.toString()),
+                        isDismissible: expense.canBeUpdatedBy(authBloc.uid),
+                        onDismissed: (_) =>
+                            _handleItemDelete(context, expense, index),
+                        confirmation:
+                            'Are you sure you want to delete this item?',
+                        child: ItemListItemFactory.create(
+                          item: item,
+                          disabled: !userIsAssignee,
+                          showDecisions: expense.settings.showItemDecisions,
+                          onLongPress: expense.canBeUpdatedBy(authBloc.uid)
+                              ? () => UpsertItemAction(
+                                  item: item,
+                                ).safeHandle(context)
+                              : null,
+                          onChangePartition: !expense.finalized
+                              ? (partition) => _handleItemPartitionChange(
+                                  context,
+                                  expense,
+                                  partition,
+                                  index,
+                                )
+                              : (p) {},
+                          expenseTax: expense.settings.tax,
+                        ),
+                      );
+                    },
+                  ),
+                ),
             ],
           ),
         );
