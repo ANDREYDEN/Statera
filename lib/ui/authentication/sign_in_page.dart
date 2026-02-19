@@ -29,6 +29,7 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _passwordConfirmController = TextEditingController();
@@ -40,10 +41,10 @@ class _SignInPageState extends State<SignInPage> {
       await signInCubit.signIn(_emailController.text, _passwordController.text);
     } else {
       await signInCubit.signUp(
+        _nameController.text,
         _emailController.text,
         _passwordController.text,
         _passwordConfirmController.text,
-        'anonymous',
       );
     }
   }
@@ -75,6 +76,20 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   Image.asset('images/logo.png', height: 150),
                   SizedBox(height: 20),
+                  if (!_isSignIn)
+                    Column(
+                      children: [
+                        TextField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          enabled: signInState is! SignInLoading,
+                        ),
+                        SizedBox(height: 8),
+                      ],
+                    ),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(

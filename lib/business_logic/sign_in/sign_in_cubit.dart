@@ -35,6 +35,10 @@ class SignInCubit extends Cubit<SignInState> {
       emit(
         SignInError(error: 'Something went wrong: ${genericError.toString()}'),
       );
+      await _errorService.recordError(
+        genericError,
+        reason: 'Sign In with Username & Password Failed',
+      );
     }
   }
 
@@ -45,12 +49,16 @@ class SignInCubit extends Cubit<SignInState> {
     String confirmPassword,
   ) async {
     try {
+      if (password != confirmPassword) {
+        throw FirebaseAuthException(code: 'password-mismatch');
+      }
+
+      if (name.trim().isEmpty) {
+        throw FirebaseAuthException(code: 'missing-display-name');
+      }
+
       emit(SignInLoading());
-      final userCredential = await _authRepository.signUp(
-        email,
-        password,
-        confirmPassword,
-      );
+      final userCredential = await _authRepository.signUp(email, password);
       await _userRepository.tryCreateUser(
         uid: userCredential.user!.uid,
         name: name,
@@ -65,6 +73,10 @@ class SignInCubit extends Cubit<SignInState> {
     } catch (genericError) {
       emit(
         SignInError(error: 'Something went wrong: ${genericError.toString()}'),
+      );
+      await _errorService.recordError(
+        genericError,
+        reason: 'Sign Up with Username & Password Failed',
       );
     }
   }

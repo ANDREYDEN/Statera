@@ -1,39 +1,52 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:mockito/mockito.dart';
 import 'package:statera/business_logic/sign_in/sign_in_cubit.dart';
+import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/error_service_mock.dart';
-import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/utils/constants.dart';
 
-class MockAuthRepository extends Mock implements AuthService {}
-
 class MockUserCredential extends Mock implements UserCredential {}
+
+class MockUser extends Mock implements User {
+  String get uid =>
+      super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
+}
 
 final userCredential = MockUserCredential();
 
 void main() {
   group('SignInCubit', () {
+    final String uid = 'foo';
+    final String displayName = 'John Doe';
+    late MockUser mockUser;
     late SignInCubit signInCubit;
-    late AuthService authRepository;
+    late MockAuthService authService;
+    late MockUserRepository userRepository;
 
     setUp(() {
-      authRepository = MockAuthRepository();
+      authService = MockAuthService();
+      userRepository = MockUserRepository();
       signInCubit = SignInCubit(
-        authRepository,
+        authService,
         MockErrorService(),
-        MockUserRepository(),
+        userRepository,
       );
+      mockUser = MockUser();
+
+      when(mockUser.uid).thenReturn(uid);
+      when(mockUser.displayName).thenReturn(displayName);
+      when(userCredential.user).thenReturn(mockUser);
       when(
-        () => authRepository.signIn(any(), any()),
+        authService.signIn(any, any),
       ).thenAnswer((_) async => userCredential);
       when(
-        () => authRepository.signUp(any(), any(), any()),
+        authService.signUp(any, any),
       ).thenAnswer((_) async => userCredential);
       when(
-        () => authRepository.signInWithGoogle(),
+        authService.signInWithGoogle(),
       ).thenAnswer((_) async => userCredential);
     });
 
@@ -48,7 +61,7 @@ void main() {
         act: (SignInCubit cubit) => cubit.signIn('email', 'password'),
         expect: () => [SignInLoading(), SignInLoaded()],
         verify: (_) {
-          verify(() => authRepository.signIn(any(), any())).called(1);
+          verify(authService.signIn(any, any)).called(1);
         },
       );
 
@@ -56,7 +69,7 @@ void main() {
         'emits SignInError when signIn throws',
         setUp: () {
           when(
-            () => authRepository.signIn(any(), any()),
+            authService.signIn(any, any),
           ).thenThrow(FirebaseAuthException(code: 'invalid-email'));
         },
         build: () => signInCubit,
@@ -66,7 +79,7 @@ void main() {
           SignInError(error: kSignInMessages['invalid-email']!),
         ],
         verify: (_) {
-          verify(() => authRepository.signIn(any(), any())).called(1);
+          verify(authService.signIn(any, any)).called(1);
         },
       );
     });
@@ -76,10 +89,17 @@ void main() {
         'emits [SignInLoading, SignInLoaded] when signUp is called',
         build: () => signInCubit,
         act: (SignInCubit cubit) =>
-            cubit.signUp('email', 'password', 'password', 'John Doe'),
+            cubit.signUp('New Name', 'email', 'password', 'password'),
         expect: () => [SignInLoading(), SignInLoaded()],
         verify: (_) {
-          verify(() => authRepository.signUp(any(), any(), any())).called(1);
+          verify(authService.signUp(any, any)).called(1);
+          verify(
+            userRepository.tryCreateUser(
+              uid: uid,
+              name: 'New Name',
+              photoURL: null,
+            ),
+          ).called(1);
         },
       );
 
@@ -87,18 +107,18 @@ void main() {
         'emits [SignInLoading, SignInError] when signUp throws',
         setUp: () {
           when(
-            () => authRepository.signUp(any(), any(), any()),
+            authService.signUp(any, any),
           ).thenThrow(FirebaseAuthException(code: 'weak-password'));
         },
         build: () => signInCubit,
         act: (SignInCubit cubit) =>
-            cubit.signUp('email', 'password', 'password', 'John Doe'),
+            cubit.signUp('John Doe', 'email', 'password', 'password'),
         expect: () => [
           SignInLoading(),
           SignInError(error: kSignUpMessages['weak-password']!),
         ],
         verify: (_) {
-          verify(() => authRepository.signUp(any(), any(), any())).called(1);
+          verify(authService.signUp(any, any)).called(1);
         },
       );
     });
@@ -110,7 +130,10 @@ void main() {
         act: (SignInCubit cubit) => cubit.signInWithGoogle(),
         expect: () => [SignInLoading(), SignInLoaded()],
         verify: (_) {
-          verify(() => authRepository.signInWithGoogle()).called(1);
+          verify(authService.signInWithGoogle()).called(1);
+          verify(
+            userRepository.tryCreateUser(uid: uid, name: displayName),
+          ).called(1);
         },
       );
 
@@ -118,7 +141,7 @@ void main() {
         'emits SignInError when signInWithGoogle throws',
         setUp: () {
           when(
-            () => authRepository.signInWithGoogle(),
+            authService.signInWithGoogle(),
           ).thenThrow(FirebaseAuthException(code: 'user-disabled'));
         },
         build: () => signInCubit,
@@ -128,7 +151,7 @@ void main() {
           SignInError(error: kFirebaseAuthErrorMessages['user-disabled']!),
         ],
         verify: (_) {
-          verify(() => authRepository.signInWithGoogle()).called(1);
+          verify(authService.signInWithGoogle()).called(1);
         },
       );
     });
