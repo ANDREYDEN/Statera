@@ -48,15 +48,21 @@ class OwingsList extends StatelessWidget {
                   userOwings.sort((a, b) {
                     final aDate = mostRecentPaymentMap[a.key.uid];
                     final bDate = mostRecentPaymentMap[b.key.uid];
-                    if (aDate == null && bDate == null) {
-                      return a.key.name.toLowerCase().compareTo(
-                        b.key.name.toLowerCase(),
-                      );
-                    }
+                    
                     if (aDate == null && bDate != null) return 1;
                     if (aDate != null && bDate == null) return -1;
-
-                    return bDate!.compareTo(aDate!);
+                    
+                    if (aDate != null && bDate != null) {
+                      final dateComparison = bDate.compareTo(aDate);
+                      if (dateComparison != 0) return dateComparison;
+                    }
+                    
+                    final debtComparison = b.value.compareTo(a.value);
+                    if (debtComparison != 0) return debtComparison;
+                    
+                    return a.key.name.toLowerCase().compareTo(
+                      b.key.name.toLowerCase(),
+                    );
                   });
 
                   return ListView.separated(
