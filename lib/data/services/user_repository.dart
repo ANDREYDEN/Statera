@@ -8,7 +8,22 @@ import 'package:statera/utils/utils.dart';
 @GenerateNiceMocks([MockSpec<UserRepository>()])
 class UserRepository extends Firestore {
   UserRepository(FirebaseFirestore firestoreInstance)
-      : super(firestoreInstance);
+    : super(firestoreInstance);
+
+  Future<void> tryCreateUser({
+    required String uid,
+    required String name,
+    String? photoURL,
+  }) async {
+    final userData = {'name': name, 'photoURL': photoURL};
+    final userRef = usersCollection.doc(uid);
+    await usersCollection.firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(userRef);
+      if (snapshot.exists) return;
+
+      transaction.set(userRef, userData);
+    });
+  }
 
   /// Updates user data in `/users/{uid}`.
   /// Auth data and related group user information will be updated by the changeUser Firebase Function
@@ -34,8 +49,12 @@ class UserRepository extends Firestore {
   }
 
   Stream<CustomUser?> userStream(String? uid) {
-    return usersCollection.doc(uid).snapshots().map(
-        (docSnap) => docSnap.exists ? CustomUser.fromUserDoc(docSnap) : null);
+    return usersCollection
+        .doc(uid)
+        .snapshots()
+        .map(
+          (docSnap) => docSnap.exists ? CustomUser.fromUserDoc(docSnap) : null,
+        );
   }
 
   Future<CustomUser> getUser(String uid) async {

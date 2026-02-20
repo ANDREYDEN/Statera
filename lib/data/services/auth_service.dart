@@ -30,11 +30,7 @@ class AuthService {
   Future<UserCredential> signUp(
     String email,
     String password,
-    String confirmPassword,
   ) {
-    if (password != confirmPassword) {
-      throw FirebaseAuthException(code: 'password-mismatch');
-    }
     return _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -95,11 +91,11 @@ class AuthService {
   //   return _auth.signInWithCredential(credential);
   // }
 
-  Future<void> signInWithApple() async {
-    await (kIsWeb ? signInWithAppleOnWeb() : signInWithAppleOnMobile());
+  Future<UserCredential> signInWithApple() {
+    return (kIsWeb ? signInWithAppleOnWeb() : signInWithAppleOnMobile());
   }
 
-  Future<UserCredential?> signInWithAppleOnWeb() async {
+  Future<UserCredential> signInWithAppleOnWeb() async {
     final provider = AppleAuthProvider()
       ..addScope('email')
       ..addScope('name');
@@ -107,7 +103,7 @@ class AuthService {
     return _auth.signInWithPopup(provider);
   }
 
-  Future<UserCredential?> signInWithAppleOnMobile() async {
+  Future<UserCredential> signInWithAppleOnMobile() async {
     final rawNonce = _generateNonce();
     final nonce = _sha256ofString(rawNonce);
 

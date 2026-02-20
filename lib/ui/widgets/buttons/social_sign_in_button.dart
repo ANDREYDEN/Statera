@@ -32,8 +32,14 @@ class SocialSignInButton extends StatelessWidget {
         onTap: isLoading ? null : onPressed,
         behavior: HitTestBehavior.opaque,
         child: Padding(
+          key: ValueKey('$type-sign-in-button'),
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Image.asset('images/$assetName', semanticLabel: '$type icon'),
+          child: Image.asset(
+            'images/$assetName',
+            semanticLabel: '$type icon',
+            height: 40,
+            width: 40,
+          ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
@@ -24,6 +25,8 @@ import 'package:statera/ui/platform_context.dart';
 class MockUser extends Mock implements User {
   String get uid =>
       super.noSuchMethod(Invocation.getter(#uid), returnValue: 'foo');
+  String get displayName =>
+      super.noSuchMethod(Invocation.getter(#displayName), returnValue: 'Foo');
 }
 
 final defaultGroupService = MockGroupRepository();
@@ -57,7 +60,7 @@ Future<void> customPump(
   List<Expense>? expenses,
   Expense? selectedExpense,
   PlatformContext? platformContext,
-  List<Provider>? extraProviders,
+  List<SingleChildWidget>? extraProviders,
 }) async {
   when(
     defaultCurrentUser.uid,

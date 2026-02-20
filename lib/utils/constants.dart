@@ -23,6 +23,7 @@ const kSignUpMessages = {
   'operation-not-allowed': 'This user has been disabled',
   'weak-password': 'Your password is not strong enough',
   'password-mismatch': 'Passwords should match',
+  'missing-display-name': 'Name should not be empty',
 };
 
 const kFirebaseAuthErrorMessages = {

@@ -18,6 +18,7 @@ class SignInPage extends StatefulWidget {
       create: (context) => SignInCubit(
         context.read<AuthService>(),
         context.read<ErrorService>(),
+        context.read<UserRepository>(),
       ),
       child: SignInPage(),
     );
@@ -28,10 +29,20 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _passwordConfirmController = TextEditingController();
   bool _isSignIn = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleSubmit() async {
     final signInCubit = context.read<SignInCubit>();
@@ -39,6 +50,7 @@ class _SignInPageState extends State<SignInPage> {
       await signInCubit.signIn(_emailController.text, _passwordController.text);
     } else {
       await signInCubit.signUp(
+        _nameController.text,
         _emailController.text,
         _passwordController.text,
         _passwordConfirmController.text,
@@ -73,6 +85,20 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   Image.asset('images/logo.png', height: 150),
                   SizedBox(height: 20),
+                  if (!_isSignIn)
+                    Column(
+                      children: [
+                        TextField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          enabled: signInState is! SignInLoading,
+                        ),
+                        SizedBox(height: 8),
+                      ],
+                    ),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
