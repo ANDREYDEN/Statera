@@ -35,6 +35,15 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _passwordConfirmController = TextEditingController();
   bool _isSignIn = true;
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleSubmit() async {
     final signInCubit = context.read<SignInCubit>();
     if (_isSignIn) {
