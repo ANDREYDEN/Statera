@@ -72,7 +72,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('orders members by name by default', (
+    testWidgets('orders members by debt then name when no recent payments', (
       WidgetTester tester,
     ) async {
       when(
@@ -96,7 +96,7 @@ void main() {
 
       expect(
         memberNames,
-        orderedEquals([memberA.name, memberB.name, memberZ.name]),
+        orderedEquals([memberZ.name, memberB.name, memberA.name]),
       );
     });
 
@@ -128,6 +128,55 @@ void main() {
               receiverId: memberB.uid,
               value: 100,
               timeCreated: laterTime,
+            ),
+          ],
+        ]),
+      );
+
+      await pumpOwingList(tester);
+
+      final memberNames = tester
+          .widgetList<Text>(
+            find.descendant(
+              of: find.byType(UserAvatarName),
+              matching: find.byType(Text),
+            ),
+          )
+          .map((t) => t.data);
+
+      expect(
+        memberNames,
+        orderedEquals([memberB.name, memberA.name, memberZ.name]),
+      );
+    });
+
+    testWidgets('orders by debt when payments have same date', (
+      WidgetTester tester,
+    ) async {
+      final sameTime = DateTime(2024, 1, 1);
+
+      when(
+        mockPaymentService.paymentsStream(
+          groupId: testGroup.id,
+          userId1: currentUser.uid,
+          newFor: currentUser.uid,
+        ),
+      ).thenAnswer(
+        (_) => Stream.fromIterable([
+          [
+            Payment(
+              groupId: testGroup.id,
+              payerId: currentUser.uid,
+              receiverId: memberA.uid,
+              value: 50,
+              timeCreated: sameTime,
+            ),
+            Payment(
+              groupId: testGroup.id,
+              payerId: currentUser.uid,
+              receiverId: memberB.uid,
+              value: 100,
+              timeCreated: sameTime,
             ),
           ],
         ]),
