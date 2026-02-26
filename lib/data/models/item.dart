@@ -29,8 +29,9 @@ abstract class Item {
   }) {
     var uuid = Uuid();
     this.id = uuid.v1();
-    this.assignees =
-        (assigneeUids ?? []).map((uid) => AssigneeDecision(uid: uid)).toList();
+    this.assignees = (assigneeUids ?? [])
+        .map((uid) => AssigneeDecision(uid: uid))
+        .toList();
   }
 
   factory Item.fake() {
@@ -40,10 +41,10 @@ abstract class Item {
   double get total;
 
   get confirmedCount => assignees.fold<double>(
-        0,
-        (previousValue, assignee) =>
-            previousValue + (assignee.parts != null ? 1 : 0),
-      );
+    0,
+    (previousValue, assignee) =>
+        previousValue + (assignee.parts != null ? 1 : 0),
+  );
 
   bool get isPartitioned => partition > 1;
 
@@ -77,9 +78,9 @@ abstract class Item {
 
   /// The total number of parts that assignees already claimed
   int get confirmedParts => assignees.fold<int>(
-        0,
-        (acc, assignee) => acc + getAssigneeParts(assignee.uid),
-      );
+    0,
+    (acc, assignee) => acc + getAssigneeParts(assignee.uid),
+  );
 
   int get undefinedParts => max(0, partition - confirmedParts);
 
@@ -108,9 +109,7 @@ abstract class Item {
 
     if (assignee == null) return;
 
-    if (isPartitioned &&
-        assignee.parts != null &&
-        parts > undefinedParts + assignee.parts!) return;
+    if (isPartitioned && parts > undefinedParts + (assignee.parts ?? 0)) return;
     assignee.parts = parts;
   }
 
@@ -129,7 +128,7 @@ abstract class Item {
       'partition': partition,
       'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
       'taxable': isTaxable,
-      'type': type.toFirestore()
+      'type': type.toFirestore(),
     };
   }
 
@@ -171,7 +170,8 @@ abstract class Item {
     item.id = data['id'] ?? uuid.v1();
     item.assignees = data['assignees']
         .map<AssigneeDecision>(
-            (assigneeData) => AssigneeDecision.fromFirestore(assigneeData))
+          (assigneeData) => AssigneeDecision.fromFirestore(assigneeData),
+        )
         .toList();
     item.partition = data['partition'] ?? 1;
     item.isTaxable = data['taxable'] ?? false;
