@@ -40,14 +40,20 @@ class ItemListItemPreview extends StatelessWidget {
     );
   }
 
+  SimpleItem getPartitionedItem() {
+    return SimpleItem(
+      name: 'Pizza',
+      value: 23.33,
+      partition: 5,
+      assigneeUids: [me.uid, other.uid, another.uid],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tenUsers = List.generate(
       10,
-      (index) => CustomUser(
-        uid: Uuid().v1(),
-        name: 'User $index',
-      ),
+      (index) => CustomUser(uid: Uuid().v1(), name: 'User $index'),
     );
 
     final authService = MockAuthService();
@@ -55,12 +61,6 @@ class ItemListItemPreview extends StatelessWidget {
     when(user.uid).thenReturn(me.uid);
     when(authService.currentUser).thenReturn(user);
 
-    final partitionedItem = SimpleItem(
-      name: 'Pizza',
-      value: 23.33,
-      partition: 5,
-      assigneeUids: [me.uid, other.uid, another.uid],
-    );
     final simpleItemWithTenUsers = SimpleItem(
       name: 'A lot of users and a very long name',
       value: 23.33,
@@ -93,24 +93,24 @@ class ItemListItemPreview extends StatelessWidget {
     return CustomPreview(
       providers: [
         BlocProvider(
-          create: (_) => GroupCubit(
-            MockGroupRepository(),
-            MockExpenseService(),
-            MockUserRepository(),
-          )..loadGroup(Group(
-              name: 'Example',
-              members: [me, other, another, ...tenUsers],
-            )),
+          create: (_) =>
+              GroupCubit(
+                MockGroupRepository(),
+                MockExpenseService(),
+                MockUserRepository(),
+              )..loadGroup(
+                Group(
+                  name: 'Example',
+                  members: [me, other, another, ...tenUsers],
+                ),
+              ),
         ),
         BlocProvider(create: (_) => AuthBloc(authService)),
         Provider.value(value: PreferencesService()),
       ],
       body: ListView(
         children: [
-          ItemListItem(
-            item: getSimpleItem(),
-            onChangePartition: (_) {},
-          ),
+          ItemListItem(item: getSimpleItem(), onChangePartition: (_) {}),
           ItemListItem(
             item: getSimpleItem()
               ..setAssigneeDecision(me.uid, 0)
@@ -122,6 +122,16 @@ class ItemListItemPreview extends StatelessWidget {
               ..setAssigneeDecision(me.uid, 1)
               ..setAssigneeDecision(other.uid, 1),
             onChangePartition: (_) {},
+          ),
+          ItemListItem(
+            item: getPartitionedItem()
+              ..assignees = [
+                AssigneeDecision(uid: me.uid, parts: 2),
+                AssigneeDecision(uid: other.uid, parts: 2),
+                AssigneeDecision(uid: another.uid, parts: 2),
+              ],
+            onChangePartition: (_) {},
+            showDecisions: true,
           ),
           ItemListItem(
             item: getSimpleItem()
@@ -139,7 +149,7 @@ class ItemListItemPreview extends StatelessWidget {
             showDecisions: true,
           ),
           ItemListItem(
-            item: partitionedItem
+            item: getPartitionedItem()
               ..setAssigneeDecision(me.uid, 2)
               ..setAssigneeDecision(other.uid, 1)
               ..setAssigneeDecision(another.uid, 2),
