@@ -48,9 +48,10 @@ async function improveWalmartName(
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     // eslint-disable-next-line max-len
-    page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0'
-    )
+    page.setUserAgent({
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0',
+    })
     await page.goto(productUrl)
 
     const element = await page.$('[data-automation="name"]')
