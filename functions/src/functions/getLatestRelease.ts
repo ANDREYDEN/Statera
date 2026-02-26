@@ -26,7 +26,9 @@ export async function getLatestRelease(platform: string): Promise<Release> {
     const error = await response.text()
     throw new Error(`Error getting latest release: ${error}`)
   }
-  const result = await response.json()
+  const result = (await response.json()) as {
+    releases: Release[]
+  }
   const releases = result.releases
   if (!releases || releases.length === 0) {
     throw new Error(`No ${platform} releases found`)
