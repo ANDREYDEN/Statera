@@ -115,7 +115,7 @@ Future<bool> snackbarCatch(
 String _stringifyException(dynamic exception, {String? errorReason}) {
   final prefix = errorReason != null ? '$errorReason: ' : '';
   final exceptionString = exception.toString().replaceAll(
-    RegExp('Exception:'),
+    RegExp(r'^Exception:\s*'),
     '',
   );
   if (exceptionString.contains('code=permission-denied')) {
