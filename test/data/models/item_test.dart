@@ -220,9 +220,19 @@ void main() {
           );
           item.assignees = [assignee, otherAssignee];
 
-          item.setAssigneeDecision(assignee.uid, (originalParts ?? 0) + 1);
-
-          expect(assignee.parts, originalParts);
+          expect(
+            () => item.setAssigneeDecision(
+              assignee.uid,
+              (originalParts ?? 0) + 1,
+            ),
+            throwsA(
+              predicate(
+                (x) =>
+                    x is Exception &&
+                    x.toString().contains('All item parts are already marked'),
+              ),
+            ),
+          );
         },
       );
     }

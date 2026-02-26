@@ -107,9 +107,13 @@ abstract class Item {
   void setAssigneeDecision(String uid, int parts) {
     var assignee = getAssigneeById(uid);
 
-    if (assignee == null) return;
+    if (assignee == null) {
+      throw new Exception('User is not an assignee of this item');
+    }
+    if (isPartitioned && parts > undefinedParts + (assignee.parts ?? 0)) {
+      throw new Exception('All item parts are already marked');
+    }
 
-    if (isPartitioned && parts > undefinedParts + (assignee.parts ?? 0)) return;
     assignee.parts = parts;
   }
 
