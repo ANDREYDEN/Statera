@@ -8,16 +8,14 @@ import 'package:statera/ui/widgets/dialogs/danger_dialog.dart';
 class DeleteGroupSetting extends StatelessWidget {
   final String groupName;
 
-  const DeleteGroupSetting({
-    Key? key,
-    required this.groupName,
-  }) : super(key: key);
+  const DeleteGroupSetting({Key? key, required this.groupName})
+    : super(key: key);
 
   void _handleDelete(BuildContext context) {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
 
-    showDialog<bool>(
+    showDialog(
       context: context,
       builder: (context) => Provider<LayoutState>.value(
         value: layoutState,
@@ -39,7 +37,8 @@ class DeleteGroupSetting extends StatelessWidget {
     return ListTile(
       title: Text('Delete the group'),
       subtitle: Text(
-          'Deleting the group will erase all group data. There is no way to undo this action.'),
+        'Deleting the group will erase all group data. There is no way to undo this action.',
+      ),
       trailing: DangerButton(
         onPressed: () => _handleDelete(context),
         text: 'Delete group',

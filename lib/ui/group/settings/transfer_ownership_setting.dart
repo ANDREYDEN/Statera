@@ -9,21 +9,19 @@ import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 class TransferOwnershipSetting extends StatelessWidget {
   final String groupName;
 
-  const TransferOwnershipSetting({
-    Key? key,
-    required this.groupName,
-  }) : super(key: key);
+  const TransferOwnershipSetting({Key? key, required this.groupName})
+    : super(key: key);
 
-  void _handleTransferOwnership(BuildContext context) async {
+  Future<void> _handleTransferOwnership(BuildContext context) async {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
 
-    final newAuthorUid = await showDialog<String?>(
+    final newAuthorUid = await showDialog<String>(
       context: context,
       builder: (context) => MultiProvider(
         providers: [
           Provider<LayoutState>.value(value: layoutState),
-          BlocProvider<GroupCubit>.value(value: groupCubit)
+          BlocProvider<GroupCubit>.value(value: groupCubit),
         ],
         child: MemberSelectDialog(
           title:

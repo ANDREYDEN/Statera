@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-class CancelButton extends StatelessWidget {
+class CancelButton<T> extends StatelessWidget {
   final dynamic Function()? onPressed;
-  final bool returnsNull;
+  final T? returnValue;
 
   const CancelButton({
     Key? key,
     this.onPressed,
-    this.returnsNull = false,
+    this.returnValue,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed:
-          onPressed ?? () => Navigator.pop(context, returnsNull ? null : false),
+          onPressed ?? () => Navigator.pop(context, returnValue),
       child: Text(
         'Cancel',
         style: TextStyle(color: Theme.of(context).colorScheme.error),
