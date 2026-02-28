@@ -50,4 +50,14 @@ platform :ios do
       ipa: path
     )
   end
+
+  desc "Create App Distribution release"
+  lane :upload_to_firebase_app_distribution do |options|
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      ipa_path: options[:ipa_path] || "../build/outputs/ipa/release/app-release.ipa",
+      groups: "friends",
+      debug: true
+    )
+  end
 end

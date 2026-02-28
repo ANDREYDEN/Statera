@@ -124,13 +124,11 @@ jobs:
           working-directory: android
 
       - name: Create App Distribution Release
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
         run: >
-          sudo fastlane run firebase_app_distribution
-          app:${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          android_artifact_type:AAB
+          bundle exec fastlane run upload_to_firebase_app_distribution
           android_artifact_path:/home/runner/work/Statera/Statera/android.aab
-          groups:friends
-          debug:true
         working-directory: android
 
   app-distribution-ios-publish:
@@ -153,23 +151,17 @@ jobs:
         run: echo $PLAY_STORE_CONFIG_JSON > fastlane-service-account.json
         working-directory: ios
 
-      - name: Copy GoogleService-Info.plist
-        env:
-          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
-        run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
-
       - name: Setup Fastlane
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0.2"
           bundler-cache: true
-          working-directory: android
+          working-directory: ios
 
       - name: Create App Distribution Release
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
         run: >
-          bundle exec fastlane run firebase_app_distribution
-          app:${{ secrets.FIREBASE_IOS_APP_ID }}
+          bundle exec fastlane run upload_to_firebase_app_distribution
           ipa_path:/home/runner/work/Statera/Statera/ios.ipa
-          groups:friends
-          debug:true
-        working-directory: android
+        working-directory: ios

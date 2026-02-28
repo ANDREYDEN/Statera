@@ -26,12 +26,11 @@ platform :android do
   end
 
   desc "Create App Distribution release"
-  lane :distribute do
+  lane :upload_to_firebase_app_distribution do |options|
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
-      # release_notes_file: "release_notes.txt",
       android_artifact_type: "AAB",
-      android_artifact_path: "../build/outputs/aab/release/app-release.aab",
+      android_artifact_path: options[:android_artifact_path] || "../build/outputs/aab/release/app-release.aab",
       groups: "friends",
       debug: true
     )
