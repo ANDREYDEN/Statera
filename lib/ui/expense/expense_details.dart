@@ -30,6 +30,7 @@ class ExpenseDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uid = context.select<AuthBloc, String>((bloc) => bloc.uid);
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
@@ -45,6 +46,8 @@ class ExpenseDetails extends StatelessWidget {
         children: [SizedBox(height: 34), ExpenseDetailsLoading()],
       ),
       builder: (context, expense) {
+        final expenseCanBeUpdated = expense.canBeUpdatedBy(uid);
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -54,8 +57,10 @@ class ExpenseDetails extends StatelessWidget {
                 child: ExpenseActionsButton(expense: expense),
               ),
             Header(),
-            if (expense.hasItems && isWide) NewItemButton(),
-            SizedBox(height: 10),
+            if (expense.hasItems && expenseCanBeUpdated && isWide) ...[
+              NewItemButton(),
+              SizedBox(height: 10),
+            ],
             Flexible(child: ItemsList()),
             if (expense.hasItems) Footer(),
           ],
