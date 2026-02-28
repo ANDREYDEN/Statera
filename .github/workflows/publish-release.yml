@@ -127,7 +127,7 @@ jobs:
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
         run: >
-          bundle exec fastlane run upload_to_firebase_app_distribution
+          bundle exec fastlane upload_to_firebase_app_distribution
           android_artifact_path:/home/runner/work/Statera/Statera/android.aab
         working-directory: android
 
@@ -162,6 +162,6 @@ jobs:
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_IOS_APP_ID }}
         run: >
-          bundle exec fastlane run upload_to_firebase_app_distribution
+          bundle exec fastlane upload_to_firebase_app_distribution
           ipa_path:/home/runner/work/Statera/Statera/ios.ipa
         working-directory: ios

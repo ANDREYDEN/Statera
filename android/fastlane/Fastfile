@@ -19,7 +19,7 @@ platform :android do
   desc "Create draft release on Google Play"
   lane :release do |options|
     upload_to_play_store(
-      skip_upload_changelogs: true
+      skip_upload_changelogs: true,
       version_name: options[:version_name],
       aab: options[:aab],
     )
@@ -30,7 +30,7 @@ platform :android do
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       android_artifact_type: "AAB",
-      android_artifact_path: options[:android_artifact_path] || "../build/outputs/aab/release/app-release.aab",
+      android_artifact_path: options[:android_artifact_path] || "../build/app/outputs/bundle/release/app-release.aab",
       groups: "friends",
       debug: true
     )
