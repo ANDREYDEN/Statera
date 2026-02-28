@@ -49,6 +49,7 @@ class _ProtectedButtonState extends State<ProtectedButton> {
                 try {
                   await widget.onPressed!();
                 } finally {
+                  if (_actionStateController.isClosed) return;
                   _actionStateController.add(false);
                 }
               };
@@ -61,9 +62,11 @@ class _ProtectedButtonState extends State<ProtectedButton> {
             : widget.child;
         return switch (widget.buttonType) {
           ButtonType.text => TextButton(onPressed: onPressed, child: content),
-          ButtonType.filled =>
-            FilledButton(onPressed: onPressed, child: content),
-          _ => ElevatedButton(onPressed: onPressed, child: content)
+          ButtonType.filled => FilledButton(
+            onPressed: onPressed,
+            child: content,
+          ),
+          _ => ElevatedButton(onPressed: onPressed, child: content),
         };
       },
     );
