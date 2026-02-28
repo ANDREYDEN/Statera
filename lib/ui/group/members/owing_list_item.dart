@@ -12,6 +12,7 @@ import 'package:statera/ui/payments/payment_list_page.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/utils.dart';
 
 class OwingListItem extends StatelessWidget {
   final CustomUser member;
@@ -39,9 +40,15 @@ class OwingListItem extends StatelessWidget {
 
     return GroupBuilder(
       builder: (context, group) {
-        final owingColor = this.owing >= group.debtThreshold
-            ? Theme.of(context).colorScheme.error
-            : null;
+        final getBalanceColor = () {
+          if (approxEqual(this.owing, 0)) {
+            return null;
+          } else if (this.owing > 0) {
+            return Theme.of(context).colorScheme.error;
+          } else {
+            return Colors.green;
+          }
+        };
         final isMemberAdmin = group.admin.uid == this.member.uid;
         final isCurrentUserAdmin = group.isAdmin(uid);
 
@@ -78,7 +85,10 @@ class OwingListItem extends StatelessWidget {
                   isLabelVisible: newPaymentsCount > 0,
                   child: PriceText(
                     value: this.owing,
-                    textStyle: TextStyle(fontSize: 18, color: owingColor),
+                    textStyle: TextStyle(
+                      fontSize: 18,
+                      color: getBalanceColor(),
+                    ),
                   ),
                 ),
               ],
