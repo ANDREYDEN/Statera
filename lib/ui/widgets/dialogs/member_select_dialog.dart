@@ -55,7 +55,7 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
         ),
       ),
       actions: [
-        CancelButton(returnsNull: true),
+        CancelButton(),
         FilledButton(
           onPressed: _selectedMemberUids.isNotEmpty
               ? () {
@@ -68,7 +68,7 @@ class _MemberSelectDialogState extends State<MemberSelectDialog> {
                 }
               : null,
           child: Text('Confirm'),
-        )
+        ),
       ],
     );
   }

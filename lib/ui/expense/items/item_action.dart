@@ -23,7 +23,7 @@ class UpsertItemAction extends ItemAction {
   @override
   @protected
   Future<void> handle(BuildContext context) async {
-    await showDialog<Item>(
+    await showDialog(
       context: context,
       builder: (_) => Provider.value(
         value: context.read<ExpenseBloc>(),

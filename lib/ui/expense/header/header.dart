@@ -140,7 +140,7 @@ class Header extends StatelessWidget {
   }
 
   _handleAuthorClick(BuildContext context, Expense expense) async {
-    final newAuthorUid = await showDialog<String?>(
+    final newAuthorUid = await showDialog<String>(
       context: context,
       builder: (_) => BlocProvider<GroupCubit>.value(
         value: context.read<GroupCubit>(),

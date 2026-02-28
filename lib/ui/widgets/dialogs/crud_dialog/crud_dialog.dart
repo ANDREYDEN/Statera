@@ -133,7 +133,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
     if (isWide) {
       return [
-        CancelButton(returnsNull: true),
+        CancelButton(),
         ProtectedButton(
           onPressed: () => submit(closeAfterSubmit: widget.closeAfterSubmit),
           child: Text('Save'),

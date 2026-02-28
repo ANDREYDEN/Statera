@@ -12,7 +12,7 @@ class DeleteAccountButton extends StatelessWidget {
   void _handleDeleteAccount(BuildContext context, CustomUser user) {
     final authBloc = context.read<AuthBloc>();
 
-    showDialog<bool>(
+    showDialog(
       context: context,
       builder: (context) => DangerDialog(
         title: 'You are about to DELETE you account',
@@ -33,7 +33,8 @@ class DeleteAccountButton extends StatelessWidget {
         return ListTile(
           title: Text('Delete your Account'),
           subtitle: Text(
-              'Deleting your account will remove your user data from the system. There is no way to undo this action.'),
+            'Deleting your account will remove your user data from the system. There is no way to undo this action.',
+          ),
           trailing: DangerButton(
             text: 'Delete Account',
             onPressed: () => _handleDeleteAccount(context, user),

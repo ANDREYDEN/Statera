@@ -41,7 +41,7 @@ class LeaveGroupSetting extends StatelessWidget {
     final layoutState = context.read<LayoutState>();
     final groupCubit = context.read<GroupCubit>();
 
-    showDialog<bool>(
+    showDialog(
       context: context,
       builder: (context) => Provider<LayoutState>.value(
         value: layoutState,

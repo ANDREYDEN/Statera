@@ -6,11 +6,8 @@ class OKCancelDialog extends StatelessWidget {
   final String text;
   final String? title;
 
-  const OKCancelDialog({
-    Key? key,
-    required this.text,
-    this.title,
-  }) : super(key: key);
+  const OKCancelDialog({Key? key, required this.text, this.title})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +15,7 @@ class OKCancelDialog extends StatelessWidget {
       title: title == null ? null : Text(title!),
       content: DialogWidth(child: Text(this.text)),
       actions: [
-        CancelButton(),
+        CancelButton(returnValue: false),
         FilledButton.tonal(
           onPressed: () {
             Navigator.pop(context, true);
