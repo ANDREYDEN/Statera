@@ -53,20 +53,18 @@ void main() {
         test('when $condition', () {
           item.assignees = [];
           for (var i = 0; i < partsList.length; i++) {
-            item.assignees.add(AssigneeDecision(
-              uid: i.toString(),
-              parts: partsList[i],
-            ));
+            item.assignees.add(
+              AssigneeDecision(uid: i.toString(), parts: partsList[i]),
+            );
           }
 
           for (var i = 0; i < partsList.length; i++) {
             final subTotal = item.getConfirmedSubtotalForUser(i.toString());
-            final taxValue =
-                item.getConfirmedTaxForUser(i.toString(), tax: tax);
-            expect(
-              subTotal + taxValue,
-              closeTo(expectedValues[i], 0.01),
+            final taxValue = item.getConfirmedTaxForUser(
+              i.toString(),
+              tax: tax,
             );
+            expect(subTotal + taxValue, closeTo(expectedValues[i], 0.01));
           }
         });
       }
@@ -115,7 +113,7 @@ void main() {
           expectedValues: [
             item.total * (1 + 0.1) / 2,
             item.total * (1 + 0.1) / 2,
-            0.0
+            0.0,
           ],
         );
       });
@@ -134,8 +132,10 @@ void main() {
           partitionedItem,
           condition: 'everybody accepted 1 part',
           partsList: [1, 1, 1],
-          expectedValues:
-              List<double>.generate(3, (_) => item.total / item.partition),
+          expectedValues: List<double>.generate(
+            3,
+            (_) => item.total / item.partition,
+          ),
         );
 
         createSharedValueTest(
@@ -167,7 +167,7 @@ void main() {
           expectedValues: [
             item.total * (1 + 0.1) / item.partition,
             item.total * (1 + 0.1) * 2 / item.partition,
-            0.0
+            0.0,
           ],
         );
       });
@@ -189,8 +189,11 @@ void main() {
     });
 
     test('can reset its assignee desicions', () {
-      var item =
-          SimpleItem(name: 'foo', value: 145.0, assigneeUids: ['1', '2', '3']);
+      var item = SimpleItem(
+        name: 'foo',
+        value: 145.0,
+        assigneeUids: ['1', '2', '3'],
+      );
 
       item.assignees = [
         AssigneeDecision(uid: '1', parts: 1),
@@ -205,16 +208,33 @@ void main() {
       }
     });
 
-    test('can not set assignee decision higher than remaining partition', () {
-      var item = SimpleItem(name: 'foo', value: 145.0, partition: 3);
+    for (var originalParts in [null, 0, 1]) {
+      test(
+        'can not set assignee decision higher than remaining partition when the original marked parts were $originalParts',
+        () {
+          var item = SimpleItem(name: 'foo', value: 145.0, partition: 3);
+          var assignee = AssigneeDecision(uid: '1', parts: originalParts);
+          var otherAssignee = AssigneeDecision(
+            uid: '2',
+            parts: item.partition - (originalParts ?? 0),
+          );
+          item.assignees = [assignee, otherAssignee];
 
-      var originalParts = 1;
-      var assignee = AssigneeDecision(uid: '1', parts: originalParts);
-      item.assignees = [assignee];
-
-      item.setAssigneeDecision(assignee.uid, 4);
-
-      expect(assignee.parts, originalParts);
-    });
+          expect(
+            () => item.setAssigneeDecision(
+              assignee.uid,
+              (originalParts ?? 0) + 1,
+            ),
+            throwsA(
+              predicate(
+                (x) =>
+                    x is Exception &&
+                    x.toString().contains('All item parts are already marked'),
+              ),
+            ),
+          );
+        },
+      );
+    }
   });
 }

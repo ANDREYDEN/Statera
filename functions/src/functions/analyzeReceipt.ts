@@ -41,9 +41,9 @@ export async function analyzeReceipt(
 async function getTextDataFromImage(url: string): Promise<IAnnotateResponse> {
   const safeUrl = url.replace('localhost', '127.0.0.1')
   const response = await fetch(safeUrl)
-  const buffer = await response.buffer()
+  const buffer = await response.arrayBuffer()
   const client = new ImageAnnotatorClient()
-  const [result] = await client.documentTextDetection(buffer)
+  const [result] = await client.documentTextDetection(Buffer.from(buffer))
   return result
 }
 
@@ -65,8 +65,12 @@ function buildRows(response: IAnnotateResponse): RowOfText[] {
   const receiptMiddle = (avgRowStart + avgRowEnd) / 2
 
   return rows.map((row) => ({
-    leftText: row.filter((box) => box.left.x < receiptMiddle).map((box) => box.content ?? ''),
-    rightText: row.filter((box) => box.left.x >= receiptMiddle).map((box) => box.content ?? ''),
+    leftText: row
+      .filter((box) => box.left.x < receiptMiddle)
+      .map((box) => box.content ?? ''),
+    rightText: row
+      .filter((box) => box.left.x >= receiptMiddle)
+      .map((box) => box.content ?? ''),
   }))
 }
 
@@ -94,20 +98,23 @@ function placeBoxesIntoRows(boxes: BoxWithText[]): BoxWithText[][] {
 function getWordAnnotations(response: IAnnotateResponse): IEntityAnnotation[] {
   const page = response.fullTextAnnotation?.pages?.[0]
   if (!page) return []
-  return page.blocks
-    ?.flatMap((block) => block.paragraphs
-      ?.flatMap((para) => para.words
-        ?.map((word) => ({
-          boundingPoly: word.boundingBox,
-          description: word.symbols
-            ?.map((s) => s.text)
-            .join(''),
-        })) ?? []
-      ) ?? [],
+  return (
+    page.blocks?.flatMap(
+      (block) =>
+        block.paragraphs?.flatMap(
+          (para) =>
+            para.words?.map((word) => ({
+              boundingPoly: word.boundingBox,
+              description: word.symbols?.map((s) => s.text).join(''),
+            })) ?? []
+        ) ?? []
     ) ?? []
+  )
 }
 
-function fixVerticalAnnotations(labels: IEntityAnnotation[]): IEntityAnnotation[] {
+function fixVerticalAnnotations(
+  labels: IEntityAnnotation[]
+): IEntityAnnotation[] {
   const longLabel = labels.find(
     (l) => l.description?.length && l.description.length > 5
   )

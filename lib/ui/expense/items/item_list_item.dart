@@ -35,6 +35,14 @@ class ItemListItem extends StatelessWidget {
       );
     }
 
+    if (item.isPartitioned && item.confirmedParts > item.partition) {
+      return Tooltip(
+        message:
+            'More parts are marked (${item.confirmedParts}) than the total number of item parts (${item.partition})',
+        child: WarningIcon(),
+      );
+    }
+
     return null;
   }
 

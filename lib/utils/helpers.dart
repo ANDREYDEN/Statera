@@ -114,11 +114,15 @@ Future<bool> snackbarCatch(
 
 String _stringifyException(dynamic exception, {String? errorReason}) {
   final prefix = errorReason != null ? '$errorReason: ' : '';
-  if (exception.toString().contains('code=permission-denied')) {
+  final exceptionString = exception.toString().replaceAll(
+    RegExp(r'^Exception:\s*'),
+    '',
+  );
+  if (exceptionString.contains('code=permission-denied')) {
     return '${prefix}Insufficient permissions';
   }
 
-  return '${prefix}${exception.toString()}';
+  return '${prefix}${exceptionString}';
 }
 
 void showSnackBar(

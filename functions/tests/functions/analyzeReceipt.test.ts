@@ -19,10 +19,12 @@ jest.mock('@google-cloud/vision', () => ({
   }),
 }))
 
-jest.mock('node-fetch', () => () =>
-  Promise.resolve({
-    buffer: jest.fn(),
-  })
+jest.mock(
+  'node-fetch',
+  () => () =>
+    Promise.resolve({
+      arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(8)),
+    })
 )
 
 describe('analyzeReceipt', () => {
