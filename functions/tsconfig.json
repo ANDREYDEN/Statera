@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
+    "target": "es2022",
     "noImplicitReturns": true,
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2019",
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
@@ -14,5 +14,8 @@
     "src",
     "tests",
     "index.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

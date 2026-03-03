@@ -1,7 +1,12 @@
 import * as admin from 'firebase-admin'
 import 'firebase-functions'
-import * as functions from 'firebase-functions'
-import { firestoreBackup } from './src/admin'
+import * as functionsV1 from 'firebase-functions/v1'
+import {
+  onDocumentCreated,
+  onDocumentUpdated,
+  onDocumentWritten,
+} from 'firebase-functions/v2/firestore'
+import { onCall } from 'firebase-functions/v2/https'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
 import { deleteRelatedGroupData } from './src/functions/deleteRelatedGroupData'
 import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
@@ -18,55 +23,66 @@ require('firebase-functions/logger/compat')
 
 admin.initializeApp()
 
-export const scheduledBackup = firestoreBackup
+export const setTimestampOnPaymentCreation = onDocumentCreated(
+  'payments/{paymentId}',
+  async (event) => {
+    const snap = event.data
+    if (!snap) return
 
-export const setTimestampOnPaymentCreation = functions.firestore
-  .document('payments/{paymentId}')
-  .onCreate(async (snap, _) => {
     await snap.ref.update({ timeCreated: snap.createTime })
-  })
+  }
+)
 
-export const getReceiptData = functions
-  .runWith({
+export const getReceiptData = onCall(
+  {
     timeoutSeconds: 300,
-    memory: '4GB',
-  })
-  .https.onCall(async (data, _) => {
-    if (!data.receiptUrl) {
-      throw Error('The parameter receiptUrl is required.')
+    memory: '4GiB',
+  },
+  async (event) => {
+    if (!event.data.receiptUrl) {
+      throw new Error('The parameter receiptUrl is required.')
     }
 
     return analyzeReceipt(
-      data.receiptUrl,
-      data.storeName,
-      data.withNameImprovement
+      event.data.receiptUrl,
+      event.data.storeName,
+      event.data.withNameImprovement
     )
-  })
+  }
+)
 
-export const cleanUpOnAccountDeletion = functions.auth
+export const cleanUpOnAccountDeletion = functionsV1.auth
   .user()
   .onDelete(async (user, _) => {
     removeUserFromGroups(user.uid)
   })
 
-export const changeUser = functions.firestore
-  .document('users/{userId}')
-  .onUpdate(async (change, context) => {
-    const oldUserData = change.before.data() as UserData
-    const newUserData = change.after.data() as UserData
+export const changeUser = onDocumentUpdated('users/{userId}', async (event) => {
+  const change = event.data
+  if (!change) return
 
-    return await updateUser(context.params.userId, oldUserData, newUserData)
-  })
+  const oldUserData = change.before.data() as UserData
+  const newUserData = change.after.data() as UserData
 
-export const notifyWhenExpenceIsCreated = functions.firestore
-  .document('expenses/{expeseId}')
-  .onCreate((snap, _) => {
+  return await updateUser(event.params.userId, oldUserData, newUserData)
+})
+
+export const notifyWhenExpenceIsCreated = onDocumentCreated(
+  'expenses/{expeseId}',
+  async (event) => {
+    const snap = event.data
+    if (!snap) return
+
     return notifyWhenExpenseCreated(snap)
-  })
+  }
+)
 
-export const handleExpenseUpdate = functions.firestore
-  .document('expenses/{expenseId}')
-  .onWrite(async (change, _) => {
+export const handleExpenseUpdate = onDocumentWritten(
+  'expenses/{expenseId}',
+  async (event) => {
+    const change = event.data
+    if (!change) return
+
     try {
       await updateUserExpenses(change)
     } catch (e) {
@@ -84,17 +100,25 @@ export const handleExpenseUpdate = functions.firestore
     if (!newExpenseSnap.exists || !oldExpenseSnap.exists) return
 
     await notifyWhenExpenseUpdated(oldExpenseSnap, newExpenseSnap)
-  })
+  }
+)
 
-export const notifyWhenGroupDebtThresholdIsReached = functions.firestore
-  .document('groups/{groupId}')
-  .onUpdate((change, _) => {
+export const notifyWhenGroupDebtThresholdIsReached = onDocumentUpdated(
+  'groups/{groupId}',
+  async (event) => {
+    const change = event.data
+    if (!change) return
+
     return notifyWhenGroupDebtThresholdReached(change)
-  })
+  }
+)
 
-export const handleGroupUpdate = functions.firestore
-  .document('groups/{groupId}')
-  .onWrite(async (change, _) => {
+export const handleGroupUpdate = onDocumentWritten(
+  'groups/{groupId}',
+  async (event) => {
+    const change = event.data
+    if (!change) return
+
     try {
       await updateUserGroupsWhenGroupChanges(change)
     } catch (e) {
@@ -105,18 +129,13 @@ export const handleGroupUpdate = functions.firestore
     if (groupDeleted) {
       await deleteRelatedGroupData(change.before.id)
     }
-  })
-
-export const notifyWhenExpenseIsCompleted = functions.https.onCall(
-  (data, _) => {
-    // TODO: deprecate. Left in for backwards compatibility
   }
 )
 
-export const getLatestAppVersion = functions.https.onCall(async (data, _) => {
-  if (!data.platform) throw new Error('parameter platform is required')
+export const getLatestAppVersion = onCall(async (event) => {
+  if (!event.data.platform) throw new Error('parameter platform is required')
 
-  const latestRelease = await getLatestRelease(data.platform)
+  const latestRelease = await getLatestRelease(event.data.platform)
 
   return latestRelease.displayVersion
 })
