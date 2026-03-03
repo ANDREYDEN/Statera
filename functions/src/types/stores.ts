@@ -2,16 +2,16 @@ import {
   filterProducts,
   filterWalmartProducts,
 } from '../transformators/filters'
-import { mergeMetroProducts, mergeWalmartProducts } from '../transformators/mergers'
+import {
+  mergeMetroProducts,
+  mergeWalmartProducts,
+} from '../transformators/mergers'
 import {
   normalizeLCBOProducts,
   normalizeProducts,
   normalizeWalmartProducts,
 } from '../transformators/normalizers'
-import {
-  improveNaming,
-  improveWalmartNaming,
-} from '../transformators/readability'
+import { improveNaming } from '../transformators/readability'
 import { RowOfText } from './geometry'
 import { Product } from './products'
 
@@ -29,28 +29,24 @@ export const defaultStore: Store = {
   normalize: normalizeProducts,
   filter: filterProducts,
   merge: (p) => p,
-  improveNaming: improveNaming,
-}
-
-export const walmart: Store = {
-  normalize: normalizeWalmartProducts,
-  filter: filterWalmartProducts,
-  merge: mergeWalmartProducts,
-  improveNaming: improveWalmartNaming,
-}
-
-export const lcbo: Store = {
-  normalize: normalizeLCBOProducts,
-  filter: filterProducts,
-  merge: (p) => p,
   improveNaming,
 }
 
+export const walmart: Store = {
+  ...defaultStore,
+  normalize: normalizeWalmartProducts,
+  filter: filterWalmartProducts,
+  merge: mergeWalmartProducts,
+}
+
+export const lcbo: Store = {
+  ...defaultStore,
+  normalize: normalizeLCBOProducts,
+}
+
 export const metro: Store = {
-  normalize: normalizeProducts,
-  filter: filterProducts,
+  ...defaultStore,
   merge: mergeMetroProducts,
-  improveNaming: improveNaming,
 }
 
 export type StoreName = 'walmart' | 'lcbo' | 'metro'
