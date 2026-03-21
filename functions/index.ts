@@ -54,7 +54,7 @@ export const getReceiptData = onCall(
 export const cleanUpOnAccountDeletion = functionsV1.auth
   .user()
   .onDelete(async (user, _) => {
-    removeUserFromGroups(user.uid)
+    return removeUserFromGroups(user.uid)
   })
 
 export const changeUser = onDocumentUpdated('users/{userId}', async (event) => {

@@ -8,7 +8,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_VERSION: 22
   FLUTTER_VERSION: 3.32.8
-  JAVA_VERSION: 20
+  JAVA_VERSION: 21
 
 jobs:
   test_flutter:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 15
+          java-version: ${{ env.JAVA_VERSION }}
           cache: "gradle"
 
       - name: Download Flutter
@@ -68,7 +68,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 15
+          java-version: ${{ env.JAVA_VERSION }}
           cache: "gradle"
 
       - name: Download Flutter
@@ -133,6 +133,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: ${{ env.JAVA_VERSION }}
 
       - name: Install dependencies
         run: npm i
@@ -243,7 +249,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 15
+          java-version: ${{ env.JAVA_VERSION }}
           cache: "gradle"
 
       - name: Download Flutter
