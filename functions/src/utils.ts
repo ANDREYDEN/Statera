@@ -1,11 +1,5 @@
 import _ from 'lodash'
 
-export function stripSku(sku: string): string {
-  const matches = sku.match(/0*(.*?)(R|$)/)
-  if (!matches) return sku
-  return matches[1]
-}
-
 export function toPascalCase(str: string): string {
   if (!str.match(/\w+/)) return str
 
