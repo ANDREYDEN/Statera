@@ -61,9 +61,7 @@ class GroupRepository extends Firestore {
   }
 
   /// Creates a new group and returns its Firestore id
-  Future<String> createGroup(Group newGroup, CustomUser user) async {
-    newGroup.addMember(user);
-
+  Future<String> createGroup(Group newGroup) async {
     final groupReference = await groupsCollection.add(newGroup);
     return groupReference.id;
   }
