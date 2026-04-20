@@ -102,9 +102,9 @@ class _GroupPageState extends State<GroupPage> {
       key: GroupPage.scaffoldKey,
       titleWidget: GroupTitle(),
       actions: [GroupQRButton()],
-      canPop: _selectedNavBarItemIndex == 0,
+      canPop: isWide || _selectedNavBarItemIndex == 0,
       onPop: (didPop) async {
-        if (didPop) return;
+        if (didPop || isWide) return;
         await _pageController.animateToPage(
           0,
           duration: PAGE_ANIMATION_DURATION,
