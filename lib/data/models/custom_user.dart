@@ -8,6 +8,7 @@ class CustomUser {
   late final String name;
   late final String? photoURL;
   final String? paymentInfo;
+  // not part of the Firestore document
   final bool isActive;
 
   CustomUser({
