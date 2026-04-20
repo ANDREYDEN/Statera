@@ -24,6 +24,8 @@ import 'package:statera/ui/widgets/dialogs/new_expense_dialog/new_expense_dialog
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
+const PAGE_ANIMATION_DURATION = Duration(milliseconds: 500);
+
 class GroupPage extends StatefulWidget {
   static const String name = 'Group';
   static final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -100,6 +102,15 @@ class _GroupPageState extends State<GroupPage> {
       key: GroupPage.scaffoldKey,
       titleWidget: GroupTitle(),
       actions: [GroupQRButton()],
+      canPop: _selectedNavBarItemIndex == 0,
+      onPop: (didPop) async {
+        if (didPop) return;
+        await _pageController.animateToPage(
+          0,
+          duration: PAGE_ANIMATION_DURATION,
+          curve: Curves.ease,
+        );
+      },
       fabText: 'New Expense',
       onFabPressed: isWide || _selectedNavBarItemIndex != 1
           ? null
@@ -123,7 +134,7 @@ class _GroupPageState extends State<GroupPage> {
               onTap: (index) async {
                 await _pageController.animateToPage(
                   index,
-                  duration: Duration(milliseconds: 500),
+                  duration: PAGE_ANIMATION_DURATION,
                   curve: Curves.ease,
                 );
               },
