@@ -44,6 +44,7 @@ class GroupsCubit extends Cubit<GroupsState> {
   addGroup(Group group, String uid) async {
     emit(GroupsState.processing(groups: state.groups));
     final user = await _userRepository.getUser(uid);
+    group.addMember(user);
     final groupId = await _groupRepository.createGroup(group, user);
     await _groupRepository.generateInviteLink(group..id = groupId);
   }

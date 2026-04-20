@@ -90,6 +90,11 @@ class CustomUser {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {'uid': uid, 'name': name, 'photoURL': photoURL};
+    return {
+      'uid': uid,
+      'name': name,
+      'photoURL': photoURL,
+      'paymentInfo': paymentInfo,
+    };
   }
 }
