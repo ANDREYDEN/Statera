@@ -24,7 +24,7 @@ import 'package:statera/ui/widgets/dialogs/new_expense_dialog/new_expense_dialog
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/unmarked_expenses_badge.dart';
 
-const PAGE_ANIMATION_DURATION = Duration(milliseconds: 500);
+const kPakeAnimationDuration = Duration(milliseconds: 500);
 
 class GroupPage extends StatefulWidget {
   static const String name = 'Group';
@@ -107,7 +107,7 @@ class _GroupPageState extends State<GroupPage> {
         if (didPop || isWide) return;
         await _pageController.animateToPage(
           0,
-          duration: PAGE_ANIMATION_DURATION,
+          duration: kPakeAnimationDuration,
           curve: Curves.ease,
         );
       },
@@ -134,7 +134,7 @@ class _GroupPageState extends State<GroupPage> {
               onTap: (index) async {
                 await _pageController.animateToPage(
                   index,
-                  duration: PAGE_ANIMATION_DURATION,
+                  duration: kPakeAnimationDuration,
                   curve: Curves.ease,
                 );
               },

@@ -70,7 +70,7 @@ class ExpensePage extends StatelessWidget {
             canPop: allItemsMarked,
             onPop: (didPop) async {
               if (didPop) return;
-              final confirmed = await showDialog(
+              final confirmed = await showDialog<bool>(
                 context: context,
                 builder: (_) => OKCancelDialog(
                   title: 'Are you sure you want to exit?',
