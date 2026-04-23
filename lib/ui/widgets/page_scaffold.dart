@@ -10,6 +10,7 @@ class PageScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? bottomNavBar;
   final String? fabText;
+  final bool canPop;
   final void Function()? onFabPressed;
   final void Function(bool didPop)? onPop;
   final Widget? fab;
@@ -22,6 +23,7 @@ class PageScaffold extends StatelessWidget {
     this.actions,
     this.bottomNavBar,
     this.fabText,
+    this.canPop = true,
     this.onFabPressed,
     this.onPop,
     this.fab,
@@ -36,6 +38,7 @@ class PageScaffold extends StatelessWidget {
         ((_, titleWidgetBuilder) => titleWidgetBuilder(this.title ?? ''));
 
     return PopScope(
+      canPop: this.canPop,
       onPopInvokedWithResult:
           onPop == null ? null : (didPop, _) => onPop!.call(didPop),
       child: Scaffold(

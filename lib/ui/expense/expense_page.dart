@@ -9,6 +9,7 @@ import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/expense_details.dart';
 import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/items/item_action.dart';
+import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class ExpensePage extends StatelessWidget {
@@ -61,7 +62,26 @@ class ExpensePage extends StatelessWidget {
           final expense = expenseState.expense;
           final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
 
+          final allItemsMarked = expense.items.every(
+            (item) => item.isMarkedBy(authBloc.uid),
+          );
+
           return PageScaffold(
+            canPop: allItemsMarked,
+            onPop: (didPop) async {
+              if (didPop) return;
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (_) => OKCancelDialog(
+                  title: 'Are you sure you want to exit?',
+                  text:
+                      'Looks like you have some unmarked items in this expense. Make sure that all items are either accepted or rejected.',
+                ),
+              );
+              if (confirmed == true) {
+                Navigator.of(context).pop();
+              }
+            },
             fabText: 'New Item',
             onFabPressed: expenseCanBeUpdated && expense.hasItems
                 ? () => UpsertItemAction().safeHandle(context)
