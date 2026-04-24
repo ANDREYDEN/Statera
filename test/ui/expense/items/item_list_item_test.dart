@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
@@ -19,15 +20,19 @@ class MockUser extends Mock implements User {
 }
 
 class AuthServiceMock extends Mock implements AuthService {
-  User? get currentUser => super
-      .noSuchMethod(Invocation.getter(#currentUser), returnValue: MockUser());
+  User? get currentUser => super.noSuchMethod(
+    Invocation.getter(#currentUser),
+    returnValue: MockUser(),
+  );
 
   @override
-  Stream<User?> currentUserStream() => super.noSuchMethod(
-        Invocation.method(#currentUserStream, []),
-        returnValue: Stream<User?>.empty(),
-        returnValueForMissingStub: Stream<User?>.empty(),
-      ) as Stream<User?>;
+  Stream<User?> currentUserStream() =>
+      super.noSuchMethod(
+            Invocation.method(#currentUserStream, []),
+            returnValue: Stream<User?>.empty(),
+            returnValueForMissingStub: Stream<User?>.empty(),
+          )
+          as Stream<User?>;
 }
 
 void main() {
@@ -57,11 +62,9 @@ void main() {
                     MockGroupRepository(),
                     MockExpenseService(),
                     MockUserRepository(),
-                  )..loadGroup(Group(
-                      name: 'Example',
-                      members: [user1, user2],
-                    )),
-                )
+                    MockErrorService(),
+                  )..loadGroup(Group(name: 'Example', members: [user1, user2])),
+                ),
               ],
               child: ItemListItem(
                 item: item,

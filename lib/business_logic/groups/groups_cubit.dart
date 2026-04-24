@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
@@ -13,11 +12,13 @@ class GroupsCubit extends Cubit<GroupsState> {
   final UserGroupRepository _userGroupRepository;
   final UserRepository _userRepository;
   StreamSubscription? _groupsSubscription;
+  final ErrorService _errorService;
 
   GroupsCubit(
     this._groupRepository,
     this._userRepository,
     this._userGroupRepository,
+    this._errorService,
   ) : super(GroupsState.loading());
 
   void load(String userId) {
@@ -30,11 +31,7 @@ class GroupsCubit extends Cubit<GroupsState> {
           emit,
           onError: (error) {
             if (error is Exception) {
-              FirebaseCrashlytics.instance.recordError(
-                error,
-                null,
-                reason: 'Groups failed to load',
-              );
+              _errorService.recordError(error, reason: 'Groups failed to load');
             }
             emit(GroupsState.error(error));
           },

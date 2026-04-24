@@ -21,6 +21,7 @@ class PaymentListPage extends StatelessWidget {
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
+            context.read<ErrorService>(),
           )..load(groupId),
         ),
         BlocProvider<OwingCubit>(

@@ -131,6 +131,7 @@ class OwingListItemExamples extends StatelessWidget {
             defaultGroupService,
             mockExpenseService,
             MockUserRepository(),
+            MockErrorService(),
           )..load((group).id),
         ),
       ],

@@ -42,6 +42,7 @@ class GroupPage extends StatefulWidget {
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
+            context.read<ErrorService>(),
           )..load(groupId),
         ),
         BlocProvider(

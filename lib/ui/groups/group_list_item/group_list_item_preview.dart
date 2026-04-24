@@ -7,6 +7,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_group_repository.mocks.dart';
@@ -42,7 +43,7 @@ class GroupListItemPreview extends StatelessWidget {
       name: 'With Outward Debt',
       balance: {
         'me': {'other': 5},
-        'other': {'me': -5}
+        'other': {'me': -5},
       },
     );
     final userGroupWithInwardDebt = UserGroup(
@@ -50,7 +51,7 @@ class GroupListItemPreview extends StatelessWidget {
       name: 'With Inward Debt',
       balance: {
         'me': {'other': -7},
-        'other': {'me': 7}
+        'other': {'me': 7},
       },
     );
     final userGroupWithOutwardAndInwardDebt = UserGroup(
@@ -59,21 +60,27 @@ class GroupListItemPreview extends StatelessWidget {
       balance: {
         'me': {'other': -5, 'another': 7},
         'other': {'me': 5, 'another': 0},
-        'another': {'me': -7, 'other': 0}
+        'another': {'me': -7, 'other': 0},
       },
     );
 
     final _groupRepository = MockGroupRepository();
     final _userRepository = MockUserRepository();
     final _userGroupRepository = MockUserGroupRepository();
+    final _errorService = MockErrorService();
 
     return CustomPreview(
       providers: [
         Provider.value(
-            value: GroupsCubit(
-                _groupRepository, _userRepository, _userGroupRepository)),
+          value: GroupsCubit(
+            _groupRepository,
+            _userRepository,
+            _userGroupRepository,
+            _errorService,
+          ),
+        ),
         Provider.value(value: AuthBloc(_authService)),
-        Provider.value(value: PreferencesService())
+        Provider.value(value: PreferencesService()),
       ],
       body: Padding(
         padding: EdgeInsets.symmetric(

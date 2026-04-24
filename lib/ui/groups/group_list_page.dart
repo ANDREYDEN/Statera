@@ -33,6 +33,7 @@ class GroupListPage extends StatelessWidget {
             context.read<GroupRepository>(),
             context.read<UserRepository>(),
             context.read<UserGroupRepository>(),
+            context.read<ErrorService>(),
           )..load(context.read<AuthBloc>().uid),
         ),
         BlocProvider(

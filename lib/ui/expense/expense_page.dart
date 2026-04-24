@@ -32,6 +32,7 @@ class ExpensePage extends StatelessWidget {
             context.read<GroupRepository>(),
             context.read<ExpenseService>(),
             context.read<UserRepository>(),
+            context.read<ErrorService>(),
           )..loadFromExpense(expenseId),
         ),
       ],
