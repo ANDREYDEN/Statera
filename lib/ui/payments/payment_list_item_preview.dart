@@ -11,6 +11,7 @@ import 'package:statera/data/models/payment/payment.dart';
 import 'package:statera/data/models/payment/payment_expense_info.dart';
 import 'package:statera/data/models/payment/payment_redirect_info.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
@@ -47,14 +48,10 @@ class ListCover extends StatelessWidget {
             MockGroupRepository(),
             MockExpenseService(),
             MockUserRepository(),
-          )..loadGroup(Group(
-              name: 'Example',
-              members: [user1, user2],
-            )),
+            MockErrorService(),
+          )..loadGroup(Group(name: 'Example', members: [user1, user2])),
         ),
-        BlocProvider(
-          create: (_) => AuthBloc(authService),
-        ),
+        BlocProvider(create: (_) => AuthBloc(authService)),
         Provider.value(value: PreferencesService()),
       ],
       body: ListView(

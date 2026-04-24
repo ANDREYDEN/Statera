@@ -13,6 +13,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/coordination_repository.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
@@ -103,6 +104,7 @@ Future<void> customPump(
             groupService ?? defaultGroupService,
             expenseService ?? defaultExpenseService,
             userRepository ?? defaultUserRepository,
+            MockErrorService(),
           )..load((group ?? defaultGroup).id),
         ),
         BlocProvider(

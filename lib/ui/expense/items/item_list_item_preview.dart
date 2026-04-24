@@ -7,6 +7,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
@@ -98,6 +99,7 @@ class ItemListItemPreview extends StatelessWidget {
                 MockGroupRepository(),
                 MockExpenseService(),
                 MockUserRepository(),
+                MockErrorService(),
               )..loadGroup(
                 Group(
                   name: 'Example',

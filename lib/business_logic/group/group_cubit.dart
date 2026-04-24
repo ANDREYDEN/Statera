@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
@@ -14,9 +13,14 @@ class GroupCubit extends Cubit<GroupState> {
   final GroupRepository _groupService;
   final ExpenseService _expenseService;
   final UserRepository _userRepository;
+  final ErrorService _errorService;
 
-  GroupCubit(this._groupService, this._expenseService, this._userRepository)
-    : super(GroupLoading());
+  GroupCubit(
+    this._groupService,
+    this._expenseService,
+    this._userRepository,
+    this._errorService,
+  ) : super(GroupLoading());
 
   // TODO: error handling
   GroupLoaded get loadedState => state as GroupLoaded;
@@ -124,11 +128,7 @@ class GroupCubit extends Cubit<GroupState> {
     } else {
       emit(GroupError(error: 'Something went wrong'));
     }
-    await FirebaseCrashlytics.instance.recordError(
-      error,
-      null,
-      reason: 'Group error',
-    );
+    await _errorService.recordError(error, reason: 'Group error');
   }
 
   @override
