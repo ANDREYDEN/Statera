@@ -13,7 +13,9 @@ class RedirectDebtVisual extends StatelessWidget {
   const RedirectDebtVisual({super.key, this.isAfter = false});
 
   Future<void> _handleOwerTap(
-      BuildContext context, DebtRedirectionLoaded loadedState) async {
+    BuildContext context,
+    DebtRedirectionLoaded loadedState,
+  ) async {
     final groupCubit = context.read<GroupCubit>();
     final debtRedirectionCubit = context.read<DebtRedirectionCubit>();
 
@@ -32,14 +34,14 @@ class RedirectDebtVisual extends StatelessWidget {
     );
 
     if (newOwerUid != null) {
-      debtRedirectionCubit.changeOwer(
-        newOwerUid: newOwerUid,
-      );
+      debtRedirectionCubit.changeOwer(newOwerUid: newOwerUid);
     }
   }
 
   Future<void> _handleReceiverTap(
-      BuildContext context, DebtRedirectionLoaded loadedState) async {
+    BuildContext context,
+    DebtRedirectionLoaded loadedState,
+  ) async {
     final groupCubit = context.read<GroupCubit>();
     final debtRedirectionCubit = context.read<DebtRedirectionCubit>();
 
@@ -58,9 +60,7 @@ class RedirectDebtVisual extends StatelessWidget {
     );
 
     if (newReceiverUid != null) {
-      debtRedirectionCubit.changeReceiver(
-        newReceiverUid: newReceiverUid,
-      );
+      debtRedirectionCubit.changeReceiver(newReceiverUid: newReceiverUid);
     }
   }
 
@@ -69,72 +69,74 @@ class RedirectDebtVisual extends StatelessWidget {
     const double avatarDimension = 65;
 
     return BlocBuilder<DebtRedirectionCubit, DebtRedirectionState>(
-        builder: (context, state) {
-      if (state is! DebtRedirectionLoaded && state is! DebtRedirectionLoading) {
-        return SizedBox.shrink();
-      }
+      builder: (context, state) {
+        if (state is! DebtRedirectionLoaded &&
+            state is! DebtRedirectionLoading) {
+          return SizedBox.shrink();
+        }
 
-      final isLoading = state is DebtRedirectionLoading;
+        final isLoading = state is DebtRedirectionLoading;
 
-      var loadedState = DebtRedirectionLoaded.fake();
-      if (state is DebtRedirectionLoaded) {
-        loadedState = state;
-      }
+        var loadedState = DebtRedirectionLoaded.fake();
+        if (state is DebtRedirectionLoaded) {
+          loadedState = state;
+        }
 
-      return Column(
-        children: [
-          SizedBox(height: 20),
-          SectionTitle(
-            isAfter ? 'After' : 'Before',
-            alignment: Alignment.centerLeft,
-          ),
-          Row(
-            children: [
-              UserAvatar(
-                author: loadedState.ower,
-                dimension: avatarDimension,
-                withName: true,
-                namePosition: NamePosition.bottom,
-                onTap: () => _handleOwerTap(context, loadedState),
-                loading: isLoading,
-              ),
-              Expanded(
-                child: RedirectArrow(
-                  value: isAfter
-                      ? loadedState.redirect.newOwerDebt
-                      : loadedState.owerDebt,
-                  color: Colors.green,
+        return Column(
+          children: [
+            SizedBox(height: 20),
+            SectionTitle(
+              isAfter ? 'After' : 'Before',
+              alignment: Alignment.centerLeft,
+            ),
+            Row(
+              children: [
+                UserAvatar(
+                  user: loadedState.ower,
+                  dimension: avatarDimension,
+                  withName: true,
+                  namePosition: NamePosition.bottom,
+                  onTap: () => _handleOwerTap(context, loadedState),
                   loading: isLoading,
                 ),
-              ),
-              UserAvatar(
-                author: loadedState.author,
-                dimension: avatarDimension,
-                withName: true,
-                namePosition: NamePosition.bottom,
-                loading: isLoading,
-              ),
-              Expanded(
-                child: RedirectArrow(
-                  value: isAfter
-                      ? loadedState.redirect.newAuthorDebt
-                      : loadedState.authorDebt,
-                  color: Colors.red,
+                Expanded(
+                  child: RedirectArrow(
+                    value: isAfter
+                        ? loadedState.redirect.newOwerDebt
+                        : loadedState.owerDebt,
+                    color: Colors.green,
+                    loading: isLoading,
+                  ),
+                ),
+                UserAvatar(
+                  user: loadedState.author,
+                  dimension: avatarDimension,
+                  withName: true,
+                  namePosition: NamePosition.bottom,
                   loading: isLoading,
                 ),
-              ),
-              UserAvatar(
-                author: loadedState.receiver,
-                dimension: avatarDimension,
-                withName: true,
-                namePosition: NamePosition.bottom,
-                onTap: () => _handleReceiverTap(context, loadedState),
-                loading: isLoading,
-              ),
-            ],
-          ),
-        ],
-      );
-    });
+                Expanded(
+                  child: RedirectArrow(
+                    value: isAfter
+                        ? loadedState.redirect.newAuthorDebt
+                        : loadedState.authorDebt,
+                    color: Colors.red,
+                    loading: isLoading,
+                  ),
+                ),
+                UserAvatar(
+                  user: loadedState.receiver,
+                  dimension: avatarDimension,
+                  withName: true,
+                  namePosition: NamePosition.bottom,
+                  onTap: () => _handleReceiverTap(context, loadedState),
+                  loading: isLoading,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 }

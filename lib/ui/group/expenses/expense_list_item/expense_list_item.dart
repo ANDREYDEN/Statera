@@ -31,7 +31,8 @@ class ExpenseListItem extends StatelessWidget {
     final isWide = context.read<LayoutState>().isWide;
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
-    final isSelected = expenseBloc.state is ExpenseLoaded &&
+    final isSelected =
+        expenseBloc.state is ExpenseLoaded &&
         (expenseBloc.state as ExpenseLoaded).expense.id == expense.id;
 
     void _handleTap() {
@@ -89,11 +90,13 @@ class ExpenseListItem extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          GroupBuilder(builder: (context, group) {
-                            return UserAvatar(
-                              author: group.getMember(expense.authorUid),
-                            );
-                          }),
+                          GroupBuilder(
+                            builder: (context, group) {
+                              return UserAvatar(
+                                user: group.getMember(expense.authorUid),
+                              );
+                            },
+                          ),
                           SizedBox(width: 15),
                           Flexible(
                             child: Column(
@@ -131,8 +134,8 @@ class ExpenseListItem extends StatelessWidget {
                 ),
                 if (expense.canBeFinalizedBy(uid) && !processing) ...[
                   SizedBox(height: 5),
-                  FinalizeButton(expense: expense)
-                ]
+                  FinalizeButton(expense: expense),
+                ],
               ],
             ),
           ),

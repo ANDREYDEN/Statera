@@ -37,7 +37,7 @@ class ExpenseListItemLoading extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          UserAvatar(author: CustomUser.fake(), loading: true),
+                          UserAvatar(user: CustomUser.fake(), loading: true),
                           SizedBox(width: 15),
                           Flexible(
                             child: Column(

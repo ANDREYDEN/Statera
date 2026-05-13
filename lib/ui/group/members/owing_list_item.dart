@@ -72,7 +72,7 @@ class OwingListItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: UserAvatar(
-                    author: this.member,
+                    user: this.member,
                     withName: true,
                     withIcon: isMemberAdmin,
                     icon: isMemberAdmin ? Icons.star : null,

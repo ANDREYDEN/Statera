@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage>
                 alignment: Alignment.center,
                 child: Stack(
                   children: [
-                    UserAvatar(author: user, dimension: 200),
+                    UserAvatar(user: user, dimension: 200),
                     Positioned(
                       right: 0,
                       bottom: 0,

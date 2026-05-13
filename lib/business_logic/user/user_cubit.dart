@@ -20,26 +20,29 @@ class UserCubit extends Cubit<UserState> {
     _userSubscription?.cancel();
     _userSubscription = _userRepository
         .userStream(userId)
-        .map((user) => user == null
-            ? UserError(error: 'User does not exist')
-            : UserLoaded(user: user))
+        .map(
+          (user) => user == null
+              ? UserError(error: 'User does not exist')
+              : UserLoaded(user: user),
+        )
         .handleError((e) {
-      if (e is FirebaseException) {
-        emit(UserError(error: 'Permission denied'));
-      } else {
-        emit(UserError(error: 'Something went wrong: ${e.toString()}'));
-      }
-    }).listen(emit);
+          if (e is FirebaseException) {
+            emit(UserError(error: 'Permission denied'));
+          } else {
+            emit(UserError(error: 'Something went wrong: ${e.toString()}'));
+          }
+        })
+        .listen(emit);
   }
 
-  void updateName(String uid, String newName) {
+  Future updateName(String uid, String newName) async {
     emit(UserLoading());
-    _userRepository.updateUser(uid: uid, name: newName);
+    await _userRepository.updateUser(uid: uid, name: newName);
   }
 
-  void updatePhotoUrl(String uid, String newPhotoUrl) {
+  Future updatePhotoUrl(String uid, String newPhotoUrl) async {
     emit(UserLoading());
-    _userRepository.updateUser(uid: uid, photoURL: newPhotoUrl);
+    await _userRepository.updateUser(uid: uid, photoURL: newPhotoUrl);
   }
 
   void updatePaymentInfo(String uid, String newPaymentInfo) {

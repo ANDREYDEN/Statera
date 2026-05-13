@@ -14,10 +14,10 @@ class HeaderAvatar extends StatelessWidget {
       builder: (context, group) {
         final otherMember = group.getMember(otherMemberId);
 
-        return UserAvatar(author: otherMember, dimension: 100);
+        return UserAvatar(user: otherMember, dimension: 100);
       },
       loadingWidget: UserAvatar(
-        author: CustomUser.fake(),
+        user: CustomUser.fake(),
         loading: true,
         dimension: 100,
       ),
