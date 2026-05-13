@@ -5,6 +5,7 @@ import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/styling/spacing.dart';
+import 'package:statera/ui/widgets/dialogs/custom_bottom_sheet.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 class ProfileReminder extends StatefulWidget {
@@ -144,30 +145,11 @@ class _ProfileReminderContentState extends State<_ProfileReminderContent> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: Spacing.l_20,
-          right: Spacing.l_20,
-          top: Spacing.m_10,
-          bottom: MediaQuery.of(context).viewInsets.bottom + Spacing.l_20,
-        ),
+    return CustomBottomSheet(
+      child: Form(
+        key: _formKey,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: Spacing.l_20),
             Text('Complete your profile', style: theme.textTheme.titleLarge),
             const SizedBox(height: Spacing.m_10),
             Text(

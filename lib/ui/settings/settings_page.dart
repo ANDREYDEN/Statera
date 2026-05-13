@@ -95,18 +95,14 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               Align(
                 alignment: Alignment.center,
-                child: Stack(
-                  children: [
-                    UserAvatar(user: user, dimension: 200),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.add_a_photo),
-                        onPressed: _handlePickPhoto,
-                      ),
-                    ),
-                  ],
+                child: UserAvatar(
+                  user: user,
+                  dimension: 200,
+                  withIcon: true,
+                  icon: Icons.add_a_photo,
+                  iconSize: 26,
+                  iconBackgroudColor: Colors.transparent,
+                  onTap: _handlePickPhoto,
                 ),
               ),
               SizedBox(height: 10),

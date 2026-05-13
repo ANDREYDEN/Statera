@@ -12,6 +12,7 @@ class UserAvatar extends StatelessWidget {
   final Color? borderColor;
   final bool withIcon;
   final IconData? icon;
+  final double iconSize;
   final Color? iconColor;
   final Color? iconBackgroudColor;
   final double? dimension;
@@ -27,6 +28,7 @@ class UserAvatar extends StatelessWidget {
     this.borderColor,
     this.withIcon = false,
     this.icon = Icons.check,
+    this.iconSize = 20,
     this.iconColor = Colors.white,
     this.iconBackgroudColor = Colors.green,
     this.dimension = 36,
@@ -125,7 +127,11 @@ class UserAvatar extends StatelessWidget {
                           color: this.iconBackgroudColor,
                         ),
                         padding: EdgeInsets.all(2),
-                        child: Icon(this.icon, size: 20, color: this.iconColor),
+                        child: Icon(
+                          this.icon,
+                          size: this.iconSize,
+                          color: this.iconColor,
+                        ),
                       ),
                     ),
                 ],
