@@ -80,12 +80,15 @@ Future<bool> snackbarCatch(
   String? successMessage,
   String? errorMessage,
   String? errorReason,
+  Function? finallyCallback,
 }) async {
   dynamic exception;
   try {
     await operation();
   } catch (err) {
     exception = err;
+  } finally {
+    finallyCallback?.call();
   }
 
   final errorOccured = exception != null;

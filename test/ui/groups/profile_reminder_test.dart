@@ -37,10 +37,52 @@ void main() {
         expect(find.text('Complete your profile'), findsNothing);
       },
     );
+
+    testWidgets(
+      'does not allow updating username to an empty value',
+      (tester) async {
+        final userCubit = await pumpProfileReminder(tester, name: 'anonymous');
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextFormField), '');
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        verifyNever(userCubit.updateName(any, any));
+      },
+    );
+
+    testWidgets(
+      'does not allow updating username to "anonymous"',
+      (tester) async {
+        final userCubit = await pumpProfileReminder(tester, name: 'anonymous');
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Please enter a valid name'), findsOneWidget);
+        verifyNever(userCubit.updateName(any, any));
+      },
+    );
+
+    testWidgets(
+      'saves the user\'s name when it is correctly set',
+      (tester) async {
+        final userCubit = await pumpProfileReminder(tester, name: 'anonymous');
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextFormField), 'Alice');
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        verify(userCubit.updateName(defaultCurrentUserId, 'Alice')).called(1);
+      },
+    );
   });
 }
 
-Future<void> pumpProfileReminder(
+Future<MockUserCubit> pumpProfileReminder(
   WidgetTester tester, {
   required String name,
 }) async {
@@ -58,4 +100,6 @@ Future<void> pumpProfileReminder(
       Provider<ErrorService>(create: (_) => MockErrorService()),
     ],
   );
+
+  return userCubit;
 }

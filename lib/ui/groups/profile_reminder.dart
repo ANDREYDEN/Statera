@@ -7,6 +7,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/styling/spacing.dart';
 import 'package:statera/ui/widgets/dialogs/custom_bottom_sheet.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/utils.dart';
 
 class ProfileReminder extends StatefulWidget {
   final Widget child;
@@ -101,28 +102,26 @@ class _ProfileReminderContentState extends State<_ProfileReminderContent> {
 
   Future<void> _handlePickPhoto() async {
     setState(() => _isUploadingPhoto = true);
-    try {
-      final pickedFile = await widget.filePickerService.pickImage(
-        source: ImageFileSource.gallery,
-      );
-      final url = await widget.fileStorageService.uploadFile(
-        pickedFile,
-        path: 'profileUrls/',
-      );
-      setState(() => _uploadedPhotoUrl = url);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error uploading photo: $e')));
-      }
-      await widget.errorService.recordError(
-        e,
-        reason: 'Profile image update failed',
-      );
-    } finally {
-      if (mounted) setState(() => _isUploadingPhoto = false);
-    }
+    await snackbarCatch(
+      context,
+      () async {
+        final pickedFile = await widget.filePickerService.pickImage(
+          source: ImageFileSource.gallery,
+        );
+        final url = await widget.fileStorageService.uploadFile(
+          pickedFile,
+          path: 'profileUrls/',
+        );
+
+        if (!mounted) return;
+        setState(() => _uploadedPhotoUrl = url);
+      },
+      errorMessage: 'Error uploading photo',
+      errorReason: 'Profile image update failed',
+      finallyCallback: () {
+        if (mounted) setState(() => _isUploadingPhoto = false);
+      },
+    );
   }
 
   Future<void> _handleSave() async {
@@ -138,6 +137,8 @@ class _ProfileReminderContentState extends State<_ProfileReminderContent> {
     if (_uploadedPhotoUrl != null) {
       await widget.userCubit.updatePhotoUrl(uid, _uploadedPhotoUrl!);
     }
+
+    if (!mounted) return;
     Navigator.pop(context);
   }
 
@@ -184,8 +185,12 @@ class _ProfileReminderContentState extends State<_ProfileReminderContent> {
                 border: OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.words,
-              validator: (value) =>
-                  value == 'anonymous' ? 'Please enter a valid name' : null,
+              validator: (value) {
+                final trimmed = value?.trim() ?? '';
+                return trimmed.isEmpty || trimmed == 'anonymous'
+                    ? 'Please enter a valid name'
+                    : null;
+              },
             ),
             const SizedBox(height: Spacing.l_20),
             Row(

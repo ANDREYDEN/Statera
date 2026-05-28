@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
@@ -53,7 +55,7 @@ class _SettingsPageState extends State<SettingsPage>
     super.initState();
   }
 
-  void _handlePickPhoto() async {
+  Future<void> _handlePickPhoto() async {
     try {
       final pickedFile = await _filePickerService.pickImage(
         source: ImageFileSource.gallery,
@@ -64,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage>
         path: 'profileUrls/',
       );
 
-      _userCubit.updatePhotoUrl(_authBloc.uid, url);
+      await _userCubit.updatePhotoUrl(_authBloc.uid, url);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error while updating profile: $e')),
