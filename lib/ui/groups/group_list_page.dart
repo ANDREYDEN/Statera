@@ -10,6 +10,7 @@ import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
+import 'package:statera/ui/groups/profile_reminder.dart';
 import 'package:statera/ui/groups/settings_badge.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/platform_context.dart';
@@ -37,9 +38,10 @@ class GroupListPage extends StatelessWidget {
           )..load(context.read<AuthBloc>().uid),
         ),
         BlocProvider(
-          create: (context) => UserCubit(context.read<UserRepository>())
-            ..load(context.read<AuthBloc>().uid),
-        )
+          create: (context) =>
+              UserCubit(context.read<UserRepository>())
+                ..load(context.read<AuthBloc>().uid),
+        ),
       ],
       child: GroupListPage(),
     );
@@ -50,27 +52,30 @@ class GroupListPage extends StatelessWidget {
     var platformContext = context.read<PlatformContext>();
 
     return Greeting(
-      child: NotificationsReminder(
-        child: PageScaffold(
-          title: kAppName,
-          actions: [
-            IconButton(
-              onPressed: () => context.goNamed(SupportPage.name),
-              icon: Icon(Icons.info_outline_rounded),
-            ),
-            IconButton(
-              onPressed: () => context.goNamed(SettingsPage.name),
-              icon: SettingsBadge(child: Icon(Icons.settings_outlined)),
-            ),
-          ],
-          fabText: 'New Group',
-          onFabPressed:
-              platformContext.isWindows ? null : () => _createGroup(context),
-          child: Column(
-            children: [
-              UpdateBanner(),
-              Expanded(child: GroupListBody()),
+      child: ProfileReminder(
+        child: NotificationsReminder(
+          child: PageScaffold(
+            title: kAppName,
+            actions: [
+              IconButton(
+                onPressed: () => context.goNamed(SupportPage.name),
+                icon: Icon(Icons.info_outline_rounded),
+              ),
+              IconButton(
+                onPressed: () => context.goNamed(SettingsPage.name),
+                icon: SettingsBadge(child: Icon(Icons.settings_outlined)),
+              ),
             ],
+            fabText: 'New Group',
+            onFabPressed: platformContext.isWindows
+                ? null
+                : () => _createGroup(context),
+            child: Column(
+              children: [
+                UpdateBanner(),
+                Expanded(child: GroupListBody()),
+              ],
+            ),
           ),
         ),
       ),

@@ -21,7 +21,7 @@ class AssigneeList extends StatelessWidget {
                     var member = group.getMember(assigneeUid);
                     return UserAvatar(
                       margin: const EdgeInsets.only(right: 4),
-                      author: member,
+                      user: member,
                       withIcon: expense.isMarkedBy(assigneeUid),
                     );
                   }).toList(),

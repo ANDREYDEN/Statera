@@ -63,7 +63,7 @@ class _ItemDecisionsState extends State<ItemDecisions> {
                   var member = group.getMember(assigneeDecision.uid);
 
                   if (!widget.item.isPartitioned)
-                    return UserAvatar(author: member, dimension: 30);
+                    return UserAvatar(user: member, dimension: 30);
 
                   return Padding(
                     padding: const EdgeInsets.only(right: 2.0),
@@ -75,7 +75,7 @@ class _ItemDecisionsState extends State<ItemDecisions> {
                           children: [
                             SizedBox(width: 4),
                             Text(assigneeDecision.parts.toString()),
-                            UserAvatar(author: member, dimension: 30),
+                            UserAvatar(user: member, dimension: 30),
                           ],
                         ),
                       ),

@@ -10,7 +10,7 @@ class OwingListItemLoading extends StatelessWidget {
     return ListTile(
       title: Row(
         children: [
-          UserAvatar(author: CustomUser.fake(), loading: true, withName: true),
+          UserAvatar(user: CustomUser.fake(), loading: true, withName: true),
         ],
       ),
     );

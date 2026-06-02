@@ -81,7 +81,7 @@ class Header extends StatelessWidget {
                             GroupBuilder(
                               builder: (context, group) {
                                 return UserAvatar(
-                                  author: group.getMember(expense.authorUid),
+                                  user: group.getMember(expense.authorUid),
                                   onTap: expenseCanBeUpdated
                                       ? () =>
                                             _handleAuthorClick(context, expense)

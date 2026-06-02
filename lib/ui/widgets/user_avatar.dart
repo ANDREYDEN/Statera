@@ -6,12 +6,13 @@ import 'package:statera/utils/utils.dart';
 part 'user_avatar_name.dart';
 
 class UserAvatar extends StatelessWidget {
-  final CustomUser author;
+  final CustomUser user;
   final void Function()? onTap;
   final bool withName;
   final Color? borderColor;
   final bool withIcon;
   final IconData? icon;
+  final double iconSize;
   final Color? iconColor;
   final Color? iconBackgroudColor;
   final double? dimension;
@@ -21,12 +22,13 @@ class UserAvatar extends StatelessWidget {
 
   UserAvatar({
     Key? key,
-    required this.author,
+    required this.user,
     this.onTap,
     this.withName = false,
     this.borderColor,
     this.withIcon = false,
     this.icon = Icons.check,
+    this.iconSize = 20,
     this.iconColor = Colors.white,
     this.iconBackgroudColor = Colors.green,
     this.dimension = 36,
@@ -36,12 +38,12 @@ class UserAvatar extends StatelessWidget {
   }) : super(key: key);
 
   String get firstLetter {
-    if (!author.isActive || author.name.isEmpty) return '?';
-    return author.name[0];
+    if (!user.isActive || user.name.isEmpty) return '?';
+    return user.name[0];
   }
 
   void Function()? getTapHandler(BuildContext context) {
-    if (!author.isActive && onTap == null) {
+    if (!user.isActive && onTap == null) {
       return () {
         showSnackBar(context, 'This user is no longer active');
       };
@@ -52,7 +54,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photoUrl = author.photoURL;
+    final photoUrl = user.photoURL;
     final tapHandler = getTapHandler(context);
 
     final result = Padding(
@@ -125,14 +127,18 @@ class UserAvatar extends StatelessWidget {
                           color: this.iconBackgroudColor,
                         ),
                         padding: EdgeInsets.all(2),
-                        child: Icon(this.icon, size: 20, color: this.iconColor),
+                        child: Icon(
+                          this.icon,
+                          size: this.iconSize,
+                          color: this.iconColor,
+                        ),
                       ),
                     ),
                 ],
               ),
               if (this.withName)
                 UserAvatarName(
-                  author.name,
+                  user.name,
                   loading: loading,
                   namePosition: namePosition,
                   dimension: dimension,

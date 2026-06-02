@@ -48,12 +48,12 @@ class HeaderLoading extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        UserAvatar(author: CustomUser.fake(), loading: true),
+                        UserAvatar(user: CustomUser.fake(), loading: true),
                         Icon(Icons.arrow_forward, color: Colors.black),
                         ...List.generate(
                           3,
                           (_) => UserAvatar(
-                            author: CustomUser.fake(),
+                            user: CustomUser.fake(),
                             loading: true,
                           ),
                         ),

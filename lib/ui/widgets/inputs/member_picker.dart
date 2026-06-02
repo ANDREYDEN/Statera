@@ -26,10 +26,10 @@ class MemberPicker extends StatefulWidget {
     this.excludeMe = false,
     this.allSelected = false,
     this.memberUids,
-  })  : this.value = value ?? [],
-        this.controller =
-            controller ?? MemberController(initialValue: value ?? []),
-        super(key: key);
+  }) : this.value = value ?? [],
+       this.controller =
+           controller ?? MemberController(initialValue: value ?? []),
+       super(key: key);
 
   @override
   State<MemberPicker> createState() => _MemberPickerState();
@@ -45,7 +45,8 @@ class _MemberPickerState extends State<MemberPicker> {
     return GroupBuilder(
       builder: (context, group) {
         final members = group.members.where((m) {
-          final inMemberUids = widget.memberUids == null ||
+          final inMemberUids =
+              widget.memberUids == null ||
               (widget.memberUids != null && widget.memberUids!.contains(m.uid));
           final notExcluded =
               !widget.excludeMe || (widget.excludeMe && m.uid != uid);
@@ -70,7 +71,7 @@ class _MemberPickerState extends State<MemberPicker> {
             ...members.map((member) {
               return UserAvatar(
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                author: member,
+                user: member,
                 borderColor: widget.controller.value.contains(member.uid)
                     ? Colors.green
                     : Colors.transparent,

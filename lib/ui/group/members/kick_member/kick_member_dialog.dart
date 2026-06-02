@@ -72,7 +72,7 @@ class KickMemberDialog extends StatelessWidget {
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: UserAvatar(author: member, withName: true),
+                  child: UserAvatar(user: member, withName: true),
                 ),
               );
             }).toList(),

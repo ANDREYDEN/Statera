@@ -19,37 +19,37 @@ class UserAvatarExamples extends StatelessWidget {
       body: ListView(
         children: [
           UserAvatar(
-            author: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
+            user: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
           ),
           UserAvatar(
-            author: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
+            user: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
             borderColor: Colors.green,
           ),
-          UserAvatar(author: CustomUser.fake(), loading: true),
-          UserAvatar(author: CustomUser.inactive()),
+          UserAvatar(user: CustomUser.fake(), loading: true),
+          UserAvatar(user: CustomUser.inactive()),
           Row(
             children: [20, 40, 60, 100, 200]
                 .map(
                   (dimension) => UserAvatar(
-                    author: CustomUser.fake(name: 'User', photoURL: null),
+                    user: CustomUser.fake(name: 'User', photoURL: null),
                     dimension: dimension * 1.0,
                   ),
                 )
                 .toList(),
           ),
           UserAvatar(
-            author: CustomUser.fake(
+            user: CustomUser.fake(
               name: 'John Doe',
               photoURL: 'https://picsum.photos/300',
             ),
             withName: true,
           ),
-          UserAvatar(author: CustomUser.fake(), loading: true, withName: true),
+          UserAvatar(user: CustomUser.fake(), loading: true, withName: true),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               UserAvatar(
-                author: CustomUser.fake(
+                user: CustomUser.fake(
                   name: 'Very long name',
                   photoURL: 'https://picsum.photos/300',
                 ),
@@ -58,7 +58,7 @@ class UserAvatarExamples extends StatelessWidget {
                 namePosition: NamePosition.bottom,
               ),
               UserAvatar(
-                author: CustomUser.fake(
+                user: CustomUser.fake(
                   name: 'short',
                   photoURL: 'https://picsum.photos/300',
                 ),
