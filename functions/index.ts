@@ -19,6 +19,7 @@ import { notifyWhenGroupDebtThresholdReached } from './src/functions/notificatio
 import { removeUserFromGroups } from './src/functions/userManagement/removeUserFromGroups'
 import { updateUser } from './src/functions/userManagement/updateUser'
 import { UserData } from './src/types/userData'
+import { analyzeReceiptWithAI } from './src/functions/analyzeReceiptWithAI'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
@@ -34,10 +35,7 @@ export const setTimestampOnPaymentCreation = onDocumentCreated(
 )
 
 export const getReceiptData = onCall(
-  {
-    timeoutSeconds: 300,
-    memory: '4GiB',
-  },
+  { timeoutSeconds: 300, memory: '4GiB' },
   async (event) => {
     if (!event.data.receiptUrl) {
       throw new Error('The parameter receiptUrl is required.')
@@ -48,6 +46,17 @@ export const getReceiptData = onCall(
       event.data.storeName,
       event.data.withNameImprovement
     )
+  }
+)
+
+export const getReceiptDataWithAI = onCall(
+  { timeoutSeconds: 60 },
+  async (event) => {
+    if (!event.data.receiptUrl) {
+      throw new Error('The parameter receiptUrl is required.')
+    }
+
+    return analyzeReceiptWithAI(event.data.receiptUrl)
   }
 )
 

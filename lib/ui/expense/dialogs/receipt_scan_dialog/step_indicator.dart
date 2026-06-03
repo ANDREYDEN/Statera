@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:statera/ui/styling/index.dart';
 
 class StepIndicator extends StatelessWidget {
   final List<StepData> steps;
@@ -22,7 +23,7 @@ class StepIndicator extends StatelessWidget {
     final isError = error != null;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: Spacing.s_8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -42,17 +43,16 @@ class StepIndicator extends StatelessWidget {
             ],
           ),
           if (currentStep.backgroundProcessed) ...[
-            SizedBox(height: 20),
+            SizedBox(height: Spacing.l_20),
             Text(
               currentStep.title,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineLarge,
-            )
-          ] else
-            Text(
-              currentStep.title,
-              textAlign: TextAlign.center,
             ),
+          ] else ...[
+            SizedBox(height: Spacing.m_10),
+            Text(currentStep.title, textAlign: TextAlign.center),
+          ],
         ],
       ),
     );
@@ -65,7 +65,7 @@ class StepData {
 
   const StepData({required this.title, this.backgroundProcessed = false});
   const StepData.background({required this.title})
-      : this.backgroundProcessed = true;
+    : this.backgroundProcessed = true;
 }
 
 class StepBar extends StatelessWidget {
@@ -78,7 +78,7 @@ class StepBar extends StatelessWidget {
     final color = switch (status) {
       StepStatus.Completed => Colors.green,
       StepStatus.Failed => Colors.red,
-      _ => Colors.grey
+      _ => Colors.grey,
     };
     final bar = Expanded(
       child: Container(
