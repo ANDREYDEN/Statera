@@ -29,13 +29,6 @@ class Expense {
   Expense.empty({String? groupId})
     : this(name: 'Empty', authorUid: '', groupId: groupId);
 
-  bool wasEarlierThan(Expense other) {
-    if (this.date == null) return true;
-    if (other.date == null) return false;
-
-    return this.date!.compareTo(other.date!) < 0;
-  }
-
   bool get hasTax => settings.tax != null;
 
   bool get hasTip => settings.tip != null;
@@ -56,6 +49,16 @@ class Expense {
       items.isNotEmpty && items.every((item) => item.completed);
 
   bool get canReceiveAssignees => !finalized;
+
+  bool get hasNoItems => this.items.isEmpty;
+  bool get hasItems => this.items.isNotEmpty;
+
+  bool wasEarlierThan(Expense other) {
+    if (this.date == null) return true;
+    if (other.date == null) return false;
+
+    return this.date!.compareTo(other.date!) < 0;
+  }
 
   bool isMarkedBy(String uid) => items.every((item) => item.isMarkedBy(uid));
 
@@ -87,8 +90,13 @@ class Expense {
     this.items[itemIdx] = newItem;
   }
 
-  get hasNoItems => this.items.isEmpty;
-  get hasItems => this.items.isNotEmpty;
+  void addTaxToAllItems() {
+    if (!hasTax) return;
+
+    for (final item in items) {
+      item.isTaxable = true;
+    }
+  }
 
   void addAssignee(String newAssigneeUid) {
     this.items.forEach((item) {
@@ -181,7 +189,11 @@ class Expense {
     };
   }
 
-  static Expense from(Expense other, {String? name, ExpenseSettings? settings}) {
+  static Expense from(
+    Expense other, {
+    String? name,
+    ExpenseSettings? settings,
+  }) {
     return Expense(
         name: name ?? other.name,
         authorUid: other.authorUid,

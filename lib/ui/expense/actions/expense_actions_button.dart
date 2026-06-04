@@ -21,6 +21,7 @@ class ExpenseActionsButton extends StatelessWidget {
       ShareExpenseAction(expense),
       if (expense.canBeUpdatedBy(authBloc.uid)) ...[
         SettingsExpenseAction(expense),
+        TaxAllItemsAction(expense),
         if (isWide) DeleteExpenseAction(expense),
       ],
       if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
