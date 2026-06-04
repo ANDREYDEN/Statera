@@ -1,10 +1,10 @@
 import { ImageAnnotatorClient } from '@google-cloud/vision'
 import { google } from '@google-cloud/vision/build/protos/protos'
 import { max, min } from 'lodash'
-import { BoxWithText, RowOfText } from '../types/geometry'
-import { Product } from '../types/products'
-import { defaultStore, StoreName, stores } from '../types/stores'
-import { distanceToRow, height, toBoxWithText } from '../utils/geometryUtils'
+import { BoxWithText, RowOfText } from '../../types/geometry'
+import { Product } from '../../types/products'
+import { defaultStore, StoreName, stores } from '../../types/stores'
+import { distanceToRow, height, toBoxWithText } from '../../utils/geometryUtils'
 import fetch from 'node-fetch'
 
 type IEntityAnnotation = google.cloud.vision.v1.IEntityAnnotation

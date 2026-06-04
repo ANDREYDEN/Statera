@@ -27,20 +27,19 @@ Future<void> main() async {
   await FirebaseRemoteConfig.instance.setDefaults(<String, dynamic>{
     'greeting_message': 'Welcome to Statera!',
     'show_greeting_dialog': false,
-    'redirect_debt_feature_flag': true
+    'redirect_debt_feature_flag': true,
+    'ai_receipt_analysis_feature_flag': false,
   });
 
   configureEmulators();
 
   final initialDynamicLink = null;
   final dynamicLinkPath = initialDynamicLink?.link.path;
-  final initialNotificationMessage =
-      await FirebaseMessaging.instance.getInitialMessage();
+  final initialNotificationMessage = await FirebaseMessaging.instance
+      .getInitialMessage();
   final notificationPath = AppLaunchHandler.getPath(initialNotificationMessage);
 
-  runApp(Statera(
-    initialRoute: dynamicLinkPath ?? notificationPath,
-  ));
+  runApp(Statera(initialRoute: dynamicLinkPath ?? notificationPath));
 }
 
 class Statera extends StatelessWidget {
@@ -57,16 +56,18 @@ class Statera extends StatelessWidget {
         child: CustomThemeBuilder(
           builder: (lightTheme, darkTheme) {
             return CustomLayoutBuilder(
-              child: Builder(builder: (context) {
-                return MaterialApp.router(
-                  title: kAppName,
-                  theme: lightTheme,
-                  darkTheme: darkTheme,
-                  themeMode: ThemeMode.system,
-                  routerConfig: CustomRouterConfig.create(context),
-                  debugShowCheckedModeBanner: false,
-                );
-              }),
+              child: Builder(
+                builder: (context) {
+                  return MaterialApp.router(
+                    title: kAppName,
+                    theme: lightTheme,
+                    darkTheme: darkTheme,
+                    themeMode: ThemeMode.system,
+                    routerConfig: CustomRouterConfig.create(context),
+                    debugShowCheckedModeBanner: false,
+                  );
+                },
+              ),
             );
           },
         ),

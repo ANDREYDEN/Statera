@@ -9,8 +9,9 @@
     "test": "export FIREBASE_AUTH_EMULATOR_HOST=\"localhost:9099\" && export FIRESTORE_EMULATOR_HOST=\"localhost:8080\" && jest",
     "lint": "eslint --ext .ts . --fix",
     "format": "prettier --write \"src/{**/*,*}.{js,ts,jsx,tsx,json}\"",
-    "build": "tsc",
-    "listen": "tsc --watch",
+    "copy-assets": "mkdir -p lib/src/assets && cp -r src/assets/* lib/src/assets/",
+    "build": "tsc && npm run copy-assets",
+    "listen": "npm run copy-assets && tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -24,7 +25,8 @@
     "firebase-admin": "^12.1.1",
     "firebase-functions": "^7.0.0",
     "lodash": "^4.17.21",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "openai": "^6.41.0"
   },
   "devDependencies": {
     "@types/jest": "^29",

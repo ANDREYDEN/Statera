@@ -8,16 +8,14 @@ import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/step_indicator.da
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/store_input.dart';
 import 'package:statera/ui/expense/dialogs/receipt_scan_dialog/with_name_improvement_input.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/ok_button.dart';
 
 class ReceiptScanBody extends StatefulWidget {
   final Expense expense;
 
-  const ReceiptScanBody({
-    Key? key,
-    required this.expense,
-  }) : super(key: key);
+  const ReceiptScanBody({Key? key, required this.expense}) : super(key: key);
 
   @override
   State<ReceiptScanBody> createState() => _ReceiptScanBodyState();
@@ -35,6 +33,7 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
   Callables get _callables => context.read<Callables>();
   ExpenseService get _expenseService => context.read<ExpenseService>();
   ErrorService get _errorService => context.read<ErrorService>();
+  FeatureService get _featureService => context.read<FeatureService>();
 
   static const List<StepData> steps = const [
     StepData(title: 'Choose a receipt'),
@@ -42,6 +41,7 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
     StepData.background(title: 'Analyzing the receipt...'),
     StepData.background(title: 'Updating expense...'),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -54,25 +54,28 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
           error: _error,
         ),
         if (_currentStep == 1) ...[
+          SizedBox(height: Spacing.m_10),
           ReceiptPicker(controller: _receiptImageController),
-          SizedBox(height: 20),
-          StoreInput(controller: _storeController),
-          ValueListenableBuilder(
-            valueListenable: _storeController,
-            builder: (_, value, child) =>
-                value == Store.walmart ? child! : SizedBox.shrink(),
-            child: WithNameImprovementInput(
-              controller: _withNameImprovementController,
+          if (!_featureService.aiReceiptAnalysisEnabled) ...[
+            SizedBox(height: Spacing.l_20),
+            StoreInput(controller: _storeController),
+            ValueListenableBuilder(
+              valueListenable: _storeController,
+              builder: (_, value, child) =>
+                  value == Store.walmart ? child! : SizedBox.shrink(),
+              child: WithNameImprovementInput(
+                controller: _withNameImprovementController,
+              ),
             ),
-          ),
-          SizedBox(height: 40),
+          ],
+          SizedBox(height: Spacing.xl_32),
           ValueListenableBuilder(
             valueListenable: _receiptImageController,
             builder: (context, receiptImage, _) {
               return Row(
                 children: [
                   Expanded(child: CancelButton()),
-                  SizedBox(width: 10),
+                  SizedBox(width: Spacing.m_10),
                   Expanded(
                     child: FilledButton(
                       onPressed: receiptImage == null ? null : _processImage,
@@ -85,16 +88,16 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
           ),
         ],
         if (_error != null)
-          Column(children: [
-            SelectableText(
-              _error!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
+          Column(
+            children: [
+              SelectableText(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
-            ),
-            SizedBox(height: 40),
-            OkButton()
-          ])
+              SizedBox(height: 40),
+              OkButton(),
+            ],
+          ),
       ],
     );
   }
@@ -105,7 +108,7 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
     });
   }
 
-  void _processImage() async {
+  Future<void> _processImage() async {
     if (_receiptImageController.value == null) {
       return;
     }
@@ -119,23 +122,26 @@ class _ReceiptScanBodyState extends State<ReceiptScanBody> {
       );
       _incrementStep();
 
-      List<Item> items = await _callables.getReceiptData(
-        receiptUrl: url,
-        selectedStore: _storeController.value.title.toLowerCase(),
-        withNameImprovement: _withNameImprovementController.value,
-      );
+      List<Item> items = [];
+      if (_featureService.aiReceiptAnalysisEnabled) {
+        items = await _callables.getReceiptDataWithAI(receiptUrl: url);
+      } else {
+        items = await _callables.getReceiptData(
+          receiptUrl: url,
+          selectedStore: _storeController.value.title.toLowerCase(),
+          withNameImprovement: _withNameImprovementController.value,
+        );
+      }
       _incrementStep();
 
       items.forEach(widget.expense.addItem);
       await _expenseService.updateExpense(widget.expense);
       Navigator.of(context).pop();
     } on Exception catch (e) {
-      setState(() {
-        _error = e.toString();
-      });
+      setState(() => _error = 'Unexpected error occurred. Please try again.');
       await _errorService.recordError(
         e,
-        reason: 'Receipt upload failed',
+        reason: 'Receipt analysis failed at step $_currentStep/${steps.length}',
       );
     }
   }
