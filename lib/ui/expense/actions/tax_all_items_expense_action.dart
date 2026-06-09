@@ -12,16 +12,16 @@ class TaxAllItemsAction extends ExpenseAction {
   @override
   @protected
   FutureOr<void> handle(BuildContext context) async {
-    final tax = expense.settings.tax;
-
-    if (tax == null) return;
+    final tax = expense.settings.tax ?? kDefaultTax;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => OKCancelDialog(
         title: 'Add tax to all items',
-        text:
-            'Are you sure you want to apply a tax of ${tax * 100}% to all items in this expense?',
+        okText: 'Confirm',
+        text: expense.hasTax
+            ? 'This action will apply a tax of ${tax * 100}% to all items in this expense.'
+            : 'This action will enable taxes for this expense and will apply a default tax of ${tax * 100}% to all items.',
       ),
     );
     if (confirmed != true) return;

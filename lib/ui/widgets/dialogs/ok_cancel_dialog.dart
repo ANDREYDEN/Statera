@@ -5,8 +5,9 @@ import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 class OKCancelDialog extends StatelessWidget {
   final String text;
   final String? title;
+  final String? okText;
 
-  const OKCancelDialog({Key? key, required this.text, this.title})
+  const OKCancelDialog({Key? key, required this.text, this.title, this.okText})
     : super(key: key);
 
   @override
@@ -20,7 +21,7 @@ class OKCancelDialog extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: Text('Yes'),
+          child: Text(okText ?? 'Yes'),
         ),
       ],
     );

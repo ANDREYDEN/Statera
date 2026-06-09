@@ -61,7 +61,7 @@ void main() {
           await tester.tap(find.text('Add tax to all items'));
           await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Yes'));
+          await tester.tap(find.text('Confirm'));
           await tester.pumpAndSettle();
 
           expect(find.textContaining('+ tax'), findsExactly(2));

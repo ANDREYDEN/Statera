@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/utils/constants.dart';
 
 class Expense {
   String id = '';
@@ -91,7 +92,9 @@ class Expense {
   }
 
   void addTaxToAllItems() {
-    if (!hasTax) return;
+    if (!hasTax) {
+      settings.tax = kDefaultTax;
+    }
 
     for (final item in items) {
       item.isTaxable = true;
