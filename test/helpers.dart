@@ -83,11 +83,15 @@ Future<void> customPump(
   final featureServiceMock = MockFeatureService();
   when(featureServiceMock.debtRedirectionEnabled).thenReturn(true);
 
+  expenseService ??= defaultExpenseService;
   final expenseBloc = ExpenseBloc(
-    expenseService ?? defaultExpenseService,
+    expenseService,
     coordinationRepository ?? defaultCoordinationRepository,
   );
   if (selectedExpense != null) {
+    when(
+      expenseService.expenseStream(any),
+    ).thenAnswer((_) => Stream.value(selectedExpense));
     expenseBloc.load(selectedExpense.id);
   }
 
@@ -97,12 +101,12 @@ Future<void> customPump(
         Provider(create: (_) => platformContext ?? PlatformContext()),
         Provider(create: (_) => LayoutState.narrow()),
         Provider(create: (_) => featureService ?? featureServiceMock),
-        Provider(create: (_) => expenseService ?? defaultExpenseService),
+        Provider(create: (_) => expenseService),
         BlocProvider(create: (_) => expenseBloc),
         BlocProvider(
           create: (context) => GroupCubit(
             groupService ?? defaultGroupService,
-            expenseService ?? defaultExpenseService,
+            expenseService!,
             userRepository ?? defaultUserRepository,
             MockErrorService(),
           )..load((group ?? defaultGroup).id),
@@ -112,7 +116,7 @@ Future<void> customPump(
             group?.id ?? defaultGroup.id,
             currentUserId ?? defaultCurrentUserId,
             userExpenseRepository ?? defaultUserExpensesRepository,
-            expenseService ?? defaultExpenseService,
+            expenseService!,
             groupService ?? defaultGroupService,
             coordinationRepository ?? defaultCoordinationRepository,
           )..load(),
