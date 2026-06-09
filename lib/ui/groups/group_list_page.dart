@@ -58,7 +58,7 @@ class GroupListPage extends StatelessWidget {
             title: kAppName,
             actions: [
               IconButton(
-                onPressed: () => context.goNamed(SupportPage.name),
+                onPressed: () => context.pushNamed(SupportPage.name),
                 icon: Icon(Icons.info_outline_rounded),
               ),
               IconButton(
