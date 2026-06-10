@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/expense/items/item_list_item.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
@@ -88,16 +86,10 @@ Future<void> _pumpItemsList(
   required Expense expense,
   String? currentUserId,
 }) {
-  final mockExpenseService = MockExpenseService();
-  when(
-    mockExpenseService.expenseStream(any),
-  ).thenAnswer((_) => Stream.fromIterable([expense]));
-
   return customPump(
     ItemsList(),
     tester,
     currentUserId: currentUserId,
-    expenseService: mockExpenseService,
     selectedExpense: expense,
   );
 }

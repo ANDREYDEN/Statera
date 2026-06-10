@@ -58,7 +58,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
         .listen(emit, onError: (error) => emit(ExpensesError(error: error)));
   }
 
-  void loadMore() async {
+  Future<void> loadMore() async {
     if (state case final ExpensesLoaded loadedState) {
       if (loadedState.allLoaded) return;
 

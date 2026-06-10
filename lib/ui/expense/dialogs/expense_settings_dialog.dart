@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
+import 'package:statera/utils/constants.dart';
 
 class ExpenseSettingsDialog extends StatelessWidget {
   final Expense expense;
@@ -32,7 +33,7 @@ class ExpenseSettingsDialog extends StatelessWidget {
         FieldData(
           id: 'tax',
           label: 'Tax',
-          initialData: (expense.settings.tax ?? .13) * 100,
+          initialData: (expense.settings.tax ?? kDefaultTax) * 100,
           formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
           validators: [FieldData.constrainedDoubleValidator(0, 100)],
           isDisabled: (fields) => fields['is_taxable'] == false,
@@ -52,7 +53,7 @@ class ExpenseSettingsDialog extends StatelessWidget {
         FieldData(
           id: 'tip',
           label: 'Tip',
-          initialData: (expense.settings.tip ?? 0.15) * 100,
+          initialData: (expense.settings.tip ?? kDefaultTip) * 100,
           formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
           validators: [FieldData.constrainedDoubleValidator(0, 100)],
           isDisabled: (fields) => fields['has_tip'] == false,

@@ -44,3 +44,6 @@ const kWideMargin = EdgeInsets.symmetric(horizontal: 50.0);
 const kRedirectDebtIcon = Icons.bolt;
 
 const kExpenseUpdateDelay = Duration(milliseconds: 1500);
+
+const kDefaultTax = .13;
+const kDefaultTip = .15;
