@@ -1,3 +1,5 @@
+import 'package:statera/data/utils/mapping_utils.dart';
+
 class ExpenseSettings {
   /// Controls wether to add new group members to this expense
   bool acceptNewMembers;
@@ -26,8 +28,8 @@ class ExpenseSettings {
     : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
       this.showItemDecisions = data['showItemDecisions'] ?? true,
       this.itemsAreTaxableByDefault = data['itemsAreTaxableByDefault'] ?? false,
-      this.tax = data['tax'],
-      this.tip = data['tip'];
+      this.tax = mapDouble(data['tax']),
+      this.tip = mapDouble(data['tip']);
 
   Map<String, dynamic> toFirestore() {
     return {

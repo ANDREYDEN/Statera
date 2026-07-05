@@ -13,3 +13,9 @@ Map<String, Map<String, double>>? mapBalance(dynamic balanceData) {
     ),
   );
 }
+
+double? mapDouble(dynamic value) {
+  if (value == null) return null;
+
+  return double.tryParse(value.toString());
+}
