@@ -27,10 +27,10 @@ class ExpenseSettings {
     this.tip,
   });
 
-  factory ExpenseSettings.fromFirestore(Map<String, dynamic> data) =>
+  factory ExpenseSettings.fromJson(Map<String, dynamic> data) =>
       _$ExpenseSettingsFromJson(data);
 
-  Map<String, dynamic> toFirestore() => _$ExpenseSettingsToJson(this);
+  Map<String, dynamic> toJson() => _$ExpenseSettingsToJson(this);
 
   static ExpenseSettings from(ExpenseSettings other) {
     return ExpenseSettings(

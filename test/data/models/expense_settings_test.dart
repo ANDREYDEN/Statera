@@ -5,7 +5,7 @@ void main() {
   group('ExpenseSettings', () {
     group('fromFirestore', () {
       test('handles int values in double fields', () {
-        final expenseSettings = ExpenseSettings.fromFirestore({'tax': 0});
+        final expenseSettings = ExpenseSettings.fromJson({'tax': 0});
 
         expect(expenseSettings.tax, 0.0);
       });
