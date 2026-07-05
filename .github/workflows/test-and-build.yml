@@ -44,8 +44,8 @@ jobs:
       - name: Install derry
         run: flutter pub global activate derry
 
-      - name: Generate mocks
-        run: derry create-mocks
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Run tests
         run: flutter test

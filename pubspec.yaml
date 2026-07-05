@@ -14,7 +14,7 @@ scripts:
   run-emulate: flutter run --dart-define="MODE=debug"
   test: flutter test
   test-coverage: flutter test --coverage && genhtml ./coverage/lcov.info -o ./coverage/html
-  create-mocks: dart run build_runner build
+  codegen: dart run build_runner build --delete-conflicting-outputs
   deploy-web: flutter build web && firebase deploy --only hosting
   deploy-functions: firebase deploy --only functions
   emulate: export GOOGLE_APPLICATION_CREDENTIALS="./serviceAccount.json" && firebase emulators:start --import ./emulator_data
@@ -60,6 +60,7 @@ dependencies:
   intl: ^0.20.2
   web: ^1.0.0
   go_router: ^16.1.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   integration_test:
@@ -69,6 +70,7 @@ dev_dependencies:
   msix: ^3.6.2
   lints: ^6.0.0
   flutter_lints: ^6.0.0
+  json_serializable: ^6.11.2
 
 flutter:
   uses-material-design: true
