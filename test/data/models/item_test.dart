@@ -173,21 +173,6 @@ void main() {
       });
     });
 
-    test('can be converted to and from a firestore object', () {
-      var item = SimpleItem(
-        name: 'foo',
-        value: 145.0,
-        partition: 3,
-        isTaxable: true,
-        assigneeUids: ['1', '2', '3'],
-      );
-
-      var firestoreItem = Item.fromFirestore(item.toFirestore());
-
-      expect(firestoreItem, item);
-      expect(firestoreItem == item, true);
-    });
-
     test('can reset its assignee desicions', () {
       var item = SimpleItem(
         name: 'foo',

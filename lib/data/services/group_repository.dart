@@ -11,13 +11,14 @@ class GroupRepository extends Firestore {
   late final DynamicLinkService _dynamicLinkService;
 
   GroupRepository(FirebaseFirestore firestoreInstance)
-      : super(firestoreInstance) {
+    : super(firestoreInstance) {
     _dynamicLinkService = DynamicLinkService();
   }
 
   Future<Group> getGroup(String? groupCode) async {
-    var groupSnap =
-        await groupsCollection.where('code', isEqualTo: groupCode).get();
+    var groupSnap = await groupsCollection
+        .where('code', isEqualTo: groupCode)
+        .get();
     if (groupSnap.docs.isEmpty)
       throw new Exception('There was no group with code $groupCode');
     var groupDoc = groupSnap.docs.first;
@@ -86,7 +87,7 @@ class GroupRepository extends Firestore {
     final group = await getGroupById(groupId);
     expense.groupId = groupId;
     expense.settings = group.defaultExpenseSettings;
-    final docRef = await expensesCollection.add(expense.toFirestore());
+    final docRef = await expensesCollection.add(expense.toJson());
     return docRef.id;
   }
 
@@ -111,9 +112,8 @@ class GroupRepository extends Firestore {
   }
 
   Stream<List<Expense>> listenForUnmarkedExpenses(String? groupId, String uid) {
-    return queryToExpensesStream(expensesQuery(
-      groupId: groupId,
-      unmarkedAssigneeId: uid,
-    ));
+    return queryToExpensesStream(
+      expensesQuery(groupId: groupId, unmarkedAssigneeId: uid),
+    );
   }
 }

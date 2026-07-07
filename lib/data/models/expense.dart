@@ -1,31 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:statera/data/enums/enums.dart';
+import 'package:statera/data/models/items_list_converter.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/utils/firestore_date_time_converter.dart';
 import 'package:statera/utils/constants.dart';
 
+part 'expense.g.dart';
+
+@JsonSerializable()
 class Expense {
-  String id = '';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String id;
   String? groupId;
-  List<Item> items = [];
-  List<String> assigneeUids = [];
+  @ItemsListConverter()
+  List<Item> items;
+  @JsonKey(name: 'assigneeIds')
+  List<String> assigneeUids;
   String name;
   String authorUid;
+  @FirestoreDateTimeConverter()
   DateTime? date;
+  @FirestoreDateTimeConverter()
   DateTime? finalizedDate;
-  late ExpenseSettings settings;
+  ExpenseSettings settings;
+
+  @JsonKey(includeFromJson: false, includeToJson: true)
+  List<String> get unmarkedAssigneeUids =>
+      assigneeUids.where((assigneeUid) => !isMarkedBy(assigneeUid)).toList();
 
   Expense({
     required this.name,
     required this.authorUid,
     this.groupId,
+    List<Item>? items,
+    List<String>? assigneeUids,
     ExpenseSettings? settings,
+    this.finalizedDate,
     this.id = '',
-  }) {
-    this.assigneeUids = [authorUid];
-    this.date = DateTime.now();
-    this.settings = settings ?? ExpenseSettings();
-  }
+  }) : items = items ?? [],
+       assigneeUids = assigneeUids ?? [authorUid],
+       date = DateTime.now(),
+       settings = settings ?? ExpenseSettings();
 
   Expense.empty({String? groupId})
     : this(name: 'Empty', authorUid: '', groupId: groupId);
@@ -176,22 +193,6 @@ class Expense {
     return ExpenseStage.Not_Marked;
   }
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'name': name,
-      'groupId': groupId,
-      'authorUid': authorUid,
-      'assigneeIds': assigneeUids,
-      'items': items.map((item) => item.toFirestore()).toList(),
-      'unmarkedAssigneeIds': assigneeUids
-          .where((assigneeUid) => !isMarkedBy(assigneeUid))
-          .toList(),
-      'date': date,
-      'finalizedDate': finalizedDate,
-      'settings': settings.toFirestore(),
-    };
-  }
-
   static Expense from(
     Expense other, {
     String? name,
@@ -210,38 +211,14 @@ class Expense {
       ..items = other.items.map((item) => Item.from(item)).toList();
   }
 
-  static Expense fromFirestore(Map<String, dynamic> data, String id) {
-    final authorUid = data['authorUid'];
-    final settings = data['settings'] == null
-        ? null
-        : ExpenseSettings.fromFirestore(data['settings']);
-
-    var expense = new Expense(
-      authorUid: authorUid,
-      name: data['name'],
-      groupId: data['groupId'],
-      settings: settings,
-    );
-    expense.id = id;
-    expense.date = data['date'] == null
-        ? null
-        : DateTime.parse(data['date'].toDate().toString());
-    expense.finalizedDate = data['finalizedDate'] == null
-        ? null
-        : DateTime.parse(data['finalizedDate'].toDate().toString());
-    expense.assigneeUids = (data['assigneeIds'] as List<dynamic>)
-        .map((a) => a.toString())
-        .toList();
-    data['items'].forEach(
-      (itemData) => {expense.items.add(Item.fromFirestore(itemData))},
-    );
-    return expense;
-  }
+  static Expense fromJson(Map<String, dynamic> data) => _$ExpenseFromJson(data);
 
   static Expense fromSnapshot(DocumentSnapshot snap) {
     final data = snap.data() as Map<String, dynamic>;
-    return fromFirestore(data, snap.id);
+    return fromJson(data)..id = snap.id;
   }
+
+  Map<String, dynamic> toJson() => _$ExpenseToJson(this);
 
   @override
   bool operator ==(Object other) {

@@ -8,11 +8,7 @@ void main() {
     String assigneeUid = 'qwe';
 
     setUp(() {
-      expense = Expense(
-        authorUid: authorUid,
-        name: 'baz',
-        groupId: 'que',
-      );
+      expense = Expense(authorUid: authorUid, name: 'baz', groupId: 'que');
     });
 
     group('assignee CRUD', () {
@@ -73,14 +69,16 @@ void main() {
           expect(expense.canReceiveAssignees, isTrue);
         });
 
-        test('can be performed even if all assignees have made their decisions',
-            () {
-          expense.addItem(Item.fake());
-          expense.assigneeUids = [assigneeUid];
-          expense.items.first.setAssigneeDecision(authorUid, 1);
+        test(
+          'can be performed even if all assignees have made their decisions',
+          () {
+            expense.addItem(Item.fake());
+            expense.assigneeUids = [assigneeUid];
+            expense.items.first.setAssigneeDecision(authorUid, 1);
 
-          expect(expense.canReceiveAssignees, isTrue);
-        });
+            expect(expense.canReceiveAssignees, isTrue);
+          },
+        );
 
         test("can't be performed if the expense is finalized", () {
           expense.addItem(Item.fake());
@@ -100,8 +98,9 @@ void main() {
           var itemAssigneeIds = item.assignees
               .map((assigneeDecision) => assigneeDecision.uid)
               .toList();
-          var expenseAssigneeIds =
-              expense.assigneeUids.map((assignee) => assigneeUid).toList();
+          var expenseAssigneeIds = expense.assigneeUids
+              .map((assignee) => assigneeUid)
+              .toList();
           expect(itemAssigneeIds, containsAll(expenseAssigneeIds));
         });
       });
@@ -145,7 +144,7 @@ void main() {
       expense.assigneeUids = [
         firstAssigneeUid,
         secondAssigneeUid,
-        thirdAssigneeUid
+        thirdAssigneeUid,
       ];
 
       var item1 = Item.fake();
@@ -340,8 +339,10 @@ void main() {
           expect(expense.getConfirmedTaxForUser(firstAssigneeUid), 13.8);
           expect(expense.getConfirmedTotalForUser(secondAssigneeUid), 30.8);
           expect(expense.getConfirmedSubtotalForUser(secondAssigneeUid), 28);
-          expect(expense.getConfirmedTaxForUser(secondAssigneeUid),
-              closeTo(2.8, 0.01));
+          expect(
+            expense.getConfirmedTaxForUser(secondAssigneeUid),
+            closeTo(2.8, 0.01),
+          );
         });
 
         test('when expense has tax & tip and some items are taxable', () {
@@ -447,10 +448,7 @@ void main() {
         );
         expense.date = null;
 
-        var firestoreExpense = Expense.fromFirestore(
-          expense.toFirestore(),
-          expense.id,
-        );
+        var firestoreExpense = Expense.fromJson(expense.toJson());
         expect(expense, firestoreExpense);
         expect(expense == firestoreExpense, isTrue);
       });

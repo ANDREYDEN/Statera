@@ -6,6 +6,9 @@ targets:
       - lib/**.dart
       - test/**.dart
     builders:
+      json_serializable:
+        options:
+          explicit_to_json: true
       mockito|mockBuilder:
         generate_for:
           - test/**.dart

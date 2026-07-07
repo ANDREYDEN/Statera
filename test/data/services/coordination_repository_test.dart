@@ -36,10 +36,7 @@ main() {
     );
     testExpense.assigneeUids = [admin.uid, member.uid];
 
-    testItem = SimpleItem(
-      name: 'Test Item',
-      value: 100,
-    );
+    testItem = SimpleItem(name: 'Test Item', value: 100);
     testExpense.addItem(testItem);
     testItem.setAssigneeDecision(member.uid, 1);
     testItem.setAssigneeDecision(admin.uid, 1);
@@ -52,7 +49,7 @@ main() {
         final groupRef = firestore.collection('groups').doc(testGroup.id);
         await groupRef.set(testGroup.toFirestore());
         final expenseRef = firestore.collection('expenses').doc(testExpense.id);
-        await expenseRef.set(testExpense.toFirestore());
+        await expenseRef.set(testExpense.toJson());
 
         // act
         final coordinationRepo = CoordinationRepository(firestore);
@@ -60,16 +57,14 @@ main() {
 
         // assert
         final updatedExpenseDoc = await expenseRef.get();
-        final updatedExpense = Expense.fromFirestore(
-          updatedExpenseDoc.data()!,
-          updatedExpenseDoc.id,
-        );
+        final updatedExpense = Expense.fromSnapshot(updatedExpenseDoc);
         expect(updatedExpense.finalizedDate, isNotNull);
 
         final paymentsSnapshot = await firestore.collection('payments').get();
         expect(paymentsSnapshot.docs.length, 1);
-        final payments =
-            paymentsSnapshot.docs.map(Payment.fromFirestore).toList();
+        final payments = paymentsSnapshot.docs
+            .map(Payment.fromFirestore)
+            .toList();
         final payment1 = payments[0];
         expect(payment1.payerId, admin.uid);
         expect(payment1.receiverId, member.uid);
@@ -95,26 +90,30 @@ main() {
         );
       });
 
-      test('throws not found exception if expense is tied to an invalid group',
-          () async {
-        // arrange
-        final invalidExpense = Expense(
-          authorUid: 'uid',
-          name: 'Test Expense',
-          groupId: 'invalidGroupId',
-        );
+      test(
+        'throws not found exception if expense is tied to an invalid group',
+        () async {
+          // arrange
+          final invalidExpense = Expense(
+            authorUid: 'uid',
+            name: 'Test Expense',
+            groupId: 'invalidGroupId',
+          );
 
-        final expenseRef =
-            firestore.collection('expenses').doc(invalidExpense.id);
-        await expenseRef.set(invalidExpense.toFirestore());
+          final expenseRef = firestore
+              .collection('expenses')
+              .doc(invalidExpense.id);
+          await expenseRef.set(invalidExpense.toJson());
 
-        // act & assert
-        final coordinationRepo = CoordinationRepository(firestore);
-        expect(
-          () async => await coordinationRepo.finalizeExpense(invalidExpense.id),
-          throwsA(isA<EntityNotFoundException<Group>>()),
-        );
-      });
+          // act & assert
+          final coordinationRepo = CoordinationRepository(firestore);
+          expect(
+            () async =>
+                await coordinationRepo.finalizeExpense(invalidExpense.id),
+            throwsA(isA<EntityNotFoundException<Group>>()),
+          );
+        },
+      );
     });
 
     group('revertExpense', () {
@@ -129,7 +128,7 @@ main() {
         final groupRef = firestore.collection('groups').doc(testGroup.id);
         await groupRef.set(testGroup.toFirestore());
         final expenseRef = firestore.collection('expenses').doc(testExpense.id);
-        await expenseRef.set(testExpense.toFirestore());
+        await expenseRef.set(testExpense.toJson());
 
         // act
         final coordinationRepo = CoordinationRepository(firestore);
@@ -137,16 +136,14 @@ main() {
 
         // assert
         final updatedExpenseDoc = await expenseRef.get();
-        final updatedExpense = Expense.fromFirestore(
-          updatedExpenseDoc.data()!,
-          updatedExpenseDoc.id,
-        );
+        final updatedExpense = Expense.fromSnapshot(updatedExpenseDoc);
         expect(updatedExpense.finalizedDate, isNull);
 
         final paymentsSnapshot = await firestore.collection('payments').get();
         expect(paymentsSnapshot.docs.length, 1);
-        final payments =
-            paymentsSnapshot.docs.map(Payment.fromFirestore).toList();
+        final payments = paymentsSnapshot.docs
+            .map(Payment.fromFirestore)
+            .toList();
         final payment1 = payments[0];
         expect(payment1.payerId, member.uid);
         expect(payment1.receiverId, admin.uid);

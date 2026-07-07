@@ -7,32 +7,37 @@ import 'package:statera/data/services/firestore.dart';
 @GenerateNiceMocks([MockSpec<CoordinationRepository>()])
 class CoordinationRepository extends Firestore {
   CoordinationRepository(FirebaseFirestore firestoreInstance)
-      : super(firestoreInstance);
+    : super(firestoreInstance);
 
   Future<void> finalizeExpense(String expenseId) async {
     await firestore.runTransaction((transaction) async {
-      final (expense, expenseDocRef) =
-          await _getExpense(transaction, expenseId);
-      final (group, groupDocRef) =
-          await _getGroup(transaction, expense.groupId);
+      final (expense, expenseDocRef) = await _getExpense(
+        transaction,
+        expenseId,
+      );
+      final (group, groupDocRef) = await _getGroup(
+        transaction,
+        expense.groupId,
+      );
 
       expense.finalizedDate = Timestamp.now().toDate();
-      await transaction.set(expenseDocRef, expense.toFirestore());
+      await transaction.set(expenseDocRef, expense.toJson());
 
       // Add expense payments from author to all assignees
       final payments = expense.assigneeUids
           .where((assigneeUid) => assigneeUid != expense.authorUid)
-          .map(
-        (assigneeUid) {
-          return Payment.fromFinalizedExpense(
-            expense: expense,
-            receiverId: assigneeUid,
-            oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
-          );
-        },
+          .map((assigneeUid) {
+            return Payment.fromFinalizedExpense(
+              expense: expense,
+              receiverId: assigneeUid,
+              oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
+            );
+          });
+      await Future.wait(
+        payments.map(
+          (payment) => paymentsCollection.add(payment.toFirestore()),
+        ),
       );
-      await Future.wait(payments
-          .map((payment) => paymentsCollection.add(payment.toFirestore())));
       for (final payment in payments) {
         group.payOffBalance(payment: payment);
       }
@@ -42,13 +47,17 @@ class CoordinationRepository extends Firestore {
 
   Future<void> revertExpense(String expenseId) async {
     await firestore.runTransaction((transaction) async {
-      final (expense, expenseDocRef) =
-          await _getExpense(transaction, expenseId);
-      final (group, groupDocRef) =
-          await _getGroup(transaction, expense.groupId);
+      final (expense, expenseDocRef) = await _getExpense(
+        transaction,
+        expenseId,
+      );
+      final (group, groupDocRef) = await _getGroup(
+        transaction,
+        expense.groupId,
+      );
 
       expense.finalizedDate = null;
-      await transaction.set(expenseDocRef, expense.toFirestore());
+      await transaction.set(expenseDocRef, expense.toJson());
 
       // add expense payments from all assignees to author
       final payments = expense.assigneeUids
@@ -62,8 +71,9 @@ class CoordinationRepository extends Firestore {
           );
 
       await Future.wait(
-        payments
-            .map((payment) => paymentsCollection.add(payment.toFirestore())),
+        payments.map(
+          (payment) => paymentsCollection.add(payment.toFirestore()),
+        ),
       );
       for (final payment in payments) {
         group.payOffBalance(payment: payment);
