@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'expense_settings.g.dart';
+
+@JsonSerializable()
 class ExpenseSettings {
   /// Controls wether to add new group members to this expense
   bool acceptNewMembers;
@@ -22,22 +27,10 @@ class ExpenseSettings {
     this.tip,
   });
 
-  ExpenseSettings.fromFirestore(Map<String, dynamic> data)
-    : this.acceptNewMembers = data['acceptNewMembers'] ?? true,
-      this.showItemDecisions = data['showItemDecisions'] ?? true,
-      this.itemsAreTaxableByDefault = data['itemsAreTaxableByDefault'] ?? false,
-      this.tax = data['tax'],
-      this.tip = data['tip'];
+  factory ExpenseSettings.fromJson(Map<String, dynamic> data) =>
+      _$ExpenseSettingsFromJson(data);
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'acceptNewMembers': acceptNewMembers,
-      'showItemDecisions': showItemDecisions,
-      'itemsAreTaxableByDefault': itemsAreTaxableByDefault,
-      'tax': tax,
-      'tip': tip,
-    };
-  }
+  Map<String, dynamic> toJson() => _$ExpenseSettingsToJson(this);
 
   static ExpenseSettings from(ExpenseSettings other) {
     return ExpenseSettings(

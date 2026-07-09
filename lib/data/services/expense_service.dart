@@ -16,7 +16,7 @@ class ExpenseService extends Firestore {
   }
 
   Future<void> updateExpense(Expense expense) {
-    return expensesCollection.doc(expense.id).set(expense.toFirestore());
+    return expensesCollection.doc(expense.id).set(expense.toJson());
   }
 
   Stream<Expense?> expenseStream(String? expenseId) {

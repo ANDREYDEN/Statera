@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/gas_item.dart';
 import 'package:statera/data/models/simple_item.dart';
@@ -11,27 +12,32 @@ import 'assignee_decision.dart';
 abstract class Item {
   late String id;
   late String name;
+  @JsonKey(defaultValue: ItemType.simple)
   ItemType type;
 
   /// Whether tax should be added to the item value
+  @JsonKey(name: 'taxable')
   bool isTaxable = false;
 
   /// Some items might consist of multiple equal parts that need to be treated separately
   int partition;
+
   List<AssigneeDecision> assignees = [];
 
   Item({
     required this.name,
     this.partition = 1,
     List<String>? assigneeUids,
+    List<AssigneeDecision>? assignees,
     this.isTaxable = false,
     this.type = ItemType.simple,
+    String? id,
   }) {
     var uuid = Uuid();
-    this.id = uuid.v1();
-    this.assignees = (assigneeUids ?? [])
-        .map((uid) => AssigneeDecision(uid: uid))
-        .toList();
+    this.id = id ?? uuid.v1();
+    this.assignees =
+        assignees ??
+        (assigneeUids ?? []).map((uid) => AssigneeDecision(uid: uid)).toList();
   }
 
   factory Item.fake() {
@@ -125,60 +131,20 @@ abstract class Item {
 
   bool get isDeniedByAll => assignees.every((assignee) => assignee.parts == 0);
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'id': id,
-      'name': name,
-      'partition': partition,
-      'assignees': assignees.map((assignee) => assignee.toFirestore()).toList(),
-      'taxable': isTaxable,
-      'type': type.toFirestore(),
-    };
-  }
+  Map<String, dynamic> toJson();
 
   static Item from(Item other) {
     var item = other.type == ItemType.simple
         ? SimpleItem.from(other as SimpleItem)
         : GasItem.from(other as GasItem);
     item.id = other.id;
+    item.type = other.type;
     item.name = other.name;
     item.partition = other.partition;
     item.isTaxable = other.isTaxable;
     item.assignees = other.assignees
         .map<AssigneeDecision>((assignee) => AssigneeDecision.from(assignee))
         .toList();
-    return item;
-  }
-
-  static Item fromFirestore(Map<String, dynamic> data) {
-    var uuid = Uuid();
-    var type = ItemType.fromFirestore(data['type']) ?? ItemType.simple;
-
-    Item item = Item.fake();
-    switch (type) {
-      case ItemType.simple:
-        item = SimpleItem(
-          name: data['name'],
-          value: double.parse(data['value'].toString()),
-        );
-        break;
-      case ItemType.gas:
-        item = GasItem(
-          name: data['name'],
-          distance: double.parse(data['distance'].toString()),
-          gasPrice: double.parse(data['gasPrice'].toString()),
-          consumption: double.parse(data['consumption'].toString()),
-        );
-        break;
-    }
-    item.id = data['id'] ?? uuid.v1();
-    item.assignees = data['assignees']
-        .map<AssigneeDecision>(
-          (assigneeData) => AssigneeDecision.fromFirestore(assigneeData),
-        )
-        .toList();
-    item.partition = data['partition'] ?? 1;
-    item.isTaxable = data['taxable'] ?? false;
     return item;
   }
 

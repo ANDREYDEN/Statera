@@ -25,10 +25,10 @@ main() {
 
         final finalizedExpensesRef = await firestore
             .collection('expenses')
-            .add(finalizedExpense.toFirestore());
+            .add(finalizedExpense.toJson());
         final pendingExpensesRef = await firestore
             .collection('expenses')
-            .add(pendingExpense.toFirestore());
+            .add(pendingExpense.toJson());
         final expenseService = ExpenseService(firestore);
         final newUserId = 'newUser';
 
@@ -40,15 +40,11 @@ main() {
 
         // assert
         final newFinalizedExpenseDoc = await finalizedExpensesRef.get();
-        final newFinalizedExpense = Expense.fromFirestore(
-          newFinalizedExpenseDoc.data()!,
-          newFinalizedExpenseDoc.id,
+        final newFinalizedExpense = Expense.fromSnapshot(
+          newFinalizedExpenseDoc,
         );
         final newPendingExpenseDoc = await pendingExpensesRef.get();
-        final newPendingExpense = Expense.fromFirestore(
-          newPendingExpenseDoc.data()!,
-          newPendingExpenseDoc.id,
-        );
+        final newPendingExpense = Expense.fromSnapshot(newPendingExpenseDoc);
 
         expect(newFinalizedExpense.assigneeUids, isNot(contains(newUserId)));
         expect(newPendingExpense.assigneeUids, contains(newUserId));

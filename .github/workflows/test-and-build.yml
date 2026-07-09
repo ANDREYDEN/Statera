@@ -44,8 +44,8 @@ jobs:
       - name: Install derry
         run: flutter pub global activate derry
 
-      - name: Generate mocks
-        run: derry create-mocks
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Run tests
         run: flutter test
@@ -98,6 +98,12 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Configure Flutter for Web
         run: flutter config --enable-web
@@ -204,8 +210,11 @@ jobs:
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
         working-directory: android
 
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Build App bundle
         run: flutter build appbundle
@@ -234,6 +243,12 @@ jobs:
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG_IOS }}
         run: echo $FIREBASE_CONFIG_IOS > ios/Runner/GoogleService-Info.plist
+
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Build iOS app
         run: flutter build ios --no-codesign
@@ -264,6 +279,12 @@ jobs:
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
+
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Build Web app
         run: flutter build web

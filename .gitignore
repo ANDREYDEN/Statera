@@ -25,6 +25,8 @@
 .pub-cache/
 .pub/
 /build/
+*.mocks.dart
+*.g.dart
 
 # Web related
 
@@ -60,7 +62,6 @@ receipts
 **/fastlane/test_output
 
 .env
-*.mocks.dart
 
 # testing
 screenshots/

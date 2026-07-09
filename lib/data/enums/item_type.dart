@@ -3,8 +3,8 @@ enum ItemType {
   simple;
 
   String toFirestore() => name;
-  static ItemType? fromFirestore(String? name) =>
+  static ItemType? fromString(String? name) =>
       name == null || !values.any((v) => v.name == name)
-          ? null
-          : values.byName(name);
+      ? null
+      : values.byName(name);
 }

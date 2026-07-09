@@ -1,5 +1,10 @@
 import 'dart:math';
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'assignee_decision.g.dart';
+
+@JsonSerializable()
 class AssigneeDecision {
   String uid;
   int? _parts; // if the value is null, then the decision has not been taken yet
@@ -13,34 +18,22 @@ class AssigneeDecision {
 
   bool get madeDecision => _parts != null;
 
-  Map<String, dynamic> toFirestore() {
-    return {
-      'uid': uid,
-      'parts': _parts,
-    };
-  }
-
   static AssigneeDecision from(AssigneeDecision other) {
-    return AssigneeDecision(
-      uid: other.uid,
-      parts: other._parts,
-    );
+    return AssigneeDecision(uid: other.uid, parts: other._parts);
   }
 
-  static AssigneeDecision fromFirestore(Map<String, dynamic> data) {
-    return AssigneeDecision(
-      uid: data['uid'],
-      parts: data['parts'],
-    );
-  }
+  static AssigneeDecision fromJson(Map<String, dynamic> data) =>
+      _$AssigneeDecisionFromJson(data);
+
+  Map<String, dynamic> toJson() => _$AssigneeDecisionToJson(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is AssigneeDecision &&
-      other.uid == uid &&
-      other._parts == _parts;
+        other.uid == uid &&
+        other._parts == _parts;
   }
 
   @override

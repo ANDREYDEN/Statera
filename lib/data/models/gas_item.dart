@@ -1,6 +1,12 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:statera/data/enums/enums.dart';
-import 'package:statera/data/models/item.dart';
 
+import 'assignee_decision.dart';
+import 'item.dart';
+
+part 'gas_item.g.dart';
+
+@JsonSerializable()
 class GasItem extends Item {
   double distance;
   double gasPrice;
@@ -11,23 +17,21 @@ class GasItem extends Item {
     required this.distance,
     required this.gasPrice,
     required this.consumption,
+    super.partition,
     super.assigneeUids,
+    super.assignees,
+    super.isTaxable,
+    super.id,
   }) : super(type: ItemType.gas);
 
   @override
   double get total => distance * gasPrice * consumption / 100;
 
-  @override
-  Map<String, dynamic> toFirestore() {
-    final base = super.toFirestore();
+  factory GasItem.fromJson(Map<String, dynamic> data) =>
+      _$GasItemFromJson(data);
 
-    return {
-      ...base,
-      'distance': distance,
-      'gasPrice': gasPrice,
-      'consumption': consumption
-    };
-  }
+  @override
+  Map<String, dynamic> toJson() => _$GasItemToJson(this);
 
   static GasItem from(GasItem other) {
     return GasItem(

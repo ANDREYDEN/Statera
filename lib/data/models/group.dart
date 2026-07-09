@@ -267,7 +267,7 @@ class Group {
       'currencySign': currencySign,
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
-      'defaultExpenseSettings': defaultExpenseSettings.toFirestore(),
+      'defaultExpenseSettings': defaultExpenseSettings.toJson(),
       'supportsDebtRedirection': supportsDebtRedirection,
     };
   }
@@ -294,7 +294,7 @@ class Group {
       debtThreshold: double.tryParse(map['debtThreshold'].toString()),
       defaultExpenseSettings: map['defaultExpenseSettings'] == null
           ? null
-          : ExpenseSettings.fromFirestore(map['defaultExpenseSettings']),
+          : ExpenseSettings.fromJson(map['defaultExpenseSettings']),
       supportsDebtRedirection: map['supportsDebtRedirection'] ?? false,
     );
   }

@@ -39,6 +39,12 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
+
       - name: Build project
         run: flutter build web
 
@@ -78,6 +84,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
       - name: Copy google-services.json
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
@@ -110,7 +121,7 @@ jobs:
     name: Build iOS Artifact
     runs-on: macos-15
     # Disabling this because mac runners are expensive and this job hangs on pod install
-    if: false 
+    if: false
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -127,6 +138,15 @@ jobs:
         env:
           DOT_ENV: ${{ secrets.DOT_ENV }}
         run: echo $DOT_ENV > .env
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Install derry
+        run: flutter pub global activate derry
+
+      - name: Produce auto-generated code
+        run: derry codegen
 
       - name: Copy GoogleService-Info.plist
         env:
