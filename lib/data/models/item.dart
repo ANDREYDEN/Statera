@@ -12,6 +12,7 @@ import 'assignee_decision.dart';
 abstract class Item {
   late String id;
   late String name;
+  @JsonKey(defaultValue: ItemType.simple)
   ItemType type;
 
   /// Whether tax should be added to the item value
