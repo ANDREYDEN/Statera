@@ -1,7 +1,7 @@
 import {
   analyzeReceipt,
   IAnnotateResponse,
-} from '../../src/functions/analyzeReceipt'
+} from '../../src/functions/receiptAnalysis/analyzeReceipt'
 import lcboReceiptShortData from '../__stubs__/receipt_data/lcbo/short/data.json'
 import walmartReceiptLongData from '../__stubs__/receipt_data/walmart/long/data.json'
 import walmartReceiptMediumData from '../__stubs__/receipt_data/walmart/medium/data.json'
@@ -14,7 +14,7 @@ import { StoreName } from '../../src/types/stores'
 
 const documentTextDetection = jest.fn()
 jest.mock('@google-cloud/vision', () => ({
-  ImageAnnotatorClient: jest.fn().mockImplementation(function() {
+  ImageAnnotatorClient: jest.fn().mockImplementation(function () {
     return { documentTextDetection }
   }),
 }))

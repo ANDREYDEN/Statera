@@ -5,11 +5,14 @@ import 'package:statera/data/models/models.dart';
 
 @GenerateNiceMocks([MockSpec<Callables>()])
 class Callables {
-  static HttpsCallable _getReceiptData =
-      FirebaseFunctions.instance.httpsCallable('getReceiptData');
+  static HttpsCallable _getReceiptData = FirebaseFunctions.instance
+      .httpsCallable('getReceiptData');
 
-  static HttpsCallable _getLatestVersion =
-      FirebaseFunctions.instance.httpsCallable('getLatestAppVersion');
+  static HttpsCallable _getReceiptDataWithAI = FirebaseFunctions.instance
+      .httpsCallable('getReceiptDataWithAI');
+
+  static HttpsCallable _getLatestVersion = FirebaseFunctions.instance
+      .httpsCallable('getLatestAppVersion');
 
   Future<List<Item>> getReceiptData({
     required String receiptUrl,
@@ -19,8 +22,22 @@ class Callables {
     var response = await _getReceiptData({
       'receiptUrl': receiptUrl,
       'storeName': selectedStore,
-      'withNameImprovement': withNameImprovement
+      'withNameImprovement': withNameImprovement,
     });
+
+    return (response.data as List<dynamic>).map((itemData) {
+      final value = double.tryParse(itemData['value'].toString()) ?? 0;
+      final quantity = int.tryParse(itemData['quantity'].toString()) ?? 1;
+      return SimpleItem(
+        name: itemData['name'] ?? 'item',
+        value: value,
+        partition: quantity,
+      );
+    }).toList();
+  }
+
+  Future<List<Item>> getReceiptDataWithAI({required String receiptUrl}) async {
+    var response = await _getReceiptDataWithAI({'receiptUrl': receiptUrl});
 
     return (response.data as List<dynamic>).map((itemData) {
       final value = double.tryParse(itemData['value'].toString()) ?? 0;
