@@ -7,6 +7,7 @@ import 'package:statera/data/services/coordination_repository.mocks.dart';
 import 'package:statera/data/services/feature_service.dart';
 import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/ui/group/expenses/expense_list_item/finalize_button.dart';
+import 'package:statera/ui/group/expenses/expenses_builder.dart';
 import 'package:statera/ui/group/group_page.dart';
 
 import '../../../../helpers.dart';
@@ -18,10 +19,7 @@ void main() {
     testWidgets('shows a regular button when the feature flag is disabled', (
       tester,
     ) async {
-      final featureService = MockFeatureService();
-      when(featureService.slideToFinalizeEnabled).thenReturn(false);
-
-      await pumpFinalizeButton(tester, expense: expense, featureService: featureService);
+      await pumpFinalizeButton(tester, expense: expense, sliderEnabled: false);
 
       expect(find.text('Finalize'), findsOneWidget);
       expect(find.text('Slide to Finalize'), findsNothing);
@@ -30,49 +28,39 @@ void main() {
     testWidgets('shows a slider when the feature flag is enabled', (
       tester,
     ) async {
-      final featureService = MockFeatureService();
-      when(featureService.slideToFinalizeEnabled).thenReturn(true);
-
-      await pumpFinalizeButton(tester, expense: expense, featureService: featureService);
+      await pumpFinalizeButton(tester, expense: expense, sliderEnabled: true);
 
       expect(find.text('Slide to Finalize'), findsOneWidget);
       expect(find.text('Finalize'), findsNothing);
     });
 
-    testWidgets(
-      'finalizes the expense once the slider is dragged to the end',
-      (tester) async {
-        final featureService = MockFeatureService();
-        when(featureService.slideToFinalizeEnabled).thenReturn(true);
+    testWidgets('finalizes the expense once the slider is dragged to the end', (
+      tester,
+    ) async {
+      final coordinationRepository = MockCoordinationRepository();
+      when(
+        coordinationRepository.finalizeExpense(any),
+      ).thenAnswer((_) async {});
 
-        final coordinationRepository = MockCoordinationRepository();
-        when(
-          coordinationRepository.finalizeExpense(any),
-        ).thenAnswer((_) async {});
+      await pumpFinalizeButton(
+        tester,
+        expense: expense,
+        sliderEnabled: true,
+        coordinationRepository: coordinationRepository,
+      );
 
-        await pumpFinalizeButton(
-          tester,
-          expense: expense,
-          featureService: featureService,
-          coordinationRepository: coordinationRepository,
-        );
+      await tester.drag(
+        find.byKey(const Key('slideToFinalizeKnob')),
+        const Offset(300, 0),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.drag(
-          find.byKey(const Key('slideToFinalizeKnob')),
-          const Offset(300, 0),
-        );
-        await tester.pumpAndSettle();
-
-        verify(coordinationRepository.finalizeExpense(expense.id)).called(1);
-      },
-    );
+      verify(coordinationRepository.finalizeExpense(expense.id)).called(1);
+    });
 
     testWidgets(
       'snaps back without finalizing when the slider is not dragged far enough',
       (tester) async {
-        final featureService = MockFeatureService();
-        when(featureService.slideToFinalizeEnabled).thenReturn(true);
-
         final coordinationRepository = MockCoordinationRepository();
         when(
           coordinationRepository.finalizeExpense(any),
@@ -81,7 +69,7 @@ void main() {
         await pumpFinalizeButton(
           tester,
           expense: expense,
-          featureService: featureService,
+          sliderEnabled: true,
           coordinationRepository: coordinationRepository,
         );
 
@@ -100,13 +88,21 @@ void main() {
 Future<void> pumpFinalizeButton(
   WidgetTester tester, {
   required expense,
-  required FeatureService featureService,
+  required bool sliderEnabled,
   MockCoordinationRepository? coordinationRepository,
 }) async {
+  final featureService = MockFeatureService();
+  when(featureService.slideToFinalizeEnabled).thenReturn(sliderEnabled);
+
   await customPump(
     Scaffold(
       key: GroupPage.scaffoldKey,
-      body: SizedBox(width: 300, child: FinalizeButton(expense: expense)),
+      body: ExpensesBuilder(
+        builder: (_, state) => SizedBox(
+          width: 300,
+          child: FinalizeButton(expense: state.expenses.first),
+        ),
+      ),
     ),
     tester,
     featureService: featureService,
@@ -114,17 +110,4 @@ Future<void> pumpFinalizeButton(
     expenses: [expense],
   );
   await tester.pumpAndSettle();
-
-  // The expenses cubit loads its state via a Stream that isn't watched by
-  // FinalizeButton, so pumpAndSettle can return before it settles.
-  final expensesCubit = tester
-      .element(find.byType(FinalizeButton))
-      .read<ExpensesCubit>();
-  while (expensesCubit.state is! ExpensesLoaded) {
-    await tester.pump(const Duration(milliseconds: 50));
-  }
-
-  // Flush the expenses stream's pending throttle timer so it doesn't leak
-  // into the test's timer-pending assertion at teardown.
-  await tester.pump(const Duration(milliseconds: 250));
 }
