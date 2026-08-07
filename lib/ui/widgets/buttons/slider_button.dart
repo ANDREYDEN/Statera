@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:statera/ui/styling/spacing.dart';
 
-// Named `SlideButton` (not `Slider`) to avoid clashing with material's Slider.
-class SlideButton extends StatefulWidget {
+class SliderButton extends StatefulWidget {
   final String text;
   final Future<void> Function() onSlideComplete;
   final Key? knobKey;
 
-  const SlideButton({
+  const SliderButton({
     super.key,
     required this.text,
     required this.onSlideComplete,
@@ -14,21 +14,26 @@ class SlideButton extends StatefulWidget {
   });
 
   @override
-  State<SlideButton> createState() => _SlideButtonState();
+  State<SliderButton> createState() => _SliderButtonState();
 }
 
-class _SlideButtonState extends State<SlideButton> {
-  static const _knobSize = 48.0;
-  static const _completionThreshold = 0.9;
+class _SliderButtonState extends State<SliderButton> {
+  static const _knobSize = 32.0;
+  static const _completionThreshold = 0.95;
+  static const _animationDuration = Duration(milliseconds: 200);
 
   double _dragExtent = 0;
   bool _isDragging = false;
   bool _isCompleting = false;
 
+  Duration get _currentAnimationDuration =>
+      _isDragging ? Duration.zero : _animationDuration;
+
   double _maxDragExtent(double trackWidth) => trackWidth - _knobSize;
 
   void _handleDragStart(DragStartDetails details) {
     if (_isCompleting) return;
+
     setState(() => _isDragging = true);
   }
 
@@ -43,13 +48,13 @@ class _SlideButtonState extends State<SlideButton> {
     });
   }
 
-  void _handleDragEnd(DragEndDetails details, double trackWidth) {
+  void _handleDragEnd(double trackWidth) {
     if (_isCompleting) return;
+
+    setState(() => _isDragging = false);
 
     final reachedThreshold =
         _dragExtent >= _maxDragExtent(trackWidth) * _completionThreshold;
-
-    setState(() => _isDragging = false);
 
     if (reachedThreshold) {
       _complete(trackWidth);
@@ -82,13 +87,15 @@ class _SlideButtonState extends State<SlideButton> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final trackWidth = constraints.maxWidth;
+        const padding = Spacing.xs_5;
+        final trackWidth = constraints.maxWidth - padding * 2;
 
         return Container(
-          height: _knobSize,
+          height: _knobSize + padding * 2,
+          padding: const EdgeInsets.all(padding),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(_knobSize / 2),
+            borderRadius: BorderRadius.circular(1000),
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
@@ -98,10 +105,21 @@ class _SlideButtonState extends State<SlideButton> {
                 widget.text,
                 style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
+              Positioned(
+                left: 0,
+                child: AnimatedContainer(
+                  duration: _currentAnimationDuration,
+                  curve: Curves.easeOut,
+                  width: _dragExtent + _knobSize,
+                  height: _knobSize,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(1000),
+                  ),
+                ),
+              ),
               AnimatedPositioned(
-                duration: _isDragging
-                    ? Duration.zero
-                    : const Duration(milliseconds: 200),
+                duration: _currentAnimationDuration,
                 curve: Curves.easeOut,
                 left: _dragExtent,
                 child: GestureDetector(
@@ -109,8 +127,7 @@ class _SlideButtonState extends State<SlideButton> {
                   onHorizontalDragStart: _handleDragStart,
                   onHorizontalDragUpdate: (details) =>
                       _handleDragUpdate(details, trackWidth),
-                  onHorizontalDragEnd: (details) =>
-                      _handleDragEnd(details, trackWidth),
+                  onHorizontalDragEnd: (_) => _handleDragEnd(trackWidth),
                   child: Container(
                     width: _knobSize,
                     height: _knobSize,
@@ -120,13 +137,17 @@ class _SlideButtonState extends State<SlideButton> {
                     ),
                     child: _isCompleting
                         ? Padding(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(Spacing.xs_5),
                             child: CircularProgressIndicator(
                               strokeWidth: 3,
                               color: colorScheme.onPrimary,
                             ),
                           )
-                        : Icon(Icons.check, color: colorScheme.onPrimary),
+                        : Icon(
+                            Icons.chevron_right_rounded,
+                            size: 32,
+                            color: colorScheme.onPrimary,
+                          ),
                   ),
                 ),
               ),
