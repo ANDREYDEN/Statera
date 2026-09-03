@@ -124,6 +124,10 @@ class _SliderButtonState extends State<SliderButton> {
                 left: _dragExtent,
                 child: GestureDetector(
                   key: widget.knobKey,
+                  behavior: HitTestBehavior.opaque,
+                  // prevent events from bubbling up
+                  onTap: () {},
+                  onLongPress: () {},
                   onHorizontalDragStart: _handleDragStart,
                   onHorizontalDragUpdate: (details) =>
                       _handleDragUpdate(details, trackWidth),
