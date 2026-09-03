@@ -34,6 +34,14 @@ class FieldData<T> {
     _fieldValue = initialData.toString();
     _controller = TextEditingController(text: initialData.toString());
     this.focusNode = FocusNode(debugLabel: this.id);
+    this.focusNode.addListener(() {
+      if (this.focusNode.hasFocus) {
+        _controller.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _controller.text.length,
+        );
+      }
+    });
   }
 
   static String requiredValidator(String text) =>

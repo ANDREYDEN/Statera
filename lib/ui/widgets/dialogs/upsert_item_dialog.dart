@@ -37,7 +37,8 @@ class UpsertItemDialog extends StatelessWidget {
     bool addingItem = initialItem == null;
 
     final expense = getExpense(context);
-    final bool itemTaxableByDefault = expense?.settings.itemsAreTaxableByDefault ?? false;
+    final bool itemTaxableByDefault =
+        expense?.settings.itemsAreTaxableByDefault ?? false;
     final bool itemHasTax = expense?.hasTax ?? false;
 
     final simpleItemFields = [
