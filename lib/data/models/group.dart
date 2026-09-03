@@ -32,6 +32,7 @@ class Group {
   late double debtThreshold;
   late ExpenseSettings defaultExpenseSettings;
   bool supportsDebtRedirection;
+  bool allowAuthorsToMarkOnBehalfOfOthers;
 
   static const String kdefaultCurrencySign = '\$';
   static const double kdefaultDebtThreshold = 50;
@@ -48,6 +49,7 @@ class Group {
     double? debtThreshold,
     ExpenseSettings? defaultExpenseSettings,
     this.supportsDebtRedirection = false,
+    this.allowAuthorsToMarkOnBehalfOfOthers = false,
   }) {
     this.members = [];
     this.balance = {};
@@ -269,6 +271,7 @@ class Group {
       'debtThreshold': debtThreshold,
       'defaultExpenseSettings': defaultExpenseSettings.toJson(),
       'supportsDebtRedirection': supportsDebtRedirection,
+      'allowAuthorsToMarkOnBehalfOfOthers': allowAuthorsToMarkOnBehalfOfOthers,
     };
   }
 
@@ -296,6 +299,8 @@ class Group {
           ? null
           : ExpenseSettings.fromJson(map['defaultExpenseSettings']),
       supportsDebtRedirection: map['supportsDebtRedirection'] ?? false,
+      allowAuthorsToMarkOnBehalfOfOthers:
+          map['allowAuthorsToMarkOnBehalfOfOthers'] ?? false,
     );
   }
 }
