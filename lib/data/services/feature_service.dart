@@ -7,4 +7,7 @@ import 'package:mockito/annotations.dart';
 class FeatureService {
   bool get debtRedirectionEnabled =>
       FirebaseRemoteConfig.instance.getBool('redirect_debt_feature_flag');
+
+  bool get slideToFinalizeEnabled =>
+      FirebaseRemoteConfig.instance.getBool('slide_to_finalize_feature_flag');
 }

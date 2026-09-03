@@ -27,7 +27,8 @@ Future<void> main() async {
   await FirebaseRemoteConfig.instance.setDefaults(<String, dynamic>{
     'greeting_message': 'Welcome to Statera!',
     'show_greeting_dialog': false,
-    'redirect_debt_feature_flag': true
+    'redirect_debt_feature_flag': true,
+    'slide_to_finalize_feature_flag': false,
   });
 
   configureEmulators();

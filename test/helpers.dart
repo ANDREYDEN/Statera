@@ -32,7 +32,7 @@ class MockUser extends Mock implements User {
 
 final defaultGroupService = MockGroupRepository();
 final defaultExpenseService = MockExpenseService();
-final defaultUserExpensesRepository = MockUserExpenseRepository();
+final defaultUserExpenseRepository = MockUserExpenseRepository();
 final defaultUserRepository = MockUserRepository();
 final defaultAuthService = MockAuthService();
 final defaultPaymentService = MockPaymentService();
@@ -69,7 +69,7 @@ Future<void> customPump(
   when(defaultAuthService.currentUser).thenAnswer((_) => defaultCurrentUser);
 
   when(
-    defaultUserExpensesRepository.listenForRelatedExpenses(
+    defaultUserExpenseRepository.listenForRelatedExpenses(
       any,
       any,
       quantity: anyNamed('quantity'),
@@ -115,7 +115,7 @@ Future<void> customPump(
           create: (context) => ExpensesCubit(
             group?.id ?? defaultGroup.id,
             currentUserId ?? defaultCurrentUserId,
-            userExpenseRepository ?? defaultUserExpensesRepository,
+            userExpenseRepository ?? defaultUserExpenseRepository,
             expenseService!,
             groupService ?? defaultGroupService,
             coordinationRepository ?? defaultCoordinationRepository,
