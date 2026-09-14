@@ -6,6 +6,7 @@ import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/expense/items/gas_item_list_item.dart';
 import 'package:statera/ui/expense/items/item_decisions.dart';
 import 'package:statera/ui/styling/index.dart';
+import 'package:statera/ui/widgets/inputs/decision_buttons.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/warning_icon.dart';
 
@@ -58,42 +59,6 @@ class ItemListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = context.select((AuthBloc authBloc) => authBloc.uid);
 
-    final denyButtonBgColor = (() {
-      if (!item.isMarkedBy(uid)) return Colors.grey[300];
-      if (item.getAssigneeParts(uid) == 0) return Colors.red[400];
-      return Colors.grey[500];
-    })();
-
-    final denyButtonColor = denyButtonBgColor == Colors.grey[300]
-        ? Colors.grey[700]
-        : Colors.white;
-
-    final denyButtonIcon = (() {
-      if (item.isPartitioned && item.getAssigneeParts(uid) > 0) {
-        return Icons.remove_rounded;
-      }
-      return Icons.close_rounded;
-    })();
-
-    final acceptButtonBgColor = (() {
-      if (!item.isMarkedBy(uid)) return Colors.grey[300];
-      if (item.getAssigneeParts(uid) > 0) return Colors.green[400];
-      return Colors.grey[500];
-    })();
-
-    final acceptButtonColor = acceptButtonBgColor == Colors.grey[300]
-        ? Colors.grey[700]
-        : Colors.white;
-
-    final acceptButtonIcon = (() {
-      if (item.isPartitioned &&
-          item.undefinedParts > 0 &&
-          item.getAssigneeParts(uid) > 0) {
-        return Icons.add_rounded;
-      }
-      return Icons.check_rounded;
-    })();
-
     return Column(
       children: [
         ListTile(
@@ -108,48 +73,11 @@ class ItemListItem extends StatelessWidget {
               children: [
                 renderPrice(context),
                 SizedBox(width: Spacing.m_10),
-                IconButton(
-                  onPressed: disabled
-                      ? null
-                      : () => this.onChangePartition(
-                          item.getAssigneeParts(uid) - 1,
-                        ),
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
-                    backgroundColor: denyButtonBgColor,
-                    foregroundColor: denyButtonColor,
-                    disabledBackgroundColor: Colors.grey[300],
-                    disabledForegroundColor: Colors.grey[400],
-                    padding: EdgeInsets.all(0),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  icon: Icon(denyButtonIcon),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: Spacing.xs_5),
-                  child: Visibility(
-                    visible: item.partition > 1,
-                    child: Text(
-                      "${item.isMarkedBy(uid) ? item.getAssigneeParts(uid) : '-'}/${item.partition}",
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: disabled
-                      ? null
-                      : () => this.onChangePartition(
-                          item.getAssigneeParts(uid) + 1,
-                        ),
-                  style: IconButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRad.s_10),
-                    backgroundColor: acceptButtonBgColor,
-                    foregroundColor: acceptButtonColor,
-                    disabledBackgroundColor: Colors.grey[300],
-                    disabledForegroundColor: Colors.grey[400],
-                    padding: EdgeInsets.all(0),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  icon: Icon(acceptButtonIcon),
+                DecisionButtons(
+                  item: item,
+                  uid: uid,
+                  onChangePartition: onChangePartition,
+                  disabled: disabled,
                 ),
               ],
             ),
