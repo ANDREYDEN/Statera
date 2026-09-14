@@ -110,13 +110,13 @@ abstract class Item {
     return isPartitioned ? definiteParts : definiteParts.clamp(0, 1);
   }
 
-  void setAssigneeDecision(String uid, int parts) {
+  void setAssigneeDecision(String uid, int? parts) {
     var assignee = getAssigneeById(uid);
 
     if (assignee == null) {
       throw new Exception('User is not an assignee of this item');
     }
-    if (isPartitioned && parts > undefinedParts + (assignee.parts ?? 0)) {
+    if (isPartitioned && parts != null && parts > undefinedParts + (assignee.parts ?? 0)) {
       throw new Exception('All item parts are already marked');
     }
 

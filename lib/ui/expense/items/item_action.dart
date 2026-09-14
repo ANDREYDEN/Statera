@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/dialogs/upsert_item_dialog.dart';
 import 'package:statera/ui/widgets/entity_action.dart';
@@ -25,8 +26,11 @@ class UpsertItemAction extends ItemAction {
   Future<void> handle(BuildContext context) async {
     await showDialog(
       context: context,
-      builder: (_) => Provider.value(
-        value: context.read<ExpenseBloc>(),
+      builder: (_) => MultiProvider(
+        providers: [
+          Provider.value(value: context.read<ExpenseBloc>()),
+          Provider.value(value: context.read<GroupCubit>()),
+        ],
         child: UpsertItemDialog(
           initialItem: item == null ? null : Item.from(item!),
           onSubmit: (newItem) {

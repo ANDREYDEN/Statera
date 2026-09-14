@@ -97,9 +97,12 @@ class Expense {
   );
 
   void addItem(Item newItem) {
-    newItem.assignees = this.assigneeUids
-        .map((assigneeUid) => AssigneeDecision(uid: assigneeUid))
-        .toList();
+    newItem.assignees = this.assigneeUids.map((assigneeUid) {
+      return newItem.assignees.firstWhere(
+        (assignee) => assignee.uid == assigneeUid,
+        orElse: () => AssigneeDecision(uid: assigneeUid),
+      );
+    }).toList();
     this.items.add(newItem);
   }
 
@@ -140,11 +143,10 @@ class Expense {
 
     this.items.forEach((item) {
       item.assignees = selectedUids.map((uid) {
-        try {
-          return item.assignees.firstWhere((assignee) => assignee.uid == uid);
-        } catch (e) {
-          return AssigneeDecision(uid: uid);
-        }
+        return item.assignees.firstWhere(
+          (assignee) => assignee.uid == uid,
+          orElse: () => AssigneeDecision(uid: uid),
+        );
       }).toList();
     });
   }

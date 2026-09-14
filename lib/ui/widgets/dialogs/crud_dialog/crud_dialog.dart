@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/collapsible_header.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/info_message.dart';
+import 'package:statera/ui/widgets/inputs/assignee_decisions_picker.dart';
 
 part 'field_data.dart';
 
@@ -170,7 +172,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   Iterable<Widget> _getFields(bool Function(FieldData) criteria) sync* {
     final selectedFields = _fields.where(criteria).toList();
-    final fieldValueMap = selectedFields.fold<Map<String, dynamic>>(
+    final fieldValueMap = _fields.fold<Map<String, dynamic>>(
       {},
       (acc, cur) => {...acc, cur.id: cur.data},
     );
@@ -233,6 +235,24 @@ class _CRUDDialogState extends State<CRUDDialog> {
                     this._dirty = true;
                     field.changeData(newValue);
                   }),
+          ),
+        );
+      } else if (field.initialData is List<AssigneeDecision>) {
+        yield Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(field.label, style: Theme.of(context).textTheme.bodySmall),
+              AssigneeDecisionsPicker(
+                value: field.data,
+                partition: fieldValueMap['item_partition'] as int? ?? 1,
+                onChange: (newValue) => setState(() {
+                  this._dirty = true;
+                  field.changeData(newValue);
+                }),
+              ),
+            ],
           ),
         );
       }
