@@ -12,6 +12,7 @@ import 'package:statera/ui/expense/assignee_list.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/header/expense_price.dart';
+import 'package:statera/ui/expense/impersonation_banner.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/group/group_builder.dart';
@@ -51,6 +52,7 @@ class ExpenseDetails extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const ImpersonationBanner(),
             if (isWide)
               Align(
                 alignment: Alignment.centerRight,
