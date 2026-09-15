@@ -108,7 +108,7 @@ class ItemsList extends StatelessWidget {
     int index,
   ) {
     final authBloc = context.read<AuthBloc>();
-    final impersonatedUid = context.watch<ImpersonationCubit>().state;
+    final impersonatedUid = context.read<ImpersonationCubit>().state;
     final effectiveUid = impersonatedUid ?? authBloc.uid;
     final expenseBloc = context.read<ExpenseBloc>();
 

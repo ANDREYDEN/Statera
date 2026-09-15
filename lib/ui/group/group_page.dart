@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
@@ -152,6 +153,7 @@ class _GroupPageState extends State<GroupPage> {
             ),
           ),
           BlocProvider(create: (context) => OwingCubit()),
+          BlocProvider(create: (_) => ImpersonationCubit()),
         ],
         child: isWide
             ? GroupWideContent(
