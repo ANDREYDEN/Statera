@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/empty_expense_items_list.dart';
@@ -20,10 +21,12 @@ class ItemsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthBloc>();
     final isWide = context.select((LayoutState state) => state.isWide);
+    final impersonatedUid = context.watch<ImpersonationCubit>().state;
+    final effectiveUid = impersonatedUid ?? authBloc.uid;
 
     return ExpenseBuilder(
       builder: (context, expense) {
-        final userIsAssignee = expense.assigneeUids.contains(authBloc.uid);
+        final userIsAssignee = expense.assigneeUids.contains(effectiveUid);
 
         return Padding(
           padding: EdgeInsets.symmetric(
@@ -105,11 +108,13 @@ class ItemsList extends StatelessWidget {
     int index,
   ) {
     final authBloc = context.read<AuthBloc>();
+    final impersonatedUid = context.watch<ImpersonationCubit>().state;
+    final effectiveUid = impersonatedUid ?? authBloc.uid;
     final expenseBloc = context.read<ExpenseBloc>();
 
     snackbarCatch(context, () {
       final updatedExpense = expense
-        ..items[index].setAssigneeDecision(authBloc.uid, parts);
+        ..items[index].setAssigneeDecision(effectiveUid, parts);
 
       expenseBloc.add(UpdateRequested(updatedExpense: updatedExpense));
     });

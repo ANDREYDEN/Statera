@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
@@ -108,6 +109,7 @@ class ItemListItemPreview extends StatelessWidget {
               ),
         ),
         BlocProvider(create: (_) => AuthBloc(authService)),
+        BlocProvider(create: (_) => ImpersonationCubit()),
         Provider.value(value: PreferencesService()),
       ],
       body: ListView(

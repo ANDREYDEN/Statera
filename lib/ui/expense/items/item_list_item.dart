@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/data/models/gas_item.dart';
 import 'package:statera/data/models/item.dart';
 import 'package:statera/ui/expense/items/gas_item_list_item.dart';
@@ -57,7 +58,9 @@ class ItemListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.select((AuthBloc authBloc) => authBloc.uid);
+    final uid =
+        context.watch<ImpersonationCubit>().state ??
+        context.read<AuthBloc>().uid;
 
     return Column(
       children: [
