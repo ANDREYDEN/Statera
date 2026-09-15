@@ -4,6 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/expense/actions/expense_action.dart';
+import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/buttons/actions_button.dart';
 
 class ExpenseActionsButton extends StatelessWidget {
@@ -17,21 +18,29 @@ class ExpenseActionsButton extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
     final isWide = context.select((LayoutState state) => state.isWide);
 
-    final actions = [
-      ShareExpenseAction(expense),
-      if (expense.canBeUpdatedBy(authBloc.uid)) ...[
-        SettingsExpenseAction(expense),
-        TaxAllItemsAction(expense),
-        if (isWide) DeleteExpenseAction(expense),
-      ],
-      if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
-        RevertExpenseAction(expense),
-    ];
+    return GroupBuilder(
+      builder: (context, group) {
+        final actions = [
+          ShareExpenseAction(expense),
+          if (expense.canBeUpdatedBy(authBloc.uid)) ...[
+            SettingsExpenseAction(expense),
+            TaxAllItemsAction(expense),
+            if (isWide) DeleteExpenseAction(expense),
+          ],
+          if (expense.isAuthoredBy(authBloc.uid) && expense.finalized)
+            RevertExpenseAction(expense),
+          if (expense.isAuthoredBy(authBloc.uid) &&
+              !expense.finalized &&
+              group.allowAuthorsToMarkOnBehalfOfOthers)
+            ImpersonateExpenseAction(expense),
+        ];
 
-    return ActionsButton(
-      tooltip: 'Expense actions',
-      actions: actions,
-      padding: EdgeInsets.symmetric(horizontal: 15.0),
+        return ActionsButton(
+          tooltip: 'Expense actions',
+          actions: actions,
+          padding: EdgeInsets.symmetric(horizontal: 15.0),
+        );
+      },
     );
   }
 }

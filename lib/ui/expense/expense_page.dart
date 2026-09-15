@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
@@ -35,6 +36,7 @@ class ExpensePage extends StatelessWidget {
             context.read<ErrorService>(),
           )..loadFromExpense(expenseId),
         ),
+        BlocProvider<ImpersonationCubit>(create: (_) => ImpersonationCubit()),
       ],
       child: ExpensePage(),
     );
