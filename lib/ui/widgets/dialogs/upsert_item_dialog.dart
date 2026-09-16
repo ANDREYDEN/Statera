@@ -51,14 +51,15 @@ class UpsertItemDialog extends StatelessWidget {
             expense.isAuthoredBy(uid) &&
             group.allowAuthorsToMarkOnBehalfOfOthers;
 
-        final initialAssigneeDecisions = expense?.assigneeUids
-            .where((assigneeUid) => assigneeUid != uid)
-            .map(
-              (assigneeUid) =>
-                  initialItem?.getAssigneeById(assigneeUid) ??
-                  AssigneeDecision(uid: assigneeUid),
-            )
-            .toList() ?? [];
+        final initialAssigneeDecisions =
+            expense?.assigneeUids
+                .map(
+                  (assigneeUid) =>
+                      initialItem?.getAssigneeById(assigneeUid) ??
+                      AssigneeDecision(uid: assigneeUid),
+                )
+                .toList() ??
+            [];
 
         final simpleItemFields = [
           FieldData<double>(
@@ -181,6 +182,7 @@ class UpsertItemDialog extends StatelessWidget {
                   SimpleItem(
                     name: values['item_name'],
                     value: values['item_value'],
+                    assignees: initialAssigneeDecisions,
                   );
               final simpleItem = item as SimpleItem;
               simpleItem.value = values['item_value'];
@@ -195,6 +197,7 @@ class UpsertItemDialog extends StatelessWidget {
                     distance: values['item_distance'],
                     gasPrice: values['item_gas_price'],
                     consumption: values['item_consumption'],
+                    assignees: initialAssigneeDecisions,
                   );
               final gasItem = item as GasItem;
               gasItem.distance = values['item_distance'];
@@ -215,7 +218,7 @@ class UpsertItemDialog extends StatelessWidget {
                     as List<AssigneeDecision>?) ??
                 [];
             for (final decision in markedDecisions) {
-              item.setAssigneeDecision(uid, decision.parts);
+              item.setAssigneeDecision(decision.uid, decision.parts);
             }
 
             onSubmit(item);
