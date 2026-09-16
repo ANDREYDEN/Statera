@@ -20,6 +20,7 @@ import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/build_context_extensions.dart';
 import 'package:statera/utils/utils.dart';
 
 part 'footer.dart';
@@ -31,7 +32,7 @@ class ExpenseDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.select<AuthBloc, String>((bloc) => bloc.uid);
+    final effectiveUid = context.watchEffectiveUid();
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
@@ -47,7 +48,7 @@ class ExpenseDetails extends StatelessWidget {
         children: [SizedBox(height: 34), ExpenseDetailsLoading()],
       ),
       builder: (context, expense) {
-        final expenseCanBeUpdated = expense.canBeUpdatedBy(uid);
+        final expenseCanBeUpdated = expense.canBeUpdatedBy(effectiveUid);
 
         return Column(
           mainAxisSize: MainAxisSize.min,

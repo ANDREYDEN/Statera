@@ -14,7 +14,8 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
+    final authBloc = context.watch<AuthBloc>();
+    final effectiveUid = context.watchEffectiveUid();
 
     return ExpenseBuilder(
       builder: (context, expense) {
@@ -26,7 +27,7 @@ class Header extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  expense.getStage(authBloc.uid).color,
+                  expense.getStage(effectiveUid).color,
                   Theme.of(context).colorScheme.surface,
                 ],
                 stops: [0, 0.8],

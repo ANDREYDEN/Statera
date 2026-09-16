@@ -10,6 +10,7 @@ import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/inputs/decision_buttons.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/warning_icon.dart';
+import 'package:statera/utils/build_context_extensions.dart';
 
 class ItemListItem extends StatelessWidget {
   final Item item;
@@ -58,9 +59,7 @@ class ItemListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid =
-        context.watch<ImpersonationCubit>().state ??
-        context.read<AuthBloc>().uid;
+    final effectiveUid = context.watchEffectiveUid();
 
     return Column(
       children: [
@@ -78,7 +77,7 @@ class ItemListItem extends StatelessWidget {
                 SizedBox(width: Spacing.m_10),
                 DecisionButtons(
                   item: item,
-                  uid: uid,
+                  uid: effectiveUid,
                   onChangePartition: onChangePartition,
                   disabled: disabled,
                 ),
