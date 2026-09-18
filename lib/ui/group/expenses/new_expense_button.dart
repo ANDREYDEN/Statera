@@ -12,12 +12,11 @@ class NewExpenseButton extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
-      child: FilledButton(
-        onPressed: () => NewExpenseDialog.show(
-          context,
-          afterAddition: expenseBloc.load,
-        ),
-        child: Icon(Icons.add),
+      child: FilledButton.icon(
+        onPressed: () =>
+            NewExpenseDialog.show(context, afterAddition: expenseBloc.load),
+        label: Text('Add Expense'),
+        icon: Icon(Icons.add),
       ),
     );
   }

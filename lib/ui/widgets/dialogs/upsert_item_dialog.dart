@@ -113,7 +113,7 @@ class UpsertItemDialog extends StatelessWidget {
         };
 
         return CRUDDialog.segmented(
-          title: addingItem ? 'Add Item' : 'Edit Item',
+          title: addingItem ? 'New Item' : 'Edit Item',
           segmentSelectionEnabled: addingItem,
           initialSelection: initialItem?.type.name,
           segments: [
