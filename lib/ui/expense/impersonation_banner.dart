@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 class ImpersonationBanner extends StatelessWidget {
@@ -18,18 +19,22 @@ class ImpersonationBanner extends StatelessWidget {
 
         return Container(
           color: Theme.of(context).colorScheme.primaryContainer,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.l_20,
+            vertical: Spacing.s_8,
+          ),
+          margin: const EdgeInsets.only(bottom: Spacing.xs_5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   UserAvatar(user: member, dimension: 28),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: Spacing.s_8),
                   Text('Viewing as ${member.name}'),
                 ],
               ),
-              TextButton(
+              OutlinedButton(
                 onPressed: () => context.read<ImpersonationCubit>().stop(),
                 child: const Text('Exit'),
               ),

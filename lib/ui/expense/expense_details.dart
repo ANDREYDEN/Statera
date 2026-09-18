@@ -16,6 +16,7 @@ import 'package:statera/ui/expense/impersonation_banner.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
 import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/price_text.dart';

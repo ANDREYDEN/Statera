@@ -22,7 +22,10 @@ class Header extends StatelessWidget {
         final expenseCanBeUpdated = expense.canBeUpdatedBy(authBloc.uid);
         return Card(
           clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          margin: EdgeInsets.symmetric(
+            horizontal: Spacing.l_20,
+            vertical: Spacing.m_10,
+          ),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
