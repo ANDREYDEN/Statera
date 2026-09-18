@@ -9,12 +9,12 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/error_service.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
+import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/header/expense_price.dart';
 import 'package:statera/ui/expense/impersonation_banner.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
-import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
@@ -33,7 +33,6 @@ class ExpenseDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveUid = context.watchEffectiveUid();
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
@@ -49,6 +48,7 @@ class ExpenseDetails extends StatelessWidget {
         children: [SizedBox(height: 34), ExpenseDetailsLoading()],
       ),
       builder: (context, expense) {
+        final effectiveUid = context.readEffectiveUid();
         final expenseCanBeUpdated = expense.canBeUpdatedBy(effectiveUid);
 
         return Column(
@@ -63,7 +63,7 @@ class ExpenseDetails extends StatelessWidget {
             Header(),
             if (expense.hasItems && expenseCanBeUpdated && isWide) ...[
               NewItemButton(),
-              SizedBox(height: 10),
+              SizedBox(height: Spacing.m_10),
             ],
             Flexible(child: ItemsList()),
             if (expense.hasItems) Footer(),
