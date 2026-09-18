@@ -157,6 +157,26 @@ class UpsertItemDialog extends StatelessWidget {
                 ),
             ]),
           ),
+          onFieldsChanged: (field, fields) {
+            final partitionField = fields
+                .where((f) => f.id == 'item_partition')
+                .firstOrNull;
+            if (partitionField == null) return null;
+            final partition = partitionField.data as int;
+
+            final decisionsField = fields
+                .where((f) => f.id == 'item_assignee_decisions')
+                .firstOrNull;
+            if (decisionsField == null) return;
+
+            final currentDecisions =
+                decisionsField.data as List<AssigneeDecision>;
+            decisionsField.changeData(
+              currentDecisions
+                  .map((decision) => decision.updateParts(partition))
+                  .toList(),
+            );
+          },
           buildWarning: (fields) {
             final itemName = (fields['item_name'] ?? '') as String;
 
@@ -208,10 +228,7 @@ class UpsertItemDialog extends StatelessWidget {
             item.name = values['item_name']!;
             item.isTaxable = values['item_taxable'] ?? false;
             var newPartition = values['item_partition']!;
-            if (addingItem || newPartition != initialItem!.partition) {
-              item.resetAssigneeDecisions();
-              item.partition = newPartition;
-            }
+            item.partition = newPartition;
 
             final markedDecisions =
                 (values['item_assignee_decisions']

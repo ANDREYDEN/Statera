@@ -26,6 +26,8 @@ class CRUDDialog extends StatefulWidget {
   final String? initialSelection;
   final bool hasAutoFocus;
   final String? Function(Map<String, dynamic>)? buildWarning;
+  final void Function(FieldData changedField, List<FieldData> fields)?
+  onFieldsChanged;
 
   CRUDDialog({
     Key? key,
@@ -37,6 +39,7 @@ class CRUDDialog extends StatefulWidget {
     this.initialSelection,
     this.hasAutoFocus = true,
     this.buildWarning,
+    this.onFieldsChanged,
   }) : super(key: key) {
     this.fieldsMap = {'default': fields};
     this.segments = [];
@@ -55,6 +58,7 @@ class CRUDDialog extends StatefulWidget {
     this.initialSelection,
     this.hasAutoFocus = true,
     this.buildWarning,
+    this.onFieldsChanged,
   }) : super(key: key);
 
   @override
@@ -163,6 +167,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   bool get _advancedFieldsPresent => _fields.any((f) => f.isAdvanced);
 
+  void _handleFieldChange(FieldData field, dynamic newValue) {
+    setState(() {
+      this._dirty = true;
+      field.changeData(newValue);
+      widget.onFieldsChanged?.call(field, _fields);
+    });
+  }
+
   void _handleSegmentSelection(Set<String> values) {
     setState(() {
       _selectedValue = values.single;
@@ -205,12 +217,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
                   : null,
               suffixIcon: Icon(field.suffixIcon, size: 20),
             ),
-            onChanged: (text) {
-              setState(() {
-                this._dirty = true;
-                field.changeData(text);
-              });
-            },
+            onChanged: (text) => _handleFieldChange(field, text),
             onFieldSubmitted: (_) {
               if (isLastField) {
                 submit(closeAfterSubmit: widget.closeAfterSubmit);
@@ -231,10 +238,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
             focusNode: field.focusNode,
             onChanged: isDisabled
                 ? null
-                : (newValue) => setState(() {
-                    this._dirty = true;
-                    field.changeData(newValue);
-                  }),
+                : (newValue) => _handleFieldChange(field, newValue),
           ),
         );
       } else if (field.initialData is List<AssigneeDecision>) {
@@ -247,10 +251,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
               AssigneeDecisionsPicker(
                 value: field.data,
                 partition: fieldValueMap['item_partition'] as int? ?? 1,
-                onChange: (newValue) => setState(() {
-                  this._dirty = true;
-                  field.changeData(newValue);
-                }),
+                onChange: (newValue) => _handleFieldChange(field, newValue),
               ),
             ],
           ),
