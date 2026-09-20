@@ -27,7 +27,7 @@ class Expense {
   ExpenseSettings settings;
 
   @JsonKey(includeFromJson: false, includeToJson: true)
-  List<String> get unmarkedAssigneeUids =>
+  List<String> get unmarkedAssigneeIds =>
       assigneeUids.where((assigneeUid) => !isMarkedBy(assigneeUid)).toList();
 
   Expense({
