@@ -1,10 +1,10 @@
 import { Item } from './item'
 
 export type Expense = {
-    assigneeIds: string[]
+    assigneeIds?: string[]
     items: Item[]
     finalizedDate: string | null
-    unmarkedAssigneeIds: string[]
+    unmarkedAssigneeIds?: string[]
     authorUid: string
     groupId: string
 }
