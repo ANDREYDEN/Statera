@@ -64,7 +64,7 @@ void main() {
     );
 
     testWidgets(
-      'clears assignee decisions made on behalf of others when the item partition changes afterwards',
+      'clamps assignee decisions made on behalf of others when the item partition shrinks afterwards',
       (tester) async {
         await tester.binding.setSurfaceSize(Size(600, 1200));
 
@@ -98,21 +98,23 @@ void main() {
         await tester.enterTextByLabel('Item Name', 'Pizza');
         await tester.enterTextByLabel('Item Value', '10');
 
+        await tester.enterTextByLabel('Item Parts', '5');
+        await tester.pumpAndSettle();
+
         final otherTile = find.ancestor(
           of: find.text(other.name),
           matching: find.byType(ListTile),
         );
-        await tester.tap(
-          find.descendant(
-            of: otherTile,
-            matching: find.byIcon(Icons.check_rounded),
-          ),
-        );
-        await tester.pumpAndSettle();
+        final otherAcceptButton = find
+            .descendant(of: otherTile, matching: find.byType(IconButton))
+            .at(1);
 
-        // Changing the partition afterwards should clear the just-made
-        // decision, since it may no longer make sense against the new
-        // partition count.
+        final otherAssigneeItemParts = 3;
+        for (var i = 0; i < otherAssigneeItemParts; i++) {
+          await tester.tap(otherAcceptButton);
+          await tester.pumpAndSettle();
+        }
+
         await tester.enterTextByLabel('Item Parts', '2');
         await tester.pumpAndSettle();
 
@@ -121,7 +123,7 @@ void main() {
 
         expect(submittedItem, isNotNull);
         expect(submittedItem!.partition, 2);
-        expect(submittedItem!.isMarkedBy(other.uid), false);
+        expect(submittedItem!.getAssigneeParts(other.uid), 2);
       },
     );
   });
