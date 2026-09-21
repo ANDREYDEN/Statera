@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/collapsible_header.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/narrow_screen_actions.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/info_message.dart';
+import 'package:statera/ui/widgets/inputs/assignee_decisions_picker.dart';
 
 part 'field_data.dart';
 
@@ -24,6 +26,8 @@ class CRUDDialog extends StatefulWidget {
   final String? initialSelection;
   final bool hasAutoFocus;
   final String? Function(Map<String, dynamic>)? buildWarning;
+  final void Function(FieldData changedField, List<FieldData> fields)?
+  onFieldsChanged;
 
   CRUDDialog({
     Key? key,
@@ -35,6 +39,7 @@ class CRUDDialog extends StatefulWidget {
     this.initialSelection,
     this.hasAutoFocus = true,
     this.buildWarning,
+    this.onFieldsChanged,
   }) : super(key: key) {
     this.fieldsMap = {'default': fields};
     this.segments = [];
@@ -53,6 +58,7 @@ class CRUDDialog extends StatefulWidget {
     this.initialSelection,
     this.hasAutoFocus = true,
     this.buildWarning,
+    this.onFieldsChanged,
   }) : super(key: key);
 
   @override
@@ -161,6 +167,14 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   bool get _advancedFieldsPresent => _fields.any((f) => f.isAdvanced);
 
+  void _handleFieldChange(FieldData field, dynamic newValue) {
+    setState(() {
+      this._dirty = true;
+      field.changeData(newValue);
+      widget.onFieldsChanged?.call(field, _fields);
+    });
+  }
+
   void _handleSegmentSelection(Set<String> values) {
     setState(() {
       _selectedValue = values.single;
@@ -170,7 +184,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
 
   Iterable<Widget> _getFields(bool Function(FieldData) criteria) sync* {
     final selectedFields = _fields.where(criteria).toList();
-    final fieldValueMap = selectedFields.fold<Map<String, dynamic>>(
+    final fieldValueMap = _fields.fold<Map<String, dynamic>>(
       {},
       (acc, cur) => {...acc, cur.id: cur.data},
     );
@@ -203,12 +217,7 @@ class _CRUDDialogState extends State<CRUDDialog> {
                   : null,
               suffixIcon: Icon(field.suffixIcon, size: 20),
             ),
-            onChanged: (text) {
-              setState(() {
-                this._dirty = true;
-                field.changeData(text);
-              });
-            },
+            onChanged: (text) => _handleFieldChange(field, text),
             onFieldSubmitted: (_) {
               if (isLastField) {
                 submit(closeAfterSubmit: widget.closeAfterSubmit);
@@ -229,10 +238,22 @@ class _CRUDDialogState extends State<CRUDDialog> {
             focusNode: field.focusNode,
             onChanged: isDisabled
                 ? null
-                : (newValue) => setState(() {
-                    this._dirty = true;
-                    field.changeData(newValue);
-                  }),
+                : (newValue) => _handleFieldChange(field, newValue),
+          ),
+        );
+      } else if (field.initialData is List<AssigneeDecision>) {
+        yield Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(field.label, style: Theme.of(context).textTheme.bodySmall),
+              AssigneeDecisionsPicker(
+                value: field.data,
+                partition: fieldValueMap['item_partition'] as int? ?? 1,
+                onChange: (newValue) => _handleFieldChange(field, newValue),
+              ),
+            ],
           ),
         );
       }

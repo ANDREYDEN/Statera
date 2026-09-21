@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/ui/expense/expense_details.dart';
+import 'package:statera/ui/expense/expense_details_wrapper.dart';
 import 'package:statera/ui/group/expenses/expense_list.dart';
 import 'package:statera/ui/group/members/owings_list.dart';
 import 'package:statera/ui/group/settings/group_settings.dart';
@@ -25,7 +25,7 @@ class GroupWideContent extends StatelessWidget {
       rightPart = PaymentList();
     } else if (navIndex == 1) {
       leftPart = ExpenseList();
-      rightPart = ExpenseDetails();
+      rightPart = ExpenseDetailsWrapper();
     } else if (navIndex == 2) {
       rightPart = GroupSettings();
     }

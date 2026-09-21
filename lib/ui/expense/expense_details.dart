@@ -9,16 +9,19 @@ import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/error_service.dart';
 import 'package:statera/ui/expense/actions/expense_actions_button.dart';
 import 'package:statera/ui/expense/assignee_list.dart';
+import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/expense/expense_builder.dart';
 import 'package:statera/ui/expense/expense_details_loading.dart';
 import 'package:statera/ui/expense/header/expense_price.dart';
+import 'package:statera/ui/expense/impersonation_banner.dart';
 import 'package:statera/ui/expense/items/items_list.dart';
-import 'package:statera/ui/expense/buttons/new_item_button.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/price_text.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/build_context_extensions.dart';
 import 'package:statera/utils/utils.dart';
 
 part 'footer.dart';
@@ -30,7 +33,6 @@ class ExpenseDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.select<AuthBloc, String>((bloc) => bloc.uid);
     final isWide = context.select((LayoutState state) => state.isWide);
 
     return ExpenseBuilder(
@@ -46,11 +48,13 @@ class ExpenseDetails extends StatelessWidget {
         children: [SizedBox(height: 34), ExpenseDetailsLoading()],
       ),
       builder: (context, expense) {
-        final expenseCanBeUpdated = expense.canBeUpdatedBy(uid);
+        final effectiveUid = context.readEffectiveUid();
+        final expenseCanBeUpdated = expense.canBeUpdatedBy(effectiveUid);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const ImpersonationBanner(),
             if (isWide)
               Align(
                 alignment: Alignment.centerRight,
@@ -59,7 +63,7 @@ class ExpenseDetails extends StatelessWidget {
             Header(),
             if (expense.hasItems && expenseCanBeUpdated && isWide) ...[
               NewItemButton(),
-              SizedBox(height: 10),
+              SizedBox(height: Spacing.m_10),
             ],
             Flexible(child: ItemsList()),
             if (expense.hasItems) Footer(),

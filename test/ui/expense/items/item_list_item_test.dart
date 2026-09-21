@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/error_service_mock.dart';
@@ -64,6 +65,9 @@ void main() {
                     MockUserRepository(),
                     MockErrorService(),
                   )..loadGroup(Group(name: 'Example', members: [user1, user2])),
+                ),
+                BlocProvider<ImpersonationCubit>(
+                  create: (_) => ImpersonationCubit(),
                 ),
               ],
               child: ItemListItem(

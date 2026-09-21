@@ -10,4 +10,7 @@ class FeatureService {
 
   bool get slideToFinalizeEnabled =>
       FirebaseRemoteConfig.instance.getBool('slide_to_finalize_feature_flag');
+
+  bool get authorAssigneeDecisionsEnabled => FirebaseRemoteConfig.instance
+      .getBool('author_assignee_decisions_feature_flag');
 }

@@ -18,6 +18,12 @@ class AssigneeDecision {
 
   bool get madeDecision => _parts != null;
 
+  void updateParts(int partition) {
+    if (_parts == null) return null;
+
+    _parts = min(_parts!, partition);
+  }
+
   static AssigneeDecision from(AssigneeDecision other) {
     return AssigneeDecision(uid: other.uid, parts: other._parts);
   }

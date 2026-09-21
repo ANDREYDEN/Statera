@@ -94,6 +94,9 @@ class FieldData<T> {
       _fieldValue = value;
     } else if (value is bool && initialData is bool) {
       _data = value as T;
+    } else if (value is List<AssigneeDecision> &&
+        initialData is List<AssigneeDecision>) {
+      _data = value as T;
     }
   }
 

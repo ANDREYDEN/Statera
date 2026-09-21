@@ -5,7 +5,7 @@ class Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
+    final effectiveUid = context.watchEffectiveUid();
 
     return ExpenseBuilder(
       builder: (context, expense) {
@@ -16,30 +16,30 @@ class Footer extends StatelessWidget {
               Divider(thickness: 3),
               FooterEntry(
                 label: 'Subtotal',
-                value: expense.getConfirmedSubtotalForUser(authBloc.uid),
-              )
+                value: expense.getConfirmedSubtotalForUser(effectiveUid),
+              ),
             ],
             if (expense.hasTax) ...[
               Divider(),
               FooterEntry(
                 label: 'Tax (${(expense.settings.tax ?? 0) * 100}%)',
-                value: expense.getConfirmedTaxForUser(authBloc.uid),
+                value: expense.getConfirmedTaxForUser(effectiveUid),
               ),
             ],
             if (expense.hasTip) ...[
               Divider(),
               FooterEntry(
                 label: 'Tip (${(expense.settings.tip ?? 0) * 100}%)',
-                value: expense.getConfirmedTipForUser(authBloc.uid),
+                value: expense.getConfirmedTipForUser(effectiveUid),
               ),
             ],
             Divider(thickness: 3),
             FooterEntry(
               label: 'Your Total',
-              value: expense.getConfirmedTotalForUser(authBloc.uid),
+              value: expense.getConfirmedTotalForUser(effectiveUid),
               bold: true,
             ),
-            SizedBox(height: 10)
+            SizedBox(height: 10),
           ],
         );
       },

@@ -11,6 +11,7 @@ import 'package:statera/ui/expense/items/item_list_item.dart';
 import 'package:statera/ui/styling/spacing.dart';
 import 'package:statera/ui/widgets/info_message.dart';
 import 'package:statera/ui/widgets/optionally_dismissible.dart';
+import 'package:statera/utils/build_context_extensions.dart';
 import 'package:statera/utils/utils.dart';
 
 class ItemsList extends StatelessWidget {
@@ -104,12 +105,12 @@ class ItemsList extends StatelessWidget {
     int parts,
     int index,
   ) {
-    final authBloc = context.read<AuthBloc>();
+    final effectiveUid = context.readEffectiveUid();
     final expenseBloc = context.read<ExpenseBloc>();
 
     snackbarCatch(context, () {
       final updatedExpense = expense
-        ..items[index].setAssigneeDecision(authBloc.uid, parts);
+        ..items[index].setAssigneeDecision(effectiveUid, parts);
 
       expenseBloc.add(UpdateRequested(updatedExpense: updatedExpense));
     });

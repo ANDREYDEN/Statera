@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/group/settings/author_marking_setting.dart';
 import 'package:statera/ui/group/settings/debt_redirect_setting.dart';
 import 'package:statera/ui/group/settings/delete_group_setting.dart';
 import 'package:statera/ui/group/settings/leave_group_setting.dart';
@@ -21,6 +23,7 @@ class GroupSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final featureService = context.read<FeatureService>();
     final layoutState = context.read<LayoutState>();
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
@@ -36,8 +39,9 @@ class GroupSettings extends StatelessWidget {
         return ListView(
           padding: EdgeInsets.symmetric(
             vertical: 20,
-            horizontal:
-                layoutState.isWide ? MediaQuery.of(context).size.width / 4 : 20,
+            horizontal: layoutState.isWide
+                ? MediaQuery.of(context).size.width / 4
+                : 20,
           ),
           children: [
             if (isAdmin) ...[
@@ -72,7 +76,7 @@ class GroupSettings extends StatelessWidget {
                 label: 'Debt Threshold',
                 validators: [
                   FieldData.requiredValidator,
-                  FieldData.intValidator
+                  FieldData.intValidator,
                 ],
                 formatters: [FilteringTextInputFormatter.deny(RegExp('-'))],
                 onPressed: (value) {
@@ -83,12 +87,14 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
+              if (featureService.authorAssigneeDecisionsEnabled)
+                AuthorMarkingSetting(group: group),
               SizedBox(height: 20),
               SectionTitle('Default Expense Settings'),
               SizedBox(height: 20),
               SwitchListTile(
                 title: Text(
-                  'Automatically add members who join the group to this expense',
+                  'Automatically add new group members to the expense',
                 ),
                 value: group.defaultExpenseSettings.acceptNewMembers,
                 onChanged: (isOn) {
@@ -100,7 +106,7 @@ class GroupSettings extends StatelessWidget {
                 },
               ),
               SwitchListTile(
-                title: Text('Show how other people marked each item'),
+                title: Text('Show how other people marked each expense item'),
                 value: group.defaultExpenseSettings.showItemDecisions,
                 onChanged: (isOn) {
                   final groupCubit = context.read<GroupCubit>();
@@ -118,7 +124,7 @@ class GroupSettings extends StatelessWidget {
                     Tooltip(
                       message: 'You can change this for each item',
                       child: Icon(Icons.info, size: 20),
-                    )
+                    ),
                   ],
                 ),
                 value: group.defaultExpenseSettings.tax != null,
@@ -169,7 +175,7 @@ class GroupSettings extends StatelessWidget {
               children: [
                 if (isAdmin) TransferOwnershipSetting(groupName: group.name),
                 LeaveGroupSetting(isAdmin: isAdmin, groupName: group.name),
-                if (isAdmin) DeleteGroupSetting(groupName: group.name)
+                if (isAdmin) DeleteGroupSetting(groupName: group.name),
               ],
             ),
           ],

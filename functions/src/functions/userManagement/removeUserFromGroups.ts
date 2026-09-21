@@ -61,7 +61,7 @@ async function removeUserFromOutstandingExpenses(uid: string, groupId: string) {
   for (const expenseDoc of expenses.docs) {
     const expense = expenseDoc.data() as Expense
 
-    expense.assigneeIds = expense.assigneeIds.filter(
+    expense.assigneeIds = (expense.assigneeIds ?? []).filter(
       (ids: string) => ids != uid
     )
     for (const item of expense.items) {

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
+import 'package:statera/business_logic/expense/impersonation_cubit.dart';
 import 'package:statera/business_logic/expenses/expenses_cubit.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
@@ -82,6 +83,7 @@ Future<void> customPump(
 
   final featureServiceMock = MockFeatureService();
   when(featureServiceMock.debtRedirectionEnabled).thenReturn(true);
+  when(featureServiceMock.authorAssigneeDecisionsEnabled).thenReturn(true);
 
   expenseService ??= defaultExpenseService;
   final expenseBloc = ExpenseBloc(
@@ -103,6 +105,7 @@ Future<void> customPump(
         Provider(create: (_) => featureService ?? featureServiceMock),
         Provider(create: (_) => expenseService),
         BlocProvider(create: (_) => expenseBloc),
+        BlocProvider(create: (_) => ImpersonationCubit()),
         BlocProvider(
           create: (context) => GroupCubit(
             groupService ?? defaultGroupService,
