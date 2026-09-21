@@ -9,5 +9,5 @@ This PR closes #
 # Checklist
 
 - [ ] This PR adds new tests
+- [ ] This PR add a new feature flag
 - [ ] This PR adds environment variables/files
-- [ ] This PR updates documentation as required

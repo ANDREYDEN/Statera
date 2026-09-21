@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/feature_service.mocks.dart';
 import 'package:statera/ui/widgets/dialogs/upsert_item_dialog.dart';
 
 import '../../../helpers.dart';
@@ -126,6 +128,45 @@ void main() {
         expect(submittedItem!.getAssigneeParts(other.uid), 2);
       },
     );
+
+    testWidgets(
+      'hides the mark-on-behalf-of-others input when the feature flag is disabled',
+      (tester) async {
+        await tester.binding.setSurfaceSize(Size(600, 1200));
+
+        final author = CustomUser.fake(name: 'Author');
+        final other = CustomUser.fake(name: 'Other');
+        final group = Group(
+          name: 'Test group',
+          members: [author, other],
+          allowAuthorsToMarkOnBehalfOfOthers: true,
+        );
+        final expense = Expense(
+          name: 'Test Expense',
+          authorUid: author.uid,
+          assigneeUids: [author.uid, other.uid],
+        );
+
+        final featureService = MockFeatureService();
+        when(featureService.authorAssigneeDecisionsEnabled).thenReturn(false);
+
+        await pumpUpsertItemDialog(
+          tester,
+          group: group,
+          expense: expense,
+          currentUserId: author.uid,
+          featureService: featureService,
+          onSubmit: (_) {},
+        );
+
+        await tester.pump();
+        await tester.tap(find.text('Advanced'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Mark on behalf of assignees'), findsNothing);
+        expect(find.text(other.name), findsNothing);
+      },
+    );
   });
 }
 
@@ -135,6 +176,7 @@ Future<void> pumpUpsertItemDialog(
   required Expense expense,
   required String currentUserId,
   required void Function(Item) onSubmit,
+  MockFeatureService? featureService,
 }) {
   return customPump(
     UpsertItemDialog(onSubmit: onSubmit),
@@ -142,5 +184,6 @@ Future<void> pumpUpsertItemDialog(
     group: group,
     selectedExpense: expense,
     currentUserId: currentUserId,
+    featureService: featureService,
   );
 }

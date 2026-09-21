@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/settings/author_marking_setting.dart';
 import 'package:statera/ui/group/settings/debt_redirect_setting.dart';
@@ -22,6 +23,7 @@ class GroupSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final featureService = context.read<FeatureService>();
     final layoutState = context.read<LayoutState>();
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
@@ -85,7 +87,8 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
-              AuthorMarkingSetting(group: group),
+              if (featureService.authorAssigneeDecisionsEnabled)
+                AuthorMarkingSetting(group: group),
               SizedBox(height: 20),
               SectionTitle('Default Expense Settings'),
               SizedBox(height: 20),

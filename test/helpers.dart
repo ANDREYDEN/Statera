@@ -83,6 +83,7 @@ Future<void> customPump(
 
   final featureServiceMock = MockFeatureService();
   when(featureServiceMock.debtRedirectionEnabled).thenReturn(true);
+  when(featureServiceMock.authorAssigneeDecisionsEnabled).thenReturn(true);
 
   expenseService ??= defaultExpenseService;
   final expenseBloc = ExpenseBloc(

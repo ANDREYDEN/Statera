@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/expense/expense_bloc.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/utils/utils.dart';
@@ -46,6 +47,7 @@ class UpsertItemDialog extends StatelessWidget {
         final bool itemHasTax = expense?.hasTax ?? false;
 
         final uid = context.read<AuthBloc>().uid;
+        final featureService = context.read<FeatureService>();
         final canMarkForOthers =
             expense != null &&
             expense.isAuthoredBy(uid) &&
@@ -148,7 +150,8 @@ class UpsertItemDialog extends StatelessWidget {
                   initialData: initialItem?.isTaxable ?? itemTaxableByDefault,
                   isAdvanced: true,
                 ),
-              if (canMarkForOthers)
+              if (canMarkForOthers &&
+                  featureService.authorAssigneeDecisionsEnabled)
                 FieldData(
                   id: 'item_assignee_decisions',
                   label: 'Mark on behalf of assignees',
