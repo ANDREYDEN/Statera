@@ -11,11 +11,12 @@ class Firestore {
   CollectionReference get expensesCollection =>
       firestore.collection('expenses');
 
-  CollectionReference<Group> get groupsCollection =>
-      firestore.collection('groups').withConverter<Group>(
-            fromFirestore: (snapshot, _) => Group.fromSnapshot(snapshot),
-            toFirestore: (group, _) => group.toFirestore(),
-          );
+  CollectionReference<Group> get groupsCollection => firestore
+      .collection('groups')
+      .withConverter<Group>(
+        fromFirestore: (snapshot, _) => Group.fromSnapshot(snapshot),
+        toFirestore: (group, _) => group.toFirestore(),
+      );
 
   CollectionReference get paymentsCollection =>
       firestore.collection('payments');
@@ -27,6 +28,15 @@ class Firestore {
 
   DocumentReference getUserGroup(String uid, String groupId) =>
       usersCollection.doc(uid).collection('groups').doc(groupId);
+
+  CollectionReference<Contact> getContactsCollection(String uid) =>
+      usersCollection
+          .doc(uid)
+          .collection('contacts')
+          .withConverter<Contact>(
+            fromFirestore: (snapshot, _) => Contact.fromSnapshot(snapshot),
+            toFirestore: (contact, _) => contact.toJson(),
+          );
 
   Query expensesQuery({
     String? groupId,
@@ -46,8 +56,10 @@ class Firestore {
     }
 
     if (unmarkedAssigneeId != null) {
-      query =
-          query.where('unmarkedAssigneeIds', arrayContains: unmarkedAssigneeId);
+      query = query.where(
+        'unmarkedAssigneeIds',
+        arrayContains: unmarkedAssigneeId,
+      );
     }
 
     if (finalized != null) {
@@ -63,6 +75,7 @@ class Firestore {
 
   Stream<List<Expense>> queryToExpensesStream(Query query) {
     return query.snapshots().map<List<Expense>>(
-        (snap) => snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList());
+      (snap) => snap.docs.map((doc) => Expense.fromSnapshot(doc)).toList(),
+    );
   }
 }

@@ -8,6 +8,7 @@ export 'firestore.dart';
 export 'expense_service.dart';
 export 'group_repository.dart';
 export 'user_group_repository.dart';
+export 'contact_repository.dart';
 export 'payment_service.dart';
 export 'notification_service.dart';
 export 'preferences_service.dart';
