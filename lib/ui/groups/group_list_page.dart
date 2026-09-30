@@ -7,6 +7,7 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/ui/contacts/contacts_list.dart';
 import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
 import 'package:statera/ui/groups/notifications_reminder.dart';
@@ -73,6 +74,7 @@ class GroupListPage extends StatelessWidget {
             child: Column(
               children: [
                 UpdateBanner(),
+                ContactsList(),
                 Expanded(child: GroupListBody()),
               ],
             ),
