@@ -21,7 +21,13 @@ class Firestore {
   CollectionReference get paymentsCollection =>
       firestore.collection('payments');
 
-  CollectionReference get usersCollection => firestore.collection('users');
+  CollectionReference<CustomUser> get usersCollection => firestore
+      .collection('users')
+      .withConverter<CustomUser>(
+        fromFirestore: (snapshot, _) =>
+            CustomUser.fromFirestore(snapshot.data() as Map<String, dynamic>),
+        toFirestore: (customUser, _) => customUser.toFirestore(),
+      );
 
   CollectionReference getUserGroupsCollection(String uid) =>
       usersCollection.doc(uid).collection('groups');

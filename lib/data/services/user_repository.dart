@@ -62,6 +62,6 @@ class UserRepository extends Firestore {
 
     if (!userDoc.exists) throw EntityNotFoundException(uid, name: 'User');
 
-    return CustomUser.fromUserDoc(userDoc);
+    return userDoc.data()!;
   }
 }
