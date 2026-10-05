@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
+import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
@@ -16,6 +17,7 @@ import 'package:statera/ui/groups/settings_badge.dart';
 import 'package:statera/ui/groups/update_banner.dart';
 import 'package:statera/ui/platform_context.dart';
 import 'package:statera/ui/settings/settings_page.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/support/support.dart';
 import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
@@ -51,6 +53,7 @@ class GroupListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = context.select((LayoutState state) => state.isWide);
     var platformContext = context.read<PlatformContext>();
 
     return Greeting(
@@ -75,8 +78,32 @@ class GroupListPage extends StatelessWidget {
             child: Column(
               children: [
                 UpdateBanner(),
-                ContactsList(),
-                Expanded(child: GroupListBody()),
+                Expanded(
+                  child: Padding(
+                    padding: isWide ? kWideMargin : kMobileMargin,
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Contacts',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        ContactsList(),
+                        SizedBox(height: Spacing.m_10),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Groups',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        Expanded(child: GroupListBody()),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

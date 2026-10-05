@@ -5,6 +5,7 @@ import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/groups/group_list_item/group_list_item.dart';
 import 'package:statera/ui/groups/group_list_item/group_list_item_loading.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/utils/utils.dart';
 
@@ -51,68 +52,65 @@ class _GroupListBodyState extends State<GroupListBody> {
         final isActive = _selectedGroupType.contains('active');
         final targetGroups = isActive ? activeGroups : archivedGroups;
 
-        return Padding(
-          padding: isWide ? kWideMargin : kMobileMargin,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 4,
-                child: Visibility(
-                  visible: groupsState.isProcessing,
-                  child: LinearProgressIndicator(),
-                ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 4,
+              child: Visibility(
+                visible: groupsState.isProcessing,
+                child: LinearProgressIndicator(),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: SegmentedButton(
-                  segments: [
-                    ButtonSegment(
-                      value: 'active',
-                      label: Text('Active'),
-                      icon: Icon(Icons.groups),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: Spacing.m_10),
+              child: SegmentedButton(
+                segments: [
+                  ButtonSegment(
+                    value: 'active',
+                    label: Text('Active'),
+                    icon: Icon(Icons.groups),
+                  ),
+                  ButtonSegment(
+                    value: 'archived',
+                    label: Text('Archived'),
+                    icon: Icon(Icons.archive),
+                  ),
+                ],
+                selected: _selectedGroupType,
+                onSelectionChanged: groupsState.isLoading
+                    ? null
+                    : (Set<String> newSelectedGroupType) => setState(() {
+                        _selectedGroupType = newSelectedGroupType;
+                      }),
+              ),
+            ),
+            Expanded(
+              child: !groupsState.isLoading && targetGroups.isEmpty
+                  ? ListEmpty(
+                      text: isActive
+                          ? 'Join or create a group!'
+                          : 'You have not archived any groups yet',
+                    )
+                  : GridView.count(
+                      shrinkWrap: true,
+                      crossAxisCount: columnCount,
+                      childAspectRatio: itemAspectRatio,
+                      children: [
+                        if (groupsState.isLoading)
+                          ...List.filled(
+                            5,
+                            GroupListItemLoading(height: rowHeight * 1.0),
+                          )
+                        else
+                          ...targetGroups
+                              .map((group) => GroupListItem(userGroup: group))
+                              .toList(),
+                        SizedBox(height: 100), // leave space for FAB
+                      ],
                     ),
-                    ButtonSegment(
-                      value: 'archived',
-                      label: Text('Archived'),
-                      icon: Icon(Icons.archive),
-                    ),
-                  ],
-                  selected: _selectedGroupType,
-                  onSelectionChanged: groupsState.isLoading
-                      ? null
-                      : (Set<String> newSelectedGroupType) => setState(() {
-                          _selectedGroupType = newSelectedGroupType;
-                        }),
-                ),
-              ),
-              Expanded(
-                child: !groupsState.isLoading && targetGroups.isEmpty
-                    ? ListEmpty(
-                        text: isActive
-                            ? 'Join or create a group!'
-                            : 'You have not archived any groups yet',
-                      )
-                    : GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: columnCount,
-                        childAspectRatio: itemAspectRatio,
-                        children: [
-                          if (groupsState.isLoading)
-                            ...List.filled(
-                              5,
-                              GroupListItemLoading(height: rowHeight * 1.0),
-                            )
-                          else
-                            ...targetGroups
-                                .map((group) => GroupListItem(userGroup: group))
-                                .toList(),
-                          SizedBox(height: 100), // leave space for FAB
-                        ],
-                      ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
