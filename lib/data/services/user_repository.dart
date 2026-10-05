@@ -52,9 +52,7 @@ class UserRepository extends Firestore {
     return usersCollection
         .doc(uid)
         .snapshots()
-        .map(
-          (docSnap) => docSnap.exists ? CustomUser.fromUserDoc(docSnap) : null,
-        );
+        .map((docSnap) => docSnap.exists ? docSnap.data() : null);
   }
 
   Future<CustomUser> getUser(String uid) async {

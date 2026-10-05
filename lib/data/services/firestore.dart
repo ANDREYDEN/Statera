@@ -24,9 +24,12 @@ class Firestore {
   CollectionReference<CustomUser> get usersCollection => firestore
       .collection('users')
       .withConverter<CustomUser>(
-        fromFirestore: (snapshot, _) =>
-            CustomUser.fromFirestore(snapshot.data() as Map<String, dynamic>),
-        toFirestore: (customUser, _) => customUser.toFirestore(),
+        fromFirestore: (snapshot, _) => CustomUser.fromFirestore(
+          snapshot.data() as Map<String, dynamic>,
+          uid: snapshot.id,
+        ),
+        toFirestore: (customUser, _) =>
+            customUser.toFirestore(includeUid: false),
       );
 
   CollectionReference getUserGroupsCollection(String uid) =>

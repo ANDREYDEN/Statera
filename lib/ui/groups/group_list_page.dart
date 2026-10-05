@@ -39,9 +39,10 @@ class GroupListPage extends StatelessWidget {
           )..load(context.read<AuthBloc>().uid),
         ),
         BlocProvider(
-          create: (context) =>
-              UserCubit(context.read<UserRepository>())
-                ..load(context.read<AuthBloc>().uid),
+          create: (context) => UserCubit(
+            context.read<UserRepository>(),
+            context.read<ErrorService>(),
+          )..load(context.read<AuthBloc>().uid),
         ),
       ],
       child: GroupListPage(),
