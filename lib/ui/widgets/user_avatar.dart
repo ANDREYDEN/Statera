@@ -76,7 +76,6 @@ class UserAvatar extends StatelessWidget {
               Stack(
                 children: [
                   Container(
-                    margin: EdgeInsets.all(2),
                     width: this.dimension,
                     height: this.dimension,
                     child: CircleAvatar(
@@ -109,7 +108,6 @@ class UserAvatar extends StatelessWidget {
                   ),
                   if (borderColor != null)
                     Container(
-                      margin: EdgeInsets.all(2),
                       width: this.dimension,
                       height: this.dimension,
                       decoration: BoxDecoration(

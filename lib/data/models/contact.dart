@@ -5,11 +5,12 @@ part 'contact.g.dart';
 
 @JsonSerializable()
 class Contact {
-  late final String uid;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  String uid;
   late final String name;
   late final String? photoURL;
 
-  Contact({required this.uid, required this.name, this.photoURL});
+  Contact({this.uid = '', required this.name, this.photoURL});
 
   static Contact fromJson(Map<String, dynamic> data) => _$ContactFromJson(data);
 

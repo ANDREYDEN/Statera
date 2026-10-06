@@ -76,6 +76,7 @@ class GroupListPage extends StatelessWidget {
                 ? null
                 : () => _createGroup(context),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 UpdateBanner(),
                 Expanded(
@@ -90,7 +91,7 @@ class GroupListPage extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                        ContactsList(),
+                        Flexible(child: ContactsList()),
                         SizedBox(height: Spacing.m_10),
                         Align(
                           alignment: Alignment.centerLeft,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:statera/ui/styling/index.dart';
+import 'package:statera/ui/contacts/add_contact_button.dart';
 
 class EmptyContactsList extends StatelessWidget {
   const EmptyContactsList({super.key});
@@ -8,13 +8,7 @@ class EmptyContactsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        IconButton.outlined(
-          onPressed: () {},
-          icon: const Icon(Icons.person_add),
-          iconSize: Spacing.xl_32,
-        ),
-      ],
+      children: [AddContactButton()],
     );
   }
 }
