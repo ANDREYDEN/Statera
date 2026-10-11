@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/contact_repository.dart';
+import 'package:statera/ui/contact/contact_page.dart';
 import 'package:statera/ui/contacts/add_contact_button.dart';
 import 'package:statera/ui/contacts/empty_contacts_list.dart';
 import 'package:statera/ui/styling/index.dart';
@@ -53,6 +55,10 @@ class ContactsList extends StatelessWidget {
                 dimension: 100,
                 withName: true,
                 namePosition: NamePosition.bottom,
+                onTap: () => context.goNamed(
+                  ContactPage.name,
+                  pathParameters: {'contactId': contact.uid},
+                ),
               );
             },
           );

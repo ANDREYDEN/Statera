@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/ui/authentication/sign_in_page.dart';
 import 'package:statera/ui/authentication/sign_out_page.dart';
+import 'package:statera/ui/contact/contact_page.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/group/group_page.dart';
 import 'package:statera/ui/group_joining/group_joining.dart';
@@ -80,6 +81,12 @@ class CustomRouterConfig {
               name: SettingsPage.name,
               path: 'settings',
               builder: (_) => SettingsPage.init(),
+            ),
+            AuthenticatedGoRoute(
+              name: ContactPage.name,
+              path: '/contact/:contactId',
+              builder: (state) =>
+                  ContactPage.init(state.pathParameters['contactId']),
             ),
             AuthenticatedGoRoute(
               name: GroupPage.name,
