@@ -37,7 +37,18 @@ To use Firebase emulators locally, run `firebase emulators:start` and pass `--da
 
 `lib/ui/routing/pages.dart` defines a `GoRouter` configuration (`CustomRouterConfig`). Routes that require authentication are wrapped in `AuthenticatedGoRoute`, which also injects `NotificationsInitializer`. The auth redirect stream watches `AuthBloc` state. Each route's `builder` calls the page's static `init()` method.
 
-### Page init pattern
+
+### State management
+
+BLoC/Cubit is used throughout. Cubits cover most features (user, groups, expenses list, payments, notifications). `ExpenseBloc` uses the event-driven `Bloc` base class for the single-expense editing flow. UI widgets read state via `BlocBuilder` / `BlocListener` / `context.select`.
+
+### Data layer
+
+All Firestore access goes through repository/service classes in `lib/data/services/`. They extend a `Firestore` base class that provides typed `CollectionReference` getters with `withConverter`. Repositories expose `Stream`s for reactive UI updates and `Future`s for mutations.
+
+## Patterns & Conventions
+
+### Page init 
 
 Every page that needs BLoC state has a static `init()` method that wraps the page widget in a `MultiBlocProvider`, creating and loading the required cubits from the already-registered repository providers:
 
@@ -57,11 +68,6 @@ static Widget init() {
 
 This keeps DI wiring at the route level and out of widget constructors.
 
-### State management
+### Styling
 
-BLoC/Cubit is used throughout. Cubits cover most features (user, groups, expenses list, payments, notifications). `ExpenseBloc` uses the event-driven `Bloc` base class for the single-expense editing flow. UI widgets read state via `BlocBuilder` / `BlocListener` / `context.select`.
-
-### Data layer
-
-All Firestore access goes through repository/service classes in `lib/data/services/`. They extend a `Firestore` base class that provides typed `CollectionReference` getters with `withConverter`. Repositories expose `Stream`s for reactive UI updates and `Future`s for mutations.
-
+`lib/ui/styling` contains useful enums/constants that should be used instead of hardcoded numbers for spacing, border radius, etc.
