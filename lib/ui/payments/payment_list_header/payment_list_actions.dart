@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/loading_text.dart';
 
@@ -33,8 +34,8 @@ class PaymentListActions extends StatelessWidget {
                       payerId: authBloc.uid,
                       receiverId: otherMemberId,
                       value: balance.abs(),
-                      oldPayerBalance: group.balance[authBloc.uid]
-                          ?[otherMemberId],
+                      oldPayerBalance:
+                          group.balance[authBloc.uid]?[otherMemberId],
                       newFor: [otherMemberId],
                     ),
                   ),
@@ -42,7 +43,7 @@ class PaymentListActions extends StatelessWidget {
                 child: Text('Pay'),
               ),
             ),
-            SizedBox(width: 16),
+            SizedBox(width: Spacing.l_20),
             Expanded(
               child: FilledButton(
                 onPressed: () => showDialog(
@@ -55,8 +56,8 @@ class PaymentListActions extends StatelessWidget {
                       payerId: otherMemberId,
                       receiverId: authBloc.uid,
                       value: balance.abs(),
-                      oldPayerBalance: group.balance[otherMemberId]
-                          ?[authBloc.uid],
+                      oldPayerBalance:
+                          group.balance[otherMemberId]?[authBloc.uid],
                       newFor: [otherMemberId],
                     ),
                   ),

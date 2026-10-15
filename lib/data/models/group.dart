@@ -261,7 +261,7 @@ class Group {
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
-      'members': members.map((x) => x.toFirestore()).toList(),
+      'members': members.map((x) => x.toFirestore(includeUid: true)).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
       'adminId': admin.uid,

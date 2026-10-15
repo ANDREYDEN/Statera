@@ -13,8 +13,9 @@ part 'user_state.dart';
 class UserCubit extends Cubit<UserState> {
   StreamSubscription? _userSubscription;
   final UserRepository _userRepository;
+  final ErrorService _errorService;
 
-  UserCubit(this._userRepository) : super(UserLoading());
+  UserCubit(this._userRepository, this._errorService) : super(UserLoading());
 
   void load(String? userId) {
     _userSubscription?.cancel();
@@ -25,7 +26,8 @@ class UserCubit extends Cubit<UserState> {
               ? UserError(error: 'User does not exist')
               : UserLoaded(user: user),
         )
-        .handleError((e) {
+        .handleError((e) async {
+          await _errorService.recordError(e, reason: 'User stream error');
           if (e is FirebaseException) {
             emit(UserError(error: 'Permission denied'));
           } else {

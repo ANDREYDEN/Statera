@@ -71,28 +71,18 @@ class CustomUser {
   int get completionPercentage =>
       (completedProfileParts.length / profileParts.length * 100).toInt();
 
-  static CustomUser fromUserDoc(DocumentSnapshot<Object?> doc) {
-    final docData = doc.data() as Map<String, dynamic>;
+  static CustomUser fromFirestore(Map<String, dynamic> data, {String? uid}) {
     return CustomUser(
-      uid: doc.id,
-      name: docData['name'] ?? 'anonymous',
-      photoURL: docData['photoURL'],
-      paymentInfo: docData['paymentInfo'],
-    );
-  }
-
-  static CustomUser fromFirestore(Map<String, dynamic> data) {
-    return CustomUser(
-      uid: data['uid'],
+      uid: uid ?? data['uid'],
       name: data['name'] ?? 'anonymous',
       photoURL: data['photoURL'],
       paymentInfo: data['paymentInfo'],
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toFirestore({bool includeUid = false}) {
     return {
-      'uid': uid,
+      if (includeUid) 'uid': uid,
       'name': name,
       'photoURL': photoURL,
       'paymentInfo': paymentInfo,
