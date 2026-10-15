@@ -27,7 +27,7 @@ class TotalDebtText extends StatelessWidget {
         Text('You owe'),
         // TODO: figure out currency sign here
         Text(
-          '${Group.kdefaultCurrencySign}${totalDebt.abs().toStringAsFixed(2)}',
+          '${Group.kdefaultCurrencySign}${totalDebt.toStringAsFixed(2)}',
           style: const TextStyle(fontSize: 32),
         ),
       ],
