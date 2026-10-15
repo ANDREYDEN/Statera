@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/group/group_builder.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 class ItemDecisions extends StatefulWidget {
@@ -62,24 +63,15 @@ class _ItemDecisionsState extends State<ItemDecisions> {
                 .map((assigneeDecision) {
                   var member = group.getMember(assigneeDecision.uid);
 
-                  if (!widget.item.isPartitioned)
-                    return UserAvatar(user: member, dimension: 30);
-
                   return Padding(
-                    padding: const EdgeInsets.only(right: 2.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        color: Theme.of(context).colorScheme.surface,
-                        child: Row(
-                          children: [
-                            SizedBox(width: 4),
-                            Text(assigneeDecision.parts.toString()),
-                            UserAvatar(user: member, dimension: 30),
-                          ],
-                        ),
-                      ),
-                    ),
+                    padding: const EdgeInsets.only(right: Spacing.xs_5),
+                    child: widget.item.isPartitioned
+                        ? UserAvatar(
+                            user: member,
+                            dimension: 30,
+                            extendedText: assigneeDecision.parts.toString(),
+                          )
+                        : UserAvatar(user: member, dimension: 30),
                   );
                 })
                 .toList(),
