@@ -92,6 +92,31 @@ class GroupListPage extends StatelessWidget {
                           ),
                         ),
                         Flexible(child: ContactsList()),
+                        // Flexible(
+                        //   child: Column(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     children: [
+                        //       ListView.separated(
+                        //         scrollDirection: Axis.horizontal,
+                        //         itemCount: 2,
+                        //         itemBuilder: (context, i) => [
+                        //           Container(
+                        //             width: 100,
+                        //             height: 100,
+                        //             color: Colors.red,
+                        //           ),
+                        //           Container(
+                        //             width: 100,
+                        //             height: 100,
+                        //             color: Colors.red,
+                        //           ),
+                        //         ][i],
+                        //         separatorBuilder: (context, index) =>
+                        //             SizedBox(width: 10),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         SizedBox(height: Spacing.m_10),
                         Align(
                           alignment: Alignment.centerLeft,

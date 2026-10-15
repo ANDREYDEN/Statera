@@ -14,9 +14,12 @@ class ContactsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final contactsRepository = context.read<ContactRepository>();
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    const padding = Spacing.l_20;
+    const nameHeight = 15;
 
     return Container(
-      padding: const EdgeInsets.all(Spacing.l_20),
+      height: ContactListItem.dimention + nameHeight + 2 * padding,
+      padding: const EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRad.m_20,

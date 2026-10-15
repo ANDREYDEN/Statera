@@ -11,6 +11,8 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 class ContactListItem extends StatelessWidget {
   final Contact contact;
 
+  static double dimention = 100;
+
   const ContactListItem({super.key, required this.contact});
 
   double _getSharedBalance(String uid, List<UserGroup> groups) {
@@ -39,7 +41,7 @@ class ContactListItem extends StatelessWidget {
             name: contact.name,
             photoURL: contact.photoURL,
           ),
-          dimension: 100,
+          dimension: dimention,
           withName: true,
           namePosition: NamePosition.bottom,
           extendedText: '\$${balance?.toStringAsFixed(2)}',
