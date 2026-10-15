@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/contact_repository.dart';
-import 'package:statera/ui/contact/contact_page.dart';
 import 'package:statera/ui/contacts/add_contact_button.dart';
+import 'package:statera/ui/contacts/contact_list_item.dart';
 import 'package:statera/ui/contacts/empty_contacts_list.dart';
 import 'package:statera/ui/styling/index.dart';
-import 'package:statera/ui/widgets/user_avatar.dart';
 
 class ContactsList extends StatelessWidget {
   const ContactsList({super.key});
@@ -43,23 +40,7 @@ class ContactsList extends StatelessWidget {
                 return SizedBox(height: 100, child: AddContactButton());
               }
 
-              final contact = contacts[i - 1];
-
-              return UserAvatar(
-                margin: const EdgeInsets.only(left: Spacing.m_10),
-                user: CustomUser(
-                  uid: contact.uid,
-                  name: contact.name,
-                  photoURL: contact.photoURL,
-                ),
-                dimension: 100,
-                withName: true,
-                namePosition: NamePosition.bottom,
-                onTap: () => context.goNamed(
-                  ContactPage.name,
-                  pathParameters: {'contactId': contact.uid},
-                ),
-              );
+              return ContactListItem(contact: contacts[i - 1]);
             },
           );
         },

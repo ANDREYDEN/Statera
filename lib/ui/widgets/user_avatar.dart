@@ -21,6 +21,7 @@ class UserAvatar extends StatelessWidget {
   final NamePosition namePosition;
   final bool loading;
   final String? extendedText;
+  final TextStyle? extendedTextStyle;
 
   UserAvatar({
     Key? key,
@@ -38,6 +39,7 @@ class UserAvatar extends StatelessWidget {
     this.namePosition = NamePosition.right,
     this.loading = false,
     this.extendedText,
+    this.extendedTextStyle,
   }) : super(key: key);
 
   String get firstLetter {
@@ -98,11 +100,12 @@ class UserAvatar extends StatelessWidget {
                               ),
                               child: Text(
                                 extendedText!,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSecondary,
-                                ),
+                                style: (extendedTextStyle ?? TextStyle())
+                                    .copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondary,
+                                    ),
                               ),
                             ),
                           ],

@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/ui/groups/group_list_item/group_list_item.dart';
 import 'package:statera/ui/groups/group_list_item/group_list_item_loading.dart';
+import 'package:statera/ui/groups/groups_builder.dart';
 import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 import 'package:statera/utils/utils.dart';
@@ -34,13 +34,8 @@ class _GroupListBodyState extends State<GroupListBody> {
     final rowHeight = 110;
     final itemAspectRatio = clampDouble(columnWidth / rowHeight, 2, 6);
 
-    return BlocBuilder<GroupsCubit, GroupsState>(
-      builder: (context, groupsState) {
-        if (groupsState.error != null) {
-          return Center(child: Text(groupsState.error.toString()));
-        }
-
-        final groups = groupsState.groups ?? [];
+    return GroupsBuilder(
+      builder: (context, groups, isLoading, isProcessing) {
         groups.sort((userGroup1, userGroup2) {
           if (userGroup1.pinned && userGroup2.pinned) return 0;
           return userGroup1.pinned ? -1 : 1;
@@ -58,7 +53,7 @@ class _GroupListBodyState extends State<GroupListBody> {
             SizedBox(
               height: 4,
               child: Visibility(
-                visible: groupsState.isProcessing,
+                visible: isProcessing,
                 child: LinearProgressIndicator(),
               ),
             ),
@@ -78,7 +73,7 @@ class _GroupListBodyState extends State<GroupListBody> {
                   ),
                 ],
                 selected: _selectedGroupType,
-                onSelectionChanged: groupsState.isLoading
+                onSelectionChanged: isLoading
                     ? null
                     : (Set<String> newSelectedGroupType) => setState(() {
                         _selectedGroupType = newSelectedGroupType;
@@ -86,7 +81,7 @@ class _GroupListBodyState extends State<GroupListBody> {
               ),
             ),
             Expanded(
-              child: !groupsState.isLoading && targetGroups.isEmpty
+              child: !isLoading && targetGroups.isEmpty
                   ? ListEmpty(
                       text: isActive
                           ? 'Join or create a group!'
@@ -97,7 +92,7 @@ class _GroupListBodyState extends State<GroupListBody> {
                       crossAxisCount: columnCount,
                       childAspectRatio: itemAspectRatio,
                       children: [
-                        if (groupsState.isLoading)
+                        if (isLoading)
                           ...List.filled(
                             5,
                             GroupListItemLoading(height: rowHeight * 1.0),
