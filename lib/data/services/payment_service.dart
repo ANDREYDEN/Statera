@@ -12,31 +12,16 @@ class PaymentService extends Firestore {
   PaymentService(this._groupService, FirebaseFirestore firestoreInstance)
     : super(firestoreInstance);
 
-  /// in [userIds], payerId goes first
   Stream<List<Payment>> paymentsStream({
-    String? groupId,
-    String? userId1,
+    required String userId1,
     String? userId2,
+    String? groupId,
     String? newFor,
   }) {
-    var paymentsFilter = Filter('groupId', isEqualTo: groupId);
-
-    if (newFor != null) {
-      paymentsFilter = Filter.and(
-        paymentsFilter,
-        Filter('newFor', arrayContains: newFor),
-      );
-    }
-
-    if (userId1 != null) {
-      paymentsFilter = Filter.and(
-        paymentsFilter,
-        Filter.or(
-          Filter('payerId', isEqualTo: userId1),
-          Filter('receiverId', isEqualTo: userId1),
-        ),
-      );
-    }
+    var paymentsFilter = Filter.or(
+      Filter('payerId', isEqualTo: userId1),
+      Filter('receiverId', isEqualTo: userId1),
+    );
 
     if (userId2 != null) {
       paymentsFilter = Filter.and(
@@ -48,10 +33,26 @@ class PaymentService extends Firestore {
       );
     }
 
-    return paymentsCollection
-        .where(paymentsFilter)
-        .snapshots()
-        .map((snap) => snap.docs.map(Payment.fromFirestore).toList());
+    if (groupId != null) {
+      paymentsFilter = Filter.and(
+        paymentsFilter,
+        Filter('groupId', isEqualTo: groupId),
+      );
+    }
+
+    if (newFor != null) {
+      paymentsFilter = Filter.and(
+        paymentsFilter,
+        Filter('newFor', arrayContains: newFor),
+      );
+    }
+
+    final finalFilter = paymentsFilter;
+    final query = paymentsCollection.where(finalFilter);
+
+    return query.snapshots().map(
+      (snap) => snap.docs.map(Payment.fromFirestore).toList(),
+    );
   }
 
   Future<void> addPayment(Payment payment) async {
