@@ -59,6 +59,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -68,6 +70,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -80,6 +84,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -89,6 +95,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -99,6 +107,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -108,6 +118,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 50,
@@ -117,6 +129,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 30,
@@ -126,6 +140,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -136,6 +152,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -146,6 +164,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 123,
@@ -156,6 +176,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 123,

@@ -7,6 +7,8 @@ import 'package:statera/data/models/payment/payment_redirect_info.dart';
 class Payment implements Comparable, Equatable {
   String? id;
   String? groupId;
+  String groupName;
+  String currencySign;
   String payerId;
   String receiverId;
   double value;
@@ -24,6 +26,8 @@ class Payment implements Comparable, Equatable {
   Payment({
     this.id,
     required this.groupId,
+    required this.groupName,
+    required this.currencySign,
     required this.payerId,
     required this.receiverId,
     required this.value,
@@ -40,52 +44,64 @@ class Payment implements Comparable, Equatable {
     required Expense expense,
     required String receiverId,
     required double? oldAuthorBalance,
-  })  : id = null,
-        groupId = expense.groupId,
-        payerId = expense.authorUid,
-        receiverId = receiverId,
-        value = expense.getConfirmedTotalForUser(receiverId),
-        newFor = [receiverId],
-        relatedExpense = PaymentExpenseInfo.fromExpense(
-          expense,
-          action: PaymentExpenseAction.finalize,
-        ),
-        oldPayerBalance = oldAuthorBalance,
-        isAdmin = false;
+    required String groupName,
+    required String currencySign,
+  }) : id = null,
+       groupId = expense.groupId,
+       groupName = groupName,
+       currencySign = currencySign,
+       payerId = expense.authorUid,
+       receiverId = receiverId,
+       value = expense.getConfirmedTotalForUser(receiverId),
+       newFor = [receiverId],
+       relatedExpense = PaymentExpenseInfo.fromExpense(
+         expense,
+         action: PaymentExpenseAction.finalize,
+       ),
+       oldPayerBalance = oldAuthorBalance,
+       isAdmin = false;
 
   Payment.fromRevertedExpense({
     required Expense expense,
     required String payerId,
     required double? oldPayerBalance,
-  })  : id = null,
-        groupId = expense.groupId,
-        payerId = payerId,
-        receiverId = expense.authorUid,
-        value = expense.getConfirmedTotalForUser(payerId),
-        newFor = [payerId],
-        relatedExpense = PaymentExpenseInfo.fromExpense(
-          expense,
-          action: PaymentExpenseAction.revert,
-        ),
-        oldPayerBalance = oldPayerBalance,
-        isAdmin = false;
+    required String groupName,
+    required String currencySign,
+  }) : id = null,
+       groupId = expense.groupId,
+       groupName = groupName,
+       currencySign = currencySign,
+       payerId = payerId,
+       receiverId = expense.authorUid,
+       value = expense.getConfirmedTotalForUser(payerId),
+       newFor = [payerId],
+       relatedExpense = PaymentExpenseInfo.fromExpense(
+         expense,
+         action: PaymentExpenseAction.revert,
+       ),
+       oldPayerBalance = oldPayerBalance,
+       isAdmin = false;
 
   Payment.fromRedirect({
     required String groupId,
+    required String groupName,
+    required String currencySign,
     required String authorId,
     required String payerId,
     required String receiverId,
     required double amount,
     required double oldPayerBalance,
-  })  : id = null,
-        groupId = groupId,
-        payerId = payerId,
-        receiverId = receiverId,
-        value = amount,
-        newFor = [payerId, receiverId],
-        redirectInfo = PaymentRedirectInfo(authorUid: authorId),
-        oldPayerBalance = oldPayerBalance,
-        isAdmin = false;
+  }) : id = null,
+       groupId = groupId,
+       groupName = groupName,
+       currencySign = currencySign,
+       payerId = payerId,
+       receiverId = receiverId,
+       value = amount,
+       newFor = [payerId, receiverId],
+       redirectInfo = PaymentRedirectInfo(authorUid: authorId),
+       oldPayerBalance = oldPayerBalance,
+       isAdmin = false;
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
@@ -115,11 +131,14 @@ class Payment implements Comparable, Equatable {
   Map<String, dynamic> toFirestore() {
     return {
       'groupId': groupId,
+      'groupName': groupName,
+      'currencySign': currencySign,
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
-      'relatedExpense':
-          relatedExpense == null ? null : relatedExpense!.toFirestore(),
+      'relatedExpense': relatedExpense == null
+          ? null
+          : relatedExpense!.toFirestore(),
       'redirectInfo': redirectInfo == null ? null : redirectInfo!.toFirestore(),
       'reason': reason,
       'oldPayerBalance': oldPayerBalance,
@@ -134,6 +153,8 @@ class Payment implements Comparable, Equatable {
     return Payment(
       id: doc.id,
       groupId: map['groupId'],
+      groupName: map['groupName'] ?? 'Unknown group',
+      currencySign: map['currencySign'] ?? '\$',
       payerId: map['payerId'],
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),

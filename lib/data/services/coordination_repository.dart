@@ -31,6 +31,8 @@ class CoordinationRepository extends Firestore {
               expense: expense,
               receiverId: assigneeUid,
               oldAuthorBalance: group.balance[expense.authorUid]?[assigneeUid],
+              groupName: group.name,
+              currencySign: group.currencySign,
             );
           });
       await Future.wait(
@@ -67,6 +69,8 @@ class CoordinationRepository extends Firestore {
               expense: expense,
               payerId: assigneeUid,
               oldPayerBalance: group.balance[assigneeUid]?[expense.authorUid],
+              groupName: group.name,
+              currencySign: group.currencySign,
             ),
           );
 

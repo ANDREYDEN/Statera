@@ -81,6 +81,8 @@ void main() {
           [
             Payment(
               groupId: testGroup.id,
+              groupName: testGroup.name,
+              currencySign: testGroup.currencySign,
               payerId: currentUser.uid,
               receiverId: memberUser.uid,
               value: 145,
