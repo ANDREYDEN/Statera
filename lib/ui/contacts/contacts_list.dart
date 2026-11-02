@@ -15,39 +15,40 @@ class ContactsList extends StatelessWidget {
     final contactsRepository = context.read<ContactRepository>();
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
     const padding = Spacing.l_20;
-    const nameHeight = 15;
 
-    return Container(
-      height: ContactListItem.dimention + nameHeight + 2 * padding,
-      padding: const EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRad.m_20,
-      ),
-      child: StreamBuilder(
-        stream: contactsRepository.listenForContacts(uid),
-        builder: (context, snap) {
-          if (snap.error != null) {
-            return Center(child: Text(snap.error.toString()));
-          }
+    return StreamBuilder(
+      stream: contactsRepository.listenForContacts(uid),
+      builder: (context, snap) {
+        if (snap.error != null) {
+          return Center(child: Text(snap.error.toString()));
+        }
 
-          final contacts = snap.data ?? [];
+        final contacts = snap.data ?? [];
 
-          if (contacts.isEmpty) return const EmptyContactsList();
+        final nameHeight = contacts.isEmpty ? 0 : 15;
 
-          return ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: contacts.length + 1,
-            itemBuilder: (context, i) {
-              if (i == 0) {
-                return SizedBox(height: 100, child: AddContactButton());
-              }
+        return Container(
+          height: ContactListItem.dimention + nameHeight + 2 * padding,
+          padding: const EdgeInsets.all(padding),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRad.m_20,
+          ),
+          child: contacts.isEmpty
+              ? const EmptyContactsList()
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: contacts.length + 1,
+                  itemBuilder: (context, i) {
+                    if (i == 0) {
+                      return SizedBox(height: 100, child: AddContactButton());
+                    }
 
-              return ContactListItem(contact: contacts[i - 1]);
-            },
-          );
-        },
-      ),
+                    return ContactListItem(contact: contacts[i - 1]);
+                  },
+                ),
+        );
+      },
     );
   }
 }
