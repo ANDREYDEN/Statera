@@ -2,38 +2,68 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/expense/expense_page.dart';
 import 'package:statera/ui/widgets/dialogs/debt_redirect_explainer_dialog.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/ok_button.dart';
+import 'package:statera/ui/widgets/loader.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 
 import '../../data/models/models.dart';
 
 class PaymentDetailsDialog extends StatelessWidget {
-  final Group group;
   final Payment payment;
 
-  const PaymentDetailsDialog({
-    Key? key,
-    required this.group,
+  const PaymentDetailsDialog({Key? key, required this.payment})
+    : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final groupRepository = context.read<GroupRepository>();
+
+    return FutureBuilder<Group>(
+      future: groupRepository.getGroupById(payment.groupId),
+      builder: (context, snapshot) {
+        final group = snapshot.data;
+
+        if (group == null) {
+          return AlertDialog(
+            title: Text('Payment Info'),
+            content: SizedBox(height: 100, child: Center(child: Loader())),
+          );
+        }
+
+        return _PaymentDetailsDialogContent(payment: payment, group: group);
+      },
+    );
+  }
+}
+
+class _PaymentDetailsDialogContent extends StatelessWidget {
+  final Payment payment;
+  final Group group;
+
+  const _PaymentDetailsDialogContent({
     required this.payment,
-  }) : super(key: key);
+    required this.group,
+  });
 
   void _navigateToExpense(BuildContext context) {
     context.goNamed(
       ExpensePage.name,
       pathParameters: {
         'groupId': payment.groupId!,
-        'expenseId': payment.relatedExpense!.id!
+        'expenseId': payment.relatedExpense!.id!,
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final receiverUid =
-        context.select<AuthBloc, String>((authBloc) => authBloc.uid);
+    final receiverUid = context.select<AuthBloc, String>(
+      (authBloc) => authBloc.uid,
+    );
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
 
     return AlertDialog(
@@ -49,10 +79,11 @@ class PaymentDetailsDialog extends StatelessWidget {
                 Expanded(child: Text(group.getMember(payment.payerId).name)),
                 Icon(Icons.arrow_forward_rounded),
                 Expanded(
-                    child: Text(
-                  group.getMember(payment.receiverId).name,
-                  textAlign: TextAlign.right,
-                )),
+                  child: Text(
+                    group.getMember(payment.receiverId).name,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
               ],
             ),
             Divider(),
@@ -78,15 +109,15 @@ class PaymentDetailsDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
+                    '${payment.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
                   ),
                   Icon(Icons.arrow_forward_rounded),
                   Text(
-                    '${group.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
+                    '${payment.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
                   ),
                 ],
               ),
-            ]
+            ],
           ],
         ),
       ),

@@ -4,6 +4,8 @@ import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/contact/contact_header/contact_header.dart';
+import 'package:statera/ui/contact/contact_payments/contact_payment_list_body.dart';
+import 'package:statera/ui/styling/index.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 
 class ContactPage extends StatelessWidget {
@@ -35,7 +37,13 @@ class ContactPage extends StatelessWidget {
         },
         errorBuilder: (context, error) => titleWidgetBuilder('Error'),
       ),
-      child: ContactHeader(),
+      child: Column(
+        children: [
+          ContactHeader(),
+          const SizedBox(height: Spacing.m_10),
+          Expanded(child: ContactPaymentListBody()),
+        ],
+      ),
     );
   }
 }
