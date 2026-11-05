@@ -11,7 +11,7 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 class ContactListItem extends StatelessWidget {
   final Contact contact;
 
-  static double dimention = 100;
+  static double dimention = 60;
 
   const ContactListItem({super.key, required this.contact});
 
@@ -46,7 +46,7 @@ class ContactListItem extends StatelessWidget {
           namePosition: NamePosition.bottom,
           extendedText: '\$${balance?.toStringAsFixed(2)}',
           extendedTextStyle: TextStyle(
-            fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+            fontSize: ContactListItem.dimention * 0.3,
           ),
           onTap: () => context.goNamed(
             ContactPage.name,
