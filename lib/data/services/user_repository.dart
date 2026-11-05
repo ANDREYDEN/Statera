@@ -52,9 +52,21 @@ class UserRepository extends Firestore {
     return usersCollection
         .doc(uid)
         .snapshots()
-        .map(
-          (docSnap) => docSnap.exists ? CustomUser.fromUserDoc(docSnap) : null,
-        );
+        .map((docSnap) => docSnap.exists ? docSnap.data() : null);
+  }
+
+  Stream<List<Group>> sharedGroupsStream(String uid1, String uid2) {
+    return groupsCollection
+        .where('balance.$uid1.$uid2', isNull: false)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => doc.data()).toList());
+  }
+
+  double getTotalDebt(List<Group> groups, String uid1, String uid2) {
+    return groups.fold(
+      0.0,
+      (total, group) => total + group.balance[uid1]![uid2]!,
+    );
   }
 
   Future<CustomUser> getUser(String uid) async {
@@ -62,6 +74,6 @@ class UserRepository extends Firestore {
 
     if (!userDoc.exists) throw EntityNotFoundException(uid, name: 'User');
 
-    return CustomUser.fromUserDoc(userDoc);
+    return userDoc.data()!;
   }
 }

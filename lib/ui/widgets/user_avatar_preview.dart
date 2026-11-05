@@ -16,8 +16,10 @@ class UserAvatarExamples extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPreview(
       providers: [Provider.value(value: PreferencesService())],
-      body: ListView(
-        children: [
+      body: ListView.separated(
+        separatorBuilder: (context, index) => SizedBox(height: 10),
+        itemCount: 10,
+        itemBuilder: (context, index) => [
           UserAvatar(
             user: CustomUser.fake(photoURL: 'https://picsum.photos/300'),
           ),
@@ -68,7 +70,19 @@ class UserAvatarExamples extends StatelessWidget {
               ),
             ],
           ),
-        ],
+          UserAvatar(user: CustomUser.fake(), extendedText: '\$10'),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UserAvatar(
+                user: CustomUser.fake(),
+                withName: true,
+                namePosition: NamePosition.bottom,
+                extendedText: '\$10',
+              ),
+            ],
+          ),
+        ][index],
       ),
     );
   }

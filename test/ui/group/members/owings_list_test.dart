@@ -113,6 +113,8 @@ void main() {
       final payments = [
         Payment(
           groupId: groupId,
+          groupName: 'Test Group',
+          currencySign: '\$',
           payerId: currentUser.uid,
           receiverId: memberA.uid,
           value: 100,
@@ -120,6 +122,8 @@ void main() {
         ),
         Payment(
           groupId: groupId,
+          groupName: 'Test Group',
+          currencySign: '\$',
           payerId: currentUser.uid,
           receiverId: memberB.uid,
           value: 50,
@@ -161,6 +165,8 @@ void main() {
       final payments = [
         Payment(
           groupId: groupId,
+          groupName: 'Test Group',
+          currencySign: '\$',
           payerId: currentUser.uid,
           receiverId: memberA.uid,
           value: 50,
@@ -168,6 +174,8 @@ void main() {
         ),
         Payment(
           groupId: groupId,
+          groupName: 'Test Group',
+          currencySign: '\$',
           payerId: currentUser.uid,
           receiverId: memberB.uid,
           value: 100,
