@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/contact_repository.dart';
 import 'package:statera/ui/contacts/add_contact_button.dart';
 import 'package:statera/ui/contacts/contact_list_item.dart';
@@ -40,25 +42,63 @@ class ContactsList extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: padding),
                   child: EmptyContactsList(),
                 )
-              : EdgeFade(
-                  builder: (context, controller) => ListView.builder(
-                    controller: controller,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: contacts.length + 1,
-                    itemBuilder: (context, i) {
-                      if (i == 0) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: Spacing.m_10),
-                          child: AddContactButton(),
-                        );
-                      }
+              : BlocBuilder<NewPaymentsCubit, NewPaymentsState>(
+                  builder: (context, paymentsState) {
+                    final sortedContacts = _sortByMostRecentNewPayment(
+                      contacts,
+                      paymentsState.mostRecentPaymentMap,
+                    );
+                    final newPaymentCount = paymentsState.paymentCount;
 
-                      return ContactListItem(contact: contacts[i - 1]);
-                    },
-                  ),
+                    return EdgeFade(
+                      builder: (context, controller) => ListView.builder(
+                        controller: controller,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: sortedContacts.length + 1,
+                        itemBuilder: (context, i) {
+                          if (i == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                left: Spacing.m_10,
+                              ),
+                              child: AddContactButton(),
+                            );
+                          }
+
+                          final contact = sortedContacts[i - 1];
+                          return ContactListItem(
+                            contact: contact,
+                            newPaymentsCount: newPaymentCount[contact.uid] ?? 0,
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
         );
       },
     );
+  }
+
+  List<Contact> _sortByMostRecentNewPayment(
+    List<Contact> contacts,
+    Map<String, DateTime> mostRecentPayments,
+  ) {
+    final result = [...contacts];
+    result.sort((a, b) {
+      final aDate = mostRecentPayments[a.uid];
+      final bDate = mostRecentPayments[b.uid];
+
+      if (aDate == null && bDate != null) return 1;
+      if (aDate != null && bDate == null) return -1;
+      if (aDate != null && bDate != null) {
+        final dateComparison = bDate.compareTo(aDate);
+        if (dateComparison != 0) return dateComparison;
+      }
+
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
+
+    return result;
   }
 }

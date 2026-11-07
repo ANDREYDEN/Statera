@@ -19,7 +19,7 @@ class NewPaymentsCubit extends Cubit<NewPaymentsState> {
     _errorService = errorService;
   }
 
-  void load({required String? groupId, required String uid}) {
+  void load({String? groupId, required String uid}) {
     _paymentsSubscription?.cancel();
     _paymentsSubscription = _paymentService
         .paymentsStream(groupId: groupId, userId1: uid, newFor: uid)

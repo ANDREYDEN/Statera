@@ -10,10 +10,15 @@ import 'package:statera/ui/widgets/user_avatar.dart';
 
 class ContactListItem extends StatelessWidget {
   final Contact contact;
+  final int newPaymentsCount;
 
   static double dimention = 60;
 
-  const ContactListItem({super.key, required this.contact});
+  const ContactListItem({
+    super.key,
+    required this.contact,
+    this.newPaymentsCount = 0,
+  });
 
   double _getSharedBalance(String uid, List<UserGroup> groups) {
     return groups
@@ -34,23 +39,27 @@ class ContactListItem extends StatelessWidget {
       builder: (context, groups, isLoading, isProcessing) {
         final balance = isLoading ? null : _getSharedBalance(uid, groups);
 
-        return UserAvatar(
-          margin: const EdgeInsets.only(left: Spacing.m_10),
-          user: CustomUser(
-            uid: contact.uid,
-            name: contact.name,
-            photoURL: contact.photoURL,
-          ),
-          dimension: dimention,
-          withName: true,
-          namePosition: NamePosition.bottom,
-          extendedText: '\$${balance?.toStringAsFixed(2)}',
-          extendedTextStyle: TextStyle(
-            fontSize: ContactListItem.dimention * 0.3,
-          ),
-          onTap: () => context.goNamed(
-            ContactPage.name,
-            pathParameters: {'contactId': contact.uid},
+        return Badge.count(
+          count: newPaymentsCount,
+          isLabelVisible: newPaymentsCount > 0,
+          child: UserAvatar(
+            margin: const EdgeInsets.only(left: Spacing.m_10),
+            user: CustomUser(
+              uid: contact.uid,
+              name: contact.name,
+              photoURL: contact.photoURL,
+            ),
+            dimension: dimention,
+            withName: true,
+            namePosition: NamePosition.bottom,
+            extendedText: '\$${balance?.toStringAsFixed(2)}',
+            extendedTextStyle: TextStyle(
+              fontSize: ContactListItem.dimention * 0.3,
+            ),
+            onTap: () => context.goNamed(
+              ContactPage.name,
+              pathParameters: {'contactId': contact.uid},
+            ),
           ),
         );
       },

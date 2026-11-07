@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/groups/groups_cubit.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
+import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
@@ -45,6 +46,12 @@ class GroupListPage extends StatelessWidget {
             context.read<UserRepository>(),
             context.read<ErrorService>(),
           )..load(context.read<AuthBloc>().uid),
+        ),
+        BlocProvider(
+          create: (context) => NewPaymentsCubit(
+            context.read<PaymentService>(),
+            context.read<ErrorService>(),
+          )..load(uid: context.read<AuthBloc>().uid),
         ),
       ],
       child: GroupListPage(),
