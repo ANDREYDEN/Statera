@@ -81,6 +81,8 @@ void main() {
           [
             Payment(
               groupId: testGroup.id,
+              groupName: testGroup.name,
+              currencySign: testGroup.currencySign,
               payerId: currentUser.uid,
               receiverId: memberUser.uid,
               value: 145,
@@ -249,7 +251,7 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
-    testWidgets('does not show options to non admins', (
+    testWidgets('does not show admin options to non admins', (
       WidgetTester tester,
     ) async {
       testGroup = Group(
@@ -260,8 +262,11 @@ void main() {
       );
 
       await pumpOwingListItem(tester);
+      await openOptionsMenu(tester);
 
-      expect(find.byIcon(Icons.more_vert), findsNothing);
+      expect(find.text('Kick Member'), findsNothing);
+      expect(find.text('Transfer Ownership'), findsNothing);
+      expect(find.text('Add to Contacts'), findsOneWidget);
     });
   });
 }

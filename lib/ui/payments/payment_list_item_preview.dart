@@ -4,18 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/custom_user.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/models/payment/payment.dart';
 import 'package:statera/data/models/payment/payment_expense_info.dart';
 import 'package:statera/data/models/payment/payment_redirect_info.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
-import 'package:statera/data/services/error_service_mock.dart';
-import 'package:statera/data/services/expense_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:statera/data/services/user_repository.mocks.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/preview_helpers.dart';
 
@@ -41,16 +37,14 @@ class ListCover extends StatelessWidget {
     when(user.uid).thenReturn('a');
     when(authService.currentUser).thenReturn(user);
 
+    final groupRepository = MockGroupRepository();
+    when(groupRepository.getGroupById(any)).thenAnswer(
+      (_) async => Group(name: 'Example', members: [user1, user2]),
+    );
+
     return CustomPreview(
       providers: [
-        BlocProvider(
-          create: (_) => GroupCubit(
-            MockGroupRepository(),
-            MockExpenseService(),
-            MockUserRepository(),
-            MockErrorService(),
-          )..loadGroup(Group(name: 'Example', members: [user1, user2])),
-        ),
+        Provider<GroupRepository>.value(value: groupRepository),
         BlocProvider(create: (_) => AuthBloc(authService)),
         Provider.value(value: PreferencesService()),
       ],
@@ -59,6 +53,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -68,6 +64,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -80,6 +78,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -89,6 +89,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -99,6 +101,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -108,6 +112,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 50,
@@ -117,6 +123,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 30,
@@ -126,6 +134,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -136,6 +146,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -146,6 +158,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 123,
@@ -156,6 +170,8 @@ class ListCover extends StatelessWidget {
           PaymentListItem(
             payment: Payment(
               groupId: 'asd',
+              groupName: 'Example',
+              currencySign: '\$',
               payerId: 'b',
               receiverId: 'a',
               value: 123,

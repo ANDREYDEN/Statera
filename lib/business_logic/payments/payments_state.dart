@@ -18,9 +18,23 @@ class PaymentsError extends PaymentsState {
 
 class PaymentsLoaded extends PaymentsState {
   final List<Payment> payments;
+  final bool allLoaded;
+  final bool loadingMore;
 
-  const PaymentsLoaded({required this.payments});
+  const PaymentsLoaded({
+    required this.payments,
+    this.allLoaded = false,
+    this.loadingMore = false,
+  });
+
+  PaymentsLoaded copyWith({bool? loadingMore}) {
+    return PaymentsLoaded(
+      payments: payments,
+      allLoaded: allLoaded,
+      loadingMore: loadingMore ?? this.loadingMore,
+    );
+  }
 
   @override
-  List<Object?> get props => [payments];
+  List<Object?> get props => [payments, allLoaded, loadingMore];
 }
