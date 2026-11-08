@@ -4,7 +4,7 @@ import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
-import 'package:statera/ui/payments/payment_list_item.dart';
+import 'package:statera/ui/payments/paginated_payment_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 
 class ContactPaymentListBody extends StatelessWidget {
@@ -56,21 +56,13 @@ class _ContactPaymentListView extends StatelessWidget {
           return Center(child: Text(state.error));
         }
 
-        final payments = (state as PaymentsLoaded).payments;
+        final loadedState = state as PaymentsLoaded;
 
-        if (payments.isEmpty) {
-          return const ListEmpty(text: 'Payment History is empty');
+        if (loadedState.payments.isEmpty) {
+          return const ListEmpty(text: 'No payments yet');
         }
 
-        return ListView.builder(
-          itemCount: payments.length,
-          itemBuilder: (context, index) {
-            return PaymentListItem(
-              payment: payments[index],
-              withGroupName: true,
-            );
-          },
-        );
+        return PaginatedPaymentList(state: loadedState, withGroupName: true);
       },
     );
   }

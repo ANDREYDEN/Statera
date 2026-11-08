@@ -5,7 +5,7 @@ import 'package:statera/business_logic/payments/payments_cubit.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/group/members/owing_builder.dart';
-import 'package:statera/ui/payments/payment_list_item.dart';
+import 'package:statera/ui/payments/paginated_payment_list.dart';
 import 'package:statera/ui/widgets/list_empty.dart';
 
 class PaymentListBody extends StatelessWidget {
@@ -53,12 +53,7 @@ class PaymentListBody extends StatelessWidget {
                       return ListEmpty(text: 'Payment History is empty');
                     }
 
-                    return ListView.builder(
-                      itemCount: payments.length,
-                      itemBuilder: (context, index) {
-                        return PaymentListItem(payment: payments[index]);
-                      },
-                    );
+                    return PaginatedPaymentList(state: state);
                   }
 
                   return Container();

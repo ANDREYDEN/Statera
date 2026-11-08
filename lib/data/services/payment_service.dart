@@ -17,6 +17,7 @@ class PaymentService extends Firestore {
     String? userId2,
     String? groupId,
     String? newFor,
+    int? limit,
   }) {
     var paymentsFilter = Filter.or(
       Filter('payerId', isEqualTo: userId1),
@@ -47,8 +48,11 @@ class PaymentService extends Firestore {
       );
     }
 
-    final finalFilter = paymentsFilter;
-    final query = paymentsCollection.where(finalFilter);
+    var query = paymentsCollection.where(paymentsFilter);
+
+    if (limit != null) {
+      query = query.orderBy('timeCreated', descending: true).limit(limit);
+    }
 
     return query.snapshots().map(
       (snap) => snap.docs.map(Payment.fromFirestore).toList(),
