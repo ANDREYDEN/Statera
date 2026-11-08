@@ -15,13 +15,13 @@ class UserRepository extends Firestore {
     required String name,
     String? photoURL,
   }) async {
-    final userData = {'name': name, 'photoURL': photoURL};
+    final user = CustomUser(uid: uid, name: name, photoURL: photoURL);
     final userRef = usersCollection.doc(uid);
     await usersCollection.firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(userRef);
       if (snapshot.exists) return;
 
-      transaction.set(userRef, userData);
+      transaction.set(userRef, user);
     });
   }
 
