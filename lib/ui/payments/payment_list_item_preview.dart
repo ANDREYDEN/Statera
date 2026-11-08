@@ -38,9 +38,9 @@ class ListCover extends StatelessWidget {
     when(authService.currentUser).thenReturn(user);
 
     final groupRepository = MockGroupRepository();
-    when(groupRepository.getGroupById(any)).thenAnswer(
-      (_) async => Group(name: 'Example', members: [user1, user2]),
-    );
+    when(
+      groupRepository.getGroupById(any),
+    ).thenAnswer((_) async => Group(name: 'Example', members: [user1, user2]));
 
     return CustomPreview(
       providers: [
@@ -74,6 +74,7 @@ class ListCover extends StatelessWidget {
                 name: 'Some Expense',
               ),
             ),
+            withGroupName: true,
           ),
           PaymentListItem(
             payment: Payment(

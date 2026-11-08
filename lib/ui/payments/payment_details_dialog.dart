@@ -87,7 +87,7 @@ class _PaymentDetailsDialogContent extends StatelessWidget {
               ],
             ),
             Divider(),
-            SectionTitle('Reason'),
+            SectionTitle('Reason', alignment: Alignment.centerLeft),
             Text(payment.getFullReason(uid, group)),
             if (payment.hasRelatedRedirect)
               Align(
@@ -104,7 +104,7 @@ class _PaymentDetailsDialogContent extends StatelessWidget {
               ),
             SizedBox(height: 20),
             if (payment.oldPayerBalance != null) ...[
-              SectionTitle('Balance change'),
+              SectionTitle('Balance change', alignment: Alignment.centerLeft),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

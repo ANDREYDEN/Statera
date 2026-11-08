@@ -57,23 +57,20 @@ class PaymentListItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (withGroupName)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.group, size: 14),
-                const SizedBox(width: 4),
-                Text(
-                  payment.groupName,
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              ],
-            ),
-          Text(
-            toStringDateTime(payment.timeCreated) ??
+            _PaymentInfoRow(icon: Icons.group, text: payment.groupName),
+          _PaymentInfoRow(
+            icon: Icons.schedule_rounded,
+            text:
+                toStringDateTime(payment.timeCreated) ??
                 'Some time in the past',
           ),
-          if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
-          if (payment.hasReason) Text(payment.reason!),
+          if (payment.hasRelatedExpense)
+            _PaymentInfoRow(
+              icon: Icons.receipt_long,
+              text: payment.relatedExpense!.name,
+            ),
+          if (payment.hasReason)
+            _PaymentInfoRow(icon: Icons.info_outline, text: payment.reason!),
         ],
       ),
       trailing: Icon(
@@ -96,5 +93,24 @@ class PaymentListItem extends StatelessWidget {
     }
 
     return paymentItem;
+  }
+}
+
+class _PaymentInfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _PaymentInfoRow({super.key, required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14),
+        const SizedBox(width: 4),
+        Text(text, style: Theme.of(context).textTheme.labelMedium),
+      ],
+    );
   }
 }
