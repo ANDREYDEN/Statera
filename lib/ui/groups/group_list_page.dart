@@ -24,6 +24,7 @@ import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 class GroupListPage extends StatelessWidget {
   static const String name = 'GroupList';
@@ -156,7 +157,7 @@ class GroupListPage extends StatelessWidget {
         ],
         onSubmit: (values) async {
           newGroup.name = values['name']!;
-          newGroup.currencySign = values['currency']!;
+          newGroup.currency = Currency.fromSign(values['currency']);
           newGroup.debtThreshold = values['debt_threshold']!;
 
           groupsCubit.addGroup(newGroup, authBloc.uid);

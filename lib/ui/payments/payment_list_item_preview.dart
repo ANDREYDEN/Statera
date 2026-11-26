@@ -14,6 +14,7 @@ import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/preview_helpers.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 class MockUser extends Mock implements User {
   String get uid =>
@@ -54,7 +55,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -65,7 +66,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -80,7 +81,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -91,7 +92,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -103,7 +104,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -114,7 +115,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 50,
@@ -125,7 +126,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'b',
               receiverId: 'a',
               value: 30,
@@ -136,7 +137,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -148,7 +149,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'a',
               receiverId: 'b',
               value: 123,
@@ -160,7 +161,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'b',
               receiverId: 'a',
               value: 123,
@@ -172,7 +173,7 @@ class ListCover extends StatelessWidget {
             payment: Payment(
               groupId: 'asd',
               groupName: 'Example',
-              currencySign: '\$',
+              currency: Currency.usd,
               payerId: 'b',
               receiverId: 'a',
               value: 123,

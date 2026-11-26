@@ -17,6 +17,7 @@ import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/utils/helpers.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 class GroupSettings extends StatelessWidget {
   const GroupSettings({Key? key}) : super(key: key);
@@ -67,7 +68,7 @@ class GroupSettings extends StatelessWidget {
                   final groupCubit = context.read<GroupCubit>();
 
                   groupCubit.update((group) {
-                    group.currencySign = value;
+                    group.currency = Currency.fromSign(value);
                   });
                 },
               ),

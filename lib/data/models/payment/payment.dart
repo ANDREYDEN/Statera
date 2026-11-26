@@ -3,12 +3,13 @@ import 'package:equatable/equatable.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/models/payment/payment_expense_info.dart';
 import 'package:statera/data/models/payment/payment_redirect_info.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 class Payment implements Comparable, Equatable {
   String? id;
   String? groupId;
   String groupName;
-  String currencySign;
+  Currency currency;
   String payerId;
   String receiverId;
   double value;
@@ -27,7 +28,7 @@ class Payment implements Comparable, Equatable {
     this.id,
     required this.groupId,
     required this.groupName,
-    required this.currencySign,
+    required this.currency,
     required this.payerId,
     required this.receiverId,
     required this.value,
@@ -45,11 +46,11 @@ class Payment implements Comparable, Equatable {
     required String receiverId,
     required double? oldAuthorBalance,
     required String groupName,
-    required String currencySign,
+    required Currency currency,
   }) : id = null,
        groupId = expense.groupId,
        groupName = groupName,
-       currencySign = currencySign,
+       currency = currency,
        payerId = expense.authorUid,
        receiverId = receiverId,
        value = expense.getConfirmedTotalForUser(receiverId),
@@ -66,11 +67,11 @@ class Payment implements Comparable, Equatable {
     required String payerId,
     required double? oldPayerBalance,
     required String groupName,
-    required String currencySign,
+    required Currency currency,
   }) : id = null,
        groupId = expense.groupId,
        groupName = groupName,
-       currencySign = currencySign,
+       currency = currency,
        payerId = payerId,
        receiverId = expense.authorUid,
        value = expense.getConfirmedTotalForUser(payerId),
@@ -85,7 +86,7 @@ class Payment implements Comparable, Equatable {
   Payment.fromRedirect({
     required String groupId,
     required String groupName,
-    required String currencySign,
+    required Currency currency,
     required String authorId,
     required String payerId,
     required String receiverId,
@@ -94,7 +95,7 @@ class Payment implements Comparable, Equatable {
   }) : id = null,
        groupId = groupId,
        groupName = groupName,
-       currencySign = currencySign,
+       currency = currency,
        payerId = payerId,
        receiverId = receiverId,
        value = amount,
@@ -102,6 +103,8 @@ class Payment implements Comparable, Equatable {
        redirectInfo = PaymentRedirectInfo(authorUid: authorId),
        oldPayerBalance = oldPayerBalance,
        isAdmin = false;
+
+  String get currencySign => currency.sign;
 
   bool isReceivedBy(String? uid) => this.receiverId == uid;
 
@@ -132,7 +135,8 @@ class Payment implements Comparable, Equatable {
     return {
       'groupId': groupId,
       'groupName': groupName,
-      'currencySign': currencySign,
+      'currencyCode': currency.code,
+      'currencySign': currency.sign,
       'payerId': payerId,
       'receiverId': receiverId,
       'value': value,
@@ -154,7 +158,10 @@ class Payment implements Comparable, Equatable {
       id: doc.id,
       groupId: map['groupId'],
       groupName: map['groupName'] ?? 'Unknown group',
-      currencySign: map['currencySign'] ?? '\$',
+      currency: Currency.fromFirestore(
+        code: map['currencyCode'],
+        sign: map['currencySign'],
+      ),
       payerId: map['payerId'],
       receiverId: map['receiverId'],
       value: double.parse(map['value'].toString()),

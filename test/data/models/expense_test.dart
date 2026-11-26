@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 void main() {
   group('Expense', () {
@@ -451,6 +452,31 @@ void main() {
         var firestoreExpense = Expense.fromJson(expense.toJson());
         expect(expense, firestoreExpense);
         expect(expense == firestoreExpense, isTrue);
+      });
+
+      test('preserves the currency', () {
+        final expense = Expense(
+          name: 'foo',
+          authorUid: authorUid,
+          currency: Currency.fromCode('EUR'),
+        )..date = null;
+
+        final json = expense.toJson();
+        final firestoreExpense = Expense.fromJson(json);
+
+        expect(json['currencyCode'], 'EUR');
+        expect(json['currencySign'], '€');
+        expect(firestoreExpense.currency.code, 'EUR');
+      });
+
+      test('defaults legacy expenses to USD', () {
+        final expense = Expense(name: 'foo', authorUid: authorUid)
+          ..date = null;
+        final json = expense.toJson()
+          ..remove('currencyCode')
+          ..remove('currencySign');
+
+        expect(Expense.fromJson(json).currency, Currency.usd);
       });
     });
   });

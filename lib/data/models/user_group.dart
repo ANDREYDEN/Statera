@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/utils/mapping_utils.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 class UserGroup {
   String groupId;
@@ -11,6 +12,7 @@ class UserGroup {
   bool archived;
   bool pinned;
   Map<String, Map<String, double>>? balance;
+  Currency currency;
 
   UserGroup({
     required this.groupId,
@@ -20,7 +22,8 @@ class UserGroup {
     this.archived = false,
     this.pinned = false,
     this.balance,
-  });
+    Currency? currency,
+  }) : currency = currency ?? Currency.usd;
 
   void toggleArchive() {
     if (archived) {
@@ -53,6 +56,8 @@ class UserGroup {
       'archived': archived,
       'pinned': pinned,
       'balance': balance,
+      'currencyCode': currency.code,
+      'currencySign': currency.sign,
     };
   }
 
@@ -67,6 +72,10 @@ class UserGroup {
       archived: data['archived'] ?? false,
       pinned: data['pinned'] ?? false,
       balance: mapBalance(data['balance']),
+      currency: Currency.fromFirestore(
+        code: data['currencyCode'],
+        sign: data['currencySign'],
+      ),
     );
   }
 
