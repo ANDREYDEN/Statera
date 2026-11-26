@@ -5,6 +5,7 @@ import 'package:statera/data/enums/enums.dart';
 import 'package:statera/data/models/items_list_converter.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/utils/firestore_date_time_converter.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/utils/constants.dart';
 
 part 'expense.g.dart';
@@ -26,6 +27,10 @@ class Expense {
   DateTime? finalizedDate;
   ExpenseSettings settings;
 
+  /// Serialized manually as `currencyCode` and `currencySign`.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  Currency currency;
+
   @JsonKey(includeFromJson: false, includeToJson: true)
   List<String> get unmarkedAssigneeIds =>
       assigneeUids.where((assigneeUid) => !isMarkedBy(assigneeUid)).toList();
@@ -37,12 +42,14 @@ class Expense {
     List<Item>? items,
     List<String>? assigneeUids,
     ExpenseSettings? settings,
+    Currency? currency,
     this.finalizedDate,
     this.id = '',
   }) : items = items ?? [],
        assigneeUids = assigneeUids ?? [authorUid],
        date = DateTime.now(),
-       settings = settings ?? ExpenseSettings();
+       settings = settings ?? ExpenseSettings(),
+       currency = currency ?? Currency.usd;
 
   Expense.empty({String? groupId})
     : this(name: 'Empty', authorUid: '', groupId: groupId);
@@ -205,6 +212,7 @@ class Expense {
         authorUid: other.authorUid,
         groupId: other.groupId,
         settings: settings ?? ExpenseSettings.from(other.settings),
+        currency: other.currency,
       )
       ..id = other.id
       ..date = other.date
@@ -213,14 +221,24 @@ class Expense {
       ..items = other.items.map((item) => Item.from(item)).toList();
   }
 
-  static Expense fromJson(Map<String, dynamic> data) => _$ExpenseFromJson(data);
+  static Expense fromJson(Map<String, dynamic> data) {
+    final currency = Currency.fromFirestore(
+      code: data['currencyCode'],
+      sign: data['currencySign'],
+    );
+    return _$ExpenseFromJson(data)..currency = currency;
+  }
 
   static Expense fromSnapshot(DocumentSnapshot snap) {
     final data = snap.data() as Map<String, dynamic>;
     return fromJson(data)..id = snap.id;
   }
 
-  Map<String, dynamic> toJson() => _$ExpenseToJson(this);
+  Map<String, dynamic> toJson() => {
+    ..._$ExpenseToJson(this),
+    'currencyCode': currency.code,
+    'currencySign': currency.sign,
+  };
 
   @override
   bool operator ==(Object other) {
@@ -235,7 +253,8 @@ class Expense {
         other.authorUid == authorUid &&
         other.date == date &&
         other.finalizedDate == finalizedDate &&
-        other.settings == settings;
+        other.settings == settings &&
+        other.currency == currency;
   }
 
   int get itemsHash => items.fold(0, (cur, e) => cur ^ e.hashCode);
@@ -252,7 +271,8 @@ class Expense {
         authorUid.hashCode ^
         date.hashCode ^
         finalizedDate.hashCode ^
-        settings.hashCode;
+        settings.hashCode ^
+        currency.hashCode;
   }
 
   @override

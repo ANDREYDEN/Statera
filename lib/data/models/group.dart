@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/utils/mapping_utils.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/data/value_objects/redirect.dart';
 import 'package:statera/utils/helpers.dart';
 
@@ -27,7 +28,8 @@ class Group {
   /// }```
   late Map<String, Map<String, double>> balance;
   String? code;
-  late String currencySign;
+  /// Default currency of the group. New expenses and payments inherit it.
+  late Currency currency;
   String? inviteLink;
   late double debtThreshold;
   late ExpenseSettings defaultExpenseSettings;
@@ -44,7 +46,7 @@ class Group {
     List<CustomUser>? members,
     String? adminId,
     Map<String, Map<String, double>>? balance,
-    String? currencySign,
+    Currency? currency,
     this.inviteLink,
     double? debtThreshold,
     ExpenseSettings? defaultExpenseSettings,
@@ -57,7 +59,7 @@ class Group {
       this.members = members;
       this.balance = balance ?? _createBalanceFromMembers(members);
     }
-    this.currencySign = currencySign ?? kdefaultCurrencySign;
+    this.currency = currency ?? Currency.usd;
     this.debtThreshold = debtThreshold ?? kdefaultDebtThreshold;
     if (code == null) _generateCode();
     this._adminId = adminId;
@@ -94,8 +96,9 @@ class Group {
     }
   }
 
-  String renderPrice(double value) =>
-      '$currencySign${value.toStringAsFixed(2)}';
+  String get currencySign => currency.sign;
+
+  String renderPrice(double value) => currency.render(value);
 
   static Map<String, Map<String, double>> _createBalanceFromMembers(
     List<CustomUser> members,
@@ -266,7 +269,8 @@ class Group {
       'memberIds': members.map((x) => x.uid).toList(),
       'adminId': admin.uid,
       'balance': getFirestoreBalance(),
-      'currencySign': currencySign,
+      'currencyCode': currency.code,
+      'currencySign': currency.sign,
       'inviteLink': inviteLink,
       'debtThreshold': debtThreshold,
       'defaultExpenseSettings': defaultExpenseSettings.toJson(),
@@ -292,7 +296,10 @@ class Group {
       adminId: map['adminId'],
       code: map['code'],
       balance: mapBalance(map['balance']),
-      currencySign: map['currencySign'],
+      currency: Currency.fromFirestore(
+        code: map['currencyCode'],
+        sign: map['currencySign'],
+      ),
       inviteLink: map['inviteLink'],
       debtThreshold: double.tryParse(map['debtThreshold'].toString()),
       defaultExpenseSettings: map['defaultExpenseSettings'] == null

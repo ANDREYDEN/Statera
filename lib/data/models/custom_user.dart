@@ -8,6 +8,10 @@ class CustomUser {
   late final String name;
   late final String? photoURL;
   final String? paymentInfo;
+
+  /// ISO code of the currency that aggregated amounts are displayed in.
+  /// Only stored on the user document, so it is not part of [toFirestore].
+  final String? preferredCurrencyCode;
   // not part of the Firestore document
   final bool isActive;
 
@@ -16,9 +20,13 @@ class CustomUser {
     required this.name,
     this.photoURL,
     this.paymentInfo,
+    this.preferredCurrencyCode,
   }) : isActive = true;
 
-  CustomUser.fromUser(User user) : paymentInfo = null, isActive = true {
+  CustomUser.fromUser(User user)
+    : paymentInfo = null,
+      preferredCurrencyCode = null,
+      isActive = true {
     this.uid = user.uid;
     this.name = user.displayName ?? 'anonymous';
     this.photoURL = user.photoURL;
@@ -29,6 +37,7 @@ class CustomUser {
     String? uid,
     this.photoURL,
     this.paymentInfo,
+    this.preferredCurrencyCode,
     this.isActive = true,
   }) {
     this.uid = uid ?? Uuid().v1();
@@ -40,6 +49,7 @@ class CustomUser {
       name = '',
       photoURL = null,
       paymentInfo = null,
+      preferredCurrencyCode = null,
       isActive = false;
 
   List<ProfilePart> get profileParts => [
@@ -77,6 +87,7 @@ class CustomUser {
       name: data['name'] ?? 'anonymous',
       photoURL: data['photoURL'],
       paymentInfo: data['paymentInfo'],
+      preferredCurrencyCode: data['preferredCurrencyCode'],
     );
   }
 

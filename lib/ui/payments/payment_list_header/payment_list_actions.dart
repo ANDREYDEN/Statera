@@ -32,7 +32,7 @@ class PaymentListActions extends StatelessWidget {
                     payment: Payment(
                       groupId: group.id,
                       groupName: group.name,
-                      currencySign: group.currencySign,
+                      currency: group.currency,
                       payerId: authBloc.uid,
                       receiverId: otherMemberId,
                       value: balance.abs(),
@@ -56,7 +56,7 @@ class PaymentListActions extends StatelessWidget {
                     payment: Payment(
                       groupId: group.id,
                       groupName: group.name,
-                      currencySign: group.currencySign,
+                      currency: group.currency,
                       payerId: otherMemberId,
                       receiverId: authBloc.uid,
                       value: balance.abs(),

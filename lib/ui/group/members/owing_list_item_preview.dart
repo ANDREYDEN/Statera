@@ -109,7 +109,7 @@ class OwingListItemExamples extends StatelessWidget {
           Payment(
             groupId: group.id,
             groupName: group.name,
-            currencySign: group.currencySign,
+            currency: group.currency,
             payerId: currentUser.uid,
             receiverId: memberUser.uid,
             value: 145,

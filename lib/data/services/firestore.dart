@@ -21,6 +21,9 @@ class Firestore {
   CollectionReference get paymentsCollection =>
       firestore.collection('payments');
 
+  CollectionReference<Map<String, dynamic>> get currenciesCollection =>
+      firestore.collection('currencies');
+
   CollectionReference<CustomUser> get usersCollection => firestore
       .collection('users')
       .withConverter<CustomUser>(

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/value_objects/aggregated_debt.dart';
 import 'package:statera/ui/contact/contact_header/settle_debt_dialog.dart';
 
 class SettleDebtButton extends StatelessWidget {
   final CustomUser contact;
-  final double? totalDebt;
+  final AggregatedDebt? totalDebt;
 
   const SettleDebtButton({
     super.key,
@@ -14,14 +15,17 @@ class SettleDebtButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final totalDebt = this.totalDebt;
+    final hasDebt = totalDebt != null && totalDebt.amount != 0;
+
     return FilledButton(
-      onPressed: totalDebt == null || totalDebt == 0
+      onPressed: !hasDebt
           ? null
           : () => showDialog(
               context: context,
               builder: (_) => SettleDebtDialog(
                 contact: contact,
-                totalDebt: totalDebt!,
+                totalDebt: totalDebt,
               ),
             ),
       child: const Text('Settle Debt'),

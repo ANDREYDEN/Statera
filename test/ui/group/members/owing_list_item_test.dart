@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/business_logic/owing/owing_cubit.dart';
 import 'package:statera/business_logic/payments/new_payments_cubit.dart';
-import 'package:statera/business_logic/group/group_cubit.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/expense_service.mocks.dart';
@@ -82,7 +82,7 @@ void main() {
             Payment(
               groupId: testGroup.id,
               groupName: testGroup.name,
-              currencySign: testGroup.currencySign,
+              currency: testGroup.currency,
               payerId: currentUser.uid,
               receiverId: memberUser.uid,
               value: 145,

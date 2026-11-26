@@ -122,6 +122,33 @@ describe('updateUserGroupsWhenGroupChanges', () => {
     })
   })
 
+  it('copies the group currency to the user group', async () => {
+    const groupId = 'foo'
+    const user: UserData = {
+      uid: 'user1',
+      name: 'Bob',
+    }
+    await admin.firestore().collection('users').doc(user.uid!).set(user)
+    const newGroup: Group = {
+      name: 'Foo',
+      balance: {},
+      members: [user],
+      debtThreshold: 50,
+      currencyCode: 'EUR',
+      currencySign: '€',
+    }
+    const before = { id: groupId, exists: false, data: () => undefined }
+    const after = firestore.makeDocumentSnapshot(newGroup, `groups/${groupId}`)
+    const change = { before, after } as unknown as Change<DocumentSnapshot>
+
+    await updateUserGroupsWhenGroupChanges(change)
+
+    const userGroupDocRef = await admin.firestore().doc(`users/${user.uid}/groups/${groupId}`).get()
+    const userGroup = userGroupDocRef.data() as UserGroup
+    expect(userGroup.currencyCode).toEqual('EUR')
+    expect(userGroup.currencySign).toEqual('€')
+  })
+
   it('deletes user group when a group is deleted', async () => {
     const groupId = 'foo'
     const user: UserData = {

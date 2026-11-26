@@ -4,4 +4,6 @@ export type UserGroup = {
     memberCount: number
     unmarkedExpenses?: number
     balance?: {[from: string]: {[to: string]: number }}
+    currencyCode?: string
+    currencySign?: string
 }

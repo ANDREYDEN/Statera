@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/ui/contact/contact_page.dart';
 
 import '../../helpers.dart';
 
 const currentUid = 'me';
 const contactUid = 'contact';
+final eur = Currency.fromCode('EUR');
 
 void main() {
   group('ContactPage', () {
@@ -17,6 +19,50 @@ void main() {
 
     setUp(() {
       firestore = FakeFirebaseFirestore();
+    });
+
+    group('total debt', () {
+      testWidgets('sums debt that is in a single currency', (tester) async {
+        await seedUsers(firestore);
+        await seedGroup(firestore, 'owing', owedToContact: 30);
+        await seedGroup(firestore, 'owed', owedToContact: -20);
+        await pumpContactPage(tester, firestore);
+
+        expect(find.text('\$10.00'), findsOneWidget);
+      });
+
+      testWidgets('converts debt into the most common currency', (
+        tester,
+      ) async {
+        await seedUsers(firestore);
+        await seedLatestRates(firestore, {'EUR': 0.5});
+        await seedGroup(firestore, 'eur1', owedToContact: 10, currency: eur);
+        await seedGroup(firestore, 'eur2', owedToContact: 10, currency: eur);
+        await seedGroup(firestore, 'usd', owedToContact: 10);
+        await pumpContactPage(tester, firestore);
+
+        expect(find.text('≈€25.00'), findsOneWidget);
+      });
+
+      testWidgets('converts debt into the preferred currency', (tester) async {
+        await seedUsers(firestore, preferredCurrencyCode: 'USD');
+        await seedLatestRates(firestore, {'EUR': 0.5});
+        await seedGroup(firestore, 'eur', owedToContact: 10, currency: eur);
+        await pumpContactPage(tester, firestore);
+
+        expect(find.text('≈\$20.00'), findsOneWidget);
+      });
+
+      testWidgets('shows an error when exchange rates are unavailable', (
+        tester,
+      ) async {
+        await seedUsers(firestore);
+        await seedGroup(firestore, 'eur', owedToContact: 10, currency: eur);
+        await seedGroup(firestore, 'usd', owedToContact: 10);
+        await pumpContactPage(tester, firestore);
+
+        expect(find.text('Unable to convert currencies'), findsOneWidget);
+      });
     });
 
     group('settling debt', () {
@@ -63,6 +109,30 @@ void main() {
         expect(await getBalance(firestore, groupId: 'owed'), 0);
       });
 
+      testWidgets('creates each payment in the currency of its group', (
+        tester,
+      ) async {
+        await seedUsers(firestore);
+        await seedLatestRates(firestore, {'EUR': 0.5});
+        await seedGroup(firestore, 'usd', owedToContact: 30);
+        await seedGroup(firestore, 'eur', owedToContact: 10, currency: eur);
+        await pumpContactPage(tester, firestore);
+
+        await settleDebt(tester);
+
+        final payments = await getPayments(firestore);
+        final eurPayment = payments.singleWhere(
+          (payment) => payment['groupId'] == 'eur',
+        );
+        expect(eurPayment['currencyCode'], 'EUR');
+        expect(eurPayment['value'], 10);
+        final usdPayment = payments.singleWhere(
+          (payment) => payment['groupId'] == 'usd',
+        );
+        expect(usdPayment['currencyCode'], 'USD');
+        expect(usdPayment['value'], 30);
+      });
+
       testWidgets('does not create payments when cancelled', (tester) async {
         await seedUsers(firestore);
         await seedGroup(firestore, 'owing', owedToContact: 30);
@@ -80,8 +150,15 @@ void main() {
   });
 }
 
-Future<void> seedUsers(FakeFirebaseFirestore firestore) async {
-  await firestore.collection('users').doc(currentUid).set({'name': 'Me'});
+Future<void> seedUsers(
+  FakeFirebaseFirestore firestore, {
+  String? preferredCurrencyCode,
+}) async {
+  await firestore.collection('users').doc(currentUid).set({
+    'name': 'Me',
+    if (preferredCurrencyCode != null)
+      'preferredCurrencyCode': preferredCurrencyCode,
+  });
   await firestore.collection('users').doc(contactUid).set({'name': 'Contact'});
 }
 
@@ -89,8 +166,10 @@ Future<void> seedGroup(
   FakeFirebaseFirestore firestore,
   String id, {
   required double owedToContact,
+  Currency? currency,
 }) async {
   final group = Group(
+    currency: currency,
     id: id,
     name: 'Group $id',
     adminId: currentUid,
@@ -104,6 +183,17 @@ Future<void> seedGroup(
     },
   );
   await firestore.collection('groups').doc(id).set(group.toFirestore());
+}
+
+Future<void> seedLatestRates(
+  FakeFirebaseFirestore firestore,
+  Map<String, double> rates,
+) async {
+  await firestore.collection('currencies').doc('latest').set({
+    'base': 'USD',
+    'date': '2026-11-25',
+    'rates': rates,
+  });
 }
 
 Future<void> pumpContactPage(
@@ -125,9 +215,13 @@ Future<void> pumpContactPage(
       Provider<PaymentService>(
         create: (_) => PaymentService(groupRepository, firestore),
       ),
+      Provider<CurrencyService>(create: (_) => CurrencyService(firestore)),
       Provider<ErrorService>(create: (_) => MockErrorService()),
     ],
   );
+  await tester.pumpAndSettle();
+  // let the payment list mark the loaded payments as viewed
+  await tester.pump(const Duration(seconds: 1));
   await tester.pumpAndSettle();
 }
 

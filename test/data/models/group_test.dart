@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/models.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 void main() {
   const mockUserId = '145';
@@ -288,6 +289,32 @@ void main() {
       expect(group.id, equals(id));
       expect(group.name, equals(name));
       expect(group.admin.uid, equals(adminId));
+    });
+
+    test('writes both the currency code and sign', () {
+      final group = Group.empty(members: [mockUser])
+        ..currency = Currency.fromCode('EUR');
+
+      final firestoreData = group.toFirestore();
+
+      expect(firestoreData['currencyCode'], 'EUR');
+      expect(firestoreData['currencySign'], '€');
+    });
+
+    test('infers the currency of a legacy document from its sign', () {
+      final group = Group.fromFirestore({
+        'name': 'Foo',
+        'currencySign': '£',
+      }, id: 'foo');
+
+      expect(group.currency.code, 'GBP');
+      expect(group.currencySign, '£');
+    });
+
+    test('defaults to USD when the document has no currency', () {
+      final group = Group.fromFirestore({'name': 'Foo'}, id: 'foo');
+
+      expect(group.currency, Currency.usd);
     });
   });
 }

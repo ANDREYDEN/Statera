@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/settings/clear_preferences_button.dart';
 import 'package:statera/ui/settings/delete_account_button.dart';
@@ -13,6 +15,7 @@ import 'package:statera/ui/settings/logout_button.dart';
 import 'package:statera/ui/settings/primary_color_picker.dart';
 import 'package:statera/ui/settings/profile_completion/profile_completion.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
+import 'package:statera/ui/widgets/inputs/currency_picker.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/ui/widgets/section_title.dart';
@@ -129,6 +132,14 @@ class _SettingsPageState extends State<SettingsPage>
               SizedBox(height: 40),
               SectionTitle('General'),
               PrimaryColorPicker(),
+              CurrencyPicker(
+                label: 'Preferred Currency',
+                selected: _getPreferredCurrency(user),
+                automaticLabel: 'Automatic',
+                onChanged: (currency) {
+                  _userCubit.updatePreferredCurrency(user.uid, currency?.code);
+                },
+              ),
               SizedBox(height: 40),
               DangerZone(
                 children: [
@@ -142,5 +153,10 @@ class _SettingsPageState extends State<SettingsPage>
         },
       ),
     );
+  }
+
+  Currency? _getPreferredCurrency(CustomUser user) {
+    final code = user.preferredCurrencyCode;
+    return code == null ? null : Currency.fromCode(code);
   }
 }

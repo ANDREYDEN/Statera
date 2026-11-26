@@ -25,3 +25,12 @@ class SingleCharacterTextInputFormatter extends TextInputFormatter {
   ) =>
       newValue.text.length > 1 ? oldValue : newValue;
 }
+
+class UpperCaseTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) =>
+      newValue.copyWith(text: newValue.text.toUpperCase());
+}

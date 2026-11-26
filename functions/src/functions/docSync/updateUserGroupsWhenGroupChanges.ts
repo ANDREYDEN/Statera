@@ -41,6 +41,7 @@ export async function updateUserGroupsWhenGroupChanges(
       name: newGroupData!.name,
       memberCount: newGroupData!.members.length,
       balance: newGroupData?.balance,
+      ...getCurrencyFields(newGroupData!),
     }
 
     await userGroupRef.set(newUserGroup)
@@ -59,6 +60,7 @@ export async function updateUserGroupsWhenGroupChanges(
       name: newGroupData!.name,
       memberCount: newGroupData!.members.length,
       balance: newGroupData?.balance,
+      ...getCurrencyFields(newGroupData!),
     }
 
     console.log(`Updating user group for user ${uid}`)
@@ -74,5 +76,12 @@ export async function updateUserGroupsWhenGroupChanges(
 
     await userGroupRef.delete()
     console.log(`Deleted user group for user ${uid}`)
+  }
+}
+
+function getCurrencyFields(group: Group): Partial<UserGroup> {
+  return {
+    ...(group.currencyCode && { currencyCode: group.currencyCode }),
+    ...(group.currencySign && { currencySign: group.currencySign }),
   }
 }

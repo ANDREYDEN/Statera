@@ -13,6 +13,7 @@ import 'package:statera/ui/group/members/owings_list.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
 import '../../../helpers.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 void main() {
   group('OwingsList', () {
@@ -114,7 +115,7 @@ void main() {
         Payment(
           groupId: groupId,
           groupName: 'Test Group',
-          currencySign: '\$',
+          currency: Currency.usd,
           payerId: currentUser.uid,
           receiverId: memberA.uid,
           value: 100,
@@ -123,7 +124,7 @@ void main() {
         Payment(
           groupId: groupId,
           groupName: 'Test Group',
-          currencySign: '\$',
+          currency: Currency.usd,
           payerId: currentUser.uid,
           receiverId: memberB.uid,
           value: 50,
@@ -166,7 +167,7 @@ void main() {
         Payment(
           groupId: groupId,
           groupName: 'Test Group',
-          currencySign: '\$',
+          currency: Currency.usd,
           payerId: currentUser.uid,
           receiverId: memberA.uid,
           value: 50,
@@ -175,7 +176,7 @@ void main() {
         Payment(
           groupId: groupId,
           groupName: 'Test Group',
-          currencySign: '\$',
+          currency: Currency.usd,
           payerId: currentUser.uid,
           receiverId: memberB.uid,
           value: 100,

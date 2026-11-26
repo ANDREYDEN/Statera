@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mockito/annotations.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'user_state.dart';
 
@@ -50,6 +50,13 @@ class UserCubit extends Cubit<UserState> {
   void updatePaymentInfo(String uid, String newPaymentInfo) {
     emit(UserLoading());
     _userRepository.updateUser(uid: uid, paymentInfo: newPaymentInfo);
+  }
+
+  Future<void> updatePreferredCurrency(String uid, String? currencyCode) {
+    return _userRepository.updatePreferredCurrency(
+      uid: uid,
+      currencyCode: currencyCode,
+    );
   }
 
   @override

@@ -14,6 +14,7 @@ import 'package:statera/ui/group/settings/leave_group_setting.dart';
 import 'package:statera/ui/group/settings/transfer_ownership_setting.dart';
 import 'package:statera/ui/widgets/danger_zone.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
+import 'package:statera/ui/widgets/inputs/currency_picker.dart';
 import 'package:statera/ui/widgets/inputs/setting_input.dart';
 import 'package:statera/ui/widgets/section_title.dart';
 import 'package:statera/utils/helpers.dart';
@@ -58,16 +59,15 @@ class GroupSettings extends StatelessWidget {
                   });
                 },
               ),
-              SettingInput(
-                initialValue: group.currencySign,
-                label: 'Currency Sign',
-                validators: [FieldData.requiredValidator],
-                formatters: [LengthLimitingTextInputFormatter(1)],
-                onPressed: (value) {
+              CurrencyPicker(
+                label: 'Currency',
+                selected: group.currency,
+                onChanged: (currency) {
+                  if (currency == null) return;
                   final groupCubit = context.read<GroupCubit>();
 
                   groupCubit.update((group) {
-                    group.currencySign = value;
+                    group.currency = currency;
                   });
                 },
               ),
