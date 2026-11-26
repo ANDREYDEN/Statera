@@ -61,7 +61,7 @@ class _PaymentDetailsDialogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final receiverUid = context.select<AuthBloc, String>(
+    final currentUid = context.select<AuthBloc, String>(
       (authBloc) => authBloc.uid,
     );
     final uid = context.select<AuthBloc, String>((authBloc) => authBloc.uid);
@@ -109,11 +109,11 @@ class _PaymentDetailsDialogContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${payment.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
+                    '${payment.currencySign}${((payment.isReceivedBy(currentUid) ? -1 : 1) * payment.oldPayerBalance!).toStringAsFixed(2)}',
                   ),
                   Icon(Icons.arrow_forward_rounded),
                   Text(
-                    '${payment.currencySign}${((payment.isReceivedBy(receiverUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
+                    '${payment.currencySign}${((payment.isReceivedBy(currentUid) ? -1 : 1) * (payment.oldPayerBalance! - payment.value)).toStringAsFixed(2)}',
                   ),
                 ],
               ),

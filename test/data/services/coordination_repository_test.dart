@@ -211,6 +211,7 @@ main() {
         expect(owedPayment.payerId, member.uid);
         expect(owedPayment.receiverId, admin.uid);
         expect(owedPayment.value, 20);
+        expect(owedPayment.oldPayerBalance, 20);
         expect(owedPayment.newFor, [member.uid]);
 
         for (final groupId in [testGroup.id!, otherGroup.id!]) {

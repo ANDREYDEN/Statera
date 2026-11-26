@@ -87,7 +87,7 @@ class CoordinationRepository extends Firestore {
     });
   }
 
-  /// Settles the balance between [uid] and [otherUid] in every group where balance > 0. 
+  /// Settles the balance between [uid] and [otherUid] in every group where balance > 0.
   /// Creates a payment for each.
   Future<void> settleDebt({
     required String uid,
@@ -188,7 +188,7 @@ class CoordinationRepository extends Firestore {
       payerId: payerId,
       receiverId: receiverId,
       value: balance.abs(),
-      oldPayerBalance: balance,
+      oldPayerBalance: balance.abs(),
       newFor: [otherUid],
     );
   }
