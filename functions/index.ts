@@ -6,8 +6,11 @@ import {
   onDocumentUpdated,
   onDocumentWritten,
 } from 'firebase-functions/v2/firestore'
+import { defineSecret } from 'firebase-functions/params'
 import { onCall } from 'firebase-functions/v2/https'
+import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { analyzeReceipt } from './src/functions/analyzeReceipt'
+import { updateCurrencyRates } from './src/functions/currencies/updateCurrencyRates'
 import { deleteRelatedGroupData } from './src/functions/deleteRelatedGroupData'
 import { updateUserExpenses } from './src/functions/docSync/updateUserExpenses'
 import { updateUserGroupsWhenExpenseChanges } from './src/functions/docSync/updateUserGroupsWhenExpenseChanges'
@@ -22,6 +25,8 @@ import { UserData } from './src/types/userData'
 require('firebase-functions/logger/compat')
 
 admin.initializeApp()
+
+const freeCurrencyApiKey = defineSecret('FREECURRENCYAPI_KEY')
 
 export const setTimestampOnPaymentCreation = onDocumentCreated(
   'payments/{paymentId}',
@@ -139,3 +144,14 @@ export const getLatestAppVersion = onCall(async (event) => {
 
   return latestRelease.displayVersion
 })
+
+export const updateCurrencies = onSchedule(
+  {
+    schedule: 'every day 00:00',
+    timeZone: 'UTC',
+    secrets: [freeCurrencyApiKey],
+  },
+  async () => {
+    await updateCurrencyRates(freeCurrencyApiKey.value())
+  }
+)
