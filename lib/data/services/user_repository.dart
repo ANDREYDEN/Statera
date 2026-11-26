@@ -48,6 +48,17 @@ class UserRepository extends Firestore {
     await usersCollection.doc(uid).update(newUserData);
   }
 
+  /// Sets the currency that aggregated amounts are displayed in.
+  /// A null [currencyCode] removes the preference.
+  Future<void> updatePreferredCurrency({
+    required String uid,
+    required String? currencyCode,
+  }) async {
+    await usersCollection.doc(uid).update({
+      'preferredCurrencyCode': currencyCode ?? FieldValue.delete(),
+    });
+  }
+
   Stream<CustomUser?> userStream(String? uid) {
     return usersCollection
         .doc(uid)

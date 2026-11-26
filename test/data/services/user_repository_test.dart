@@ -46,5 +46,34 @@ main() {
         expect(user.paymentInfo, 'my info');
       });
     });
+
+    group('updatePreferredCurrency', () {
+      test('sets the preferred currency', () async {
+        await userRepository.tryCreateUser(uid: 'uid', name: 'John');
+
+        await userRepository.updatePreferredCurrency(
+          uid: 'uid',
+          currencyCode: 'EUR',
+        );
+
+        final user = await userRepository.getUser('uid');
+        expect(user.preferredCurrencyCode, 'EUR');
+      });
+
+      test('removes the preferred currency', () async {
+        await firestore.collection('users').doc('uid').set({
+          'name': 'John',
+          'preferredCurrencyCode': 'EUR',
+        });
+
+        await userRepository.updatePreferredCurrency(
+          uid: 'uid',
+          currencyCode: null,
+        );
+
+        final userDoc = await firestore.collection('users').doc('uid').get();
+        expect(userDoc.data()!.containsKey('preferredCurrencyCode'), isFalse);
+      });
+    });
   });
 }

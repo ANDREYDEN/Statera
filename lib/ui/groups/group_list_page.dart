@@ -9,6 +9,7 @@ import 'package:statera/business_logic/payments/new_payments_cubit.dart';
 import 'package:statera/business_logic/user/user_cubit.dart';
 import 'package:statera/data/models/group.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/ui/contacts/contacts_list.dart';
 import 'package:statera/ui/groups/greeting.dart';
 import 'package:statera/ui/groups/group_list_body.dart';
@@ -24,7 +25,6 @@ import 'package:statera/ui/widgets/dialogs/crud_dialog/crud_dialog.dart';
 import 'package:statera/ui/widgets/dialogs/dialogs.dart';
 import 'package:statera/ui/widgets/page_scaffold.dart';
 import 'package:statera/utils/utils.dart';
-import 'package:statera/data/value_objects/currency.dart';
 
 class GroupListPage extends StatelessWidget {
   static const String name = 'GroupList';
@@ -125,7 +125,8 @@ class GroupListPage extends StatelessWidget {
     final authBloc = context.read<AuthBloc>();
     final groupsCubit = context.read<GroupsCubit>();
 
-    final newGroup = Group.empty(name: '');
+    final newGroup = Group.empty(name: '')
+      ..currency = _getPreferredCurrency(context);
 
     showDialog(
       context: context,
@@ -140,10 +141,13 @@ class GroupListPage extends StatelessWidget {
           ),
           FieldData(
             id: 'currency',
-            label: 'Currency Sign',
-            initialData: newGroup.currencySign,
-            validators: [FieldData.requiredValidator],
-            formatters: [SingleCharacterTextInputFormatter()],
+            label: 'Currency Code',
+            initialData: newGroup.currency.code,
+            validators: [FieldData.requiredValidator, _currencyCodeValidator],
+            formatters: [
+              LengthLimitingTextInputFormatter(3),
+              UpperCaseTextInputFormatter(),
+            ],
             isAdvanced: true,
           ),
           FieldData<double>(
@@ -157,12 +161,24 @@ class GroupListPage extends StatelessWidget {
         ],
         onSubmit: (values) async {
           newGroup.name = values['name']!;
-          newGroup.currency = Currency.fromSign(values['currency']);
+          newGroup.currency = Currency.fromCode(values['currency']);
           newGroup.debtThreshold = values['debt_threshold']!;
 
           groupsCubit.addGroup(newGroup, authBloc.uid);
         },
       ),
     );
+  }
+
+  Currency _getPreferredCurrency(BuildContext context) {
+    final userState = context.read<UserCubit>().state;
+    if (userState is! UserLoaded) return Currency.usd;
+
+    return Currency.fromCode(userState.user.preferredCurrencyCode);
+  }
+
+  String _currencyCodeValidator(String code) {
+    final isSupported = Currency.all.any((currency) => currency.code == code);
+    return isSupported ? '' : 'Unsupported currency';
   }
 }

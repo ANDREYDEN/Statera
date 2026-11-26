@@ -12,9 +12,9 @@ import 'package:statera/data/models/payment/payment_redirect_info.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/ui/payments/payment_list_item.dart';
 import 'package:statera/utils/preview_helpers.dart';
-import 'package:statera/data/value_objects/currency.dart';
 
 class MockUser extends Mock implements User {
   String get uid =>
