@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 
 main() {
   group('GroupRepository', () {
@@ -73,6 +74,35 @@ main() {
         );
 
         expect(updatedGroup.members.map((m) => m.uid), contains(newUser.uid));
+      });
+    });
+
+    group('addExpense', () {
+      test('stamps the group currency on the new expense', () async {
+        final firestore = FakeFirebaseFirestore();
+        final groupService = GroupRepository(firestore);
+        final admin = CustomUser.fake(uid: 'admin');
+        final groupId = await groupService.createGroup(
+          Group(
+            name: 'Foo',
+            code: 'bar',
+            adminId: admin.uid,
+            members: [admin],
+            currency: Currency.fromCode('EUR'),
+          ),
+        );
+
+        final expenseId = await groupService.addExpense(
+          groupId,
+          Expense(name: 'Lunch', authorUid: admin.uid),
+        );
+
+        final expenseDoc = await firestore
+            .collection('expenses')
+            .doc(expenseId)
+            .get();
+        expect(expenseDoc.data()!['currencyCode'], 'EUR');
+        expect(expenseDoc.data()!['currencySign'], '€');
       });
     });
   });

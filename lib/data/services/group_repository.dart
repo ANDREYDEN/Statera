@@ -87,6 +87,7 @@ class GroupRepository extends Firestore {
     final group = await getGroupById(groupId);
     expense.groupId = groupId;
     expense.settings = group.defaultExpenseSettings;
+    expense.currency = group.currency;
     final docRef = await expensesCollection.add(expense.toJson());
     return docRef.id;
   }

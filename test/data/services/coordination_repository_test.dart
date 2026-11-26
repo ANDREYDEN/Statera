@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/currency.dart';
 import 'package:statera/utils/helpers.dart';
 
 main() {
@@ -219,6 +220,34 @@ main() {
           expect(group.balance[admin.uid]![member.uid], 0);
           expect(group.balance[member.uid]![admin.uid], 0);
         }
+      });
+
+      test('creates each payment in the currency of its group', () async {
+        final euroGroup = Group(
+          id: 'euroGroupId',
+          name: 'Euro Group',
+          members: [admin, member],
+          currency: Currency.fromCode('EUR'),
+        );
+        final balance = {
+          admin.uid: {member.uid: 10.0},
+          member.uid: {admin.uid: -10.0},
+        };
+        await seedGroup(firestore, testGroup, balance: balance);
+        await seedGroup(firestore, euroGroup, balance: balance);
+
+        final coordinationRepo = CoordinationRepository(firestore);
+        await coordinationRepo.settleDebt(
+          uid: admin.uid,
+          otherUid: member.uid,
+        );
+
+        final payments = await getPayments(firestore);
+        final currencyByGroup = {
+          for (final payment in payments) payment.groupId: payment.currency,
+        };
+        expect(currencyByGroup[testGroup.id], Currency.usd);
+        expect(currencyByGroup[euroGroup.id], Currency.fromCode('EUR'));
       });
 
       test('skips groups with no debt to settle', () async {
