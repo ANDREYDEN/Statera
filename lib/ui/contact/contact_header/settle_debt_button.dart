@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:statera/data/models/models.dart';
 import 'package:statera/ui/contact/contact_header/settle_debt_dialog.dart';
 
 class SettleDebtButton extends StatelessWidget {
-  final String contactName;
+  final CustomUser contact;
   final double? totalDebt;
 
   const SettleDebtButton({
     super.key,
-    required this.contactName,
+    required this.contact,
     required this.totalDebt,
   });
 
@@ -19,7 +20,7 @@ class SettleDebtButton extends StatelessWidget {
           : () => showDialog(
               context: context,
               builder: (_) => SettleDebtDialog(
-                contactName: contactName,
+                contact: contact,
                 totalDebt: totalDebt!,
               ),
             ),

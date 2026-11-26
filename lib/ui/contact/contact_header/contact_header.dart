@@ -84,7 +84,7 @@ class _ContactHeaderContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        SettleDebtButton(contactName: contact.name, totalDebt: totalDebt),
+        SettleDebtButton(contact: contact, totalDebt: totalDebt),
       ],
     );
   }

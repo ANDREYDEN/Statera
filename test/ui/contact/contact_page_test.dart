@@ -119,6 +119,9 @@ Future<void> pumpContactPage(
     extraProviders: [
       Provider<UserRepository>(create: (_) => UserRepository(firestore)),
       Provider<GroupRepository>(create: (_) => groupRepository),
+      Provider<CoordinationRepository>(
+        create: (_) => CoordinationRepository(firestore),
+      ),
       Provider<PaymentService>(
         create: (_) => PaymentService(groupRepository, firestore),
       ),
@@ -132,6 +135,8 @@ Future<void> settleDebt(WidgetTester tester) async {
   await tester.tap(find.text('Settle Debt'));
   await tester.pumpAndSettle();
   await tester.tap(find.text('Confirm'));
+  await tester.pumpAndSettle();
+  // let the payment list mark the new payments as viewed
   await tester.pumpAndSettle();
 }
 

@@ -3,6 +3,7 @@ import 'package:mockito/annotations.dart';
 import 'package:statera/data/exceptions/not_found_exception.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
+import 'package:statera/utils/helpers.dart';
 
 @GenerateNiceMocks([MockSpec<CoordinationRepository>()])
 class CoordinationRepository extends Firestore {
@@ -86,6 +87,32 @@ class CoordinationRepository extends Firestore {
     });
   }
 
+  /// Settles the balance between [uid] and [otherUid] in every group where balance > 0. 
+  /// Creates a payment for each.
+  Future<void> settleDebt({
+    required String uid,
+    required String otherUid,
+  }) async {
+    final sharedGroupIds = await _getSharedGroupIds(uid, otherUid);
+
+    await firestore.runTransaction((transaction) async {
+      final groups = await _getGroups(transaction, sharedGroupIds);
+
+      for (final group in groups) {
+        final balance = group.balance[uid]?[otherUid];
+        final reverseBalance = group.balance[otherUid]?[uid];
+        final hasBalanceRecords = balance != null && reverseBalance != null;
+        if (!hasBalanceRecords || approxEqual(balance, 0)) continue;
+
+        final payment = _createSettlingPayment(group, uid, otherUid, balance);
+        group.payOffBalance(payment: payment);
+
+        transaction.set(groupsCollection.doc(group.id), group);
+        transaction.set(paymentsCollection.doc(), payment.toFirestore());
+      }
+    });
+  }
+
   Future<(Expense, DocumentReference)> _getExpense(
     Transaction transaction,
     String expenseId,
@@ -112,5 +139,57 @@ class CoordinationRepository extends Firestore {
     }
 
     return (group, groupDocRef);
+  }
+
+  Future<List<String>> _getSharedGroupIds(String uid, String otherUid) async {
+    // Firestore allows only one `arrayContains` per query, so the other member is checked locally.
+    final snap = await groupsCollection
+        .where('memberIds', arrayContains: uid)
+        .get();
+
+    return snap.docs
+        .where(
+          (doc) => doc.data().members.any((member) => member.uid == otherUid),
+        )
+        .map((doc) => doc.id)
+        .toList();
+  }
+
+  /// Reads the groups within the transaction, ignoring the ones that no longer exist.
+  Future<List<Group>> _getGroups(
+    Transaction transaction,
+    List<String> groupIds,
+  ) async {
+    final snaps = await Future.wait(
+      groupIds.map((id) => transaction.get(groupsCollection.doc(id))),
+    );
+
+    return snaps
+        .where((snap) => snap.exists)
+        .map((snap) => snap.data()!)
+        .toList();
+  }
+
+  /// A positive [balance] means that [uid] owes [otherUid].
+  Payment _createSettlingPayment(
+    Group group,
+    String uid,
+    String otherUid,
+    double balance,
+  ) {
+    final uidIsPayer = balance > 0;
+    final payerId = uidIsPayer ? uid : otherUid;
+    final receiverId = uidIsPayer ? otherUid : uid;
+
+    return Payment(
+      groupId: group.id,
+      groupName: group.name,
+      currencySign: group.currencySign,
+      payerId: payerId,
+      receiverId: receiverId,
+      value: balance.abs(),
+      oldPayerBalance: balance,
+      newFor: [otherUid],
+    );
   }
 }
