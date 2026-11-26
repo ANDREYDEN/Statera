@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/aggregated_debt.dart';
 import 'package:statera/ui/authentication/user_builder.dart';
 import 'package:statera/ui/contact/contact_header/settle_debt_button.dart';
 import 'package:statera/ui/contact/contact_header/total_debt_text.dart';
+import 'package:statera/ui/widgets/aggregated_debt_builder.dart';
 import 'package:statera/ui/widgets/payment_info.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
 
@@ -30,18 +32,39 @@ class ContactHeader extends StatelessWidget {
             final uid = context.watch<AuthBloc>().uid;
             final userRepository = context.read<UserRepository>();
 
-            return StreamBuilder<List<Group>>(
-              stream: userRepository.sharedGroupsStream(uid, contact.uid),
-              builder: (context, snap) {
-                final groups = snap.data;
-                final totalDebt = groups == null
-                    ? null
-                    : userRepository.getTotalDebt(groups, uid, contact.uid);
+            return StreamBuilder<CustomUser?>(
+              stream: userRepository.userStream(uid),
+              builder: (context, currentUserSnap) {
+                return StreamBuilder<List<Group>>(
+                  stream: userRepository.sharedGroupsStream(uid, contact.uid),
+                  builder: (context, groupsSnap) {
+                    final groups = groupsSnap.data;
+                    final isLoading =
+                        groups == null || !currentUserSnap.hasData;
 
-                return _ContactHeaderContent(
-                  contact: contact,
-                  contactLoading: false,
-                  totalDebt: totalDebt,
+                    return AggregatedDebtBuilder(
+                      parts: isLoading
+                          ? null
+                          : userRepository.getDebtParts(
+                              groups,
+                              uid,
+                              contact.uid,
+                            ),
+                      preferredCurrencyCode:
+                          currentUserSnap.data?.preferredCurrencyCode,
+                      errorBuilder: (context) => _ContactHeaderContent(
+                        contact: contact,
+                        contactLoading: false,
+                        totalDebt: null,
+                        conversionFailed: true,
+                      ),
+                      builder: (context, totalDebt) => _ContactHeaderContent(
+                        contact: contact,
+                        contactLoading: false,
+                        totalDebt: totalDebt,
+                      ),
+                    );
+                  },
                 );
               },
             );
@@ -55,12 +78,14 @@ class ContactHeader extends StatelessWidget {
 class _ContactHeaderContent extends StatelessWidget {
   final CustomUser contact;
   final bool contactLoading;
-  final double? totalDebt;
+  final AggregatedDebt? totalDebt;
+  final bool conversionFailed;
 
   const _ContactHeaderContent({
     required this.contact,
     required this.contactLoading,
     required this.totalDebt,
+    this.conversionFailed = false,
   });
 
   @override
@@ -76,7 +101,10 @@ class _ContactHeaderContent extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TotalDebtText(totalDebt: totalDebt),
+                  TotalDebtText(
+                    totalDebt: totalDebt,
+                    conversionFailed: conversionFailed,
+                  ),
                   PaymentInfo(user: contact),
                 ],
               ),

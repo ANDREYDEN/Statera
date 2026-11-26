@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
+import 'package:statera/data/value_objects/aggregated_debt.dart';
 import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/utils/helpers.dart';
 
 class SettleDebtDialog extends StatelessWidget {
   final CustomUser contact;
-  final double totalDebt;
+  final AggregatedDebt totalDebt;
 
   const SettleDebtDialog({
     super.key,
@@ -19,10 +20,10 @@ class SettleDebtDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final amount =
-        '${Group.kdefaultCurrencySign}${totalDebt.abs().toStringAsFixed(2)}';
-    final verb = totalDebt > 0 ? 'paid' : 'received';
-    final direction = totalDebt > 0 ? 'to' : 'from';
+    final amount = totalDebt.render(absolute: true);
+    final isOwing = totalDebt.amount > 0;
+    final verb = isOwing ? 'paid' : 'received';
+    final direction = isOwing ? 'to' : 'from';
 
     return AlertDialog(
       title: const Text('Settle Debt'),

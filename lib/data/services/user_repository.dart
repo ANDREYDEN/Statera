@@ -3,6 +3,7 @@ import 'package:mockito/annotations.dart';
 import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/firestore.dart';
+import 'package:statera/data/value_objects/aggregated_debt.dart';
 import 'package:statera/utils/utils.dart';
 
 @GenerateNiceMocks([MockSpec<UserRepository>()])
@@ -73,11 +74,17 @@ class UserRepository extends Firestore {
         .map((snap) => snap.docs.map((doc) => doc.data()).toList());
   }
 
-  double getTotalDebt(List<Group> groups, String uid1, String uid2) {
-    return groups.fold(
-      0.0,
-      (total, group) => total + group.balance[uid1]![uid2]!,
-    );
+  /// Debt that [uid1] owes [uid2] in each of the [groups], in the currency
+  /// of each group.
+  List<DebtPart> getDebtParts(List<Group> groups, String uid1, String uid2) {
+    return groups
+        .map(
+          (group) => (
+            currency: group.currency,
+            amount: group.balance[uid1]![uid2]!,
+          ),
+        )
+        .toList();
   }
 
   Future<CustomUser> getUser(String uid) async {
