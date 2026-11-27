@@ -23,7 +23,8 @@ class ContactHeader extends StatelessWidget {
           loadingWidget: _ContactHeaderContent(
             contact: CustomUser.fake(),
             contactLoading: true,
-            totalDebt: null,
+            totalDebt: 0,
+            hasBalanceToSettle: false,
           ),
           errorBuilder: (context, error) => Text(error.error.toString()),
           builder: (context, contact) {
@@ -33,15 +34,21 @@ class ContactHeader extends StatelessWidget {
             return StreamBuilder<List<Group>>(
               stream: userRepository.sharedGroupsStream(uid, contact.uid),
               builder: (context, snap) {
-                final groups = snap.data;
-                final totalDebt = groups == null
-                    ? null
-                    : userRepository.getTotalDebt(groups, uid, contact.uid);
+                final groups = snap.data ?? [];
+                final totalDebt = userRepository.getTotalDebt(
+                  groups,
+                  uid,
+                  contact.uid,
+                );
+                final hasBalanceToSettle = groups.any(
+                  (group) => group.membersHaveBalance(uid, contact.uid),
+                );
 
                 return _ContactHeaderContent(
                   contact: contact,
                   contactLoading: false,
                   totalDebt: totalDebt,
+                  hasBalanceToSettle: hasBalanceToSettle,
                 );
               },
             );
@@ -55,12 +62,14 @@ class ContactHeader extends StatelessWidget {
 class _ContactHeaderContent extends StatelessWidget {
   final CustomUser contact;
   final bool contactLoading;
-  final double? totalDebt;
+  final double totalDebt;
+  final bool hasBalanceToSettle;
 
   const _ContactHeaderContent({
     required this.contact,
     required this.contactLoading,
     required this.totalDebt,
+    required this.hasBalanceToSettle,
   });
 
   @override
@@ -76,7 +85,7 @@ class _ContactHeaderContent extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TotalDebtText(totalDebt: totalDebt),
+                  TotalDebtText(totalDebt: totalDebt, loading: contactLoading),
                   PaymentInfo(user: contact),
                 ],
               ),
@@ -84,7 +93,11 @@ class _ContactHeaderContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        SettleDebtButton(contact: contact, totalDebt: totalDebt),
+        SettleDebtButton(
+          contact: contact,
+          totalDebt: totalDebt,
+          hasBalanceToSettle: hasBalanceToSettle,
+        ),
       ],
     );
   }

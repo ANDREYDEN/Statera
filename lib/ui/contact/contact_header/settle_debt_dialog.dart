@@ -19,16 +19,9 @@ class SettleDebtDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final amount =
-        '${Group.kdefaultCurrencySign}${totalDebt.abs().toStringAsFixed(2)}';
-    final verb = totalDebt > 0 ? 'paid' : 'received';
-    final direction = totalDebt > 0 ? 'to' : 'from';
-
     return AlertDialog(
       title: const Text('Settle Debt'),
-      content: Text(
-        'Please confirm that you $verb $amount $direction ${contact.name}. This action will settle the balance across all shared groups.',
-      ),
+      content: Text(_buildConfirmationText()),
       actions: [
         CancelButton(),
         ProtectedButton(
@@ -37,6 +30,20 @@ class SettleDebtDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _buildConfirmationText() {
+    final balancesCancelOut = approxEqual(totalDebt, 0);
+    if (balancesCancelOut) {
+      return 'No payment is needed. This action settle the balance across all shared groups.';
+    }
+
+    final amount =
+        '${Group.kdefaultCurrencySign}${totalDebt.abs().toStringAsFixed(2)}';
+    final verb = totalDebt > 0 ? 'paid' : 'received';
+    final direction = totalDebt > 0 ? 'to' : 'from';
+
+    return 'Please confirm that you $verb $amount $direction ${contact.name}. This action will settle the balance across all shared groups.';
   }
 
   Future<void> _settleDebt(BuildContext context) async {
