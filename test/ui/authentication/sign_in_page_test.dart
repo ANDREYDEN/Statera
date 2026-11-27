@@ -108,8 +108,7 @@ void main() {
 
       final userDoc = await userRepository.usersCollection.doc(uid).get();
       expect(userDoc.exists, isTrue);
-      final userData = userDoc.data() as Map<String, dynamic>?;
-      expect(userData?['name'], authDisplayName);
+      expect(userDoc.data()?.name, authDisplayName);
 
       verify(authService.signUp(any, any)).called(1);
     });
@@ -127,8 +126,7 @@ void main() {
 
         final userDoc = await userRepository.usersCollection.doc(uid).get();
         expect(userDoc.exists, isTrue);
-        final userData = userDoc.data() as Map<String, dynamic>?;
-        expect(userData?['name'], authDisplayName);
+        expect(userDoc.data()?.name, authDisplayName);
 
         verify(authService.signInWithGoogle()).called(1);
       });
@@ -149,8 +147,7 @@ void main() {
 
         final userDoc = await userRepository.usersCollection.doc(uid).get();
         expect(userDoc.exists, isTrue);
-        final userData = userDoc.data() as Map<String, dynamic>?;
-        expect(userData?['name'], existingName);
+        expect(userDoc.data()?.name, existingName);
 
         verify(authService.signInWithGoogle()).called(1);
       });

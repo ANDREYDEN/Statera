@@ -144,6 +144,10 @@ class Group {
     );
   }
 
+  bool membersHaveBalance(String uid1, String uid2) {
+    return !approxEqual(balance[uid1]![uid2]!, 0);
+  }
+
   void payOffBalance({required Payment payment}) {
     if (this.members.every((member) => member.uid != payment.payerId)) {
       throw new Exception(
@@ -261,7 +265,7 @@ class Group {
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
-      'members': members.map((x) => x.toFirestore()).toList(),
+      'members': members.map((x) => x.toFirestore(includeUid: true)).toList(),
       'code': code,
       'memberIds': members.map((x) => x.uid).toList(),
       'adminId': admin.uid,

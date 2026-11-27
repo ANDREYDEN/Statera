@@ -160,5 +160,119 @@ main() {
         );
       });
     });
+
+    group('settleDebt', () {
+      test('settles every shared group with a non-zero balance', () async {
+        final otherGroup = Group(
+          id: 'otherGroupId',
+          name: 'Other Group',
+          members: [admin, member],
+        );
+        await seedGroup(
+          firestore,
+          testGroup,
+          balance: {
+            admin.uid: {member.uid: 30},
+            member.uid: {admin.uid: -30},
+          },
+        );
+        await seedGroup(
+          firestore,
+          otherGroup,
+          balance: {
+            admin.uid: {member.uid: -20},
+            member.uid: {admin.uid: 20},
+          },
+        );
+
+        final coordinationRepo = CoordinationRepository(firestore);
+        await coordinationRepo.settleDebt(
+          uid: admin.uid,
+          otherUid: member.uid,
+        );
+
+        final payments = await getPayments(firestore);
+        expect(payments, hasLength(2));
+
+        final owingPayment = payments.singleWhere(
+          (payment) => payment.groupId == testGroup.id,
+        );
+        expect(owingPayment.groupName, testGroup.name);
+        expect(owingPayment.payerId, admin.uid);
+        expect(owingPayment.receiverId, member.uid);
+        expect(owingPayment.value, 30);
+        expect(owingPayment.oldPayerBalance, 30);
+        expect(owingPayment.newFor, [member.uid]);
+
+        final owedPayment = payments.singleWhere(
+          (payment) => payment.groupId == otherGroup.id,
+        );
+        expect(owedPayment.groupName, otherGroup.name);
+        expect(owedPayment.payerId, member.uid);
+        expect(owedPayment.receiverId, admin.uid);
+        expect(owedPayment.value, 20);
+        expect(owedPayment.oldPayerBalance, 20);
+        expect(owedPayment.newFor, [member.uid]);
+
+        for (final groupId in [testGroup.id!, otherGroup.id!]) {
+          final group = await getGroup(firestore, groupId);
+          expect(group.balance[admin.uid]![member.uid], 0);
+          expect(group.balance[member.uid]![admin.uid], 0);
+        }
+      });
+
+      test('skips groups with no debt to settle', () async {
+        final noBalanceGroup = Group(
+          id: 'noBalanceGroupId',
+          name: 'No Balance Group',
+          members: [admin, member],
+        );
+        final stranger = CustomUser.fake(uid: 'stranger');
+        final unsharedGroup = Group(
+          id: 'unsharedGroupId',
+          name: 'Unshared Group',
+          members: [admin, stranger],
+        );
+        await seedGroup(firestore, testGroup, balance: testGroup.balance);
+        await seedGroup(firestore, noBalanceGroup, balance: {});
+        await seedGroup(
+          firestore,
+          unsharedGroup,
+          balance: {
+            admin.uid: {stranger.uid: 30, member.uid: 30},
+            stranger.uid: {admin.uid: -30},
+          },
+        );
+
+        final coordinationRepo = CoordinationRepository(firestore);
+        await coordinationRepo.settleDebt(
+          uid: admin.uid,
+          otherUid: member.uid,
+        );
+
+        expect(await getPayments(firestore), isEmpty);
+        final group = await getGroup(firestore, unsharedGroup.id!);
+        expect(group.balance[admin.uid]![stranger.uid], 30);
+      });
+    });
   });
+}
+
+Future<void> seedGroup(
+  FakeFirebaseFirestore firestore,
+  Group group, {
+  required Map<String, Map<String, double>> balance,
+}) async {
+  group.balance = balance;
+  await firestore.collection('groups').doc(group.id).set(group.toFirestore());
+}
+
+Future<List<Payment>> getPayments(FakeFirebaseFirestore firestore) async {
+  final snap = await firestore.collection('payments').get();
+  return snap.docs.map(Payment.fromFirestore).toList();
+}
+
+Future<Group> getGroup(FakeFirebaseFirestore firestore, String id) async {
+  final doc = await firestore.collection('groups').doc(id).get();
+  return Group.fromSnapshot(doc);
 }

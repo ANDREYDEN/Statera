@@ -3,24 +3,25 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:statera/business_logic/auth/auth_bloc.dart';
 import 'package:statera/data/models/models.dart';
-import 'package:statera/ui/group/group_builder.dart';
 import 'package:statera/ui/payments/payment_details_dialog.dart';
 import 'package:statera/utils/utils.dart';
 
 class PaymentListItem extends StatelessWidget {
   final Payment payment;
+  final bool withGroupName;
 
   const PaymentListItem({
     Key? key,
     required this.payment,
+    this.withGroupName = false,
   }) : super(key: key);
 
-  void _handleTap(BuildContext context, Group group) {
+  void _handleTap(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => BlocProvider<AuthBloc>.value(
         value: context.read<AuthBloc>(),
-        child: PaymentDetailsDialog(payment: payment, group: group),
+        child: PaymentDetailsDialog(payment: payment),
       ),
     );
   }
@@ -38,53 +39,78 @@ class PaymentListItem extends StatelessWidget {
 
     Color paymentColor = payment.isReceivedBy(uid) ? Colors.red : Colors.green;
 
-    return GroupBuilder(
-      builder: (context, group) {
-        final paymentItem = ListTile(
-          isThreeLine: payment.hasRelatedExpense || payment.hasReason,
-          leading: Icon(
-            _getIcon(),
-            color: payment.isAdmin
-                ? Colors.red
-                : Theme.of(context).colorScheme.secondary,
-            size: 30,
-          ),
-          title: Text(
-            "${group.currencySign}${payment.isReceivedBy(uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
-            style: TextStyle(color: paymentColor),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+    final paymentItem = ListTile(
+      isThreeLine:
+          withGroupName || payment.hasRelatedExpense || payment.hasReason,
+      leading: Icon(
+        _getIcon(),
+        color: payment.isAdmin
+            ? Colors.red
+            : Theme.of(context).colorScheme.secondary,
+        size: 30,
+      ),
+      title: Text(
+        "${payment.currencySign}${payment.isReceivedBy(uid) ? '+' : '-'}${payment.value.toStringAsFixed(2)}",
+        style: TextStyle(color: paymentColor),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (withGroupName)
+            _PaymentInfoRow(icon: Icons.group, text: payment.groupName),
+          _PaymentInfoRow(
+            icon: Icons.schedule_rounded,
+            text:
                 toStringDateTime(payment.timeCreated) ??
-                    'Some time in the past',
-              ),
-              if (payment.hasRelatedExpense) Text(payment.relatedExpense!.name),
-              if (payment.hasReason) Text(payment.reason!),
-            ],
+                'Some time in the past',
           ),
-          trailing: Icon(
-            payment.isReceivedBy(uid)
-                ? Icons.arrow_upward_rounded
-                : Icons.arrow_downward_rounded,
-            color: paymentColor,
-            size: 30,
-          ),
-          onTap: () => _handleTap(context, group),
-        );
+          if (payment.hasRelatedExpense)
+            _PaymentInfoRow(
+              icon: Icons.receipt_long,
+              text: payment.relatedExpense!.name,
+            ),
+          if (payment.hasReason)
+            _PaymentInfoRow(icon: Icons.info_outline, text: payment.reason!),
+        ],
+      ),
+      trailing: Icon(
+        payment.isReceivedBy(uid)
+            ? Icons.arrow_upward_rounded
+            : Icons.arrow_downward_rounded,
+        color: paymentColor,
+        size: 30,
+      ),
+      onTap: () => _handleTap(context),
+    );
 
-        if (payment.newFor.contains(uid)) {
-          return paymentItem.animate().slideX(
-                duration: Duration(milliseconds: 1000),
-                curve: Curves.easeOutExpo,
-                begin: 1,
-                end: 0,
-              );
-        }
+    if (payment.newFor.contains(uid)) {
+      return paymentItem.animate().slideX(
+        duration: Duration(milliseconds: 1000),
+        curve: Curves.easeOutExpo,
+        begin: 1,
+        end: 0,
+      );
+    }
 
-        return paymentItem;
-      },
+    return paymentItem;
+  }
+}
+
+class _PaymentInfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _PaymentInfoRow({super.key, required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14),
+        const SizedBox(width: 4),
+        Text(text, style: Theme.of(context).textTheme.labelMedium),
+      ],
     );
   }
 }

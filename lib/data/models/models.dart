@@ -1,5 +1,6 @@
 export 'assignee.dart';
 export 'assignee_decision.dart';
+export 'contact.dart';
 export 'custom_user.dart';
 export 'expense.dart';
 export 'group.dart';

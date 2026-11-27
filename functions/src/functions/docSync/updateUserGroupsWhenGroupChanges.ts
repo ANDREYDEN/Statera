@@ -4,10 +4,13 @@ import { DocumentSnapshot } from 'firebase-functions/v1/firestore'
 import { Group } from '../../types/group'
 import { UserGroup } from '../../types/userGroup'
 
-export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSnapshot>) {
-  const oldGroupData = change.before.data() as (Group | undefined)
-  const newGroupData = change.after.data() as (Group | undefined)
+export async function updateUserGroupsWhenGroupChanges(
+  change: Change<DocumentSnapshot>
+) {
+  const oldGroupData = change.before.data() as Group | undefined
+  const newGroupData = change.after.data() as Group | undefined
   const groupId = change.after.id
+  console.log(`Processing update of group ${groupId}`)
 
   const oldMemberUids = (oldGroupData?.members ?? [])
     .map((member) => member.uid)
@@ -16,9 +19,15 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
     .map((member) => member.uid)
     .filter((uid) => !!uid)
 
-  const addedMemberUids = newMemberUids.filter((newUid) => !oldMemberUids.includes(newUid))
-  const updatedMemberUids = newMemberUids.filter((newUid) => oldMemberUids.includes(newUid))
-  const deletedMemberUids = oldMemberUids.filter((oldUid) => !newMemberUids.includes(oldUid))
+  const addedMemberUids = newMemberUids.filter(
+    (newUid) => !oldMemberUids.includes(newUid)
+  )
+  const updatedMemberUids = newMemberUids.filter((newUid) =>
+    oldMemberUids.includes(newUid)
+  )
+  const deletedMemberUids = oldMemberUids.filter(
+    (oldUid) => !newMemberUids.includes(oldUid)
+  )
 
   for (const uid of addedMemberUids) {
     const userGroupRef = firestore()
@@ -35,6 +44,7 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
     }
 
     await userGroupRef.set(newUserGroup)
+    console.log(`Added user group to user ${uid}`)
   }
 
   for (const uid of updatedMemberUids) {
@@ -51,6 +61,7 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
       balance: newGroupData?.balance,
     }
 
+    console.log(`Updating user group for user ${uid}`)
     await userGroupRef.update(newUserGroup)
   }
 
@@ -62,5 +73,6 @@ export async function updateUserGroupsWhenGroupChanges(change: Change<DocumentSn
       .doc(groupId)
 
     await userGroupRef.delete()
+    console.log(`Deleted user group for user ${uid}`)
   }
 }

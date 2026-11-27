@@ -5,6 +5,41 @@ import 'package:statera/data/services/services.dart';
 
 main() {
   group('GroupRepository', () {
+    group('createGroup and saveGroup', () {
+      test('creates a group that can be read back', () async {
+        final groupService = GroupRepository(FakeFirebaseFirestore());
+        final admin = CustomUser.fake(uid: 'admin');
+        final newGroup = Group(
+          name: 'Foo',
+          code: 'bar',
+          adminId: admin.uid,
+          members: [admin],
+        );
+
+        final id = await groupService.createGroup(newGroup);
+
+        final group = await groupService.getGroupById(id);
+        expect(group.id, id);
+        expect(group.name, 'Foo');
+        expect(group.members.map((m) => m.uid), ['admin']);
+      });
+
+      test('saves changes to an existing group', () async {
+        final groupService = GroupRepository(FakeFirebaseFirestore());
+        final admin = CustomUser.fake(uid: 'admin');
+        final id = await groupService.createGroup(
+          Group(name: 'Foo', code: 'bar', adminId: admin.uid, members: [admin]),
+        );
+        final group = await groupService.getGroupById(id);
+
+        group.name = 'Renamed';
+        await groupService.saveGroup(group);
+
+        final savedGroup = await groupService.getGroupById(id);
+        expect(savedGroup.name, 'Renamed');
+      });
+    });
+
     group('addMember', () {
       test('adds a new member to group', () async {
         // arrange

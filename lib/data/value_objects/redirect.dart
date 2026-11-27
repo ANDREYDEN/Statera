@@ -45,6 +45,8 @@ class Redirect {
 
     payments.add(Payment.fromRedirect(
       groupId: group.id!,
+      groupName: group.name,
+      currencySign: group.currencySign,
       authorId: authorUid,
       payerId: owerUid,
       receiverId: authorUid,
@@ -53,6 +55,8 @@ class Redirect {
     ));
     payments.add(Payment.fromRedirect(
       groupId: group.id!,
+      groupName: group.name,
+      currencySign: group.currencySign,
       authorId: authorUid,
       payerId: authorUid,
       receiverId: receiverUid,
@@ -61,6 +65,8 @@ class Redirect {
     ));
     payments.add(Payment.fromRedirect(
       groupId: group.id!,
+      groupName: group.name,
+      currencySign: group.currencySign,
       authorId: authorUid,
       payerId: receiverUid,
       receiverId: owerUid,
