@@ -9,6 +9,7 @@ import 'package:statera/business_logic/layout/layout_state.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/auth_service.mocks.dart';
 import 'package:statera/data/services/contact_repository.mocks.dart';
+import 'package:statera/data/services/error_service_mock.dart';
 import 'package:statera/data/services/group_repository.mocks.dart';
 import 'package:statera/data/services/services.dart';
 import 'package:statera/data/services/user_group_repository.mocks.dart';
@@ -105,6 +106,33 @@ void main() {
     );
 
     testWidgets(
+      'keeps the dialog open and shows an error when adding fails',
+      (tester) async {
+        when(
+          contactRepository.addContact(currentUid, alice.uid),
+        ).thenThrow(Exception('network error'));
+
+        await pumpAddContactDialog(
+          tester,
+          authService: authService,
+          groupRepository: groupRepository,
+          userGroupRepository: userGroupRepository,
+          contactRepository: contactRepository,
+        );
+
+        await tester.tap(find.text('Group One'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(alice.name));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Add'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Failed to add contact'), findsOneWidget);
+        expect(find.text('Add Contacts'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'shows a message when all group members are already contacts',
       (tester) async {
         await pumpAddContactDialog(
@@ -142,12 +170,15 @@ Future<void> pumpAddContactDialog(
         Provider<GroupRepository>.value(value: groupRepository),
         Provider<UserGroupRepository>.value(value: userGroupRepository),
         Provider<ContactRepository>.value(value: contactRepository),
+        Provider<ErrorService>(create: (_) => MockErrorService()),
       ],
       child: MaterialApp(
-        home: Builder(
-          builder: (context) => ElevatedButton(
-            onPressed: () => AddContactDialog.show(context),
-            child: const Text('open'),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () => AddContactDialog.show(context),
+              child: const Text('open'),
+            ),
           ),
         ),
       ),

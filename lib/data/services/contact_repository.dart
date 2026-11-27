@@ -1,5 +1,5 @@
 import 'package:mockito/annotations.dart';
-import 'package:statera/data/exceptions/not_found_exception.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/contact.dart';
 import 'package:statera/data/services/services.dart';
 
@@ -19,11 +19,12 @@ class ContactRepository extends Firestore {
         .doc(newContactUid)
         .get();
     final contactExists = existingContactDocSnap.exists;
-    if (contactExists) return;
+    if (contactExists) throw ConflictException('Contact already exists');
 
     final userDocSnap = await usersCollection.doc(newContactUid).get();
-    if (!userDocSnap.exists)
-      throw new EntityNotFoundException(newContactUid, name: 'User');
+    if (!userDocSnap.exists) {
+      throw EntityNotFoundException(newContactUid, name: 'User');
+    }
 
     final newContactUser = userDocSnap.data()!;
     await contactsCollection

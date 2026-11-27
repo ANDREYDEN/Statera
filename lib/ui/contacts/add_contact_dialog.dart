@@ -7,6 +7,7 @@ import 'package:statera/ui/widgets/buttons/cancel_button.dart';
 import 'package:statera/ui/widgets/buttons/protected_button.dart';
 import 'package:statera/ui/widgets/dialogs/dialog_width.dart';
 import 'package:statera/ui/widgets/user_avatar.dart';
+import 'package:statera/utils/helpers.dart';
 
 class AddContactDialog extends StatefulWidget {
   const AddContactDialog({super.key});
@@ -46,15 +47,24 @@ class _AddContactDialogState extends State<AddContactDialog> {
 
   Future<void> _handleSubmit() async {
     final contactRepository = context.read<ContactRepository>();
+    final navigator = Navigator.of(context);
+    final isPlural = _selectedMemberUids.length > 1;
 
-    await Future.wait(
-      _selectedMemberUids.map(
-        (memberUid) => contactRepository.addContact(_uid, memberUid),
+    final succeeded = await snackbarCatch(
+      context,
+      () => Future.wait(
+        _selectedMemberUids.map(
+          (memberUid) => contactRepository.addContact(_uid, memberUid),
+        ),
       ),
+      successMessage: isPlural
+          ? 'Contacts added successfully'
+          : 'Contact added successfully',
+      errorMessage: isPlural ? 'Failed to add contacts' : 'Failed to add contact',
     );
 
-    if (!mounted) return;
-    Navigator.pop(context);
+    if (!succeeded || !mounted) return;
+    navigator.pop();
   }
 
   @override

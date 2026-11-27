@@ -1,5 +1,6 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:statera/data/exceptions/exceptions.dart';
 import 'package:statera/data/models/models.dart';
 import 'package:statera/data/services/services.dart';
 
@@ -29,22 +30,56 @@ main() {
       expect(contacts.first.name, friend.name);
     });
 
-    test('does not duplicate a contact that already exists', () async {
+    test(
+      'throws a ConflictException and does not duplicate an existing contact',
+      () async {
+        final firestore = FakeFirebaseFirestore();
+        final friend = CustomUser.fake(uid: 'friend', name: 'Friend');
+
+        await firestore
+            .collection('users')
+            .doc(friend.uid)
+            .set(friend.toFirestore());
+
+        final contactRepository = ContactRepository(firestore);
+
+        await contactRepository.addContact(uid, friend.uid);
+        await expectLater(
+          contactRepository.addContact(uid, friend.uid),
+          throwsA(isA<ConflictException>()),
+        );
+
+        final contacts = await contactRepository.listenForContacts(uid).first;
+        expect(contacts, hasLength(1));
+      },
+    );
+
+    test('throws an EntityNotFoundException when the user does not exist', () {
+      final contactRepository = ContactRepository(FakeFirebaseFirestore());
+
+      expect(
+        contactRepository.addContact(uid, 'missing'),
+        throwsA(isA<EntityNotFoundException>()),
+      );
+    });
+
+    test('stores the contact uid in the contact document', () async {
       final firestore = FakeFirebaseFirestore();
       final friend = CustomUser.fake(uid: 'friend', name: 'Friend');
-
       await firestore
           .collection('users')
           .doc(friend.uid)
           .set(friend.toFirestore());
 
-      final contactRepository = ContactRepository(firestore);
+      await ContactRepository(firestore).addContact(uid, friend.uid);
 
-      await contactRepository.addContact(uid, friend.uid);
-      await contactRepository.addContact(uid, friend.uid);
-
-      final contacts = await contactRepository.listenForContacts(uid).first;
-      expect(contacts, hasLength(1));
+      final contactDoc = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('contacts')
+          .doc(friend.uid)
+          .get();
+      expect(contactDoc.data()?['uid'], friend.uid);
     });
   });
 }

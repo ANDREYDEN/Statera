@@ -144,6 +144,10 @@ class Group {
     );
   }
 
+  bool membersHaveBalance(String uid1, String uid2) {
+    return !approxEqual(balance[uid1]![uid2]!, 0);
+  }
+
   void payOffBalance({required Payment payment}) {
     if (this.members.every((member) => member.uid != payment.payerId)) {
       throw new Exception(

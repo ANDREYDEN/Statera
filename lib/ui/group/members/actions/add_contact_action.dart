@@ -28,8 +28,8 @@ class AddContactAction extends MemberAction {
     await snackbarCatch(context, () async {
       try {
         await contactRepository.addContact(authBloc.uid, user.uid);
-      } on EntityNotFoundException catch (_) {
-        throw Exception('Contact already exists');
+      } on ConflictException {
+        rethrow;
       } catch (e) {
         final errorMessage = 'Failed to add contact';
         await errorService.recordError(e, reason: errorMessage);
